@@ -61,11 +61,19 @@ class Form implements FormInterface
 
         $field = $this->fields[$name];
         $value = $this->values[$name] ?? null;
-        $label = Tag::label($field['options']['label'], ['for' => $name]);
-        $fieldElement = $this->renderFieldElement($name, $field, $value);
-
-        // Example of a simple, default field wrapper using Tag
-        return Tag::div([$label, $fieldElement], ['class' => 'form-group']);
+        
+        // Use Tag builder for elements
+        $labelHtml = Tag::label($field['options']['label'], ['for' => $name]);
+        $fieldHtml = $this->renderFieldElement($name, $field, $value);
+        
+        // Use string replacement for the template
+        $fieldTemplate = $this->getFieldTemplate();
+        
+        return str_replace(
+            ['{label}', '{field}'],
+            [$labelHtml, $fieldHtml],
+            $fieldTemplate
+        );
     }
 
     protected function renderFieldElement(string $name, array $field, $value)
@@ -173,14 +181,33 @@ class Form implements FormInterface
 
     protected function wrapForm(string $content): string
     {
-        // Default form wrapper using Tag
-        return Tag::form([
-            $content,
-            Tag::div(
-                Tag::button('Submit', ['type' => 'submit']),
-                ['class' => 'form-group']
-            )
-        ], ['method' => 'post']);
+        $formTemplate = $this->getFormTemplate();
+
+        // Use string replacement for the main form template
+        return str_replace('{fields}', $content, $formTemplate);
+    }
+
+    protected function getFormTemplate(): string
+    {
+        if ($this->template === 'default') {
+            // Default template using Tag builder
+            return Tag::form(
+                '{fields}' . Tag::div(Tag::button('Submit', ['type' => 'submit']), ['class' => 'form-group']),
+                ['method' => 'post']
+            );
+        }
+        // In a real scenario, you might load this from a file
+        return $this->template;
+    }
+
+    protected function getFieldTemplate(): string
+    {
+        if ($this->fieldTemplate === 'default') {
+            // Default template using Tag builder
+            return Tag::div('{label}{field}', ['class' => 'form-group']);
+        }
+        // In a real scenario, you might load this from a file
+        return $this->fieldTemplate;
     }
 
     // --- Template methods remain unchanged ---
@@ -224,4 +251,4 @@ $form->setValues(['username' => 'johndoe', 'country' => 'ca', 'subscribe' => tru
 echo $form->render();
 
 
-*/  
+*/
