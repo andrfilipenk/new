@@ -5,13 +5,18 @@ class Tag {
 
     private $tag;
     private $attributes = [];
-    private $content = '';
+    private $content = [];
     private $selfClosing = false;
 
-    public function __construct($tag, $selfClosing = false) 
+    private static $selfClosingTags = [
+        'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 
+        'link', 'meta', 'param', 'source', 'track', 'wbr'
+    ];
+
+    public function __construct($tag) 
     {
         $this->tag = $tag;
-        $this->selfClosing = $selfClosing;
+        $this->selfClosing = in_array($tag, self::$selfClosingTags);
     }
 
     public function attr($name, $value) 
@@ -20,9 +25,9 @@ class Tag {
         return $this;
     }
 
-    public function content($content) 
+    public function content(...$content) 
     {
-        $this->content = $content;
+        $this->content = array_merge($this->content, $content);
         return $this;
     }
 
@@ -30,18 +35,24 @@ class Tag {
     {
         $html = '<' . $this->tag;
         
-        // Add attributes
         foreach ($this->attributes as $name => $value) {
-            $value = htmlspecialchars($value, ENT_QUOTES);
-            $html .= sprintf(" %s=\"%s\"", $name, $value);
+            if ($value === true) {
+                $html .= ' ' . $name;
+            } else if ($value !== false && $value !== null) {
+                $value = htmlspecialchars((string)$value, ENT_QUOTES);
+                $html .= sprintf(" %s=\"%s\"", $name, $value);
+            }
         }
         
-        // Self-closing tag or content
         if ($this->selfClosing) {
-            $html .= ' />';
-        } else {
-            $html .= '>' . $this->content . '</' . $this->tag . '>';
+            return $html . ' />';
         }
+        
+        $html .= '>';
+        foreach ($this->content as $item) {
+            $html .= (string)$item;
+        }
+        $html .= '</' . $this->tag . '>';
         
         return $html;
     }
@@ -51,38 +62,49 @@ class Tag {
         return $this->render();
     }
 
-    // Quick static creators for common elements
-    public static function div($content = '', $attributes = []) 
+    public static function __callStatic($name, $arguments)
     {
-        $el = new self('div');
-        $el->content($content);
-        foreach ($attributes as $k => $v) $el->attr($k, $v);
-        return $el;
-    }
+        $el = new self($name);
+        
+        // First argument can be content
+        if (isset($arguments[0]) && (is_string($arguments[0]) || is_array($arguments[0]) || $arguments[0] instanceof self)) {
+            $el->content(...(is_array($arguments[0]) ? $arguments[0] : [$arguments[0]]));
+        }
 
-    public static function label($label, $attributes = []) 
-    {
-        $el = new self('label');
-        $el->content($label);
-        foreach ($attributes as $k => $v) $el->attr($k, $v);
-        return $el;
-    }
+        // Second argument can be attributes
+        $attributes = $arguments[1] ?? ($arguments[0] ?? []);
+        if (is_array($attributes)) {
+            foreach ($attributes as $k => $v) {
+                $el->attr($k, $v);
+            }
+        }
 
-    public static function input($attributes = []) 
-    {
-        $el = new self('input', true);
-        foreach ($attributes as $k => $v) $el->attr($k, $v);
         return $el;
     }
 }
 
-
 /*
+// --- NEW USAGE EXAMPLES ---
 
+// Simple tag with content and attributes
 echo Tag::div('Hello World', ['class' => 'text-bold']);
 // Output: <div class="text-bold">Hello World</div>
 
-echo Tag::input(['type' => 'text', 'name' => 'username']);
-// Output: <input type="text" name="username" />
+// Any self-closing tag is automatically handled
+echo Tag::input(['type' => 'text', 'name' => 'username', 'required' => true]);
+// Output: <input type="text" name="username" required />
 
- */
+// Create any tag dynamically
+echo Tag::span('I am a span', ['id' => 'my-span']);
+// Output: <span id="my-span">I am a span</span>
+
+// Nesting tags
+echo Tag::div([
+    Tag::h1('Title'),
+    Tag::p('This is a paragraph with a ' . Tag::strong('bold') . ' word.'),
+    Tag::br(),
+    Tag::input(['type' => 'submit', 'value' => 'Go'])
+], ['class' => 'container']);
+// Output: <div class="container"><h1>Title</h1><p>This is a paragraph with a <strong>bold</strong> word.</p><br /><input type="submit" value="Go" /></div>
+
+*/

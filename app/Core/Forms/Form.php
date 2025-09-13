@@ -45,13 +45,12 @@ class Form implements FormInterface
 
     public function render(): string
     {
-        $output = '';
-        
-        foreach ($this->fields as $name => $field) {
-            $output .= $this->renderField($name);
+        $fieldsHtml = '';
+        foreach (array_keys($this->fields) as $name) {
+            $fieldsHtml .= $this->renderField($name);
         }
         
-        return $this->wrapForm($output);
+        return $this->wrapForm($fieldsHtml);
     }
 
     public function renderField(string $name): string
@@ -61,21 +60,130 @@ class Form implements FormInterface
         }
 
         $field = $this->fields[$name];
-        $value = $this->values[$name] ?? '';
+        $value = $this->values[$name] ?? null;
+        $label = Tag::label($field['options']['label'], ['for' => $name]);
+        $fieldElement = $this->renderFieldElement($name, $field, $value);
+
+        // Example of a simple, default field wrapper using Tag
+        return Tag::div([$label, $fieldElement], ['class' => 'form-group']);
+    }
+
+    protected function renderFieldElement(string $name, array $field, $value)
+    {
+        $type = $field['type'];
+        $method = 'render' . ucfirst($type) . 'Field';
+
+        if (method_exists($this, $method)) {
+            return $this->{$method}($name, $field, $value);
+        }
+
+        // Fallback for simple input types
+        return $this->renderInputField($name, $field, $value);
+    }
+
+    protected function buildAttributes(string $name, array $field, $value): array
+    {
+        $attributes = $field['options']['attributes'];
+        $attributes['name'] = $name;
+        $attributes['id'] = $attributes['id'] ?? $name;
+
+        if ($field['options']['required']) {
+            $attributes['required'] = true;
+        }
+
+        return $attributes;
+    }
+
+    protected function renderInputField(string $name, array $field, $value)
+    {
+        $attributes = $this->buildAttributes($name, $field, $value);
+        $type = $field['type'];
+
+        $attributes['type'] = ($type === 'datetime') ? 'datetime-local' : $type;
         
-        // Try custom field template first
-        $fieldTemplate = $this->templatesPath . 'fields/' . $this->fieldTemplate . '.phtml';
-        if (file_exists($fieldTemplate)) {
-            return $this->renderTemplate($fieldTemplate, [
-                'field' => $field,
-                'name' => $name,
-                'value' => $value
-            ]);
+        if ($value instanceof \DateTimeInterface) {
+            if ($type === 'datetime') $value = $value->format('Y-m-d\TH:i');
+            elseif ($type === 'date') $value = $value->format('Y-m-d');
+            elseif ($type === 'time') $value = $value->format('H:i');
         }
         
-        // Fall back to built-in rendering
-        return $this->renderFieldHtml($name, $field, $value);
+        $attributes['value'] = $value;
+
+        return Tag::input($attributes);
     }
+
+    protected function renderTextareaField(string $name, array $field, $value)
+    {
+        $attributes = $this->buildAttributes($name, $field, $value);
+        return Tag::textarea((string) $value, $attributes);
+    }
+
+    protected function renderSelectField(string $name, array $field, $value)
+    {
+        $attributes = $this->buildAttributes($name, $field, $value);
+        $optionsHtml = [];
+
+        foreach ($field['options']['options'] as $optValue => $optLabel) {
+            $optionAttrs = ['value' => $optValue];
+            if ((string)$optValue === (string)$value) {
+                $optionAttrs['selected'] = true;
+            }
+            $optionsHtml[] = Tag::option($optLabel, $optionAttrs);
+        }
+
+        return Tag::select($optionsHtml, $attributes);
+    }
+
+    protected function renderCheckboxField(string $name, array $field, $value)
+    {
+        $attributes = $this->buildAttributes($name, $field, $value);
+        $attributes['type'] = 'checkbox';
+        $attributes['value'] = $attributes['value'] ?? '1';
+
+        if ($value) {
+            $attributes['checked'] = true;
+        }
+
+        return Tag::input($attributes);
+    }
+
+    protected function renderRadioField(string $name, array $field, $value)
+    {
+        $attributes = $this->buildAttributes($name, $field, $value);
+        $attributes['type'] = 'radio';
+        $radiosHtml = [];
+
+        foreach ($field['options']['options'] as $optValue => $optLabel) {
+            $radioAttrs = $attributes;
+            $radioAttrs['value'] = $optValue;
+            $radioAttrs['id'] .= '_' . $optValue;
+
+            if ((string)$optValue === (string)$value) {
+                $radioAttrs['checked'] = true;
+            }
+            
+            $radiosHtml[] = Tag::label([
+                Tag::input($radioAttrs),
+                ' ' . $optLabel
+            ], ['for' => $radioAttrs['id'], 'class' => 'radio-inline']);
+        }
+
+        return implode('', $radiosHtml);
+    }
+
+    protected function wrapForm(string $content): string
+    {
+        // Default form wrapper using Tag
+        return Tag::form([
+            $content,
+            Tag::div(
+                Tag::button('Submit', ['type' => 'submit']),
+                ['class' => 'form-group']
+            )
+        ], ['method' => 'post']);
+    }
+
+    // --- Template methods remain unchanged ---
 
     public function setTemplate(string $template): FormInterface
     {
@@ -94,125 +202,26 @@ class Form implements FormInterface
         return ucwords(str_replace(['_', '-'], ' ', $name));
     }
 
-    protected function renderFieldHtml(string $name, array $field, $value, $required = ''): string
-    {
-        $type       = $field['type'];
-        $options    = $field['options'];
-        $attributes = $this->buildAttributes($options['attributes']);
-        $label      = $options['label'];
-        $required   = $options['required'] ? ' required' : '';
-        
-        switch ($type) {
-            case 'text':
-            case 'email':
-            case 'password':
-            case 'number':
-            case 'datetime':
-            case 'date':
-            case 'time':
-                $type  = $type === 'datetime' ? 'datetime-local' : $type;
-                $value = $type === 'datetime'   && $value instanceof \DateTimeInterface ? $value->format('Y-m-d\TH:i') : $value;
-                $value = $type === 'date'       && $value instanceof \DateTimeInterface ? $value->format('Y-m-d') : $value;
-                $value = $type === 'time'       && $value instanceof \DateTimeInterface ? $value->format('H:i') : $value;
-                return <<<HTML
-<div class="form-group">
-    <label for="$name">$label</label>
-    <input type="$type" name="$name" value="$value"$attributes$required>
-</div>
-HTML;
-
-            case 'textarea':
-                return <<<HTML
-<div class="form-group">
-    <label for="$name">$label</label>
-    <textarea name="$name"$attributes$required>$value</textarea>
-</div>
-HTML;
-
-            case 'select':
-                $selectOptions = '';
-                foreach ($options['options'] as $optValue => $optLabel) {
-                    $selected = $optValue == $value ? ' selected' : '';
-                    $selectOptions .= "<option value=\"$optValue\"$selected>$optLabel</option>";
-                }
-                return <<<HTML
-<div class="form-group">
-    <label for="$name">$label</label>
-    <select name="$name"$attributes$required>$selectOptions</select>
-</div>
-HTML;
-
-            case 'checkbox':
-                $checked = $value ? ' checked' : '';
-                return <<<HTML
-<div class="form-group checkbox">
-    <label>
-        <input type="checkbox" name="$name" value="1"$attributes$checked$required> $label
-    </label>
-</div>
-HTML;
-
-            case 'radio':
-                $radioOptions = '';
-                foreach ($options['options'] as $optValue => $optLabel) {
-                    $checked = $optValue == $value ? ' checked' : '';
-                    $radioOptions .= <<<HTML
-<label class="radio-inline">
-    <input type="radio" name="$name" value="$optValue"$checked$required> $optLabel
-</label>
-HTML;
-                }
-                return <<<HTML
-<div class="form-group">
-    <label>$label</label>
-    <div>$radioOptions</div>
-</div>
-HTML;
-
-            default:
-                return '';
-        }
-    }
-
-    protected function buildAttributes(array $attributes): string
-    {
-        $html = '';
-        foreach ($attributes as $key => $value) {
-            $html .= " $key=\"$value\"";
-        }
-        return $html;
-    }
-
-    protected function wrapForm(string $content): string
-    {
-        $formTemplate = $this->templatesPath . $this->template . '.phtml';
-        
-        if (file_exists($formTemplate)) {
-            return $this->renderTemplate($formTemplate, ['content' => $content]);
-        }
-        
-        // Default form wrapper
-        return <<<HTML
-<form method="post">
-    $content
-    <div class="form-group">
-        <button type="submit">Submit</button>
-    </div>
-</form>
-HTML;
-    }
-
-    protected function renderTemplate(string $templatePath, array $data = []): string
-    {
-        extract($data);
-        ob_start();
-        include $templatePath;
-        return ob_get_clean();
-    }
-
     public function setTemplatesPath(string $path): FormInterface
     {
         $this->templatesPath = rtrim($path, '/') . '/';
         return $this;
     }
 }
+
+/* Example usage:
+$form = new Form();
+$form->addField('username', 'text', ['label' => 'Username', 'required' => true]);
+$form->addField('password', 'password', ['label' => 'Password', 'required' => true]);
+$form->addField('bio', 'textarea', ['label' => 'Biography']);
+$form->addField('country', 'select', [
+    'label' => 'Country',
+    'options' => ['us' => 'USA', 'ca' => 'Canada'],
+    'required' => true
+]);
+$form->addField('subscribe', 'checkbox', ['label' => 'Subscribe to newsletter']);
+$form->setValues(['username' => 'johndoe', 'country' => 'ca', 'subscribe' => true]);
+echo $form->render();
+
+
+*/  
