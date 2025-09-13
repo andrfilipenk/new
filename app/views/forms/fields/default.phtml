@@ -1,0 +1,20 @@
+<div class="form-group">
+    <label for="<?= $name ?>"><?= $field['options']['label'] ?></label>
+    <?php
+    $fieldHtml = '';
+    $value = htmlspecialchars($value);
+    $attributes = '';
+    
+    foreach ($field['options']['attributes'] as $attr => $val) {
+        $attributes .= " $attr=\"$val\"";
+    }
+    
+    if ($field['type'] === 'textarea') {
+        $fieldHtml = "<textarea name=\"$name\"$attributes>$value</textarea>";
+    } else {
+        $fieldHtml = "<input type=\"{$field['type']}\" name=\"$name\" value=\"$value\"$attributes>";
+    }
+    
+    echo $fieldHtml;
+    ?>
+</div>

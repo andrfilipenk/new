@@ -1,0 +1,11 @@
+<!-- app/views/module/base/index/index.phtml -->
+<h1>Welcome to our Framework</h1>
+<p>Hello, <?= $name ?? 'Guest' ?>!</p>
+
+<?php if (!empty($users)): ?>
+    <ul>
+        <?php foreach ($users as $user): ?>
+            <li><?= $user['name'] ?></li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>

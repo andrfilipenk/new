@@ -1,0 +1,18 @@
+<!-- app/views/layouts/default.phtml -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?= $this->getVar('title') ?? 'My Application' ?></title>
+    <meta charset="utf-8">
+    <?= $this->partial('partials/header') ?>
+</head>
+<body>
+    <?= $this->partial('partials/header') ?>
+    
+    <div class="content">
+        <?= $viewContent ?>
+    </div>
+    
+    <?= $this->partial('partials/footer') ?>
+</body>
+</html>
