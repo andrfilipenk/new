@@ -20,6 +20,24 @@ abstract class Relation
     }
     
     abstract public function getResults();
+
+    /**
+     * Set the constraints for an eager load of the relation.
+     *
+     * @param  array  $models
+     * @return void
+     */
+    abstract public function addEagerConstraints(array $models);
+
+    /**
+     * Match the eagerly loaded results to their parents.
+     *
+     * @param  array   $models
+     * @param  array   $results
+     * @param  string  $relation
+     * @return array
+     */
+    abstract public function match(array $models, array $results, $relation);
     
     public function getQuery()
     {

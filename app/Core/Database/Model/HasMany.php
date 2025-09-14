@@ -22,7 +22,42 @@ class HasMany extends Relation
     public function getResults()
     {
         return $this->query
-            ->where($this->foreignKey, $this->parent->{$this->localKey})
+            ->where($this->foreignKey, $this->parent->getAttribute($this->localKey))
             ->get();
+    }
+
+    public function addEagerConstraints(array $models)
+    {
+        $this->query->whereIn($this->foreignKey, $this->getKeys($models, $this->localKey));
+    }
+
+    public function match(array $models, array $results, $relation)
+    {
+        $dictionary = $this->buildDictionary($results);
+
+        foreach ($models as $model) {
+            $key = $model->getAttribute($this->localKey);
+            if (isset($dictionary[$key])) {
+                $model->setRelation($relation, $dictionary[$key]);
+            }
+        }
+
+        return $models;
+    }
+
+    protected function buildDictionary(array $results)
+    {
+        $dictionary = [];
+        foreach ($results as $result) {
+            $dictionary[$result->getAttribute($this->foreignKey)][] = $result;
+        }
+        return $dictionary;
+    }
+
+    protected function getKeys(array $models, $key)
+    {
+        return array_unique(array_filter(array_map(function ($model) use ($key) {
+            return $model->getAttribute($key);
+        }, $models)));
     }
 }

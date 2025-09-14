@@ -27,7 +27,8 @@ return [
             'routes' => [
                 '/' => [
                     'controller' => 'Module\Base\Controller\Index',
-                    'action' => 'index'
+                    'action' => 'index',
+                    'method'     => 'GET'
                 ]
             ],
             'services' => [

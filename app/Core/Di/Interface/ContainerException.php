@@ -3,6 +3,7 @@
 namespace Core\Di\Interface;
 
 /**
- * Error during service creation or retrieval
+ * PSR-11 Container Exception Interface
+ * Base interface representing a generic exception in a container.
  */
-interface ContainerException extends Exception {}
+interface ContainerException extends \Throwable {}

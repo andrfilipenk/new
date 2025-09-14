@@ -23,22 +23,51 @@ class BelongsToMany extends Relation
     
     public function getResults()
     {
-        // Join the pivot table with the related table
-        $results = $this->query
-            ->select($this->related->table . '.*')
-            ->join($this->table, 
+        $this->addJoin();
+        
+        return $this->query
+            ->where($this->table . '.' . $this->foreignPivotKey, $this->parent->getKey())
+            ->get();
+    }
+
+    public function addEagerConstraints(array $models)
+    {
+        $this->query->whereIn($this->table . '.' . $this->foreignPivotKey, $this->getKeys($models, $this->parent->getKeyName()));
+    }
+
+    public function match(array $models, array $results, $relation)
+    {
+        $dictionary = [];
+        foreach ($results as $result) {
+            $pivotKey = $result->pivot->{$this->foreignPivotKey};
+            $dictionary[$pivotKey][] = $result;
+        }
+
+        foreach ($models as $model) {
+            $key = $model->getKey();
+            if (isset($dictionary[$key])) {
+                $model->setRelation($relation, $dictionary[$key]);
+            }
+        }
+
+        return $models;
+    }
+
+    protected function addJoin()
+    {
+        $this->query->select($this->related->getTable() . '.*', $this->table . '.* as pivot')
+            ->join(
+                $this->table, 
                 $this->table . '.' . $this->relatedPivotKey, 
                 '=', 
-                $this->related->table . '.' . $this->related->primaryKey
-            )
-            ->where($this->table . '.' . $this->foreignPivotKey, $this->parent->{$this->parent->primaryKey})
-            ->get();
-            
-        return array_map(function($item) {
-            $model = new $this->related;
-            $model->fill((array)$item);
-            $model->exists = true;
-            return $model;
-        }, $results);
+                $this->related->getTable() . '.' . $this->related->getKeyName()
+            );
+    }
+
+    protected function getKeys(array $models, $key)
+    {
+        return array_unique(array_filter(array_map(function ($model) use ($key) {
+            return $model->getAttribute($key);
+        }, $models)));
     }
 }

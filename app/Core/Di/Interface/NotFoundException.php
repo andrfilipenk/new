@@ -3,6 +3,7 @@
 namespace Core\Di\Interface;
 
 /**
- * No entry was found in the container
+ * PSR-11 Not Found Exception Interface
+ * No entry was found in the container.
  */
-interface NotFoundException extends Exception {}
+interface NotFoundException extends \Throwable {}

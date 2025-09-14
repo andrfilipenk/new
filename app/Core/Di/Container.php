@@ -5,11 +5,12 @@ namespace Core\Di;
 use Closure;
 use Core\Di\Interface\Container as ContainerInterface;
 use Core\Di\Exception\NotFound;
-
-
+use Core\Di\Exception\Container as ContainerException;
+use ReflectionClass;
+use ReflectionParameter;
 
 /**
- * Lightweight Dependency Injection Container
+ * Lightweight Dependency Injection Container with Autowiring
  */
 class Container implements ContainerInterface
 {
@@ -25,7 +26,8 @@ class Container implements ContainerInterface
         }
         
         self::$default = $this;
-        $this->set('di', $this);
+        $this->set(ContainerInterface::class, $this);
+        $this->set(get_class($this), $this);
     }
 
     /**
@@ -44,7 +46,6 @@ class Container implements ContainerInterface
         if (self::$default === null) {
             self::$default = new self();
         }
-        
         return self::$default;
     }
 
@@ -53,13 +54,10 @@ class Container implements ContainerInterface
      */
     public function set(string $id, $concrete): void
     {
-        // Remove existing entries
         unset($this->instances[$id], $this->factories[$id]);
         
-        if (is_callable($concrete)) {
+        if ($concrete instanceof Closure) {
             $this->factories[$id] = $concrete;
-        } elseif (is_object($concrete)) {
-            $this->instances[$id] = $concrete;
         } else {
             $this->definitions[$id] = $concrete;
         }
@@ -70,26 +68,22 @@ class Container implements ContainerInterface
      */
     public function get(string $id)
     {
-        // Return existing instance if available
         if (isset($this->instances[$id])) {
             return $this->instances[$id];
         }
         
-        // Create new instance
         if (isset($this->factories[$id])) {
-            return $this->instances[$id] = $this->factories[$id]($this);
+            return $this->instances[$id] = ($this->factories[$id])($this);
         }
         
-        if (isset($this->definitions[$id])) {
-            return $this->instances[$id] = $this->build($this->definitions[$id]);
+        $concrete = $this->definitions[$id] ?? $id;
+        
+        if ($this->isResolvable($concrete)) {
+            $instance = $this->build($concrete);
+            return $this->instances[$id] = $instance;
         }
         
-        // Auto-resolve class if it exists
-        if (class_exists($id)) {
-            return $this->instances[$id] = $this->build($id);
-        }
-        
-        throw new NotFound("Service '{$id}' not found in container");
+        throw new NotFound("Service '{$id}' not found or cannot be resolved.");
     }
 
     /**
@@ -97,112 +91,72 @@ class Container implements ContainerInterface
      */
     public function has(string $id): bool
     {
-        return isset($this->instances[$id]) ||
-               isset($this->factories[$id]) ||
-               isset($this->definitions[$id]) ||
-               class_exists($id);
+        return isset($this->definitions[$id]) || isset($this->instances[$id]) || $this->isResolvable($id);
     }
 
-    /**
-     * Build a service from definition
-     */
-    protected function build($definition)
+    protected function isResolvable($abstract): bool
     {
-        if (is_string($definition) && class_exists($definition)) {
-            return $this->autowire($definition);
-        }
-        
-        if (is_array($definition) && isset($definition['class'])) {
-            return $this->buildFromArray($definition);
-        }
-        
-        return $definition;
+        return ($abstract instanceof Closure) || (is_string($abstract) && class_exists($abstract));
     }
 
-    /**
-     * Simple autowiring without reflection
-     */
+    protected function build($concrete)
+    {
+        if ($concrete instanceof Closure) {
+            return $concrete($this);
+        }
+
+        if (is_string($concrete) && class_exists($concrete)) {
+            return $this->autowire($concrete);
+        }
+
+        throw new ContainerException("Cannot resolve service. Invalid definition provided.");
+    }
+
     protected function autowire(string $class)
     {
-        // For minimal implementation, we'll use simple instantiation
-        return new $class();
-    }
+        $reflector = new ReflectionClass($class);
 
-    /**
-     * Build service from array definition
-     */
-    protected function buildFromArray(array $definition)
-    {
-        $class = $definition['class'];
-        $args = $definition['arguments'] ?? [];
-        
-        // Resolve arguments
-        $resolvedArgs = [];
-        foreach ($args as $arg) {
-            $resolvedArgs[] = $this->resolveArgument($arg);
+        if (!$reflector->isInstantiable()) {
+            throw new ContainerException("Class {$class} is not instantiable.");
         }
-        
-        return new $class(...$resolvedArgs);
-    }
 
-    /**
-     * Resolve argument value (could be service reference or literal)
-     */
-    protected function resolveArgument($arg)
-    {
-        if (is_string($arg) && strpos($arg, '@') === 0) {
-            return $this->get(substr($arg, 1));
+        $constructor = $reflector->getConstructor();
+
+        if (is_null($constructor)) {
+            return new $class();
         }
-        
-        return $arg;
+
+        $dependencies = array_map(
+            fn(ReflectionParameter $param) => $this->resolveParameter($param),
+            $constructor->getParameters()
+        );
+
+        return $reflector->newInstanceArgs($dependencies);
     }
 
-    /**
-     * Create a factory service (new instance each time)
-     */
-    public function factory(callable $factory): Closure
+    protected function resolveParameter(ReflectionParameter $param)
     {
-        return function() use ($factory) {
-            return $factory($this);
-        };
-    }
+        $type = $param->getType();
 
-    /**
-     * Extend a service definition
-     */
-    public function extend(string $id, callable $extender): void
-    {
-        $service = $this->get($id);
-        $extended = $extender($service, $this);
-        
-        if ($extended !== null) {
-            $this->set($id, $extended);
+        if ($type && !$type->isBuiltin()) {
+            return $this->get($type->getName());
         }
+
+        if ($param->isDefaultValueAvailable()) {
+            return $param->getDefaultValue();
+        }
+
+        throw new ContainerException("Cannot resolve constructor parameter '{$param->getName()}' for class '{$param->getDeclaringClass()->getName()}'.");
     }
 
-    /**
-     * Register a service provider
-     */
     public function register($provider): void
     {
         if (is_string($provider)) {
-            $provider = new $provider();
+            $provider = $this->build($provider);
         }
         
         if (method_exists($provider, 'register')) {
             $provider->register($this);
         }
-    }
-
-    /**
-     * Get all registered service IDs
-     */
-    public function getServices(): array
-    {
-        return array_unique(array_merge(
-            array_keys($this->definitions),
-            array_keys($this->factories),
-            array_keys($this->instances)
-        ));
     }
 }

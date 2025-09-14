@@ -5,108 +5,64 @@ namespace Core\Mvc;
 use Core\Di\Interface\Container as ContainerInterface;
 use Core\Di\Injectable;
 use Core\Events\EventAware;
+use Core\Http\Request;
+use Core\Http\Response;
 
 class Dispatcher
 {
     use Injectable, EventAware;
 
-    protected $handler;
-    protected $action;
-    protected $params;
     protected $actionName;
     protected $controllerName;
 
-    public function __construct(ContainerInterface $di)
+    public function dispatch(array $route, Request $request)
     {
-        $this->setDI($di);
-    }
-
-    public function dispatch(array $route): void
-    {
-        // Extract route information
         $handlerClass = $route['controller'];
         $action = $route['action'];
         $params = $route['params'] ?? [];
 
-        // Store action and controller names
         $this->actionName = $action;
         $this->controllerName = $handlerClass;
 
-        // Trigger beforeDispatch event
-        $event = $this->fireEvent('core:beforeDispatch', [
-            'handler' => $handlerClass,
-            'action' => $action,
-            'params' => $params
-        ]);
+        $this->fireEvent('core:beforeDispatch', $this);
 
-        // Check if event stopped propagation
-        if ($event->isPropagationStopped()) {
-            return;
-        }
-
-        // Instantiate the controller
         if (!class_exists($handlerClass)) {
             throw new \Exception("Controller {$handlerClass} not found");
         }
 
-        $handler = new $handlerClass();
-        
-        // Inject DI container
-        if ($handler instanceof \Core\Di\Injectable) {
-            $handler->setDI($this->getDI());
-        }
+        // Use the DI container to build the controller, enabling autowiring
+        $handler = $this->getDI()->get($handlerClass);
 
-        // Inject EventsManager
-        if ($handler instanceof \Core\Events\EventAware) {
-            $handler->setEventsManager($this->getEventsManager());
-        }
-
-        // Initialize controller
         if (method_exists($handler, 'initialize')) {
             $handler->initialize();
         }
 
-        // Check if action exists
         $actionMethod = $action . 'Action';
         if (!method_exists($handler, $actionMethod)) {
             throw new \Exception("Action {$actionMethod} not found in {$handlerClass}");
         }
 
-        // Trigger beforeExecuteRoute event
         $this->fireEvent('core:beforeExecuteRoute', $handler);
 
-        // Execute the action
-        $response = call_user_func_array([$handler, $actionMethod], $params);
+        // Execute the action and get the return value
+        $responseContent = call_user_func_array([$handler, $actionMethod], $params);
 
-        // Call afterExecute method if exists
         if (method_exists($handler, 'afterExecute')) {
             $handler->afterExecute();
         }
-        
 
-        // Get the response from the controller
-        $finalResponse = $handler->getResponse() ?? $response;
-
-        // Handle array responses
-        if (is_array($finalResponse)) {
-            header('Content-Type: application/json');
-            $finalResponse = json_encode($finalResponse);
+        // If the controller action returns a full Response object, use it directly
+        if ($responseContent instanceof Response) {
+            return $responseContent;
         }
 
-        // Handle view objects
-        if ($finalResponse instanceof \Core\View\ViewInterface) {
-            $finalResponse = $finalResponse->render();
+        // If the controller returns an array, create a JSON response
+        if (is_array($responseContent)) {
+            return Response::json($responseContent);
         }
 
-        // Handle objects with __toString method
-        if (is_object($finalResponse) && method_exists($finalResponse, '__toString')) {
-            $finalResponse = (string)$finalResponse;
-        }
-
-        // Output the response
-        if ($finalResponse !== null) {
-            echo $finalResponse;
-        }
+        // Otherwise, treat the return value as content for a standard HTML response
+        return new Response($responseContent);
     }
 
     public function getActionName(): string

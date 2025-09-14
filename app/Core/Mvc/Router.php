@@ -19,12 +19,15 @@ class Router
         ];
     }
     
-    public function match(string $uri): ?array
+    public function match(string $uri, string $method): ?array
     {
         $uri = trim($uri, '/');
         
         foreach ($this->routes as $route) {
-            if (preg_match($route['regex'], $uri, $matches)) {
+            // Check if HTTP method matches (if specified in route config)
+            $methodMatch = !isset($route['config']['method']) || strcasecmp($route['config']['method'], $method) === 0;
+
+            if ($methodMatch && preg_match($route['regex'], $uri, $matches)) {
                 // Filter out numeric keys (keep only named captures)
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
                 

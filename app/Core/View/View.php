@@ -4,109 +4,106 @@ namespace Core\View;
 
 use Core\Di\Injectable;
 use Core\Events\EventAware;
+use Exception;
 
 class View implements ViewInterface
 {
     use Injectable, EventAware;
 
     protected $templatePath;
+    protected $cachePath;
     protected $layout = 'default';
     protected $layoutEnabled = true;
     protected $vars = [];
-    protected $content;
+    protected $sections = [];
+    protected $activeSection;
 
-    public function __construct(string $templatePath)
+    public function __construct(string $templatePath, ?string $cachePath = null)
     {
         $this->templatePath = rtrim($templatePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if ($cachePath) {
+            $this->cachePath = rtrim($cachePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+            if (!is_dir($this->cachePath)) {
+                mkdir($this->cachePath, 0755, true);
+            }
+        }
     }
 
     public function render(string $template, array $data = []): string
     {
-        // Merge passed data with stored variables
-        $renderData = array_merge($this->vars, $data);
+        $this->vars = array_merge($this->vars, $data);
+        $templateFile = $this->templatePath . $template . '.phtml';
         
-        // Trigger beforeRender event
-        $event = $this->fireEvent('view:beforeRender', $this, [
-            'template' => $template,
-            'data' => $renderData
-        ]);
-        
-        if ($event->isPropagationStopped()) {
-            return $event->getData() ?? '';
+        if ($this->cachePath) {
+            $cachedFile = $this->cachePath . str_replace(['/', '\\'], '_', $template) . '.php';
+            if (!file_exists($cachedFile) || filemtime($templateFile) > filemtime($cachedFile)) {
+                $content = file_get_contents($templateFile);
+                // In a real scenario, you might do more complex parsing here.
+                // For now, we just copy it.
+                file_put_contents($cachedFile, $content);
+            }
+            $templateFile = $cachedFile;
         }
+
+        $this->fireEvent('view:beforeRender', $this);
+
+        $content = $this->capture($templateFile, $this->vars);
+
+        if ($this->layoutEnabled && $this->layout) {
+            $this->sections['content'] = $content;
+            $layoutFile = $this->templatePath . 'layouts' . DIRECTORY_SEPARATOR . $this->layout . '.phtml';
+            $output = $this->capture($layoutFile, $this->vars);
+        } else {
+            $output = $content;
+        }
+
+        $this->fireEvent('view:afterRender', $this, ['output' => $output]);
         
-        // Extract variables for the template
-        extract($renderData, EXTR_SKIP);
+        return $output;
+    }
+
+    protected function capture(string $templateFile, array $data): string
+    {
+        // Make the view instance itself available in the template
+        $data['view'] = $this;
+        extract($data, EXTR_SKIP);
         
-        // Start output buffering
         ob_start();
-        
         try {
-            // Include the template file
-            include $this->templatePath . $template . '.phtml';
-            
-            // Get the template content
-            $this->content = ob_get_clean();
-        } catch (\Exception $e) {
+            include $templateFile;
+        } catch (Exception $e) {
             ob_end_clean();
             throw $e;
         }
-        
-        // Apply layout if enabled
-        if ($this->layoutEnabled) {
-            $output = $this->applyLayout($this->content);
-        } else {
-            $output = $this->content;
-        }
-        
-        // Trigger afterRender event
-        $this->fireEvent('view:afterRender', $this, [
-            'output' => $output
-        ]);
-        
-        return $output;
+        return ob_get_clean();
     }
 
     public function partial(string $template, array $data = []): string
     {
-        // Store current layout state
-        $layoutEnabled = $this->layoutEnabled;
-        
-        // Disable layout for partials
-        $this->disableLayout();
-        
-        // Render the partial
+        $originalLayoutState = $this->layoutEnabled;
+        $this->layoutEnabled = false;
         $output = $this->render($template, $data);
-        
-        // Restore layout state
-        if ($layoutEnabled) {
-            $this->enableLayout();
-        }
-        
+        $this->layoutEnabled = $originalLayoutState;
         return $output;
     }
 
-    protected function applyLayout(string $content): string
+    public function startSection(string $name): void
     {
-        // Extract variables for the layout
-        extract($this->vars, EXTR_SKIP);
-        
-        // Store content for use in layout
-        $viewContent = $content;
-        
-        // Start output buffering
+        $this->activeSection = $name;
         ob_start();
-        
-        try {
-            // Include the layout file
-            include $this->templatePath . 'layouts' . DIRECTORY_SEPARATOR . $this->layout . '.phtml';
-            
-            // Get the layout content
-            return ob_get_clean();
-        } catch (\Exception $e) {
-            ob_end_clean();
-            throw $e;
+    }
+
+    public function endSection(): void
+    {
+        if ($this->activeSection) {
+            $this->sections[$this->activeSection] = ob_get_clean();
+            $this->activeSection = null;
         }
+    }
+
+    public function yield(string $name, string $default = ''): string
+    {
+        return $this->sections[$name] ?? $default;
     }
 
     public function setLayout(string $layout): void
@@ -138,14 +135,10 @@ class View implements ViewInterface
     {
         return $this->vars[$name] ?? null;
     }
-
-    public function getTemplatePath(): string
-    {
-        return $this->templatePath;
-    }
-
-    public function getContent(): string
-    {
-        return $this->content;
-    }
 }
+
+// example usage in a template:
+// <!--?php $this->startSection('header'); ?-->
+// <!--?php $this->endSection(); ?-->
+// <!--?= $this->yield('header', '<h1>Default Header</h1>'); ?-->
+// <!--?= $this->yield('content'); ?--> <!-- Main content section -->

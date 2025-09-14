@@ -2,58 +2,111 @@
 
 namespace Core\Utils;
 
+use DateTimeImmutable;
+use DateTimeInterface;
+use DateTimeZone;
+use Exception;
+
 class DateTimeHelper
 {
-    public static function createFromFormat(string $format, string $datetime, string $timezone = null): ?\DateTimeImmutable
+    /**
+     * Creates a DateTimeImmutable object from a specific format.
+     */
+    public static function createFromFormat(string $format, string $datetime, ?string $timezone = null): ?DateTimeImmutable
     {
         try {
-            if ($timezone) {
-                return \DateTimeImmutable::createFromFormat($format, $datetime, new \DateTimeZone($timezone));
-            }
-            return \DateTimeImmutable::createFromFormat($format, $datetime);
-        } catch (\Exception $e) {
+            $tz = $timezone ? new DateTimeZone($timezone) : null;
+            return DateTimeImmutable::createFromFormat($format, $datetime, $tz);
+        } catch (Exception $e) {
             return null;
         }
     }
 
-    public static function createFromString(string $datetime, string $timezone = null): ?\DateTimeImmutable
+    /**
+     * Creates a DateTimeImmutable object from a string.
+     */
+    public static function createFromString(string $datetime, ?string $timezone = null): ?DateTimeImmutable
     {
         try {
-            if ($timezone) {
-                return new \DateTimeImmutable($datetime, new \DateTimeZone($timezone));
-            }
-            return new \DateTimeImmutable($datetime);
-        } catch (\Exception $e) {
+            $tz = $timezone ? new DateTimeZone($timezone) : null;
+            return new DateTimeImmutable($datetime, $tz);
+        } catch (Exception $e) {
             return null;
         }
     }
 
-    public static function formatForInput(\DateTimeInterface $datetime, string $type = 'datetime'): string
+    /**
+     * Formats a DateTime object for HTML input fields.
+     */
+    public static function formatForInput(DateTimeInterface $datetime, string $type = 'datetime'): string
     {
-        switch ($type) {
-            case 'date':
-                return $datetime->format('Y-m-d');
-            case 'time':
-                return $datetime->format('H:i');
-            case 'datetime':
-            default:
-                return $datetime->format('Y-m-d\TH:i');
+        return match ($type) {
+            'date' => $datetime->format('Y-m-d'),
+            'time' => $datetime->format('H:i'),
+            default => $datetime->format('Y-m-d\TH:i'),
+        };
+    }
+
+    /**
+     * Formats a DateTime object into a human-readable "time ago" or "from now" string.
+     */
+    public static function humanReadable(DateTimeInterface $datetime): string
+    {
+        $now = new DateTimeImmutable();
+        $diff = $now->diff($datetime);
+
+        $periods = [
+            'y' => 'year',
+            'm' => 'month',
+            'd' => 'day',
+            'h' => 'hour',
+            'i' => 'minute',
+            's' => 'second',
+        ];
+
+        foreach ($periods as $key => $period) {
+            if ($diff->$key > 0) {
+                $value = $diff->$key;
+                $unit = $period . ($value > 1 ? 's' : '');
+                return $diff->invert ? "$value $unit ago" : "in $value $unit";
+            }
         }
+
+        return 'Just now';
     }
 
-    public static function isValidFormat(string $datetime, string $format): bool
+    /**
+     * Generates an HTML select dropdown for timezones using the Tag helper.
+     */
+    public static function timezoneSelect(string $name, ?string $selected = null, array $attributes = []): Tag
     {
-        $parsed = date_parse_from_format($format, $datetime);
-        return $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
+        $options = [];
+        foreach (self::getTimezoneList() as $value => $label) {
+            $optionAttrs = ['value' => $value];
+            if ($selected === $value) {
+                $optionAttrs['selected'] = true;
+            }
+            $options[] = Tag::option($label, $optionAttrs);
+        }
+
+        $selectAttributes = array_merge($attributes, ['name' => $name]);
+        return Tag::select($options, $selectAttributes);
     }
 
+    /**
+     * Returns an array of all timezone identifiers.
+     */
     public static function getTimezoneList(): array
     {
-        $timezones = [];
-        $identifiers = \DateTimeZone::listIdentifiers();
-        foreach ($identifiers as $identifier) {
-            $timezones[$identifier] = str_replace('_', ' ', $identifier);
-        }
-        return $timezones;
+        return DateTimeZone::listIdentifiers();
+    }
+
+    /**
+     * Validates if a string matches a given date format.
+     */
+    public static function isValidFormat(string $datetime, string $format): bool
+    {
+        $d = self::createFromFormat($format, $datetime);
+        return $d && $d->format($format) === $datetime;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Core\Events;
 
+use InvalidArgumentException;
+
 class Manager
 {
     protected $listeners = [];
@@ -15,16 +17,15 @@ class Manager
 
     public function detach(string $event, callable $listener): void
     {
-        if (!isset($this->listeners[$event])) {
+        if (empty($this->listeners[$event])) {
             return;
         }
 
-        foreach ($this->listeners[$event] as $priority => $listeners) {
-            foreach ($listeners as $key => $value) {
-                if ($value === $listener) {
-                    unset($this->listeners[$event][$priority][$key]);
-                    unset($this->sorted[$event]);
-                }
+        foreach ($this->listeners[$event] as $priority => &$listeners) {
+            if (($key = array_search($listener, $listeners, true)) !== false) {
+                unset($listeners[$key]);
+                unset($this->sorted[$event]);
+                return;
             }
         }
     }
@@ -39,81 +40,64 @@ class Manager
         }
     }
 
-    public function trigger($event, $data = null)
+    public function trigger($event, $data = null): Event
     {
         if (is_string($event)) {
             $event = new Event($event, $data);
         }
 
-        if (!$event instanceof EventInterface) {
-            throw new \InvalidArgumentException('Event must be a string or implement EventInterface');
+        if (!$event instanceof Event) {
+            throw new InvalidArgumentException('Event must be a string or an instance of Core\Events\Event');
         }
 
-        $eventName = $event->getName();
-        
-        if (!isset($this->listeners[$eventName])) {
-            return $event;
-        }
-
-        // Sort listeners by priority if not already sorted
-        if (!isset($this->sorted[$eventName])) {
-            $this->sortListeners($eventName);
-        }
-
-        foreach ($this->sorted[$eventName] as $listener) {
-            $result = call_user_func($listener, $event);
-            #$result = $listener($event);
-            
+        foreach ($this->getListenersForEvent($event) as $listener) {
             if ($event->isPropagationStopped()) {
                 break;
             }
-            
-            if ($result !== null) {
-                $event->setData($result);
-            }
+            $listener($event);
         }
 
         return $event;
     }
 
-    public function hasListeners(string $event = null): bool
+    public function getListenersForEvent(Event $event): iterable
     {
-        if ($event === null) {
-            return !empty($this->listeners);
+        $eventName = $event->getName();
+
+        if (!isset($this->sorted[$eventName])) {
+            $this->sortListeners($eventName);
         }
 
-        return isset($this->listeners[$event]);
-    }
+        $listeners = $this->sorted[$eventName] ?? [];
 
-    public function getListeners(string $event = null): array
-    {
-        if ($event === null) {
-            return $this->listeners;
+        // Add wildcard listeners
+        foreach ($this->listeners as $eventPattern => $priorityListeners) {
+            if (str_ends_with($eventPattern, '*') && str_starts_with($eventName, rtrim($eventPattern, '*'))) {
+                if (!isset($this->sorted[$eventPattern])) {
+                    $this->sortListeners($eventPattern);
+                }
+                $listeners = array_merge($listeners, $this->sorted[$eventPattern]);
+            }
+        }
+        
+        // Re-sort if wildcards were added
+        if (count($listeners) > count($this->sorted[$eventName] ?? [])) {
+            // This is a simplified sort for the combined list.
+            // A more robust implementation would re-sort based on original priorities.
+            return $listeners;
         }
 
-        if (!isset($this->sorted[$event])) {
-            $this->sortListeners($event);
-        }
-
-        return $this->sorted[$event] ?? [];
+        return $listeners;
     }
 
     protected function sortListeners(string $event): void
     {
         $this->sorted[$event] = [];
-        
-        if (!isset($this->listeners[$event])) {
+        if (empty($this->listeners[$event])) {
             return;
         }
 
-        // Get all priorities and sort in reverse order (higher priority first)
         krsort($this->listeners[$event]);
-        
-        // Flatten the array
-        foreach ($this->listeners[$event] as $listeners) {
-            foreach ($listeners as $listener) {
-                $this->sorted[$event][] = $listener;
-            }
-        }
+        $this->sorted[$event] = array_merge(...array_values($this->listeners[$event]));
     }
 }

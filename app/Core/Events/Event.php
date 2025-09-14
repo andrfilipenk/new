@@ -2,7 +2,7 @@
 
 namespace Core\Events;
 
-class Event implements EventInterface
+class Event implements StoppableEventInterface
 {
     protected $name;
     protected $data;

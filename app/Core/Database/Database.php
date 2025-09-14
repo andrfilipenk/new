@@ -13,17 +13,15 @@ class Database
     use Injectable;
 
     protected $pdo;
-    protected $query;
     protected $table;
-    protected $params = [];
-    protected $connection;
 
     // Query parts
-    protected $select = '*';
-    protected $where = [];
-    protected $orderBy = '';
-    protected $limit = '';
-    protected $offset = '';
+    protected $selects = ['*'];
+    protected $wheres = [];
+    protected $bindings = [];
+    protected $orders = [];
+    protected $limit;
+    protected $offset;
 
     /**
      * Constructor - initializes database connection
@@ -47,7 +45,7 @@ class Database
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
                 PDO::ATTR_EMULATE_PREPARES => false,
-                PDO::ATTR_PERSISTENT => $cfg['persistent'],
+                PDO::ATTR_PERSISTENT => $cfg['persistent'] ?? false,
             ];
 
             $this->pdo = new PDO(
@@ -75,9 +73,9 @@ class Database
     /**
      * Select columns
      */
-    public function select($columns)
+    public function select($columns = '*')
     {
-        $this->select = is_array($columns) ? implode(', ', $columns) : $columns;
+        $this->selects = is_array($columns) ? $columns : func_get_args();
         return $this;
     }
 
@@ -86,18 +84,16 @@ class Database
      */
     public function where($column, $operator = null, $value = null, $boolean = 'AND')
     {
-        // If only two parameters, assume equals operator
         if (func_num_args() === 2) {
             $value = $operator;
             $operator = '=';
         }
 
-        $this->where[] = [
-            'column' => $column,
-            'operator' => $operator,
-            'value' => $value,
-            'boolean' => $boolean
-        ];
+        $this->wheres[] = compact('column', 'operator', 'value', 'boolean');
+        
+        if (!is_null($value)) {
+            $this->bindings[] = $value;
+        }
 
         return $this;
     }
@@ -111,11 +107,21 @@ class Database
     }
 
     /**
+     * Add a WHERE IN condition
+     */
+    public function whereIn($column, array $values, $boolean = 'AND')
+    {
+        $this->wheres[] = ['column' => $column, 'operator' => 'IN', 'values' => $values, 'boolean' => $boolean];
+        $this->bindings = array_merge($this->bindings, $values);
+        return $this;
+    }
+
+    /**
      * Order by clause
      */
     public function orderBy($column, $direction = 'ASC')
     {
-        $this->orderBy = "ORDER BY {$column} {$direction}";
+        $this->orders[] = "{$column} " . strtoupper($direction);
         return $this;
     }
 
@@ -124,7 +130,7 @@ class Database
      */
     public function limit($limit)
     {
-        $this->limit = "LIMIT {$limit}";
+        $this->limit = (int) $limit;
         return $this;
     }
 
@@ -133,7 +139,7 @@ class Database
      */
     public function offset($offset)
     {
-        $this->offset = "OFFSET {$offset}";
+        $this->offset = (int) $offset;
         return $this;
     }
 
@@ -143,7 +149,7 @@ class Database
     public function get()
     {
         $sql = $this->buildSelectQuery();
-        $stmt = $this->executeQuery($sql, $this->params);
+        $stmt = $this->executeQuery($sql, $this->bindings);
         return $stmt->fetchAll();
     }
 
@@ -154,7 +160,7 @@ class Database
     {
         $this->limit(1);
         $sql = $this->buildSelectQuery();
-        $stmt = $this->executeQuery($sql, $this->params);
+        $stmt = $this->executeQuery($sql, $this->bindings);
         return $stmt->fetch();
     }
 
@@ -164,11 +170,11 @@ class Database
     public function insert(array $data)
     {
         $columns = implode(', ', array_keys($data));
-        $placeholders = ':' . implode(', :', array_keys($data));
+        $placeholders = rtrim(str_repeat('?,', count($data)), ',');
         
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
         
-        $stmt = $this->executeQuery($sql, $data);
+        $this->executeQuery($sql, array_values($data));
         return $this->pdo->lastInsertId();
     }
 
@@ -177,17 +183,13 @@ class Database
      */
     public function update(array $data)
     {
-        $setClause = '';
-        foreach ($data as $key => $value) {
-            $setClause .= "{$key} = :{$key}, ";
-        }
-        $setClause = rtrim($setClause, ', ');
+        $setClause = implode(' = ?, ', array_keys($data)) . ' = ?';
         
         $whereClause = $this->buildWhereClause();
         
         $sql = "UPDATE {$this->table} SET {$setClause} {$whereClause}";
         
-        $params = array_merge($data, $this->params);
+        $params = array_merge(array_values($data), $this->bindings);
         $stmt = $this->executeQuery($sql, $params);
         
         return $stmt->rowCount();
@@ -202,7 +204,7 @@ class Database
         
         $sql = "DELETE FROM {$this->table} {$whereClause}";
         
-        $stmt = $this->executeQuery($sql, $this->params);
+        $stmt = $this->executeQuery($sql, $this->bindings);
         return $stmt->rowCount();
     }
 
@@ -211,13 +213,21 @@ class Database
      */
     protected function buildSelectQuery()
     {
-        $whereClause = $this->buildWhereClause();
+        $sql = "SELECT " . implode(', ', $this->selects) . " FROM {$this->table}";
         
-        return "SELECT {$this->select} FROM {$this->table} 
-                {$whereClause} 
-                {$this->orderBy} 
-                {$this->limit} 
-                {$this->offset}";
+        $sql .= $this->buildWhereClause();
+
+        if (!empty($this->orders)) {
+            $sql .= " ORDER BY " . implode(', ', $this->orders);
+        }
+        if (!is_null($this->limit)) {
+            $sql .= " LIMIT {$this->limit}";
+        }
+        if (!is_null($this->offset)) {
+            $sql .= " OFFSET {$this->offset}";
+        }
+        
+        return $sql;
     }
 
     /**
@@ -225,27 +235,23 @@ class Database
      */
     protected function buildWhereClause()
     {
-        if (empty($this->where)) {
+        if (empty($this->wheres)) {
             return '';
         }
 
-        $whereClause = 'WHERE ';
         $conditions = [];
+        foreach ($this->wheres as $i => $condition) {
+            $prefix = ($i > 0) ? "{$condition['boolean']} " : '';
 
-        foreach ($this->where as $index => $condition) {
-            $paramName = 'where_' . $index . '_' . str_replace('.', '_', $condition['column']);
-            
-            if ($index === 0) {
-                $conditions[] = "{$condition['column']} {$condition['operator']} :{$paramName}";
+            if ($condition['operator'] === 'IN') {
+                $placeholders = rtrim(str_repeat('?,', count($condition['values'])), ',');
+                $conditions[] = "{$prefix}{$condition['column']} IN ({$placeholders})";
             } else {
-                $conditions[] = "{$condition['boolean']} {$condition['column']} {$condition['operator']} :{$paramName}";
+                $conditions[] = "{$prefix}{$condition['column']} {$condition['operator']} ?";
             }
-            
-            $this->params[$paramName] = $condition['value'];
         }
 
-        $whereClause .= implode(' ', $conditions);
-        return $whereClause;
+        return " WHERE " . implode(' ', $conditions);
     }
 
     /**
@@ -258,7 +264,7 @@ class Database
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            throw new DatabaseException("Query execution failed: " . $e->getMessage());
+            throw new DatabaseException("Query execution failed: " . $e->getMessage() . " (SQL: $sql)");
         }
     }
 
@@ -267,12 +273,12 @@ class Database
      */
     protected function reset()
     {
-        $this->select = '*';
-        $this->where = [];
-        $this->orderBy = '';
-        $this->limit = '';
-        $this->offset = '';
-        $this->params = [];
+        $this->selects = ['*'];
+        $this->wheres = [];
+        $this->bindings = [];
+        $this->orders = [];
+        $this->limit = null;
+        $this->offset = null;
     }
 
     /**
@@ -286,7 +292,8 @@ class Database
     public function execute(string $sql, array $params = [])
     {
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($params);
+        $stmt->execute($params);
+        return $stmt;
     }
 
     /**
@@ -315,3 +322,93 @@ class Database
     }
 }
 
+// Example usage:
+// $db = new Database();
+// $users = $db->table('users')->where('status', 'active')->orderBy('created_at', 'DESC')->get();
+// foreach ($users as $user) {
+//     echo $user->name . "\n";
+// }
+
+// class User extends Model {
+ //     protected $table = ?users?;
+ //     public function roles() {
+ //         return $this-?belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
+ //     }
+ // }
+ 
+ // class Role extends Model {
+ //     protected $table = ?roles?;
+ //     public function users() {
+ //         return $this-?belongsToMany(User::class, 'user_roles', 'role_id', 'user_id');
+ //     }
+ // }
+ 
+ // class Post extends Model {
+ //     protected $table = ?posts?;
+ //     public function user() {
+//         return $this-?belongsTo(User::class);
+ //     }
+ // }
+
+// class Profile extends Model {
+    //     protected $table = ?profiles?;
+    //     public function user() {
+    //         return $this-?belongsTo(User::class);
+    //     }
+    // }
+
+// Example usage:
+// $user = (new User())->find(1);
+ // echo $user->name;
+ // $profile = $user->profile();
+ // echo $profile->bio;
+ // $posts = $user->posts();
+ // foreach ($posts as $post) {
+ //     echo $post->title . "\n";
+ // }
+ 
+ // $roles = $user->roles();
+ // foreach ($roles as $role) {
+ //     echo $role->name . "\n";
+ // }
+// $role = (new Role())->find(1);
+ // echo $role->name;
+// $users = $role->users();
+ // foreach ($users as $user) {
+ //     echo $user->name . "\n";
+ // }
+// class User extends Model {
+ //     protected $table = ?users?;
+//     public function profile() {  
+ //         return $this-?hasOne(Profile::class);
+ //     }
+ 
+ //     public function posts() {
+ //         return $this-?hasMany(Post::class);
+ //     }
+ 
+ //     public function roles() {
+ //         return $this-?belongsToMany(Role::class);
+ //     }
+ // }
+ 
+ // class Profile extends Model {
+ //     protected $table = ?profiles?;
+ //     public function user() {
+ //         return $this-?belongsTo(User::class);
+ //     }
+ // }
+ 
+ // class Post extends Model {
+ //     protected $table = ?posts?;
+ //     public function user() {
+//         return $this-?belongsTo(User::class);
+ //     }
+ // }
+ 
+ // class Role extends Model {
+ //     protected $table = ?roles?;
+ //     public function users() {
+ //         return $this-?belongsToMany(User::class);
+ //     }
+ // }

@@ -1,122 +1,81 @@
 <?php
-// app/Core/Application.php
+// app/Core/Mvc/Application.php
 namespace Core\Mvc;
 
-use Core\Database\Database;
-use Core\Di\Container;
-use Core\Di\ContainerBuilder;
-use Core\Events\Manager as EventsManager;
+use Core\Di\Interface\Container as ContainerInterface;
+use Core\Http\Request;
+use Core\Http\Response;
+use Exception;
 
 class Application
 {
     protected $di;
-    protected $eventsManager;
-    protected $router;
-    protected $dispatcher;
-    protected $modules = [];
 
-    public function __construct(array $config = [])
+    public function __construct(ContainerInterface $di)
     {
-        // Build dependency injection container
-        $builder = new ContainerBuilder();
-        // Register core services
-        $builder->addDefinition('config', $config);
-        $builder->addDefinition('eventsManager', EventsManager::class);
-        $builder->addDefinition('db', Database::class);
-        $builder->addDefinition('router', Router::class);
-        $builder->addDefinition('dispatcher', function($di) {
-            return new Dispatcher($di);
-        });
-        $builder->addDefinition('application', $this);
-        // Build the container
-        $this->di = $builder->build();
-        // Get instances
-        $this->eventsManager = $this->di->get('eventsManager');
-        $this->router = $this->di->get('router');
-        $this->dispatcher = $this->di->get('dispatcher');
-
-        // Set default events manager for EventAware components
-        //EventsManager::setDefault($this->eventsManager);
+        $this->di = $di;
+        $this->di->set('application', $this);
     }
 
-    public function registerModules(array $modules): void
+    public function handle(Request $request): Response
     {
-        $this->modules = $modules;
-        // Register module routes
-        foreach ($modules as $module) {
-            if (isset($module['routes'])) {
-                $this->registerRoutes($module['routes']);
-            }
-            if (isset($module['services'])) {
-                $this->registerServices($module['services']);
-            }
-        }
-    }
+        $eventsManager = $this->di->get('eventsManager');
+        $router = $this->di->get('router');
+        $dispatcher = $this->di->get('dispatcher');
 
-    public function registerRoutes(array $routes): void
-    {
-        foreach ($routes as $pattern => $config) {
-            $this->router->add($pattern, $config);
-        }
-    }
-
-    public function registerServices(array $services): void
-    {
-        foreach ($services as $name => $service) {
-            $this->di->set($name, $service);
-        }
-    }
-
-    public function handle(string $uri): void
-    {
         try {
-            // Trigger beforeHandle event
-            $this->eventsManager->trigger('application:beforeHandle', $this);
-            // Route the request
-            $route = $this->router->match($uri);
+            $eventsManager->trigger('application:beforeHandle', $this, ['request' => $request]);
 
-            var_dump($route);
+            $route = $router->match($request->uri(), $request->method());
+
+
+            var_dump($request->uri());
             if (!$route) {
-                // Trigger beforeNotFound event
-                $event = $this->eventsManager->trigger('application:beforeNotFound', $this, [
-                    'uri' => $uri
-                ]);
-                if (!$event->isPropagationStopped()) {
-                    // Default 404 handling
-                    http_response_code(404);
-                    echo 'Page not found';
-                }
-                return;
+                $eventsManager->trigger('application:beforeNotFound', $this);
+                return Response::error('Page Not Found', Response::HTTP_NOT_FOUND);
             }
 
-            // Dispatch the request
-            $this->dispatcher->dispatch($route);
-            // Trigger afterHandle event
-            $this->eventsManager->trigger('application:afterHandle', $this);
-        } catch (\Exception $e) {
-            // Trigger onException event
-            $event = $this->eventsManager->trigger('application:onException', $this, [
-                'exception' => $e
-            ]);
-            if (!$event->isPropagationStopped()) {
-                // Default exception handling
-                http_response_code(500);
-                echo 'An error occurred: ' . $e->getMessage();
-                // Log error in production
-                if (ini_get('display_errors') !== '1') {
-                    error_log($e->getMessage());
-                }
+            $dispatcher->setDI($this->di);
+            $response = $dispatcher->dispatch($route, $request);
+
+            if (!$response instanceof Response) {
+                // If controller doesn't return a Response, wrap its output
+                $response = new Response($response);
             }
+
+            $eventsManager->trigger('application:afterHandle', $this, ['response' => $response]);
+
+            return $response;
+
+        } catch (Exception $e) {
+            $event = $eventsManager->trigger('application:onException', $this, ['exception' => $e]);
+            
+            // In production, you would log the error
+            // error_log($e->getMessage() . PHP_EOL . $e->getTraceAsString());
+
+            // Return a generic error response
+            return Response::error('An unexpected error occurred.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function getDI(): Container
+    public function getDI(): ContainerInterface
     {
         return $this->di;
     }
-
-    public function getEventsManager(): EventsManager
-    {
-        return $this->eventsManager;
-    }
 }
+
+// Example public/index.php
+
+// 1. Create and configure the DI Container
+// $di = new \Core\Di\Container();
+// ... register all your services (db, config, router, etc.)
+
+// 2. Create the Application with the container
+//$app = new \Core\Mvc\Application($di);
+
+// 3. Create a Request and handle it
+//$request = new \Core\Http\Request();
+//$response = $app->handle($request);
+
+// 4. Send the final response
+// $response->send();

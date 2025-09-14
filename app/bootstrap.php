@@ -16,13 +16,38 @@ spl_autoload_register(function ($class) {
 
 // Load configuration
 $config = require APP_PATH . 'config.php';
+$di = new \Core\Di\Container();
+
+// --- Register Core Services ---
+$di->set('config', fn() => $config);
+
+$di->set('router', function() use ($config) {
+    $router = new \Core\Mvc\Router();
+    if (isset($config['modules'])) {
+        foreach ($config['modules'] as $module) {
+            if (isset($module['routes'])) {
+                foreach ($module['routes'] as $pattern => $routeConfig) {
+                    $router->add($pattern, $routeConfig);
+                }
+            }
+        }
+    }
+    return $router;
+});
+
+$di->set('dispatcher', fn() => new \Core\Mvc\Dispatcher());
+$di->set('eventsManager', fn() => new \Core\Events\Manager());
+$di->set('view', function() use ($di) {
+    $viewConfig = $di->get('config')['view'];
+    $view = new \Core\View\View($viewConfig['path']);
+    if (isset($viewConfig['layout'])) {
+        $view->setLayout($viewConfig['layout']);
+    }
+    return $view;
+});
+
 
 // Create application instance
-$application = new \Core\Mvc\Application($config);
+$app = new \Core\Mvc\Application($di);
 
-// Register modules
-if (isset($config['modules'])) {
-    $application->registerModules($config['modules']);
-}
-
-return $application;
+return $app;

@@ -20,8 +20,8 @@ abstract class Model
     protected $primaryKey = 'id';
     protected $attributes = [];
     protected $original = [];
-    protected $exists = false;
     protected $relations = [];
+    protected $exists = false;
 
     // Relationship constants
     const HAS_ONE           = 'hasOne';
@@ -34,13 +34,11 @@ abstract class Model
      */
     public function __construct(array $attributes = [])
     {
+        $this->syncOriginal();
         $this->fill($attributes);
         
         if (!isset($this->table)) {
-            // Auto-generate table name from class name
-            $class = get_class($this);
-            $class = substr(strrchr($class, '\\'), 1);
-            $this->table = strtolower($class);
+            $this->table = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassBaseName($this))) . 's';
         }
     }
 
@@ -105,8 +103,7 @@ abstract class Model
             return $this->relations[$key];
         }
 
-        $method = $key;
-        $relation = $this->$method();
+        $relation = $this->$key();
 
         if (!$relation instanceof Relation) {
             return $relation;
@@ -136,19 +133,22 @@ abstract class Model
      */
     public function save()
     {
+        $query = $this->newQuery();
+        
         if ($this->exists) {
-            // Update
-            $primaryKey = $this->primaryKey;
-            self::db()->table($this->table)
-               ->where($primaryKey, $this->$primaryKey)
-               ->update($this->attributes);
+            $dirty = $this->getDirty();
+            if (!empty($dirty)) {
+                $query->where($this->primaryKey, $this->getKey())->update($dirty);
+            }
         } else {
-            // Insert
-            $id = self::db()->table($this->table)->insert($this->attributes);
-            $this->primaryKey = $id;
-            $this->exists = true;
+            $id = $query->insert($this->attributes);
+            if ($id) {
+                $this->setAttribute($this->primaryKey, $id);
+                $this->exists = true;
+            }
         }
         
+        $this->syncOriginal();
         return $this;
     }
 
@@ -158,16 +158,10 @@ abstract class Model
     public static function find($id)
     {
         $instance = new static;
-
-        
-        $result = self::db()->table($instance->table)
-                    ->where($instance->primaryKey, $id)
-                    ->first();
+        $result = $instance->newQuery()->where($instance->primaryKey, $id)->first();
         
         if ($result) {
-            $instance->fill((array)$result);
-            $instance->exists = true;
-            return $instance;
+            return $instance->newFromBuilder($result);
         }
         
         return null;
@@ -178,16 +172,15 @@ abstract class Model
      */
     public static function all()
     {
-        $instance = new static;
-        
-        $results = self::db()->table($instance->table)->get();
-        
-        return array_map(function($item) use ($instance) {
-            $model = new static;
-            $model->fill((array)$item);
-            $model->exists = true;
-            return $model;
-        }, $results);
+        return static::query()->get();
+    }
+
+    /**
+     * Handle dynamic static method calls into the query builder.
+     */
+    public static function __callStatic($method, $parameters)
+    {
+        return (new static)->newQuery()->$method(...$parameters);
     }
 
     /**
@@ -243,6 +236,38 @@ abstract class Model
         return new BelongsToMany($instance, $this, $table, $foreignPivotKey, $relatedPivotKey);
     }
 
+    // --- Helper methods ---
+
+    public function newFromBuilder($attributes = [])
+    {
+        $model = new static;
+        $model->fill((array) $attributes);
+        $model->exists = true;
+        $model->syncOriginal();
+        return $model;
+    }
+
+    public function getKey()
+    {
+        return $this->getAttribute($this->primaryKey);
+    }
+
+    protected function getDirty()
+    {
+        $dirty = [];
+        foreach ($this->attributes as $key => $value) {
+            if (!array_key_exists($key, $this->original) || $value !== $this->original[$key]) {
+                $dirty[$key] = $value;
+            }
+        }
+        return $dirty;
+    }
+
+    protected function syncOriginal()
+    {
+        $this->original = $this->attributes;
+    }
+
     protected function getClassBaseName($class)
     {
         $class = is_object($class) ? get_class($class) : $class;
@@ -254,7 +279,7 @@ abstract class Model
      */
     protected function getForeignKey()
     {
-        return strtolower($this->getClassBaseName($this)) . '_id';
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassBaseName($this))) . '_id';
     }
 
     /**
@@ -263,8 +288,8 @@ abstract class Model
     protected function getJoinTableName($related)
     {
         $models = [
-            strtolower($this->getClassBaseName($this)),
-            strtolower($this->getClassBaseName($related))
+            strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassBaseName($this))),
+            strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassBaseName($related)))
         ];
         
         sort($models);
@@ -272,3 +297,35 @@ abstract class Model
         return implode('_', $models);
     }
 }
+
+// Example usage:
+// class User extends Model {
+//     protected $table = 'users';  // Optional if table name follows convention
+//     public function profile() {
+//         return $this->hasOne(Profile::class);
+//     }
+//     public function posts() {
+//         return $this->hasMany(Post::class);
+//     }
+//     public function roles() {
+//         return $this->belongsToMany(Role::class);
+//     }
+// }
+// class Profile extends Model {
+//     protected $table = 'profiles';
+//     public function user() {
+//         return $this->belongsTo(User::class);
+//     }
+// }
+// class Post extends Model {
+//     protected $table = 'posts';
+//     public function user() {
+//         return $this->belongsTo(User::class);
+//     }
+// }
+// class Role extends Model {
+//     protected $table = 'roles';
+//     public function users() {
+//         return $this->belongsToMany(User::class);
+//     }
+// }
