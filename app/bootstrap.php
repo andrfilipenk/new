@@ -1,6 +1,8 @@
 <?php
+
 define('BASE_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('APP_PATH', BASE_PATH . 'app' . DIRECTORY_SEPARATOR);
+define('APP_DIR', dirname($_SERVER['SCRIPT_NAME'],2));
 
 // Register autoloader
 spl_autoload_register(function ($class) {
@@ -20,7 +22,7 @@ $di = new \Core\Di\Container();
 
 // --- Register Core Services ---
 $di->set('config', fn() => $config);
-
+$di->set('db', fn() => new \Core\Database\Database());
 $di->set('router', function() use ($config) {
     $router = new \Core\Mvc\Router();
     if (isset($config['modules'])) {

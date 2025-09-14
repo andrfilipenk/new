@@ -18,6 +18,8 @@ class Controller
             $this->view = $this->getDI()->get('view');
         }
     }
+
+    public function afterExecute() {}
     
     /**
      * Renders a view. If data is returned from an action, it's passed to the view.

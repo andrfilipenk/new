@@ -83,7 +83,9 @@ class Request
 
     public function uri(): string
     {
-        return strtok($this->server['REQUEST_URI'] ?? '/', '?');
+        $uri = $this->server['REQUEST_URI'];
+        $uri = str_replace(APP_DIR, '', $uri);
+        return $uri;
     }
 
     public function ip(): string

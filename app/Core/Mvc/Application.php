@@ -28,8 +28,6 @@ class Application
 
             $route = $router->match($request->uri(), $request->method());
 
-
-            var_dump($request->uri());
             if (!$route) {
                 $eventsManager->trigger('application:beforeNotFound', $this);
                 return Response::error('Page Not Found', Response::HTTP_NOT_FOUND);
@@ -54,6 +52,7 @@ class Application
             // error_log($e->getMessage() . PHP_EOL . $e->getTraceAsString());
 
             // Return a generic error response
+            var_dump($e->getMessage());
             return Response::error('An unexpected error occurred.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
