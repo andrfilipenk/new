@@ -3,7 +3,7 @@
 namespace Core\Di\Interface;
 
 /**
- * PSR-11 Container Interface
+ * PSR-11 Compatible Container Interface
  * Describes the interface of a container that exposes methods to read its entries.
  */
 interface Container
@@ -25,4 +25,13 @@ interface Container
      * @return bool
      */
     public function has(string $id): bool;
+
+    /**
+     * Defines or overrides an entry in the container.
+     *
+     * @param string $id The identifier of the entry.
+     * @param mixed $concrete The concrete implementation, which can be a class name, an object, or a Closure.
+     * @return void
+     */
+    public function set(string $id, $concrete): void;
 }

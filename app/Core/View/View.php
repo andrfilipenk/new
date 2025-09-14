@@ -57,7 +57,8 @@ class View implements ViewInterface
             $output = $content;
         }
 
-        $this->fireEvent('view:afterRender', $this, ['output' => $output]);
+        // need to be fixed in future
+        $this->fireEvent('view:afterRender', $this);
         
         return $output;
     }
