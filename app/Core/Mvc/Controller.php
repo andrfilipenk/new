@@ -10,6 +10,7 @@ class Controller
 {
     use Injectable, EventAware;
     
+    /** @var \Core\View\View $view */
     protected $view;
     
     public function initialize(): void

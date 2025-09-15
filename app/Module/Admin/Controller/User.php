@@ -30,7 +30,6 @@ class User extends Controller
     public function apiAction()
     {
         // Disable auto-render and return JSON
-        $this->disableAutoRender();
         
         return json_encode([
             'status' => 'success',

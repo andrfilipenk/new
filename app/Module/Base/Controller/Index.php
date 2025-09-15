@@ -32,7 +32,7 @@ class Index extends Controller
     public function apiAction()
     {
         // Disable auto-render and return JSON
-        $this->disableAutoRender();
+        $this->view->disableLayout();
         
         return json_encode([
             'status' => 'success',
