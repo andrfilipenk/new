@@ -30,6 +30,7 @@ class Application
 
 
             var_dump($request->uri());
+            var_dump($route);
             if (!$route) {
                 $eventsManager->trigger('application:beforeNotFound', $this);
                 return Response::error('Page Not Found', Response::HTTP_NOT_FOUND);
