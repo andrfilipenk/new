@@ -6,6 +6,7 @@ use Core\Database\Model;
 
 class Users extends Model
 {
+    protected $table = 'users';
     protected $primaryKey = 'user_id';
     /* 
     CREATE TABLE users (
