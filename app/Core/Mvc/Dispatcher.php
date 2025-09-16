@@ -14,6 +14,7 @@ class Dispatcher
 
     protected $actionName;
     protected $controllerName;
+    protected $params = [];
 
     public function dispatch(array $route, Request $request)
     {
@@ -23,6 +24,7 @@ class Dispatcher
 
         $this->actionName = $action;
         $this->controllerName = $handlerClass;
+        $this->params = $params;
 
         $this->fireEvent('core:beforeDispatch', $this);
 
@@ -45,7 +47,7 @@ class Dispatcher
         $this->fireEvent('core:beforeExecuteRoute', $handler);
 
         // Execute the action and get the return value
-        $responseContent = call_user_func_array([$handler, $actionMethod], $params);
+        $responseContent = call_user_func([$handler, $actionMethod]);
 
         if (method_exists($handler, 'afterExecute')) {
             $handler->afterExecute();
@@ -63,6 +65,11 @@ class Dispatcher
 
         // Otherwise, treat the return value as content for a standard HTML response
         return new Response($responseContent);
+    }
+
+    public function getParam($key, $default = null)
+    {
+        return isset($this->params[$key]) ? $this->params[$key] : $default;
     }
 
     public function getActionName(): string

@@ -49,7 +49,13 @@ class Database
     {
         $new = clone $this;
         $new->table = $table;
-        $new->query = [
+        $new->resetQuery();
+        return $new;
+    }
+
+    private function resetQuery(): void
+    {
+        $this->query = [
             'select' => ['*'],
             'where' => [],
             'bindings' => [],
@@ -58,7 +64,6 @@ class Database
             'offset' => null,
             'join' => []
         ];
-        return $new;
     }
 
     public function select(array|string $columns = '*'): self
@@ -73,9 +78,26 @@ class Database
             $value = $operator;
             $operator = '=';
         }
-
         $this->query['where'][] = [$column, $operator, $value, 'AND'];
-        if ($value !== null) {
+
+        // Only add binding if value is not null and not an array (for IN clause)
+        if ($value !== null && !is_array($value)) {
+            $this->query['bindings'][] = $value;
+        }
+
+        return $this;
+    }
+
+    public function orWhere(string $column, mixed $operator = null, mixed $value = null): self
+    {
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $this->query['where'][] = [$column, $operator, $value, 'OR'];
+
+        if ($value !== null && !is_array($value)) {
             $this->query['bindings'][] = $value;
         }
 
@@ -85,9 +107,9 @@ class Database
     public function whereIn(string $column, array $values): self
     {
         if (empty($values)) return $this;
-        
+
         $this->query['where'][] = [$column, 'IN', $values, 'AND'];
-        $this->query['bindings'] = [...$this->query['bindings'], ...$values];
+        $this->query['bindings'] = array_merge($this->query['bindings'], array_values($values));
         return $this;
     }
 
@@ -99,7 +121,7 @@ class Database
 
     public function orderBy(string $column, string $direction = 'ASC'): self
     {
-        $this->query['order'][] = "{$column} " . strtoupper($direction);
+        $this->query['order'][] = $column . ' ' . strtoupper($direction);
         return $this;
     }
 
@@ -117,41 +139,55 @@ class Database
 
     public function get(): array
     {
-        return $this->execute($this->buildSelect())->fetchAll();
+        $sql = $this->buildSelect();
+        return $this->execute($sql, $this->query['bindings'])->fetchAll();
     }
 
     public function first(): ?array
     {
-        $result = $this->limit(1)->get();
+        $this->limit(1);
+        $result = $this->get();
         return $result[0] ?? null;
     }
 
     public function insert(array $data): string
     {
+        if (empty($data)) {
+            throw new DatabaseException("Cannot insert empty data");
+        }
+
         $columns = implode(',', array_keys($data));
         $placeholders = str_repeat('?,', count($data) - 1) . '?';
-        
-        $this->execute("INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})", array_values($data));
+
+        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
+        $this->execute($sql, array_values($data));
+
         return $this->pdo->lastInsertId();
     }
 
     public function update(array $data): int
     {
+        if (empty($data)) {
+            throw new DatabaseException("Cannot update with empty data");
+        }
+
         $set = implode(' = ?,', array_keys($data)) . ' = ?';
         $sql = "UPDATE {$this->table} SET {$set}" . $this->buildWhere();
-        
-        return $this->execute($sql, [...array_values($data), ...$this->query['bindings']])->rowCount();
+
+        $bindings = array_merge(array_values($data), $this->query['bindings']);
+        return $this->execute($sql, $bindings)->rowCount();
     }
 
     public function delete(): int
     {
-        return $this->execute("DELETE FROM {$this->table}" . $this->buildWhere(), $this->query['bindings'])->rowCount();
+        $sql = "DELETE FROM {$this->table}" . $this->buildWhere();
+        return $this->execute($sql, $this->query['bindings'])->rowCount();
     }
 
     private function buildSelect(): string
     {
         $sql = "SELECT " . implode(',', $this->query['select']) . " FROM {$this->table}";
-        
+
         if ($this->query['join']) {
             $sql .= ' ' . implode(' ', $this->query['join']);
         }
@@ -168,27 +204,30 @@ class Database
                 $sql .= " OFFSET {$this->query['offset']}";
             }
         }
-
         return $sql;
     }
 
     private function buildWhere(): string
     {
-        if (!$this->query['where']) return '';
+        if (empty($this->query['where'])) {
+            return '';
+        }
 
         $conditions = [];
         foreach ($this->query['where'] as $i => [$column, $operator, $value, $boolean]) {
             $prefix = $i > 0 ? " {$boolean} " : '';
-            
+
             if ($operator === 'IN') {
-                $placeholders = str_repeat('?,', count($value) - 1) . '?';
-                $conditions[] = "{$prefix}{$column} IN ({$placeholders})";
+                if (is_array($value) && !empty($value)) {
+                    $placeholders = str_repeat('?,', count($value) - 1) . '?';
+                    $conditions[] = "{$prefix}{$column} IN ({$placeholders})";
+                }
             } else {
                 $conditions[] = "{$prefix}{$column} {$operator} ?";
             }
         }
 
-        return ' WHERE ' . implode('', $conditions);
+        return $conditions ? ' WHERE ' . implode('', $conditions) : '';
     }
 
     private function execute(string $sql, array $params = []): \PDOStatement
@@ -198,7 +237,16 @@ class Database
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            throw new DatabaseException("Query failed: {$e->getMessage()}");
+            // Debug information
+            $paramCount = substr_count($sql, '?');
+            $providedCount = count($params);
+
+            throw new DatabaseException(
+                "Query failed: {$e->getMessage()}\n" .
+                "SQL: {$sql}\n" .
+                "Expected parameters: {$paramCount}, Provided: {$providedCount}\n" .
+                "Parameters: " . json_encode($params)
+            );
         }
     }
 

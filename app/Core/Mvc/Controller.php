@@ -20,6 +20,26 @@ class Controller
         }
     }
 
+    /**
+     * Undocumented function
+     *
+     * @return \Core\Http\Request
+     */
+    public function getRequest()
+    {
+        return $this->getDI()->get('request');
+    }
+
+    public function isPost()
+    {
+        return $this->getRequest()->isMethod('post');
+    }
+
+    public function getPost($key = null, $default = null)
+    {
+        return $this->getRequest()->post($key, $default);
+    }
+
     public function afterExecute() {}
     
     /**

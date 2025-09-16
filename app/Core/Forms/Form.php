@@ -15,17 +15,17 @@ class Form implements FormInterface
     public function __construct()
     {
         $this->renderers = [
-            'text' => $this->inputRenderer(),
-            'email' => $this->inputRenderer(),
-            'password' => $this->inputRenderer(), 
-            'number' => $this->inputRenderer(),
-            'date' => $this->inputRenderer(),
-            'time' => $this->inputRenderer(),
-            'datetime' => $this->inputRenderer('datetime-local'),
-            'textarea' => fn($n, $f, $v) => Tag::textarea($v ?: '', $this->attrs($n, $f)),
-            'select' => fn($n, $f, $v) => $this->selectRenderer($n, $f, $v),
-            'checkbox' => fn($n, $f, $v) => $this->checkboxRenderer($n, $f, $v),
-            'radio' => fn($n, $f, $v) => $this->radioRenderer($n, $f, $v),
+            'text'      => $this->inputRenderer(),
+            'email'     => $this->inputRenderer(),
+            'password'  => $this->inputRenderer(), 
+            'number'    => $this->inputRenderer(),
+            'date'      => $this->inputRenderer(),
+            'time'      => $this->inputRenderer(),
+            'datetime'  => $this->inputRenderer('datetime-local'),
+            'textarea'  => fn($n, $f, $v) => Tag::textarea($v ?: '', $this->attrs($n, $f)),
+            'select'    => fn($n, $f, $v) => $this->selectRenderer($n, $f, $v),
+            'checkbox'  => fn($n, $f, $v) => $this->checkboxRenderer($n, $f, $v),
+            'radio'     => fn($n, $f, $v) => $this->radioRenderer($n, $f, $v),
         ];
     }
 
@@ -34,7 +34,7 @@ class Form implements FormInterface
         return fn($name, $field, $value) => Tag::input(array_merge(
             $this->attrs($name, $field),
             [
-                'type' => $typeOverride ?? $field['type'],
+                'type'  => $typeOverride ?? $field['type'],
                 'value' => $this->formatValue($value, $field['type'])
             ]
         ));
@@ -43,12 +43,12 @@ class Form implements FormInterface
     public function addField(string $name, string $type, array $options = []): static
     {
         $this->fields[$name] = [
-            'type' => $type,
-            'label' => $options['label'] ?? $this->generateLabel($name),
-            'required' => $options['required'] ?? false,
-            'attributes' => $options['attributes'] ?? [],
-            'options' => $options['options'] ?? [],
-            'renderer' => $options['renderer'] ?? null,
+            'type'          => $type,
+            'label'         => $options['label'] ?? $this->generateLabel($name),
+            'required'      => $options['required'] ?? false,
+            'attributes'    => $options['attributes'] ?? [],
+            'options'       => $options['options'] ?? [],
+            'renderer'      => $options['renderer'] ?? null,
         ];
         return $this;
     }
@@ -72,21 +72,34 @@ class Form implements FormInterface
 
     public function render(): string
     {
-        $fields = '';
+        $output = $this->template;
+        
+        // Replace individual field placeholders first
         foreach (array_keys($this->fields) as $name) {
-            $fields .= $this->renderField($name);
+            $placeholder = '{field_' . $name . '}';
+            if (strpos($output, $placeholder) !== false) {
+                $output = str_replace($placeholder, $this->renderField($name), $output);
+            }
         }
-        return str_replace('{fields}', $fields, $this->template);
+        
+        // Then replace the general {fields} placeholder with any remaining fields
+        $remainingFields = '';
+        foreach (array_keys($this->fields) as $name) {
+            $placeholder = '{field_' . $name . '}';
+            if (strpos($output, $placeholder) === false) {
+                $remainingFields .= $this->renderField($name);
+            }
+        }
+        
+        return str_replace('{fields}', $remainingFields, $output);
     }
 
     public function renderField(string $name): string
     {
         $field = $this->fields[$name] ?? null;
         if (!$field) return '';
-
-        $value = $this->values[$name] ?? null;
-        $renderer = $field['renderer'] ?? $this->renderers[$field['type']] ?? $this->renderers['text'];
-        
+        $value      = $this->values[$name] ?? null;
+        $renderer   = $field['renderer'] ?? $this->renderers[$field['type']] ?? $this->renderers['text'];
         return str_replace(
             ['{label}', '{field}'],
             [
@@ -102,8 +115,8 @@ class Form implements FormInterface
         $options = [];
         foreach ($field['options'] as $optValue => $label) {
             $options[] = Tag::option($label, [
-                'value' => $optValue,
-                'selected' => (string)$optValue === (string)$value
+                'value'     => $optValue,
+                'selected'  => (string)$optValue === (string)$value
             ]);
         }
         return Tag::select($options, $this->attrs($name, $field));
@@ -112,9 +125,9 @@ class Form implements FormInterface
     private function checkboxRenderer(string $name, array $field, $value): string
     {
         return Tag::input(array_merge($this->attrs($name, $field), [
-            'type' => 'checkbox',
-            'value' => '1',
-            'checked' => (bool)$value
+            'type'      => 'checkbox',
+            'value'     => '1',
+            'checked'   => (bool)$value
         ]));
     }
 
@@ -125,11 +138,11 @@ class Form implements FormInterface
             $id = $name . '_' . $optValue;
             $radios[] = Tag::label([
                 Tag::input([
-                    'type' => 'radio',
-                    'name' => $name,
-                    'value' => $optValue,
-                    'id' => $id,
-                    'checked' => (string)$optValue === (string)$value
+                    'type'      => 'radio',
+                    'name'      => $name,
+                    'value'     => $optValue,
+                    'id'        => $id,
+                    'checked'   => (string)$optValue === (string)$value
                 ]),
                 ' ' . $label
             ], ['for' => $id, 'class' => 'radio-inline']);
@@ -140,9 +153,9 @@ class Form implements FormInterface
     private function attrs(string $name, array $field): array
     {
         return array_merge($field['attributes'], [
-            'name' => $name,
-            'id' => $field['attributes']['id'] ?? $name,
-            'required' => $field['required'] ?: null
+            'name'      => $name,
+            'id'        => $field['attributes']['id'] ?? $name,
+            'required'  => $field['required'] ?: null
         ]);
     }
 
@@ -150,9 +163,9 @@ class Form implements FormInterface
     {
         if ($value instanceof \DateTimeInterface) {
             return match($type) {
-                'datetime' => $value->format('Y-m-d\TH:i'),
-                'date' => $value->format('Y-m-d'),
-                'time' => $value->format('H:i'),
+                'datetime'  => $value->format('Y-m-d\TH:i'),
+                'date'      => $value->format('Y-m-d'),
+                'time'      => $value->format('H:i'),
                 default => (string) $value
             };
         }
@@ -176,3 +189,8 @@ class Form implements FormInterface
         return $this;
     }
 }
+
+/*
+
+example of form 
+ */

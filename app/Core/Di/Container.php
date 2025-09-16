@@ -24,7 +24,6 @@ class Container implements ContainerInterface
         foreach ($definitions as $id => $definition) {
             $this->set($id, $definition);
         }
-        
         self::$default = $this;
         $this->set(ContainerInterface::class, $this);
         $this->set(get_class($this), $this);
@@ -55,7 +54,6 @@ class Container implements ContainerInterface
     public function set(string $id, $concrete): void
     {
         unset($this->instances[$id], $this->factories[$id]);
-        
         if ($concrete instanceof Closure) {
             $this->factories[$id] = $concrete;
         } else {
@@ -71,18 +69,14 @@ class Container implements ContainerInterface
         if (isset($this->instances[$id])) {
             return $this->instances[$id];
         }
-        
         if (isset($this->factories[$id])) {
             return $this->instances[$id] = ($this->factories[$id])($this);
         }
-        
         $concrete = $this->definitions[$id] ?? $id;
-        
         if ($this->isResolvable($concrete)) {
             $instance = $this->build($concrete);
             return $this->instances[$id] = $instance;
         }
-        
         throw new NotFound("Service '{$id}' not found or cannot be resolved.");
     }
 
@@ -104,48 +98,38 @@ class Container implements ContainerInterface
         if ($concrete instanceof Closure) {
             return $concrete($this);
         }
-
         if (is_string($concrete) && class_exists($concrete)) {
             return $this->autowire($concrete);
         }
-
         throw new ContainerException("Cannot resolve service. Invalid definition provided.");
     }
 
     protected function autowire(string $class)
     {
         $reflector = new ReflectionClass($class);
-
         if (!$reflector->isInstantiable()) {
             throw new ContainerException("Class {$class} is not instantiable.");
         }
-
         $constructor = $reflector->getConstructor();
-
         if (is_null($constructor)) {
             return new $class();
         }
-
         $dependencies = array_map(
             fn(ReflectionParameter $param) => $this->resolveParameter($param),
             $constructor->getParameters()
         );
-
         return $reflector->newInstanceArgs($dependencies);
     }
 
     protected function resolveParameter(ReflectionParameter $param)
     {
         $type = $param->getType();
-
         if ($type && !$type->isBuiltin()) {
             return $this->get($type->getName());
         }
-
         if ($param->isDefaultValueAvailable()) {
             return $param->getDefaultValue();
         }
-
         throw new ContainerException("Cannot resolve constructor parameter '{$param->getName()}' for class '{$param->getDeclaringClass()->getName()}'.");
     }
 
@@ -154,7 +138,6 @@ class Container implements ContainerInterface
         if (is_string($provider)) {
             $provider = $this->build($provider);
         }
-        
         if (method_exists($provider, 'register')) {
             $provider->register($this);
         }

@@ -19,8 +19,11 @@ class Application
 
     public function handle(Request $request): Response
     {
+        /** @var \Core\Events\Manager $eventsManager */
         $eventsManager = $this->di->get('eventsManager');
+        /** @var Router $router */
         $router = $this->di->get('router');
+        /** @var Dispatcher $dispatcher */
         $dispatcher = $this->di->get('dispatcher');
 
         try {

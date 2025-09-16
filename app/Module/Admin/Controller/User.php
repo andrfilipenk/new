@@ -2,38 +2,42 @@
 namespace Module\Admin\Controller;
 
 use Core\Mvc\Controller;
+use Module\Admin\Models\Users;
 
 class User extends Controller
 {
-    public function getAction($id): array
+    /**
+     * returns user
+     *
+     * @return Users
+     */
+    protected function getUser()
     {
-        $user = \Module\Admin\Models\Users::find($id);
-        if (null === $user) {
+        /** @var \Core\Mvc\Dispatcher $dispatcher */
+        $dispatcher = $this->getDI()->get('dispatcher');
+        $id = $dispatcher->getParam('id');
+        $user = Users::find($id);
+        return $user;
+    }
+
+    public function getAction()
+    {
+        return $this->getUser()->getData();
+    }
+
+    public function createAction()
+    {
+        if ($this->isPost()) {
+            
+        }
+        // returns rendered form
+    }
+
+    public function editAction()
+    {
+        if ($this->isPost()) {
 
         }
-        
-        
-        var_dump($user);
-        exit;
-
-    }
-    
-    public function aboutAction()
-    {
-        // Manual view rendering with custom template
-        $this->view->setVar('title', 'About Us');
-        $this->view->setVar('content', 'This is the about page.');
-        
-        return $this->view->render('module/base/index/custom-about');
-    }
-    
-    public function apiAction()
-    {
-        // Disable auto-render and return JSON
-        
-        return json_encode([
-            'status' => 'success',
-            'data' => ['message' => 'API response']
-        ]);
+        // returns rendered form
     }
 }

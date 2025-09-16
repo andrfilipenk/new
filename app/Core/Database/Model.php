@@ -10,19 +10,19 @@ use Core\Database\Model\BelongsToMany;
 
 abstract class Model
 {
-    protected string $table = '';
-    protected string $primaryKey = 'id';
+    protected $table = '';
+    protected $primaryKey = 'id';
     protected array $attributes = [];
     protected array $original = [];
     protected array $relations = [];
     protected bool $exists = false;
     
     private static array $instances = [];
-    private static Database $db;
+    private static ?Database $db = null;
 
     public function __construct(array $attributes = [])
     {
-        if (!isset(self::$db)) {
+        if (self::$db === null) {
             self::$db = Container::getDefault()->get('db');
         }
 
@@ -40,8 +40,10 @@ abstract class Model
         return self::$db->table($instance->table);
     }
 
-    public static function find(mixed $id): ?static
+    public static function find(mixed $id): Model
     {
+        if ($id === null) return null;
+
         $result = static::query()->where(static::getInstance()->primaryKey, $id)->first();
         return $result ? static::newFromBuilder($result) : null;
     }
@@ -56,7 +58,8 @@ abstract class Model
 
     public static function all(): array
     {
-        return array_map([static::class, 'newFromBuilder'], static::query()->get());
+        $results = static::query()->get();
+        return array_map([static::class, 'newFromBuilder'], $results);
     }
 
     public static function with(array $relations): QueryBuilder
@@ -69,22 +72,29 @@ abstract class Model
         if ($this->exists) {
             $dirty = $this->getDirty();
             if (!empty($dirty)) {
-                static::query()->where($this->primaryKey, $this->getKey())->update($dirty);
+                $affected = static::query()->where($this->primaryKey, $this->getKey())->update($dirty);
+                return $affected > 0;
             }
+            return true; // No changes to save
         } else {
             $id = static::query()->insert($this->attributes);
-            $this->setAttribute($this->primaryKey, $id);
-            $this->exists = true;
+            if ($id) {
+                $this->setAttribute($this->primaryKey, $id);
+                $this->exists = true;
+                $this->syncOriginal();
+                return true;
+            }
         }
 
-        $this->syncOriginal();
-        return true;
+        return false;
     }
 
-    // Relationship methods
+    // Relationship methods - Fixed to work with Relations
     public function hasOne(string $related, ?string $foreignKey = null, ?string $localKey = null): HasOne
     {
-        return new HasOne($this->getRelatedInstance($related), $this, 
+        return new HasOne(
+            $this->getRelatedInstance($related),
+            $this,
             $foreignKey ?? $this->getForeignKey(), 
             $localKey ?? $this->primaryKey
         );
@@ -92,7 +102,9 @@ abstract class Model
 
     public function hasMany(string $related, ?string $foreignKey = null, ?string $localKey = null): HasMany
     {
-        return new HasMany($this->getRelatedInstance($related), $this,
+        return new HasMany(
+            $this->getRelatedInstance($related),
+            $this,
             $foreignKey ?? $this->getForeignKey(),
             $localKey ?? $this->primaryKey
         );
@@ -101,7 +113,9 @@ abstract class Model
     public function belongsTo(string $related, ?string $foreignKey = null, ?string $ownerKey = null): BelongsTo
     {
         $instance = $this->getRelatedInstance($related);
-        return new BelongsTo($instance, $this,
+        return new BelongsTo(
+            $instance,
+            $this,
             $foreignKey ?? $instance->getForeignKey(),
             $ownerKey ?? $instance->primaryKey
         );
@@ -110,14 +124,16 @@ abstract class Model
     public function belongsToMany(string $related, ?string $table = null, ?string $foreignPivotKey = null, ?string $relatedPivotKey = null): BelongsToMany
     {
         $instance = $this->getRelatedInstance($related);
-        return new BelongsToMany($instance, $this,
+        return new BelongsToMany(
+            $instance,
+            $this,
             $table ?? $this->getJoinTableName($instance),
             $foreignPivotKey ?? $this->getForeignKey(),
             $relatedPivotKey ?? $instance->getForeignKey()
         );
     }
 
-    // Optimized helper methods
+    // Helper methods
     private static function getInstance(): static
     {
         $class = static::class;
@@ -143,29 +159,40 @@ abstract class Model
         return $model;
     }
 
-    // Accessors
+    public function getTable(): string
+    {
+        return $this->table;
+    }
+
+    public function getKeyName(): string
+    {
+        return $this->primaryKey;
+    }
+
+    // Accessors and mutators
     public function fill(array $attributes): self
     {
         $this->attributes = array_merge($this->attributes, $attributes);
         return $this;
     }
 
-    public function setAttribute(string $key, mixed $value): self
+    public function setData(string $key, mixed $value): self
     {
         $this->attributes[$key] = $value;
         return $this;
     }
 
-    public function getAttribute(string $key): mixed
+    public function getData($key = null): mixed
     {
+        if ($key === null) {
+            return $this->attributes;
+        }
         if (array_key_exists($key, $this->attributes)) {
             return $this->attributes[$key];
         }
-
         if (method_exists($this, $key) && !array_key_exists($key, $this->relations)) {
             return $this->relations[$key] = $this->$key()->getResults();
         }
-
         return $this->relations[$key] ?? null;
     }
 
@@ -179,12 +206,15 @@ abstract class Model
         $this->relations[$key] = $value;
     }
 
-    private function getDirty(): array
+    protected function getDirty(): array
     {
-        return array_filter($this->attributes, fn($value, $key) => 
-            !array_key_exists($key, $this->original) || $value !== $this->original[$key], 
-            ARRAY_FILTER_USE_BOTH
-        );
+        $dirty = [];
+        foreach ($this->attributes as $key => $value) {
+            if (!array_key_exists($key, $this->original) || $value !== $this->original[$key]) {
+                $dirty[$key] = $value;
+            }
+        }
+        return $dirty;
     }
 
     private function syncOriginal(): void
@@ -206,8 +236,9 @@ abstract class Model
         sort($models);
         return implode('_', $models);
     }
-    
-    static public function className($class): string {
+
+    public static function className($class): string
+    {
         $class = is_object($class) ? get_class($class) : $class;
         return basename(str_replace('\\', '/', $class));
     }
@@ -228,17 +259,3 @@ abstract class Model
         return static::query()->$method(...$parameters);
     }
 }
-
-/*
-// Eager loading (prevents N+1)
-$users = User::with(['posts', 'profile'])->get();
-
-// Optimized bulk operations
-$users = User::findMany([1, 2, 3, 4, 5]);
-
-// Fluent API remains the same
-$activeUsers = User::where('status', 'active')
-                  ->orderBy('created_at', 'desc')
-                  ->limit(10)
-                  ->get();
-                  */

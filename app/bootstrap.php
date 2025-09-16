@@ -22,6 +22,17 @@ $di = new \Core\Di\Container();
 
 // --- Register Core Services ---
 $di->set('config', fn() => $config);
+
+$di->register(new \Core\View\ViewServiceProvider());
+$di->register(new \Core\Session\SessionServiceProvider());
+$di->register(new \Core\Cookie\CookieServiceProvider());
+
+// Register session service
+$di->set('session', \Core\Session\Session::class);
+
+// Register cookie service
+$di->set('cookie', \Core\Cookie\Cookie::class);
+
 $di->set('db', fn() => new \Core\Database\Database());
 $di->set('router', function() use ($config) {
     $router = new \Core\Mvc\Router();
