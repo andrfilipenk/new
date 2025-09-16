@@ -2,51 +2,51 @@
 
 namespace Core\Forms;
 
-use BadMethodCallException;
-
 class Builder
 {
-    protected $form;
+    private Form $form;
+    private static array $typeMap = [
+        'text' => 'text', 'email' => 'email', 'password' => 'password',
+        'number' => 'number', 'date' => 'date', 'time' => 'time', 
+        'datetime' => 'datetime', 'textarea' => 'textarea',
+        'select' => 'select', 'radio' => 'radio', 'checkbox' => 'checkbox'
+    ];
 
     public function __construct()
     {
         $this->form = new Form();
     }
 
-    /**
-     * Dynamically adds form fields.
-     *
-     * Catches calls to methods like `addTextField('name', 'Label')` or
-     * `addSelect('country', ['us' => 'USA'], 'Country')`.
-     *
-     * @param string $name The name of the method being called.
-     * @param array $arguments An enumerated array containing the parameters passed to the method.
-     * @return self
-     */
-    public function __call(string $name, array $arguments): self
+    public function __call(string $name, array $args): self
     {
-        if (strpos($name, 'add') === 0) {
-            $type = strtolower(preg_replace('/(Field|Group)$/', '', substr($name, 3)));
-            
-            $fieldName = $arguments[0];
-            $fieldOptions = [];
-
-            if (in_array($type, ['select', 'radio'])) {
-                // Signature: (string $name, array $options, string $label = null, array $attributes = [])
-                $fieldOptions['options'] = $arguments[1] ?? [];
-                $fieldOptions['label'] = $arguments[2] ?? null;
-                $fieldOptions['attributes'] = $arguments[3] ?? [];
-            } else {
-                // Signature: (string $name, string $label = null, array $attributes = [])
-                $fieldOptions['label'] = $arguments[1] ?? null;
-                $fieldOptions['attributes'] = $arguments[2] ?? [];
-            }
-
-            $this->form->addField($fieldName, $type, $fieldOptions);
-            return $this;
+        if (!str_starts_with($name, 'add')) {
+            throw new \BadMethodCallException("Method {$name} not found");
         }
 
-        throw new BadMethodCallException(sprintf('Method %s::%s does not exist.', static::class, $name));
+        $type = strtolower(preg_replace('/^add|Field$|Group$/i', '', $name));
+        
+        if (!isset(self::$typeMap[$type])) {
+            throw new \BadMethodCallException("Unknown field type: {$type}");
+        }
+
+        $fieldName = $args[0];
+        $options = [];
+
+        if (in_array($type, ['select', 'radio'])) {
+            $options = [
+                'options' => $args[1] ?? [],
+                'label' => $args[2] ?? null,
+                'attributes' => $args[3] ?? []
+            ];
+        } else {
+            $options = [
+                'label' => $args[1] ?? null,
+                'attributes' => $args[2] ?? []
+            ];
+        }
+
+        $this->form->addField($fieldName, $type, array_filter($options));
+        return $this;
     }
 
     public function setValues(array $values): self
@@ -61,9 +61,9 @@ class Builder
         return $this;
     }
 
-    public function setFieldTemplate(string $fieldTemplate): self
+    public function setFieldTemplate(string $template): self
     {
-        $this->form->setFieldTemplate($fieldTemplate);
+        $this->form->setFieldTemplate($template);
         return $this;
     }
 
@@ -78,31 +78,24 @@ class Builder
     }
 }
 
-/* Example usage:
+// Example for name, beginDate, endDate, users_id
+/*
+$userOptions = [1 => 'John Doe', 2 => 'Jane Smith', 3 => 'Mike Johnson'];
+
 $form = (new Builder())
-    ->addTextField('username', 'Username', ['class' => 'form-control'])
-    ->addPasswordField('password', 'Password', ['class' => 'form-control'])
-    ->addSelect('country', ['us' => 'USA', 'ca' => 'Canada'], 'Country', ['class' => 'form-select'])
-    ->setValues(['username' => 'johndoe', 'country' => 'ca'])
-    ->setTemplate('<form>{fields}<button type="submit">Submit</button></form>')
-    ->setFieldTemplate('<div class="mb-3">{label}{field}{error}</div>')
-    ->build();
-
-
-echo $form->render();
-echo $form;
-
-write example for form with fields: name, beginDate, endDate, users_id
-<!--
-$form = (new Builder())
-    ->addTextField('name', 'Name', ['class' => 'form-control'])
-    ->addDateField('beginDate', 'Begin Date', ['class' => 'form-control'])
+    ->addTextField('name', 'Project Name', ['class' => 'form-control', 'required' => true])
+    ->addDateField('beginDate', 'Start Date', ['class' => 'form-control'])
     ->addDateField('endDate', 'End Date', ['class' => 'form-control'])
-    ->addSelect('users_id', [1 => 'User 1', 2 => 'User 2'], 'User', ['class' => 'form-select'])
-    ->setValues(['name' => 'Project X', 'beginDate' => '2024-01-01', 'endDate' => '2024-12-31', 'users_id' => 2])
-    ->setTemplate('<form>{fields}<button type="submit">Submit</button></form>')
-    ->setFieldTemplate('<div class="mb-3">{label}{field}{error}</div>')
-    ->build();
-echo $form->render();
+    ->addSelect('users_id', $userOptions, 'Assigned User', ['class' => 'form-select'])
+    ->setValues([
+        'name' => 'Project Alpha',
+        'beginDate' => '2024-01-15',
+        'endDate' => '2024-06-30',
+        'users_id' => 2
+    ])
+    ->setTemplate('<form method="post" class="needs-validation">{fields}<button type="submit" class="btn btn-primary">Save Project</button></form>')
+    ->setFieldTemplate('<div class="mb-3">{label}{field}</div>')
+    ->render();
+
 echo $form;
 */

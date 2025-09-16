@@ -1,110 +1,82 @@
 <?php
+
 namespace Core\Utils;
 
-class Tag {
+class Tag 
+{
+    private string $tag;
+    private array $attributes = [];
+    private array $content = [];
 
-    private $tag;
-    private $attributes = [];
-    private $content = [];
-    private $selfClosing = false;
-
-    private static $selfClosingTags = [
+    private static array $voidTags = [
         'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 
         'link', 'meta', 'param', 'source', 'track', 'wbr'
     ];
 
-    public function __construct($tag) 
+    public function __construct(string $tag) 
     {
         $this->tag = $tag;
-        $this->selfClosing = in_array($tag, self::$selfClosingTags);
     }
 
-    public function attr($name, $value) 
+    public function attr(string $name, $value): self
     {
         $this->attributes[$name] = $value;
         return $this;
     }
 
-    public function content(...$content) 
+    public function content(...$content): self
     {
         $this->content = array_merge($this->content, $content);
         return $this;
     }
 
-    public function render() 
+    public function render(): string
     {
-        $html = '<' . $this->tag;
+        $html = '<' . $this->tag . $this->renderAttributes();
         
+        if (in_array($this->tag, self::$voidTags)) {
+            return $html . '>';
+        }
+        
+        return $html . '>' . implode('', $this->content) . '</' . $this->tag . '>';
+    }
+
+    private function renderAttributes(): string
+    {
+        if (empty($this->attributes)) return '';
+        
+        $attrs = [];
         foreach ($this->attributes as $name => $value) {
             if ($value === true) {
-                $html .= ' ' . $name;
-            } else if ($value !== false && $value !== null) {
-                $value = htmlspecialchars((string)$value, ENT_QUOTES);
-                $html .= sprintf(" %s=\"%s\"", $name, $value);
+                $attrs[] = $name;
+            } elseif ($value !== false && $value !== null) {
+                $attrs[] = $name . '="' . htmlspecialchars((string)$value, ENT_QUOTES) . '"';
             }
         }
         
-        if ($this->selfClosing) {
-            return $html . ' />';
-        }
-        
-        $html .= '>';
-        foreach ($this->content as $item) {
-            $html .= (string)$item;
-        }
-        $html .= '</' . $this->tag . '>';
-        
-        return $html;
+        return $attrs ? ' ' . implode(' ', $attrs) : '';
     }
 
-    public function __toString() 
+    public function __toString(): string
     {
         return $this->render();
     }
 
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic(string $name, array $args): self
     {
-        $el = new self($name);
+        $tag = new self($name);
         
-        // First argument can be content
-        if (isset($arguments[0]) && (is_string($arguments[0]) || is_array($arguments[0]) || $arguments[0] instanceof self)) {
-            $el->content(...(is_array($arguments[0]) ? $arguments[0] : [$arguments[0]]));
+        if (isset($args[0])) {
+            $content = is_array($args[0]) ? $args[0] : [$args[0]];
+            $tag->content(...$content);
         }
 
-        // Second argument can be attributes
-        $attributes = $arguments[1] ?? ($arguments[0] ?? []);
-        if (is_array($attributes)) {
-            foreach ($attributes as $k => $v) {
-                $el->attr($k, $v);
+        if (isset($args[1]) && is_array($args[1])) {
+            foreach ($args[1] as $attr => $value) {
+                $tag->attr($attr, $value);
             }
         }
 
-        return $el;
+        return $tag;
     }
 }
-
-/*
-// --- NEW USAGE EXAMPLES ---
-
-// Simple tag with content and attributes
-echo Tag::div('Hello World', ['class' => 'text-bold']);
-// Output: <div class="text-bold">Hello World</div>
-
-// Any self-closing tag is automatically handled
-echo Tag::input(['type' => 'text', 'name' => 'username', 'required' => true]);
-// Output: <input type="text" name="username" required />
-
-// Create any tag dynamically
-echo Tag::span('I am a span', ['id' => 'my-span']);
-// Output: <span id="my-span">I am a span</span>
-
-// Nesting tags
-echo Tag::div([
-    Tag::h1('Title'),
-    Tag::p('This is a paragraph with a ' . Tag::strong('bold') . ' word.'),
-    Tag::br(),
-    Tag::input(['type' => 'submit', 'value' => 'Go'])
-], ['class' => 'container']);
-// Output: <div class="container"><h1>Title</h1><p>This is a paragraph with a <strong>bold</strong> word.</p><br /><input type="submit" value="Go" /></div>
-
-*/
