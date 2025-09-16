@@ -1,5 +1,5 @@
 <?php
-
+// app/Core/Di/Interface/Exception.php
 namespace Core\Di\Interface;
 
 /**

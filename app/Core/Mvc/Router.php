@@ -1,5 +1,5 @@
 <?php
-// app/Core/Router/Router.php
+// app/Core/Mvc/Router.php
 namespace Core\Mvc;
 
 class Router

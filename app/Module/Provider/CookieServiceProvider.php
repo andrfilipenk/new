@@ -1,7 +1,8 @@
 <?php
-// app/Core/Cookie/CookieServiceProvider.php
-namespace Core\Cookie;
+// app/Module/Povider/CookieServiceProvider.php
+namespace Module\Povider;
 
+use Core\Cookie\Cookie;
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container;
 

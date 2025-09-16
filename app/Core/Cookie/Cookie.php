@@ -32,10 +32,12 @@ class Cookie implements CookieInterface
             $options['expires'] = time() + (int)($options['expires'] * 86400); // Convert days to seconds
         }
         // Trigger beforeSet event
-        $event = $this->fireEvent('cookie:beforeSet', $this, [
-            'name'      => $name,
-            'value'     => $value,
-            'options'   => $options
+        $event = $this->fireEvent('cookie:beforeSet', [$this, 
+            [
+                'name'      => $name,
+                'value'     => $value,
+                'options'   => $options
+            ]
         ]);
         if ($event->isPropagationStopped()) {
             return false;
@@ -57,10 +59,12 @@ class Cookie implements CookieInterface
             // Also set in $_COOKIE for immediate access
             $_COOKIE[$name] = $value;
             // Trigger afterSet event
-            $this->fireEvent('cookie:afterSet', $this, [
-                'name'      => $name,
-                'value'     => $value,
-                'options'   => $options
+            $this->fireEvent('cookie:afterSet', [$this,
+                [
+                    'name'      => $name,
+                    'value'     => $value,
+                    'options'   => $options
+                ]
             ]);
         }
         return $result;
@@ -69,17 +73,21 @@ class Cookie implements CookieInterface
     public function get(string $name, $default = null)
     {
         // Trigger beforeGet event
-        $event = $this->fireEvent('cookie:beforeGet', $this, [
-            'name' => $name
+        $event = $this->fireEvent('cookie:beforeGet',  [$this,
+            [
+                'name' => $name
+            ]
         ]);
         if ($event->isPropagationStopped()) {
             return $default;
         }
         $value = $_COOKIE[$name] ?? $default;
         // Trigger afterGet event
-        $this->fireEvent('cookie:afterGet', $this, [
-            'name'  => $name,
-            'value' => $value
+        $this->fireEvent('cookie:afterGet',  [$this, 
+            [
+                'name'  => $name,
+                'value' => $value
+            ]
         ]);
         return $value;
     }
@@ -96,9 +104,11 @@ class Cookie implements CookieInterface
         // Set expiration to past to delete
         $options['expires'] = time() - 3600;
         // Trigger beforeDelete event
-        $event = $this->fireEvent('cookie:beforeDelete', $this, [
-            'name'      => $name,
-            'options'   => $options
+        $event = $this->fireEvent('cookie:beforeDelete', [ $this,
+            [
+                'name'      => $name,
+                'options'   => $options
+            ]
         ]);
         if ($event->isPropagationStopped()) {
             return false;
@@ -120,8 +130,10 @@ class Cookie implements CookieInterface
             // Also remove from $_COOKIE for immediate effect
             unset($_COOKIE[$name]);
             // Trigger afterDelete event
-            $this->fireEvent('cookie:afterDelete', $this, [
-                'name' => $name
+            $this->fireEvent('cookie:afterDelete', [$this, 
+                [
+                    'name' => $name
+                ]
             ]);
         }
         return $result;

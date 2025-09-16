@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/Model/HasOne.php
 namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
@@ -11,7 +12,7 @@ class HasOne extends HasMany
     public function getResults()
     {
         return $this->query
-            ->where($this->foreignKey, $this->parent->getAttribute($this->localKey))
+            ->where($this->foreignKey, $this->parent->getData($this->localKey))
             ->first();
     }
 
@@ -20,7 +21,7 @@ class HasOne extends HasMany
         $dictionary = $this->buildDictionary($results);
 
         foreach ($models as $model) {
-            $key = $model->getAttribute($this->localKey);
+            $key = $model->getData($this->localKey);
             if (isset($dictionary[$key])) {
                 $model->setRelation($relation, $dictionary[$key][0]);
             }

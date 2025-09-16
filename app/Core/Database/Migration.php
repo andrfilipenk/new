@@ -1,6 +1,8 @@
 <?php
+// app/Core/Database/Migration.php
 namespace Core\Database;
 
+use Core\Di\Container;
 use Core\Di\Injectable;
 
 /**
@@ -9,13 +11,9 @@ use Core\Di\Injectable;
 abstract class Migration
 {
     use Injectable;
-
-    /** @var Database $db */
-    protected $db;
-
-    public function __construct()
-    {
-        $this->db = $this->getDI()->get('db');
+    
+    static public function db() : Database {
+        return Container::getDefault()->get('db');
     }
 
     /**
@@ -33,11 +31,11 @@ abstract class Migration
      */
     protected function createTable($tableName, callable $callback)
     {
-        $table = new Blueprint($tableName);
-        $callback($table);
+        $blueprint = new Blueprint($tableName);
+        $callback($blueprint);
         
-        $sql = $table->toSql();
-        $this->db->execute($sql);
+        $sql = $blueprint->toSql();
+        self::db()->execute($sql);
     }
 
     /**
@@ -45,7 +43,7 @@ abstract class Migration
      */
     protected function dropTable($tableName)
     {
-        $this->db->execute("DROP TABLE IF EXISTS {$tableName}");
+        self::db()->execute("DROP TABLE IF EXISTS {$tableName}");
     }
 
     /**
@@ -53,12 +51,12 @@ abstract class Migration
      */
     protected function table($tableName, callable $callback)
     {
-        $table = new Blueprint($tableName, true);
+        $table = new Blueprint($tableName);
         $callback($table);
         
         $sql = $table->toSql();
         if (!empty($sql)) {
-            $this->db->execute($sql);
+            self::db()->execute($sql);
         }
     }
 }

@@ -1,5 +1,5 @@
 <?php
-// app/Core/Dispatcher.php
+// app/Core/Mvc/Dispatcher.php
 namespace Core\Mvc;
 
 use Core\Di\Interface\Container as ContainerInterface;

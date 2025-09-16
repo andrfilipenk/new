@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/Database.php
 namespace Core\Database;
 
 use PDO;
@@ -230,7 +231,7 @@ class Database
         return $conditions ? ' WHERE ' . implode('', $conditions) : '';
     }
 
-    private function execute(string $sql, array $params = []): \PDOStatement
+    public function execute(string $sql, array $params = []): \PDOStatement
     {
         try {
             $stmt = $this->pdo->prepare($sql);

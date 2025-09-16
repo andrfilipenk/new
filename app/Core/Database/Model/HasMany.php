@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/Model/HasMany.php
 namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
@@ -22,7 +23,7 @@ class HasMany extends Relation
     public function getResults()
     {
         return $this->query
-            ->where($this->foreignKey, $this->parent->getAttribute($this->localKey))
+            ->where($this->foreignKey, $this->parent->getData($this->localKey))
             ->get();
     }
 
@@ -36,7 +37,7 @@ class HasMany extends Relation
         $dictionary = $this->buildDictionary($results);
 
         foreach ($models as $model) {
-            $key = $model->getAttribute($this->localKey);
+            $key = $model->getData($this->localKey);
             if (isset($dictionary[$key])) {
                 $model->setRelation($relation, $dictionary[$key]);
             }
@@ -49,7 +50,7 @@ class HasMany extends Relation
     {
         $dictionary = [];
         foreach ($results as $result) {
-            $dictionary[$result->getAttribute($this->foreignKey)][] = $result;
+            $dictionary[$result->getData($this->foreignKey)][] = $result;
         }
         return $dictionary;
     }
@@ -57,7 +58,7 @@ class HasMany extends Relation
     protected function getKeys(array $models, $key)
     {
         return array_unique(array_filter(array_map(function ($model) use ($key) {
-            return $model->getAttribute($key);
+            return $model->getData($key);
         }, $models)));
     }
 }

@@ -1,5 +1,5 @@
 <?php
-
+// app/Core/Events/StoppableEventInterface.php
 namespace Core\Events;
 
 /**

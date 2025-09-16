@@ -1,4 +1,5 @@
 <?php
+// app/Core/Events/EventAware.php
 namespace Core\Events;
 
 trait EventAware

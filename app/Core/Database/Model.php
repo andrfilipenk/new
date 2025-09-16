@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/Model.php
 namespace Core\Database;
 
 use Core\Di\Container;
@@ -18,14 +19,9 @@ abstract class Model
     protected bool $exists = false;
     
     private static array $instances = [];
-    private static ?Database $db = null;
 
     public function __construct(array $attributes = [])
     {
-        if (self::$db === null) {
-            self::$db = Container::getDefault()->get('db');
-        }
-
         if (!$this->table) {
             $this->table = $this->getTableName();
         }
@@ -34,13 +30,26 @@ abstract class Model
         $this->syncOriginal();
     }
 
+    static public function db(): Database {
+        return Container::getDefault()->get('db');
+    }
+
+    /**
+     * Get a new query instance for the model's table
+     */
+    public function newQuery()
+    {
+        return self::db()->table($this->table);
+    }
+
+
     public static function query(): Database
     {
         $instance = static::getInstance();
-        return self::$db->table($instance->table);
+        return self::db()->table($instance->table);
     }
 
-    public static function find(mixed $id): Model
+    public static function find(mixed $id): Model|null
     {
         if ($id === null) return null;
 
@@ -79,7 +88,7 @@ abstract class Model
         } else {
             $id = static::query()->insert($this->attributes);
             if ($id) {
-                $this->setAttribute($this->primaryKey, $id);
+                $this->setData($this->primaryKey, $id);
                 $this->exists = true;
                 $this->syncOriginal();
                 return true;
@@ -246,12 +255,12 @@ abstract class Model
     // Magic methods
     public function __get(string $key): mixed
     {
-        return $this->getAttribute($key);
+        return $this->getData($key);
     }
 
     public function __set(string $key, mixed $value): void
     {
-        $this->setAttribute($key, $value);
+        $this->setData($key, $value);
     }
 
     public static function __callStatic(string $method, array $parameters): mixed

@@ -1,5 +1,5 @@
 <?php
-
+// app/Core/Forms/FormInterface.php
 namespace Core\Forms;
 
 interface FormInterface

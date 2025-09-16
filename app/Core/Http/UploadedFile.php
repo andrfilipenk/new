@@ -1,5 +1,5 @@
 <?php
-
+// app/Core/Http/UploadedFile.php
 namespace Core\Http;
 
 use RuntimeException;

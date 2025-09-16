@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/Blueprint.php
 namespace Core\Database;
 
 /**
@@ -9,186 +10,82 @@ class Blueprint
     protected $table;
     protected $columns = [];
     protected $commands = [];
-    protected $modifying = false;
 
-    public function __construct($table, $modifying = false)
+    public function __construct($table)
     {
         $this->table = $table;
-        $this->modifying = $modifying;
     }
 
-    public function id($column = 'id')
+    protected function addColumn(string $type, string $name): ColumnDefinition
     {
-        return $this->integer($column, true);
+        $column = new ColumnDefinition([
+            'type' => $type,
+            'name' => $name,
+        ]);
+        $this->columns[] = $column;
+        return $column;
     }
 
-    public function integer($column, $autoIncrement = false, $primaryKey = false)
+    public function id(string $name = 'id'): ColumnDefinition
     {
-        $this->columns[] = [
-            'name' => $column,
-            'type' => 'INT',
-            'auto_increment' => $autoIncrement,
-            'primary_key' => $primaryKey
-        ];
-        return $this;
+        return $this->addColumn('INT', $name)->unsigned()->autoIncrement()->primary();
     }
 
-    public function string($column, $length = 255)
+    public function string(string $name, int $length = 255): ColumnDefinition
     {
-        $this->columns[] = [
-            'name' => $column,
-            'type' => "VARCHAR($length)"
-        ];
-        return $this;
+        return $this->addColumn("VARCHAR({$length})", $name);
     }
 
-    public function text($column)
+    public function integer(string $name): ColumnDefinition
     {
-        $this->columns[] = [
-            'name' => $column,
-            'type' => 'TEXT'
-        ];
-        return $this;
+        return $this->addColumn('INT', $name);
     }
 
-    public function timestamp($column)
+    public function text(string $name): ColumnDefinition
     {
-        $this->columns[] = [
-            'name' => $column,
-            'type' => 'TIMESTAMP'
-        ];
-        return $this;
+        return $this->addColumn('TEXT', $name);
     }
 
-    public function timestamps()
+    public function timestamp(string $name): ColumnDefinition
     {
-        $this->timestamp('created_at')->nullable();
-        $this->timestamp('updated_at')->nullable();
+        return $this->addColumn('TIMESTAMP', $name);
     }
 
-    public function nullable()
+    public function timestamps(): void
     {
-        $lastColumn = end($this->columns);
-        $lastColumn['nullable'] = true;
-        $this->columns[key($this->columns)] = $lastColumn;
-        return $this;
+        $this->timestamp('created_at')->nullable()->default('CURRENT_TIMESTAMP');
+        $this->timestamp('updated_at')->nullable()->default('CURRENT_TIMESTAMP');
     }
 
-    public function default($value)
+    public function foreign(string $column): ColumnDefinition
     {
-        $lastColumn = end($this->columns);
-        $lastColumn['default'] = $value;
-        $this->columns[key($this->columns)] = $lastColumn;
-        return $this;
+        return $this->addColumn('FOREIGN', $column);
     }
 
-    public function unique()
+    public function toSql(): string
     {
-        $lastColumn = end($this->columns);
-        $this->commands[] = [
-            'type' => 'unique',
-            'column' => $lastColumn['name']
-        ];
-        return $this;
-    }
-
-    public function foreign($column)
-    {
-        $command = [
-            'type' => 'foreign',
-            'column' => $column
-        ];
-        $this->commands[] = $command;
-        return $this;
-    }
-
-    public function references($column)
-    {
-        $lastCommand = end($this->commands);
-        $lastCommand['references'] = $column;
-        $this->commands[key($this->commands)] = $lastCommand;
-        return $this;
-    }
-
-    public function on($table)
-    {
-        $lastCommand = end($this->commands);
-        $lastCommand['on'] = $table;
-        $this->commands[key($this->commands)] = $lastCommand;
-        return $this;
-    }
-
-    public function toSql()
-    {
-        if ($this->modifying) {
-            return $this->toAlterSql();
-        }
-        return $this->toCreateSql();
-    }
-
-    protected function toCreateSql()
-    {
-        $sql = "CREATE TABLE {$this->table} (";
-        $columns = [];
+        $columnsSql = [];
+        $primaryKeys = [];
+        $foreignKeys = [];
         foreach ($this->columns as $column) {
-            $columnSql = "{$column['name']} {$column['type']}";
-            if (isset($column['nullable']) && $column['nullable']) {
-                $columnSql .= " NULL";
-            } else {
-                $columnSql .= " NOT NULL";
+            if ($column->get('type') === 'FOREIGN') {
+                $foreignKeys[] = $column->toSql();
+                continue;
             }
-            if (isset($column['default'])) {
-                $default = is_string($column['default']) ? "'{$column['default']}'" : $column['default'];
-                $columnSql .= " DEFAULT {$default}";
-            }
-            if (isset($column['auto_increment']) && $column['auto_increment']) {
-                $columnSql .= " AUTO_INCREMENT";
-            }
-            if (isset($column['primary_key']) && $column['primary_key']) {
-                $columnSql .= " PRIMARY KEY";
-            }
-            $columns[] = $columnSql;
-        }
-        $sql .= implode(', ', $columns);
-        // Add unique constraints
-        foreach ($this->commands as $command) {
-            if ($command['type'] === 'unique') {
-                $sql .= ", UNIQUE ({$command['column']})";
+            $columnsSql[] = $column->toSql();
+            if ($column->get('primary')) {
+                $primaryKeys[] = $column->get('name');
             }
         }
-        // Add foreign key constraints
-        foreach ($this->commands as $command) {
-            if ($command['type'] === 'foreign') {
-                $sql .= ", FOREIGN KEY ({$command['column']}) REFERENCES {$command['on']}({$command['references']})";
-            }
+        $sql = "CREATE TABLE `{$this->table}` (\n";
+        $sql .= "    " . implode(",\n    ", $columnsSql);
+        if (!empty($primaryKeys)) {
+            $sql .= ",\n    PRIMARY KEY (`" . implode('`, `', $primaryKeys) . "`)";
         }
-        $sql .= ")";
+        if (!empty($foreignKeys)) {
+            $sql .= ",\n    " . implode(",\n    ", $foreignKeys);
+        }
+        $sql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
         return $sql;
-    }
-
-    protected function toAlterSql()
-    {
-        $sql = [];
-        foreach ($this->columns as $column) {
-            $columnSql = "ALTER TABLE {$this->table} ADD COLUMN {$column['name']} {$column['type']}";
-            if (isset($column['nullable']) && $column['nullable']) {
-                $columnSql .= " NULL";
-            } else {
-                $columnSql .= " NOT NULL";
-            }
-            if (isset($column['default'])) {
-                $default = is_string($column['default']) ? "'{$column['default']}'" : $column['default'];
-                $columnSql .= " DEFAULT {$default}";
-            }
-            $sql[] = $columnSql;
-        }
-        foreach ($this->commands as $command) {
-            if ($command['type'] === 'unique') {
-                $sql[] = "ALTER TABLE {$this->table} ADD UNIQUE ({$command['column']})";
-            } elseif ($command['type'] === 'foreign') {
-                $sql[] = "ALTER TABLE {$this->table} ADD FOREIGN KEY ({$command['column']}) REFERENCES {$command['on']}({$command['references']})";
-            }
-        }
-        return implode('; ', $sql);
     }
 }

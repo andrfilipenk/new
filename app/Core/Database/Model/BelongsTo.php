@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/Model/BelongsTo.php
 namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
@@ -21,7 +22,7 @@ class BelongsTo extends Relation
     
     public function getResults()
     {
-        $foreignKeyValue = $this->parent->getAttribute($this->foreignKey);
+        $foreignKeyValue = $this->parent->getData($this->foreignKey);
         return $foreignKeyValue ? $this->query->where($this->ownerKey, $foreignKeyValue)->first() : null;
     }
 

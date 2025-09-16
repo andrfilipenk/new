@@ -1,5 +1,6 @@
 <?php
-namespace Core\View;
+// app/Module/Provider/ViewServiceProvider.php
+namespace Module\Provider;
 
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container as ContainerInterface;
@@ -10,22 +11,15 @@ class ViewServiceProvider implements ServiceProvider
     {
         $di->set('view', function() use ($di) {
             $config = $di->get('config')['view'];
-            
-            $view = new View($config['path'], $config['cachePath'] ?? null);
-            
-            // Set default layout if configured
+            // The constructor now only needs the template path.
+            $view = new View($config['path']);
             if (isset($config['layout'])) {
                 $view->setLayout($config['layout']);
             }
-            
-            // Inject DI container
             $view->setDI($di);
-            
-            // Inject events manager if available
             if ($di->has('eventsManager')) {
                 $view->setEventsManager($di->get('eventsManager'));
             }
-            
             return $view;
         });
     }

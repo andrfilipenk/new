@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/Model/BelongsToMany.php
 namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
@@ -66,8 +67,8 @@ class BelongsToMany extends Relation
 
     protected function getKeys(array $models, $key)
     {
-        return array_unique(array_filter(array_map(function ($model) use ($key) {
-            return $model->getAttribute($key);
+        return array_unique(array: array_filter(array_map(function ($model) use ($key) {
+            return $model->getData($key);
         }, $models)));
     }
 }

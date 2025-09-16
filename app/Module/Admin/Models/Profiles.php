@@ -1,5 +1,5 @@
 <?php
-// User model
+// app/Module/Admin/Models/Profiles.php
 namespace Module\Admin\Models;
 
 use Core\Database\Model;
@@ -21,6 +21,6 @@ class Profiles extends Model
     
     public function profile()
     {
-        return $this->hasOne(Profile::class);
+        return $this->hasOne(Profiles::class);
     }
 }

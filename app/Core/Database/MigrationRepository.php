@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/MigrationRepository.php
 namespace Core\Database;
 
 use Core\Di\Injectable;

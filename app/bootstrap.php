@@ -1,5 +1,5 @@
 <?php
-
+// app/bootstrap.php
 define('BASE_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
 define('APP_PATH', BASE_PATH . 'app' . DIRECTORY_SEPARATOR);
 define('APP_DIR', dirname($_SERVER['SCRIPT_NAME'],2));
@@ -23,9 +23,9 @@ $di = new \Core\Di\Container();
 // --- Register Core Services ---
 $di->set('config', fn() => $config);
 
-$di->register(new \Core\View\ViewServiceProvider());
-$di->register(new \Core\Session\SessionServiceProvider());
-$di->register(new \Core\Cookie\CookieServiceProvider());
+$di->register(new \Module\Provider\ViewServiceProvider());
+$di->register(new \Module\Provider\SessionServiceProvider());
+$di->register(new \Module\Provider\CookieServiceProvider());
 
 // Register session service
 $di->set('session', \Core\Session\Session::class);
@@ -58,7 +58,8 @@ $di->set('view', function() use ($di) {
     }
     return $view;
 });
-
+$di->set(\Core\Database\MigrationRepository::class, fn() => new \Core\Database\MigrationRepository());
+$di->set(\Core\Database\Migrator::class, fn() => new \Core\Database\Migrator());
 
 // Create application instance
 $app = new \Core\Mvc\Application($di);

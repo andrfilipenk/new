@@ -1,0 +1,16 @@
+<?php
+    // Set default values
+    $type = $type ?? 'info'; // 'info', 'success', 'warning', 'danger'
+    $message = $message ?? 'This is an alert.';
+
+    $alertClasses = [
+        'info' => 'alert-blue',
+        'success' => 'alert-green',
+        'warning' => 'alert-yellow',
+        'danger' => 'alert-red',
+    ];
+    $class = $alertClasses[$type];
+?>
+<div class="alert <?= $class ?>">
+    <?= htmlspecialchars($message) ?>
+</div>

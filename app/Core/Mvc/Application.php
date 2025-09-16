@@ -27,7 +27,7 @@ class Application
         $dispatcher = $this->di->get('dispatcher');
 
         try {
-            $eventsManager->trigger('application:beforeHandle', $this, ['request' => $request]);
+            $eventsManager->trigger('application:beforeHandle', $this);
 
             $route = $router->match($request->uri(), $request->method());
 
@@ -44,12 +44,12 @@ class Application
                 $response = new Response($response);
             }
 
-            $eventsManager->trigger('application:afterHandle', $this, ['response' => $response]);
+            $eventsManager->trigger('application:afterHandle', $this);
 
             return $response;
 
         } catch (Exception $e) {
-            $event = $eventsManager->trigger('application:onException', $this, ['exception' => $e]);
+            $event = $eventsManager->trigger('application:onException', [$this, $e] );
             
             // In production, you would log the error
             // error_log($e->getMessage() . PHP_EOL . $e->getTraceAsString());

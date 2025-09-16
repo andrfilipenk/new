@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/QueryBuilder.php
 namespace Core\Database;
 
 class QueryBuilder

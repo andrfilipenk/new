@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/DatabaseException.php
 namespace Core\Database;
 
 /**

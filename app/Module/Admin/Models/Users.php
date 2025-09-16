@@ -1,5 +1,5 @@
 <?php
-// User model
+// app/Module/Admin/Models/Users.php
 namespace Module\Admin\Models;
 
 use Core\Database\Model;

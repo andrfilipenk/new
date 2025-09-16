@@ -1,0 +1,11 @@
+<?php
+use Core\Mvc\Controller;
+// In some controller...
+class Test extends Controller {
+
+    public function index() {
+    // Render the view with a specific layout
+        return $this->render('index', [], 'in-controller');
+    }
+      
+}

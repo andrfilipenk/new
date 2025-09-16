@@ -3,9 +3,13 @@
 namespace Module\Base\Controller;
 
 use Core\Mvc\Controller;
+use stdClass;
 
 class User extends Controller
 {
+    protected function authenticate($username,$password) {
+        return new stdClass;
+    }
     public function rememberMeAction()
     {
         if ($this->request->isPost()) {
@@ -14,7 +18,7 @@ class User extends Controller
             $remember = $this->request->getPost('remember', false);
             
             // Authenticate user (pseudo-code)
-            if ($this->authenticate($username, $password)) {
+            if ($user = $this->authenticate($username, $password)) {
                 // Store user in session
                 $this->session->set('user', [
                     'id' => $user->id,

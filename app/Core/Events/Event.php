@@ -1,5 +1,5 @@
 <?php
-
+// app/Core/Events/Event.php
 namespace Core\Events;
 
 class Event implements StoppableEventInterface

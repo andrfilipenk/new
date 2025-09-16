@@ -1,4 +1,5 @@
 <?php
+// app/Core/Di/Exception/NotFound.php
 namespace Core\Di\Exception;
 
 use Core\Di\Interface\NotFoundException;

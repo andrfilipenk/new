@@ -1,0 +1,14 @@
+<?php $this->setLayout('app'); // This layout itself uses 'app.phtml' as its base ?>
+
+<?php $this->startSection('content'); ?>
+    <div class="admin-panel">
+        <aside class="admin-sidebar">
+            <!-- Admin Navigation -->
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/users">Users</a>
+        </aside>
+        <main class="admin-content">
+            <?php echo $this->yield('main-content'); // A new section for the actual page content ?>
+        </main>
+    </div>
+<?php $this->endSection(); ?>

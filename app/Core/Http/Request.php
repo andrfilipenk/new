@@ -1,5 +1,5 @@
 <?php
-
+// app/Core/Http/Request.php
 namespace Core\Http;
 
 class Request

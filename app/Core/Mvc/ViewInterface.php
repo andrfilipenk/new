@@ -1,6 +1,6 @@
 <?php
-// app/Core/View/ViewInterface.php
-namespace Core\View;
+// app/Core/Mvc/ViewInterface.php
+namespace Core\Mvc;
 
 interface ViewInterface
 {

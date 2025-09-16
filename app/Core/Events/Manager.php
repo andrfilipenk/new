@@ -1,5 +1,5 @@
 <?php
-
+// app/Core/Events/Manager.php
 namespace Core\Events;
 
 use InvalidArgumentException;

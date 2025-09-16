@@ -1,4 +1,5 @@
 <?php
+// app/Core/Database/Model/Relation.php
 namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;

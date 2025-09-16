@@ -1,7 +1,6 @@
 <?php
-
+// app/Core/Di/Injectable.php
 namespace Core\Di;
-
 
 use Core\Di\Interface\Container as ContainerInterface;
 

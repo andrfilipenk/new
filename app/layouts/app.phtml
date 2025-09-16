@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($title ?? 'My App') ?></title>
+    <!-- Base CSS -->
+    <?php echo $this->yield('styles'); ?>
+</head>
+<body>
+    <div class="container">
+        <?php echo $this->yield('content'); ?>
+    </div>
+    <!-- Base JS -->
+    <?php echo $this->yield('scripts'); ?>
+</body>
+</html>

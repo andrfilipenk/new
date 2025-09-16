@@ -1,5 +1,5 @@
 <?php
-
+// app/Core/Events/EventInterface.php
 namespace Core\Events;
 
 interface EventInterface

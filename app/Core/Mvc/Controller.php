@@ -1,16 +1,17 @@
 <?php
+// app/Core/Mvc/Controller.php
 namespace Core\Mvc;
 
 use Core\Di\Injectable;
 use Core\Events\EventAware;
 use Core\Http\Response;
-use Core\View\ViewInterface;
+use Core\Mvc\ViewInterface;
 
 class Controller
 {
     use Injectable, EventAware;
     
-    /** @var \Core\View\View $view */
+    /** @var \Core\Mvc\View $view */
     protected $view;
     
     public function initialize(): void

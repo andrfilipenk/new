@@ -1,0 +1,13 @@
+<h1>My Page</h1>
+
+<?php echo $this->partial('partials/_alert', [
+    'type' => 'success',
+    'message' => 'Your profile was updated successfully!'
+]); ?>
+
+<p>Some page content...</p>
+
+<?php echo $this->partial('partials/_alert', [
+    'type' => 'danger',
+    'message' => 'Could not connect to the database.'
+]); ?>

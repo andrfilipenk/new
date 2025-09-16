@@ -1,7 +1,8 @@
 <?php
-// app/Core/Session/SessionServiceProvider.php
-namespace Core\Session;
+// app/Module/Provider/SessionServiceProvider.php
+namespace Module\Provider;
 
+use Core\Session\Session;
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container;
 
