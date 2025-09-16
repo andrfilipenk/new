@@ -2,330 +2,243 @@
 namespace Core\Database;
 
 use Core\Di\Container;
-use Core\Di\Injectable;
 use Core\Database\Model\Relation;
 use Core\Database\Model\HasOne;
 use Core\Database\Model\HasMany;
 use Core\Database\Model\BelongsTo;
 use Core\Database\Model\BelongsToMany;
 
-/**
- * Base Model class with relationship support
- */
 abstract class Model
 {
-    use Injectable;
+    protected string $table = '';
+    protected string $primaryKey = 'id';
+    protected array $attributes = [];
+    protected array $original = [];
+    protected array $relations = [];
+    protected bool $exists = false;
+    
+    private static array $instances = [];
+    private static Database $db;
 
-    protected $table;
-    protected $primaryKey = 'id';
-    protected $attributes = [];
-    protected $original = [];
-    protected $relations = [];
-    protected $exists = false;
-
-    // Relationship constants
-    const HAS_ONE           = 'hasOne';
-    const HAS_MANY          = 'hasMany';
-    const BELONGS_TO        = 'belongsTo';
-    const BELONGS_TO_MANY   = 'belongsToMany';
-
-    /**
-     * Model constructor
-     */
     public function __construct(array $attributes = [])
     {
-        $this->syncOriginal();
+        if (!isset(self::$db)) {
+            self::$db = Container::getDefault()->get('db');
+        }
+
+        if (!$this->table) {
+            $this->table = $this->getTableName();
+        }
+
         $this->fill($attributes);
+        $this->syncOriginal();
+    }
+
+    public static function query(): Database
+    {
+        $instance = static::getInstance();
+        return self::$db->table($instance->table);
+    }
+
+    public static function find(mixed $id): ?static
+    {
+        $result = static::query()->where(static::getInstance()->primaryKey, $id)->first();
+        return $result ? static::newFromBuilder($result) : null;
+    }
+
+    public static function findMany(array $ids): array
+    {
+        if (empty($ids)) return [];
         
-        if (!isset($this->table)) {
-            $this->table = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassBaseName($this))) . 's';
-        }
+        $results = static::query()->whereIn(static::getInstance()->primaryKey, $ids)->get();
+        return array_map([static::class, 'newFromBuilder'], $results);
     }
 
-    /**
-     * Returns db instance
-     */
-    static public function db(): Database {
-        return Container::getDefault()->get('db');
-    }
-
-    /**
-     * Get a new query instance for the model's table
-     */
-    public function newQuery()
+    public static function all(): array
     {
-        return self::db()->table($this->table);
+        return array_map([static::class, 'newFromBuilder'], static::query()->get());
     }
 
-    /**
-     * Fill model with attributes
-     */
-    public function fill(array $attributes)
+    public static function with(array $relations): QueryBuilder
     {
-        foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
-        }
-        return $this;
+        return new QueryBuilder(static::class, $relations);
     }
 
-    /**
-     * Set attribute
-     */
-    public function setAttribute($key, $value)
+    public function save(): bool
     {
-        $this->attributes[$key] = $value;
-        return $this;
-    }
-
-    /**
-     * Get attribute
-     */
-    public function getAttribute($key)
-    {
-        if (array_key_exists($key, $this->attributes)) {
-            return $this->attributes[$key];
-        }
-
-        if (method_exists($this, $key)) {
-            // Relationship method
-            return $this->getRelationship($key);
-        }
-
-        return null;
-    }
-
-    /**
-     * Get relationship
-     */
-    protected function getRelationship($key)
-    {
-        if (array_key_exists($key, $this->relations)) {
-            return $this->relations[$key];
-        }
-
-        $relation = $this->$key();
-
-        if (!$relation instanceof Relation) {
-            return $relation;
-        }
-
-        return $this->relations[$key] = $relation->getResults();
-    }
-
-    /**
-     * Magic getter
-     */
-    public function __get($key)
-    {
-        return $this->getAttribute($key);
-    }
-
-    /**
-     * Magic setter
-     */
-    public function __set($key, $value)
-    {
-        return $this->setAttribute($key, $value);
-    }
-
-    /**
-     * Save model
-     */
-    public function save()
-    {
-        $query = $this->newQuery();
-        
         if ($this->exists) {
             $dirty = $this->getDirty();
             if (!empty($dirty)) {
-                $query->where($this->primaryKey, $this->getKey())->update($dirty);
+                static::query()->where($this->primaryKey, $this->getKey())->update($dirty);
             }
         } else {
-            $id = $query->insert($this->attributes);
-            if ($id) {
-                $this->setAttribute($this->primaryKey, $id);
-                $this->exists = true;
-            }
+            $id = static::query()->insert($this->attributes);
+            $this->setAttribute($this->primaryKey, $id);
+            $this->exists = true;
         }
-        
+
         $this->syncOriginal();
-        return $this;
+        return true;
     }
 
-    /**
-     * Find by primary key
-     */
-    public static function find($id)
+    // Relationship methods
+    public function hasOne(string $related, ?string $foreignKey = null, ?string $localKey = null): HasOne
     {
-        $instance = new static;
-        $result = $instance->newQuery()->where($instance->primaryKey, $id)->first();
-        
-        if ($result) {
-            return $instance->newFromBuilder($result);
-        }
-        
-        return null;
+        return new HasOne($this->getRelatedInstance($related), $this, 
+            $foreignKey ?? $this->getForeignKey(), 
+            $localKey ?? $this->primaryKey
+        );
     }
 
-    /**
-     * Get all records
-     */
-    public static function all()
+    public function hasMany(string $related, ?string $foreignKey = null, ?string $localKey = null): HasMany
     {
-        return static::query()->get();
+        return new HasMany($this->getRelatedInstance($related), $this,
+            $foreignKey ?? $this->getForeignKey(),
+            $localKey ?? $this->primaryKey
+        );
     }
 
-    /**
-     * Handle dynamic static method calls into the query builder.
-     */
-    public static function __callStatic($method, $parameters)
+    public function belongsTo(string $related, ?string $foreignKey = null, ?string $ownerKey = null): BelongsTo
     {
-        return (new static)->newQuery()->$method(...$parameters);
+        $instance = $this->getRelatedInstance($related);
+        return new BelongsTo($instance, $this,
+            $foreignKey ?? $instance->getForeignKey(),
+            $ownerKey ?? $instance->primaryKey
+        );
     }
 
-    /**
-     * Define a one-to-one relationship
-     */
-    protected function hasOne($related, $foreignKey = null, $localKey = null)
+    public function belongsToMany(string $related, ?string $table = null, ?string $foreignPivotKey = null, ?string $relatedPivotKey = null): BelongsToMany
     {
-        $instance = new $related;
-        
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
-        $localKey = $localKey ?: $this->primaryKey;
-        
-        return new HasOne($instance, $this, $foreignKey, $localKey);
+        $instance = $this->getRelatedInstance($related);
+        return new BelongsToMany($instance, $this,
+            $table ?? $this->getJoinTableName($instance),
+            $foreignPivotKey ?? $this->getForeignKey(),
+            $relatedPivotKey ?? $instance->getForeignKey()
+        );
     }
 
-    /**
-     * Define a one-to-many relationship
-     */
-    protected function hasMany($related, $foreignKey = null, $localKey = null)
+    // Optimized helper methods
+    private static function getInstance(): static
     {
-        $instance = new $related;
-        
-        $foreignKey = $foreignKey ?: $this->getForeignKey();
-        $localKey = $localKey ?: $this->primaryKey;
-        
-        return new HasMany($instance, $this, $foreignKey, $localKey);
+        $class = static::class;
+        return self::$instances[$class] ??= new static;
     }
 
-    /**
-     * Define an inverse relationship
-     */
-    protected function belongsTo($related, $foreignKey = null, $ownerKey = null)
+    private function getRelatedInstance(string $class): Model
     {
-        $instance = new $related;
-        
-        $foreignKey = $foreignKey ?: $instance->getForeignKey();
-        $ownerKey = $ownerKey ?: $instance->primaryKey;
-        
-        return new BelongsTo($instance, $this, $foreignKey, $ownerKey);
+        return self::$instances[$class] ??= new $class;
     }
 
-    /**
-     * Define a many-to-many relationship
-     */
-    protected function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null)
+    private function getTableName(): string
     {
-        $instance = new $related;
-        
-        $table = $table ?: $this->getJoinTableName($instance);
-        $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
-        $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
-        
-        return new BelongsToMany($instance, $this, $table, $foreignPivotKey, $relatedPivotKey);
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', self::className(static::class))) . 's';
     }
 
-    // --- Helper methods ---
-
-    public function newFromBuilder($attributes = [])
+    public static function newFromBuilder(array $attributes): static
     {
         $model = new static;
-        $model->fill((array) $attributes);
+        $model->attributes = $attributes;
         $model->exists = true;
         $model->syncOriginal();
         return $model;
     }
 
-    public function getKey()
+    // Accessors
+    public function fill(array $attributes): self
     {
-        return $this->getAttribute($this->primaryKey);
+        $this->attributes = array_merge($this->attributes, $attributes);
+        return $this;
     }
 
-    protected function getDirty()
+    public function setAttribute(string $key, mixed $value): self
     {
-        $dirty = [];
-        foreach ($this->attributes as $key => $value) {
-            if (!array_key_exists($key, $this->original) || $value !== $this->original[$key]) {
-                $dirty[$key] = $value;
-            }
+        $this->attributes[$key] = $value;
+        return $this;
+    }
+
+    public function getAttribute(string $key): mixed
+    {
+        if (array_key_exists($key, $this->attributes)) {
+            return $this->attributes[$key];
         }
-        return $dirty;
+
+        if (method_exists($this, $key) && !array_key_exists($key, $this->relations)) {
+            return $this->relations[$key] = $this->$key()->getResults();
+        }
+
+        return $this->relations[$key] ?? null;
     }
 
-    protected function syncOriginal()
+    public function getKey(): mixed
+    {
+        return $this->attributes[$this->primaryKey] ?? null;
+    }
+
+    public function setRelation(string $key, mixed $value): void
+    {
+        $this->relations[$key] = $value;
+    }
+
+    private function getDirty(): array
+    {
+        return array_filter($this->attributes, fn($value, $key) => 
+            !array_key_exists($key, $this->original) || $value !== $this->original[$key], 
+            ARRAY_FILTER_USE_BOTH
+        );
+    }
+
+    private function syncOriginal(): void
     {
         $this->original = $this->attributes;
     }
 
-    protected function getClassBaseName($class)
+    private function getForeignKey(): string
     {
+        return strtolower(self::className(static::class)) . '_id';
+    }
+
+    private function getJoinTableName(Model $related): string
+    {
+        $models = [
+            strtolower(self::className(static::class)),
+            strtolower(self::className($related))
+        ];
+        sort($models);
+        return implode('_', $models);
+    }
+    
+    static public function className($class): string {
         $class = is_object($class) ? get_class($class) : $class;
         return basename(str_replace('\\', '/', $class));
     }
 
-    /**
-     * Get the foreign key for the model
-     */
-    protected function getForeignKey()
+    // Magic methods
+    public function __get(string $key): mixed
     {
-        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassBaseName($this))) . '_id';
+        return $this->getAttribute($key);
     }
 
-    /**
-     * Get the join table name for many-to-many relationships
-     */
-    protected function getJoinTableName($related)
+    public function __set(string $key, mixed $value): void
     {
-        $models = [
-            strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassBaseName($this))),
-            strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $this->getClassBaseName($related)))
-        ];
-        
-        sort($models);
-        
-        return implode('_', $models);
+        $this->setAttribute($key, $value);
+    }
+
+    public static function __callStatic(string $method, array $parameters): mixed
+    {
+        return static::query()->$method(...$parameters);
     }
 }
 
-// Example usage:
-// class User extends Model {
-//     protected $table = 'users';  // Optional if table name follows convention
-//     public function profile() {
-//         return $this->hasOne(Profile::class);
-//     }
-//     public function posts() {
-//         return $this->hasMany(Post::class);
-//     }
-//     public function roles() {
-//         return $this->belongsToMany(Role::class);
-//     }
-// }
-// class Profile extends Model {
-//     protected $table = 'profiles';
-//     public function user() {
-//         return $this->belongsTo(User::class);
-//     }
-// }
-// class Post extends Model {
-//     protected $table = 'posts';
-//     public function user() {
-//         return $this->belongsTo(User::class);
-//     }
-// }
-// class Role extends Model {
-//     protected $table = 'roles';
-//     public function users() {
-//         return $this->belongsToMany(User::class);
-//     }
-// }
+/*
+// Eager loading (prevents N+1)
+$users = User::with(['posts', 'profile'])->get();
+
+// Optimized bulk operations
+$users = User::findMany([1, 2, 3, 4, 5]);
+
+// Fluent API remains the same
+$activeUsers = User::where('status', 'active')
+                  ->orderBy('created_at', 'desc')
+                  ->limit(10)
+                  ->get();
+                  */

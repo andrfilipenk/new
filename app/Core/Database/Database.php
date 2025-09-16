@@ -5,410 +5,205 @@ use PDO;
 use PDOException;
 use Core\Di\Injectable;
 
-/**
- * Database Component for Lightweight PHP Framework
- */
 class Database
 {
     use Injectable;
 
-    protected $pdo;
-    protected $table;
+    private ?PDO $pdo = null;
+    private string $table = '';
+    private array $query = [
+        'select' => ['*'],
+        'where' => [],
+        'bindings' => [],
+        'order' => [],
+        'limit' => null,
+        'offset' => null,
+        'join' => []
+    ];
 
-    // Query parts
-    protected $selects = ['*'];
-    protected $wheres = [];
-    protected $bindings = [];
-    protected $orders = [];
-    protected $limit;
-    protected $offset;
-
-    /**
-     * Constructor - initializes database connection
-     */
     public function __construct()
     {
         $this->connect();
     }
 
-    /**
-     * Establish database connection
-     */
-    protected function connect()
+    private function connect(): void
     {
+        if ($this->pdo) return;
+
         try {
-            $config = $this->getDI()->get('config');
-            $cfg = $config['db'];
-            $dsn = "{$cfg['driver']}:host={$cfg['host']};dbname={$cfg['database']};charset={$cfg['charset']}";
+            $config = $this->getDI()->get('config')['db'];
+            $dsn = "{$config['driver']}:host={$config['host']};dbname={$config['database']};charset=utf8mb4";
             
-            $options = [
+            $this->pdo = new PDO($dsn, $config['username'], $config['password'], [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
-                PDO::ATTR_PERSISTENT => $cfg['persistent'] ?? false,
-            ];
-
-            $this->pdo = new PDO(
-                $dsn, 
-                $cfg['username'], 
-                $cfg['password'], 
-                $options
-            );
-
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET SESSION sql_mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO'"
+            ]);
         } catch (PDOException $e) {
             throw new DatabaseException("Connection failed: " . $e->getMessage());
         }
     }
 
-    /**
-     * Set table for query
-     */
-    public function table($table)
+    public function table(string $table): self
     {
-        $this->table = $table;
-        $this->reset();
+        $new = clone $this;
+        $new->table = $table;
+        $new->query = [
+            'select' => ['*'],
+            'where' => [],
+            'bindings' => [],
+            'order' => [],
+            'limit' => null,
+            'offset' => null,
+            'join' => []
+        ];
+        return $new;
+    }
+
+    public function select(array|string $columns = '*'): self
+    {
+        $this->query['select'] = is_array($columns) ? $columns : func_get_args();
         return $this;
     }
 
-    /**
-     * Select columns
-     */
-    public function select($columns = '*')
-    {
-        $this->selects = is_array($columns) ? $columns : func_get_args();
-        return $this;
-    }
-
-    /**
-     * Add where condition
-     */
-    public function where($column, $operator = null, $value = null, $boolean = 'AND')
+    public function where(string $column, mixed $operator = null, mixed $value = null): self
     {
         if (func_num_args() === 2) {
             $value = $operator;
             $operator = '=';
         }
 
-        $this->wheres[] = compact('column', 'operator', 'value', 'boolean');
-        
-        if (!is_null($value)) {
-            $this->bindings[] = $value;
+        $this->query['where'][] = [$column, $operator, $value, 'AND'];
+        if ($value !== null) {
+            $this->query['bindings'][] = $value;
         }
 
         return $this;
     }
 
-    /**
-     * Add OR where condition
-     */
-    public function orWhere($column, $operator = null, $value = null)
+    public function whereIn(string $column, array $values): self
     {
-        return $this->where($column, $operator, $value, 'OR');
-    }
-
-    /**
-     * Add a WHERE IN condition
-     */
-    public function whereIn($column, array $values, $boolean = 'AND')
-    {
-        $this->wheres[] = ['column' => $column, 'operator' => 'IN', 'values' => $values, 'boolean' => $boolean];
-        $this->bindings = array_merge($this->bindings, $values);
-        return $this;
-    }
-
-    /**
-     * Order by clause
-     */
-    public function orderBy($column, $direction = 'ASC')
-    {
-        $this->orders[] = "{$column} " . strtoupper($direction);
-        return $this;
-    }
-
-    /**
-     * Limit clause
-     */
-    public function limit($limit)
-    {
-        $this->limit = (int) $limit;
-        return $this;
-    }
-
-    /**
-     * Offset clause
-     */
-    public function offset($offset)
-    {
-        $this->offset = (int) $offset;
-        return $this;
-    }
-
-    /**
-     * Execute SELECT query and return results
-     */
-    public function get()
-    {
-        $sql = $this->buildSelectQuery();
-        $stmt = $this->executeQuery($sql, $this->bindings);
-        return $stmt->fetchAll();
-    }
-
-    /**
-     * Execute SELECT query and return first result
-     */
-    public function first()
-    {
-        $this->limit(1);
-        $sql = $this->buildSelectQuery();
-        $stmt = $this->executeQuery($sql, $this->bindings);
-        return $stmt->fetch();
-    }
-
-    /**
-     * Insert data
-     */
-    public function insert(array $data)
-    {
-        $columns = implode(', ', array_keys($data));
-        $placeholders = rtrim(str_repeat('?,', count($data)), ',');
+        if (empty($values)) return $this;
         
-        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
+        $this->query['where'][] = [$column, 'IN', $values, 'AND'];
+        $this->query['bindings'] = [...$this->query['bindings'], ...$values];
+        return $this;
+    }
+
+    public function join(string $table, string $first, string $operator, string $second): self
+    {
+        $this->query['join'][] = "INNER JOIN {$table} ON {$first} {$operator} {$second}";
+        return $this;
+    }
+
+    public function orderBy(string $column, string $direction = 'ASC'): self
+    {
+        $this->query['order'][] = "{$column} " . strtoupper($direction);
+        return $this;
+    }
+
+    public function limit(int $limit): self
+    {
+        $this->query['limit'] = $limit;
+        return $this;
+    }
+
+    public function offset(int $offset): self
+    {
+        $this->query['offset'] = $offset;
+        return $this;
+    }
+
+    public function get(): array
+    {
+        return $this->execute($this->buildSelect())->fetchAll();
+    }
+
+    public function first(): ?array
+    {
+        $result = $this->limit(1)->get();
+        return $result[0] ?? null;
+    }
+
+    public function insert(array $data): string
+    {
+        $columns = implode(',', array_keys($data));
+        $placeholders = str_repeat('?,', count($data) - 1) . '?';
         
-        $this->executeQuery($sql, array_values($data));
+        $this->execute("INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})", array_values($data));
         return $this->pdo->lastInsertId();
     }
 
-    /**
-     * Update data
-     */
-    public function update(array $data)
+    public function update(array $data): int
     {
-        $setClause = implode(' = ?, ', array_keys($data)) . ' = ?';
+        $set = implode(' = ?,', array_keys($data)) . ' = ?';
+        $sql = "UPDATE {$this->table} SET {$set}" . $this->buildWhere();
         
-        $whereClause = $this->buildWhereClause();
-        
-        $sql = "UPDATE {$this->table} SET {$setClause} {$whereClause}";
-        
-        $params = array_merge(array_values($data), $this->bindings);
-        $stmt = $this->executeQuery($sql, $params);
-        
-        return $stmt->rowCount();
+        return $this->execute($sql, [...array_values($data), ...$this->query['bindings']])->rowCount();
     }
 
-    /**
-     * Delete records
-     */
-    public function delete()
+    public function delete(): int
     {
-        $whereClause = $this->buildWhereClause();
-        
-        $sql = "DELETE FROM {$this->table} {$whereClause}";
-        
-        $stmt = $this->executeQuery($sql, $this->bindings);
-        return $stmt->rowCount();
+        return $this->execute("DELETE FROM {$this->table}" . $this->buildWhere(), $this->query['bindings'])->rowCount();
     }
 
-    /**
-     * Build SELECT query
-     */
-    protected function buildSelectQuery()
+    private function buildSelect(): string
     {
-        $sql = "SELECT " . implode(', ', $this->selects) . " FROM {$this->table}";
+        $sql = "SELECT " . implode(',', $this->query['select']) . " FROM {$this->table}";
         
-        $sql .= $this->buildWhereClause();
-
-        if (!empty($this->orders)) {
-            $sql .= " ORDER BY " . implode(', ', $this->orders);
-        }
-        if (!is_null($this->limit)) {
-            $sql .= " LIMIT {$this->limit}";
-        }
-        if (!is_null($this->offset)) {
-            $sql .= " OFFSET {$this->offset}";
-        }
-        
-        return $sql;
-    }
-
-    /**
-     * Build WHERE clause
-     */
-    protected function buildWhereClause()
-    {
-        if (empty($this->wheres)) {
-            return '';
+        if ($this->query['join']) {
+            $sql .= ' ' . implode(' ', $this->query['join']);
         }
 
-        $conditions = [];
-        foreach ($this->wheres as $i => $condition) {
-            $prefix = ($i > 0) ? "{$condition['boolean']} " : '';
+        $sql .= $this->buildWhere();
 
-            if ($condition['operator'] === 'IN') {
-                $placeholders = rtrim(str_repeat('?,', count($condition['values'])), ',');
-                $conditions[] = "{$prefix}{$condition['column']} IN ({$placeholders})";
-            } else {
-                $conditions[] = "{$prefix}{$condition['column']} {$condition['operator']} ?";
+        if ($this->query['order']) {
+            $sql .= ' ORDER BY ' . implode(',', $this->query['order']);
+        }
+
+        if ($this->query['limit']) {
+            $sql .= " LIMIT {$this->query['limit']}";
+            if ($this->query['offset']) {
+                $sql .= " OFFSET {$this->query['offset']}";
             }
         }
 
-        return " WHERE " . implode(' ', $conditions);
+        return $sql;
     }
 
-    /**
-     * Execute query with parameters
-     */
-    protected function executeQuery($sql, $params = [])
+    private function buildWhere(): string
+    {
+        if (!$this->query['where']) return '';
+
+        $conditions = [];
+        foreach ($this->query['where'] as $i => [$column, $operator, $value, $boolean]) {
+            $prefix = $i > 0 ? " {$boolean} " : '';
+            
+            if ($operator === 'IN') {
+                $placeholders = str_repeat('?,', count($value) - 1) . '?';
+                $conditions[] = "{$prefix}{$column} IN ({$placeholders})";
+            } else {
+                $conditions[] = "{$prefix}{$column} {$operator} ?";
+            }
+        }
+
+        return ' WHERE ' . implode('', $conditions);
+    }
+
+    private function execute(string $sql, array $params = []): \PDOStatement
     {
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            throw new DatabaseException("Query execution failed: " . $e->getMessage() . " (SQL: $sql)");
+            throw new DatabaseException("Query failed: {$e->getMessage()}");
         }
     }
 
-    /**
-     * Reset query builder
-     */
-    protected function reset()
-    {
-        $this->selects = ['*'];
-        $this->wheres = [];
-        $this->bindings = [];
-        $this->orders = [];
-        $this->limit = null;
-        $this->offset = null;
-    }
-
-    /**
-     * Begin transaction
-     */
-    public function beginTransaction()
-    {
-        return $this->pdo->beginTransaction();
-    }
-
-    public function execute(string $sql, array $params = [])
-    {
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt;
-    }
-
-    /**
-     * Commit transaction
-     */
-    public function commit()
-    {
-        return $this->pdo->commit();
-    }
-
-    /**
-     * Rollback transaction
-     *
-     */
-    public function rollback()
-    {
-        return $this->pdo->rollBack();
-    }
-
-    /**
-     * Get PDO instance
-     */
-    public function getPdo()
-    {
-        return $this->pdo;
-    }
+    public function beginTransaction(): bool { return $this->pdo->beginTransaction(); }
+    public function commit(): bool { return $this->pdo->commit(); }
+    public function rollback(): bool { return $this->pdo->rollBack(); }
+    public function getPdo(): PDO { return $this->pdo; }
 }
-
-// Example usage:
-// $db = new Database();
-// $users = $db->table('users')->where('status', 'active')->orderBy('created_at', 'DESC')->get();
-// foreach ($users as $user) {
-//     echo $user->name . "\n";
-// }
-
-// class User extends Model {
- //     protected $table = ?users?;
- //     public function roles() {
- //         return $this-?belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
- //     }
- // }
- 
- // class Role extends Model {
- //     protected $table = ?roles?;
- //     public function users() {
- //         return $this-?belongsToMany(User::class, 'user_roles', 'role_id', 'user_id');
- //     }
- // }
- 
- // class Post extends Model {
- //     protected $table = ?posts?;
- //     public function user() {
-//         return $this-?belongsTo(User::class);
- //     }
- // }
-
-// class Profile extends Model {
-    //     protected $table = ?profiles?;
-    //     public function user() {
-    //         return $this-?belongsTo(User::class);
-    //     }
-    // }
-
-// Example usage:
-// $user = (new User())->find(1);
- // echo $user->name;
- // $profile = $user->profile();
- // echo $profile->bio;
- // $posts = $user->posts();
- // foreach ($posts as $post) {
- //     echo $post->title . "\n";
- // }
- 
- // $roles = $user->roles();
- // foreach ($roles as $role) {
- //     echo $role->name . "\n";
- // }
-// $role = (new Role())->find(1);
- // echo $role->name;
-// $users = $role->users();
- // foreach ($users as $user) {
- //     echo $user->name . "\n";
- // }
-// class User extends Model {
- //     protected $table = ?users?;
-//     public function profile() {  
- //         return $this-?hasOne(Profile::class);
- //     }
- 
- //     public function posts() {
- //         return $this-?hasMany(Post::class);
- //     }
- 
- //     public function roles() {
- //         return $this-?belongsToMany(Role::class);
- //     }
- // }
- 
- // class Profile extends Model {
- //     protected $table = ?profiles?;
- //     public function user() {
- //         return $this-?belongsTo(User::class);
- //     }
- // }
- 
- // class Post extends Model {
- //     protected $table = ?posts?;
- //     public function user() {
-//         return $this-?belongsTo(User::class);
- //     }
- // }
- 
- // class Role extends Model {
- //     protected $table = ?roles?;
- //     public function users() {
- //         return $this-?belongsToMany(User::class);
- //     }
- // }
