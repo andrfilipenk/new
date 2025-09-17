@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= $this->getVar('title') ?? 'Our Framework' ?></title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Identity Bar -->
+        <header class="top-bar">
+            <div class="brand">
+                <h1><?= $this->getVar('brand') ?? 'Our Framework' ?></h1>
+            </div>
+            <div class="user-menu">
+                <span class="user-name">Guest</span>
+                <button class="menu-toggle" id="menuToggle">☰</button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-content">
+                    <nav class="main-nav" id="mainNav">
+                        <!-- Navigation will be loaded dynamically via AJAX -->
+                        <div class="loading">Loading menu...</div>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="content" id="content">
+                <?= $viewContent ?>
+            </main>
+        </div>
+    </div>
+    <script src="/js/app.js"></script>
+</body>
+</html>

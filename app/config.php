@@ -45,7 +45,7 @@ return [
         'base' => [
             'routes' => [
                 '/' => [
-                    'controller' => 'Module\Base\Controller\Index',
+                    'controller' => 'Module\Base\Controller\Dashboard',
                     'action' => 'index',
                     'method'     => 'GET'
                 ]

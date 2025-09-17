@@ -22,7 +22,7 @@ class Controller
     }
 
     /**
-     * Undocumented function
+     * Returns request object
      *
      * @return \Core\Http\Request
      */
@@ -31,6 +31,11 @@ class Controller
         return $this->getDI()->get('request');
     }
 
+    /**
+     * Check if method is post
+     *
+     * @return boolean
+     */
     public function isPost()
     {
         return $this->getRequest()->isMethod('post');
@@ -54,7 +59,6 @@ class Controller
         if ($this->view === null) {
             throw new \Exception("View service is not available");
         }
-        
         $template = $template ?? $this->getTemplateName();
         return $this->view->render($template, $data);
     }

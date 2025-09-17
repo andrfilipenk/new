@@ -6,18 +6,13 @@ use Core\Mvc\Controller;
 
 class Index extends Controller
 {
-    public function indexAction(): array
+    public function indexAction(): void
     {
-        // Return data to be passed to the view (auto-rendered)
-        return [
-            'title' => 'Home Page',
-            'name' => 'John Doe',
-            'users' => [
-                ['name' => 'Alice'],
-                ['name' => 'Bob'],
-                ['name' => 'Charlie']
-            ]
-        ];
+        /** @var \Core\Mvc\View $view */
+        $view = $this->getDI()->get('view');
+        $view->setLayout('app');
+
+        
     }
     
     public function afterExecute(): void

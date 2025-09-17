@@ -52,7 +52,7 @@ $di->set('dispatcher', fn() => new \Core\Mvc\Dispatcher());
 $di->set('eventsManager', fn() => new \Core\Events\Manager());
 $di->set('view', function() use ($di) {
     $viewConfig = $di->get('config')['view'];
-    $view = new \Core\View\View($viewConfig['path']);
+    $view = new \Core\Mvc\View($viewConfig['path']);
     if (isset($viewConfig['layout'])) {
         $view->setLayout($viewConfig['layout']);
     }

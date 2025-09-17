@@ -43,7 +43,7 @@ class UserController
     public function createAction(Request $request, Response $response)
     {
         // Check if it's a POST request
-        if (!$request->isPost()) {
+        if (!$request->isMethod('post')) {
             return $response->setStatusCode(405)->setContent('Method Not Allowed');
         }
         
@@ -72,7 +72,7 @@ class UserController
         $user = $this->userService->getUser($id);
         
         if (!$user) {
-            return $response->notFound('User not found');
+            return $response->error('User not found');
         }
         
         // Render view

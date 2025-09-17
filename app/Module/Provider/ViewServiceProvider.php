@@ -2,6 +2,7 @@
 // app/Module/Provider/ViewServiceProvider.php
 namespace Module\Provider;
 
+use Core\Mvc\View;
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container as ContainerInterface;
 

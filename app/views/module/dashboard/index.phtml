@@ -1,0 +1,51 @@
+<!-- app/views/module/base/dashboard/index.phtml -->
+<div class="dashboard">
+    <h1><?= $welcome ?></h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Users</h3>
+            <p class="stat-value"><?= $stats['users'] ?></p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Orders</h3>
+            <p class="stat-value"><?= $stats['orders'] ?></p>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Revenue</h3>
+            <p class="stat-value"><?= $stats['revenue'] ?></p>
+        </div>
+    </div>
+    
+    <div class="recent-activity mt-2">
+        <h2>Recent Activity</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Action</th>
+                    <th>User</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2023-05-15</td>
+                    <td>Login</td>
+                    <td>john@example.com</td>
+                </tr>
+                <tr>
+                    <td>2023-05-14</td>
+                    <td>Order created</td>
+                    <td>sarah@example.com</td>
+                </tr>
+                <tr>
+                    <td>2023-05-13</td>
+                    <td>User registered</td>
+                    <td>mike@example.com</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

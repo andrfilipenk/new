@@ -41,7 +41,6 @@ class Builder
                 'attributes'    => $args[2] ?? []
             ];
         }
-
         $this->form->addField($fieldName, $type, array_filter($options));
         return $this;
     }
