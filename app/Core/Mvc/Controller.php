@@ -89,9 +89,26 @@ class Controller
      */
     protected function redirect(string $url, int $statusCode = 302): Response
     {
-        return Response::redirect($url, $statusCode);
+        return Response::redirect('/new' . $url, $statusCode)->send();
+    }
+
+    public function flashSuccess($message)
+    {
+        $this->getDI()->get('session')->flash('success', $message);
+        return $this;
+    }
+
+    public function flashError($message)
+    {
+        $this->getDI()->get('session')->flash('error', $message);
+        return $this;
     }
     
+    /**
+     * Undocumented function
+     *
+     * @return string
+     */
     protected function getTemplateName(): string
     {
         $dispatcher = $this->getDI()->get('dispatcher');

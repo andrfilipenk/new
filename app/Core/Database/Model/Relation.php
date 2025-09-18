@@ -44,4 +44,9 @@ abstract class Relation
     {
         return $this->query;
     }
+
+    public function getRelatedInstance()
+    {
+        return $this->related;
+    }
 }

@@ -8,8 +8,15 @@ class Tasks extends Model
 {
     protected $table = 'tasks';
     protected $primaryKey = 'task_id';
-    protected $fillable = [
-        'created_by', 'assigned_to', 'title', 'created_date', 'begin_date', 'end_date', 'status', 'priority'
+    protected array $fillable = [
+        'created_by', 
+        'assigned_to', 
+        'title', 
+        'created_date', 
+        'begin_date', 
+        'end_date', 
+        'status', 
+        'priority'
     ];
 
     // Relationship: creator

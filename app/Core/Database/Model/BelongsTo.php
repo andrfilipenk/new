@@ -29,7 +29,7 @@ class BelongsTo extends Relation
     public function addEagerConstraints(array $models)
     {
         $keys = array_unique(array_filter(array_map(function ($model) {
-            return $model->getAttribute($this->foreignKey);
+            return $model->getData($this->foreignKey);
         }, $models)));
 
         $this->query->whereIn($this->ownerKey, $keys);
@@ -39,11 +39,11 @@ class BelongsTo extends Relation
     {
         $dictionary = [];
         foreach ($results as $result) {
-            $dictionary[$result->getAttribute($this->ownerKey)] = $result;
+            $dictionary[$result->getData($this->ownerKey)] = $result;
         }
 
         foreach ($models as $model) {
-            $key = $model->getAttribute($this->foreignKey);
+            $key = $model->getData($this->foreignKey);
             if (isset($dictionary[$key])) {
                 $model->setRelation($relation, $dictionary[$key]);
             }

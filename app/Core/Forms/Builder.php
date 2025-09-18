@@ -38,21 +38,43 @@ class Builder
         $fieldName  = $args[0];
         $options    = [];
 
+        // Normalize attributes: merge all options into 'attributes'
+        $attributes = [];
+        // For select/radio: args[3], for button: args[2], otherwise: args[2]
+        if (in_array($type, ['select', 'radio'])) {
+            $attributes = $args[3] ?? [];
+        } elseif ($type === 'button') {
+            $attributes = $args[2] ?? [];
+        } else {
+            $attributes = $args[2] ?? [];
+        }
+
+        // Move standard HTML attributes from options to 'attributes'
+        foreach (['required', 'placeholder', 'class', 'id', 'min', 'max', 'step', 'readonly', 'disabled', 'autocomplete', 'pattern'] as $attrKey) {
+            if (isset($attributes[$attrKey])) {
+                $attributes[$attrKey] = $attributes[$attrKey];
+            }
+            // Also support if passed as a separate argument (not inside attributes array)
+            if (isset($args[2][$attrKey])) {
+                $attributes[$attrKey] = $args[2][$attrKey];
+            }
+        }
+
         if (in_array($type, ['select', 'radio'])) {
             $options = [
                 'options'       => $args[1] ?? [],
                 'label'         => $args[2] ?? null,
-                'attributes'    => $args[3] ?? []
+                'attributes'    => $attributes
             ];
         } elseif ($type === 'button') {
             $options = [
-                'label' => $args[1] ?? null,
-                'attributes' => $args[2] ?? [],
+                'label'         => $args[1] ?? null,
+                'attributes'    => $attributes,
             ];
         } else {
             $options = [
                 'label'         => $args[1] ?? null,
-                'attributes'    => $args[2] ?? []
+                'attributes'    => $attributes
             ];
         }
         $this->form->addField($fieldName, $type, array_filter($options));

@@ -118,19 +118,25 @@ class Tag
     public static function __callStatic(string $name, array $args): self
     {
         $tag = new self($name);
-        
-        if (isset($args[0])) {
-            if (is_array($args[0])) {
-                $tag->content(...$args[0]);
-            } else {
-                $tag->content($args[0]);
+
+        // Void tags should treat first argument as attributes.
+        if (in_array($tag->tag, self::$voidTags)) {
+            if (isset($args[0]) && is_array($args[0])) {
+                $tag->attrs($args[0]);
+            }
+        } else {
+            // Non-void tags: first argument is content, second is attributes
+            if (isset($args[0])) {
+                if (is_array($args[0])) {
+                    $tag->content(...$args[0]);
+                } else {
+                    $tag->content($args[0]);
+                }
+            }
+            if (isset($args[1]) && is_array($args[1])) {
+                $tag->attrs($args[1]);
             }
         }
-        
-        if (isset($args[1]) && is_array($args[1])) {
-            $tag->attrs($args[1]);
-        }
-        
         return $tag;
     }
 

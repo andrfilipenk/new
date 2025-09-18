@@ -21,10 +21,10 @@ class Task extends Controller
             $data = $this->getRequest()->all();
             $task = new Tasks($data);
             if ($task->save()) {
-                $this->getDI()->get('session')->flash('success', 'Task created.');
+                $this->flashSuccess('Task created.');
                 return $this->redirect('/admin/tasks');
             } else {
-                $this->getDI()->get('session')->flash('error', 'Failed to create task.');
+                $this->flashError('Failed to create task.');
             }
             $form->setValues($data);
         }
@@ -38,19 +38,21 @@ class Task extends Controller
     {
         $id = $this->getDI()->get('dispatcher')->getParam('id');
         $task = Tasks::find($id);
-        if (!$task) {
-            return $this->redirect('/admin/tasks');
+        if ($task === null) {
+            $this->flashError('Task not found');
+            $response = $this->redirect('/admin/tasks');
+            var_dump($response);
+            return $response;
         }
         $form = TaskForm::build($task->getData());
-
         if ($this->isPost()) {
             $data = $this->getRequest()->all();
             $task->fill($data);
             if ($task->save()) {
-                $this->getDI()->get('session')->flash('success', 'Task updated.');
+                $this->flashSuccess('Task updated.');
                 return $this->redirect('/admin/tasks');
             } else {
-                $this->getDI()->get('session')->flash('error', 'Failed to update task.');
+                $this->flashError('Failed to update task.');
             }
             $form->setValues($data);
         }
@@ -66,9 +68,9 @@ class Task extends Controller
         $id = $this->getDI()->get('dispatcher')->getParam('id');
         $task = Tasks::find($id);
         if ($task) { // && $task->delete()
-            $this->getDI()->get('session')->flash('success', 'Task deleted.');
+            $this->flashSuccess('Task deleted.');
         } else {
-            $this->getDI()->get('session')->flash('error', 'Failed to delete task.');
+            $this->flashError('Failed to delete task.');
         }
         return $this->redirect('/admin/tasks');
     }

@@ -3,7 +3,6 @@
 namespace Core\Database;
 
 use Core\Di\Container;
-use Core\Database\Model\Relation;
 use Core\Database\Model\HasOne;
 use Core\Database\Model\HasMany;
 use Core\Database\Model\BelongsTo;
@@ -18,6 +17,7 @@ abstract class Model
     protected array $relations = [];
     protected bool $exists = false;
     protected array $with = [];
+    protected array $fillable = [];
     
     private static array $instances = [];
 
@@ -26,7 +26,6 @@ abstract class Model
         if (!$this->table) {
             $this->table = $this->getTableName();
         }
-
         $this->fill($attributes);
         $this->syncOriginal();
     }

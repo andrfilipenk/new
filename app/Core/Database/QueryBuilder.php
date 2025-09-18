@@ -109,7 +109,7 @@ class QueryBuilder
 
             $results = $relationInstance->getQuery()->get();
             $relationModels = array_map(
-                [get_class($relationInstance->getRelated()), 'newFromBuilder'],
+                [get_class($relationInstance->getRelatedInstance()), 'newFromBuilder'],
                 $results
             );
 

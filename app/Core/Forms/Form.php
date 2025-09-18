@@ -26,8 +26,8 @@ class Form implements FormInterface
             'select'    => fn($n, $f, $v) => $this->selectRenderer($n, $f, $v),
             'checkbox'  => fn($n, $f, $v) => $this->checkboxRenderer($n, $f, $v),
             'radio'     => fn($n, $f, $v) => $this->radioRenderer($n, $f, $v),
-            'button' => fn($n, $f, $v) => $this->buttonRenderer($n, $f, $v), // Added button renderer
-            'hidden' => fn($n, $f, $v) => $this->inputRenderer('hidden')($n, $f, $v), // Added hidden renderer
+            'button' => fn($n, $f, $v) => $this->buttonRenderer($n, $f, $v),
+            'hidden' => fn($n, $f, $v) => $this->inputRenderer('hidden')($n, $f, $v),
         ];
     }
 
@@ -55,7 +55,7 @@ class Form implements FormInterface
         $this->fields[$name] = [
             'type'          => $type,
             'label'         => $options['label'] ?? $this->generateLabel($name),
-            'required'      => $options['required'] ?? false,
+            'required'      => $options['attributes']['required'] ?? false,
             'attributes'    => $options['attributes'] ?? [],
             'options'       => $options['options'] ?? [],
             'renderer'      => $options['renderer'] ?? null,
@@ -112,7 +112,7 @@ class Form implements FormInterface
         $renderer   = $field['renderer'] ?? $this->renderers[$field['type']] ?? $this->renderers['text'];
         $fieldHtml = $renderer($name, $field, $value);
         if ($field['type'] === 'button' || $field['type'] === 'hidden') {
-            return $fieldHtml; // Buttons and hidden fields don't need labels
+            return $fieldHtml;
         }
         return str_replace(
             ['{label}', '{field}'],
@@ -163,11 +163,20 @@ class Form implements FormInterface
 
     private function attrs(string $name, array $field): array
     {
-        return array_merge($field['attributes'], [
-            'name'      => $name,
-            'id'        => $field['attributes']['id'] ?? $name,
-            'required'  => $field['required'] ?: null
-        ]);
+        $attrs = $field['attributes'] ?? [];
+        // Set id if not present
+        if (!isset($attrs['id'])) {
+            $attrs['id'] = $name;
+        }
+        // Set required if present in attributes or field
+        if (!empty($attrs['required']) || !empty($field['required'])) {
+            $attrs['required'] = 'required';
+        }
+        if ($field['type'] !== 'button') {
+            // Always set name
+            $attrs['name'] = $name;
+        }
+        return $attrs;
     }
 
     private function formatValue($value, string $type): string
@@ -200,8 +209,3 @@ class Form implements FormInterface
         return $this;
     }
 }
-
-/*
-
-example of form 
- */

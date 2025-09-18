@@ -41,7 +41,7 @@ class Response
     public static function redirect(string $url, int $statusCode = self::HTTP_FOUND): self
     {
         $response = new static('', $statusCode, ['Location' => $url]);
-        return $response;
+        return $response->send();
     }
 
     public static function error(string $message = 'Error', int $statusCode = self::HTTP_INTERNAL_SERVER_ERROR): self

@@ -7,7 +7,7 @@ use Core\Database\Model;
 class Users extends Model
 {
     protected $table = 'users';
-    protected $fillable = ['name', 'email', 'password', 'kuhnle_id'];
+    protected array $fillable = ['name', 'email', 'password', 'kuhnle_id'];
     protected $primaryKey = 'user_id';
     #protected array $with = ['profile']; // Always eager load profile
 
