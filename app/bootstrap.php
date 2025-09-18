@@ -23,10 +23,9 @@ $di = new \Core\Di\Container();
 // --- Register Core Services ---
 $di->set('config', fn() => $config);
 
-$di->register(new \Module\Provider\ViewServiceProvider());
 $di->register(new \Module\Provider\SessionServiceProvider());
 $di->register(new \Module\Provider\CookieServiceProvider());
-
+$di->register(new \Module\Provider\ViewServiceProvider());
 // Register session service
 $di->set('session', \Core\Session\Session::class);
 
@@ -48,16 +47,10 @@ $di->set('router', function() use ($config) {
     return $router;
 });
 
+
 $di->set('dispatcher', fn() => new \Core\Mvc\Dispatcher());
 $di->set('eventsManager', fn() => new \Core\Events\Manager());
-$di->set('view', function() use ($di) {
-    $viewConfig = $di->get('config')['view'];
-    $view = new \Core\Mvc\View($viewConfig['path']);
-    if (isset($viewConfig['layout'])) {
-        $view->setLayout($viewConfig['layout']);
-    }
-    return $view;
-});
+
 $di->set(\Core\Database\MigrationRepository::class, fn() => new \Core\Database\MigrationRepository());
 $di->set(\Core\Database\Migrator::class, fn() => new \Core\Database\Migrator());
 

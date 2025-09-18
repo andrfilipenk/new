@@ -5,7 +5,19 @@ class Test extends Controller {
 
     public function index() {
     // Render the view with a specific layout
-        return $this->render('index', [], 'in-controller');
+        #return $this->render('index', [], 'in-controller');
     }
-      
+
+    public function showUsersAction()
+    {
+        $users = Users::all();
+        
+        // If it's an AJAX request, don't render the full layout
+        if ($this->request->isAjax()) {
+            $this->view->disableLayout();
+        }
+        
+        // The view will be rendered with or without the layout
+        return $this->render('users/list', ['users' => $users]);
+    }
 }

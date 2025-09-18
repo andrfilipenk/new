@@ -49,7 +49,6 @@ class View implements ViewInterface
 
     protected function capture(string $templateFile, array $data): string
     {
-        // Make the view instance itself available in the template as $this
         extract($data, EXTR_SKIP);
         ob_start();
         try {
