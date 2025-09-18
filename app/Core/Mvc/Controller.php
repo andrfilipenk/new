@@ -13,12 +13,22 @@ class Controller
     
     /** @var \Core\Mvc\View $view */
     protected $view;
-    
-    public function initialize(): void
+
+        
+    // public function initialize() {}
+    // public function afterExecute() {}
+
+    /**
+     * Returns view instance
+     *
+     * @return \Core\Mvc\View
+     */
+    public function getView()
     {
-        if ($this->getDI()->has('view')) {
+        if (null === $this->view) {
             $this->view = $this->getDI()->get('view');
         }
+        return $this->view;
     }
 
     /**
@@ -41,12 +51,17 @@ class Controller
         return $this->getRequest()->isMethod('post');
     }
 
+    /**
+     * Returns post data
+     *
+     * @param [type] $key
+     * @param [type] $default
+     * @return mixed
+     */
     public function getPost($key = null, $default = null)
     {
         return $this->getRequest()->post($key, $default);
     }
-
-    public function afterExecute() {}
     
     /**
      * Renders a view. If data is returned from an action, it's passed to the view.
@@ -56,11 +71,8 @@ class Controller
      */
     protected function render(string $template = null, array $data = []): string
     {
-        if ($this->view === null) {
-            throw new \Exception("View service is not available");
-        }
         $template = $template ?? $this->getTemplateName();
-        return $this->view->render($template, $data);
+        return $this->getView()->render($template, $data);
     }
 
     /**
@@ -80,7 +92,8 @@ class Controller
         $action = $dispatcher->getActionName();
         
         $parts = explode('\\', $calledClass);
-        $module = strtolower($parts[1]);
+
+        $module = 'module' . DIRECTORY_SEPARATOR . strtolower($parts[1]) . DIRECTORY_SEPARATOR;
         $controller = strtolower(str_replace('Controller', '', end($parts)));
         
         return $module . DIRECTORY_SEPARATOR . $controller . DIRECTORY_SEPARATOR . $action;

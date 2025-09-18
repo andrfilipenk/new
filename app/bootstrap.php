@@ -26,11 +26,6 @@ $di->set('config', fn() => $config);
 $di->register(new \Module\Provider\SessionServiceProvider());
 $di->register(new \Module\Provider\CookieServiceProvider());
 $di->register(new \Module\Provider\ViewServiceProvider());
-// Register session service
-$di->set('session', \Core\Session\Session::class);
-
-// Register cookie service
-$di->set('cookie', \Core\Cookie\Cookie::class);
 
 $di->set('db', fn() => new \Core\Database\Database());
 $di->set('router', function() use ($config) {

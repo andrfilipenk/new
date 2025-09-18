@@ -9,7 +9,7 @@ class Form implements FormInterface
     protected array $fields = [];
     protected array $values = [];
     protected array $renderers;
-    protected string $template = '<form method="post">{fields}<button type="submit">Submit</button></form>';
+    protected string $template = '<form method="post">{fields}</form>';
     protected string $fieldTemplate = '<div class="form-group">{label}{field}</div>';
 
     public function __construct()
@@ -26,6 +26,8 @@ class Form implements FormInterface
             'select'    => fn($n, $f, $v) => $this->selectRenderer($n, $f, $v),
             'checkbox'  => fn($n, $f, $v) => $this->checkboxRenderer($n, $f, $v),
             'radio'     => fn($n, $f, $v) => $this->radioRenderer($n, $f, $v),
+            'button' => fn($n, $f, $v) => $this->buttonRenderer($n, $f, $v), // Added button renderer
+            'hidden' => fn($n, $f, $v) => $this->inputRenderer('hidden')($n, $f, $v), // Added hidden renderer
         ];
     }
 
@@ -37,6 +39,14 @@ class Form implements FormInterface
                 'type'  => $typeOverride ?? $field['type'],
                 'value' => $this->formatValue($value, $field['type'])
             ]
+        ));
+    }
+
+    private function buttonRenderer(string $name, array $field, $value): string
+    {
+        return Tag::button($field['label'], array_merge(
+            $this->attrs($name, $field),
+            ['type' => $field['attributes']['type'] ?? 'button']
         ));
     }
 
@@ -100,12 +110,13 @@ class Form implements FormInterface
         if (!$field) return '';
         $value      = $this->values[$name] ?? null;
         $renderer   = $field['renderer'] ?? $this->renderers[$field['type']] ?? $this->renderers['text'];
+        $fieldHtml = $renderer($name, $field, $value);
+        if ($field['type'] === 'button' || $field['type'] === 'hidden') {
+            return $fieldHtml; // Buttons and hidden fields don't need labels
+        }
         return str_replace(
             ['{label}', '{field}'],
-            [
-                Tag::label($field['label'], ['for' => $name]),
-                $renderer($name, $field, $value)
-            ],
+            [Tag::label($field['label'], ['for' => $name]), $fieldHtml],
             $this->fieldTemplate
         );
     }

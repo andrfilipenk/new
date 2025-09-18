@@ -9,7 +9,7 @@ class Dashboard extends Controller
     public function indexAction()
     {
         // Set the layout for this action
-        $this->getDI()->get('view')->setLayout('app');
+        // $this->getView()->setLayout('app');
 
         // Prepare navigation items
         $navigation = [
@@ -20,7 +20,7 @@ class Dashboard extends Controller
         ];
         
         // Return the data, and the framework will handle rendering
-        return [
+        $data = [
             'title' => 'Dashboard - Our Framework',
             'brand' => 'Our Framework',
             'user_name' => 'John Doe',
@@ -32,5 +32,7 @@ class Dashboard extends Controller
                 'revenue' => '$12,432'
             ]
         ];
+
+        return $this->render(null, $data);
     }
 }

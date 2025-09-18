@@ -55,7 +55,7 @@ class Application
             // error_log($e->getMessage() . PHP_EOL . $e->getTraceAsString());
 
             // Return a generic error response
-            var_dump($e->getMessage());
+            // var_dump($e->getMessage());
             return Response::error('An unexpected error occurred.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -65,19 +65,3 @@ class Application
         return $this->di;
     }
 }
-
-// Example public/index.php
-
-// 1. Create and configure the DI Container
-// $di = new \Core\Di\Container();
-// ... register all your services (db, config, router, etc.)
-
-// 2. Create the Application with the container
-//$app = new \Core\Mvc\Application($di);
-
-// 3. Create a Request and handle it
-//$request = new \Core\Http\Request();
-//$response = $app->handle($request);
-
-// 4. Send the final response
-// $response->send();

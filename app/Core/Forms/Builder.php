@@ -6,10 +6,19 @@ class Builder
 {
     private Form $form;
     private static array $typeMap = [
-        'text' => 'text', 'email' => 'email', 'password' => 'password',
-        'number' => 'number', 'date' => 'date', 'time' => 'time', 
-        'datetime' => 'datetime', 'textarea' => 'textarea',
-        'select' => 'select', 'radio' => 'radio', 'checkbox' => 'checkbox'
+        'text' => 'text',
+        'email' => 'email',
+        'password' => 'password',
+        'number' => 'number',
+        'date' => 'date',
+        'time' => 'time',
+        'datetime' => 'datetime',
+        'textarea' => 'textarea',
+        'select' => 'select',
+        'radio' => 'radio',
+        'checkbox' => 'checkbox',
+        'button' => 'button', // Added button type
+        'hidden' => 'hidden', // Added hidden type
     ];
 
     public function __construct()
@@ -34,6 +43,11 @@ class Builder
                 'options'       => $args[1] ?? [],
                 'label'         => $args[2] ?? null,
                 'attributes'    => $args[3] ?? []
+            ];
+        } elseif ($type === 'button') {
+            $options = [
+                'label' => $args[1] ?? null,
+                'attributes' => $args[2] ?? [],
             ];
         } else {
             $options = [

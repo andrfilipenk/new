@@ -31,4 +31,4 @@ class ViewServiceProvider implements ServiceProvider
 // add this line in your bootstrap file after creating the DI container
 // $di->register(new \Core\View\ViewServiceProvider());
 // example usage in a controller
-// $this->di->get('view')->render('template', ['var' => 'value']);
+// 
