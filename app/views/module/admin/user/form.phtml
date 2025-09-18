@@ -1,0 +1,5 @@
+<h1><?= isset($user) ? 'Edit User' : 'Create User' ?></h1>
+<?php if (isset($form)): ?>
+    <?= $form ?>
+<?php endif; ?>
+<a href="/admin/users">Back to User List</a>

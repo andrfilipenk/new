@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<?php $session = $this->getDI()->get('session'); ?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
-    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="/new/css/app.css">
 </head>
 <body>
     <div class="app-container">
@@ -42,6 +42,14 @@
 
             <!-- Content Area -->
             <main class="content" id="content">
+                <?php if ($session->hasFlash('success')): ?>
+                    <div class="alert alert-success"><?= $session->getFlash('success') ?></div>
+                <?php endif; ?>
+                <?php if ($session->hasFlash('error')): ?>
+                    <div class="alert alert-danger"><?= $session->getFlash('error') ?></div>
+                <?php endif; ?>
+
+
                 <?php echo $this->yield('content'); ?>
             </main>
         </div>
@@ -49,3 +57,5 @@
     <script src="js/app.js"></script>
 </body>
 </html>
+
+lets create new crud based manager for tasks. place it under Module/Admin. tasks have following fields in database: 

@@ -56,19 +56,22 @@ return [
         ],
         'admin' => [
             'routes' => [
-                '/admin/' => [
-                    'controller' => 'Module\Admin\Controller\Index',
+                '/admin/users' => [
+                    'controller' => 'Module\Admin\Controller\User',
                     'action' => 'index'
                 ],
                 '/admin/user-create' => [
                     'controller' => 'Module\Admin\Controller\User',
-                    'action' => 'create' // create
+                    'action' => 'create'
                 ],
-                '/admin/user-{action}/{id}' => [
+                '/admin/user-edit/{id}' => [
                     'controller' => 'Module\Admin\Controller\User',
-                    'action' => '{action}' // get, update, delete
+                    'action' => 'edit'
                 ],
-                
+                '/admin/user-delete/{id}' => [
+                    'controller' => 'Module\Admin\Controller\User',
+                    'action' => 'delete'
+                ],
             ],
             'services' => [
                 #'myappService' => 'Module\Myapp\Service\MyappService'

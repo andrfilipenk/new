@@ -71,7 +71,14 @@ class Controller
      */
     protected function render(string $template = null, array $data = []): string
     {
-        $template = $template ?? $this->getTemplateName();
+        if ($template !== null) {
+            $dispatcher = $this->getDI()->get('dispatcher');
+            $calledClass = $dispatcher->getControllerName();
+            $parts = explode('\\', strtolower($calledClass));
+            $template = 'module' . DIRECTORY_SEPARATOR . $parts[1] . DIRECTORY_SEPARATOR . $template;
+        } else {
+            $template = $this->getTemplateName();
+        }
         return $this->getView()->render($template, $data);
     }
 

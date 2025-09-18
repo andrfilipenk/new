@@ -1,0 +1,26 @@
+<h1>User List</h1>
+<?php if (!empty($users)): ?>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th><th>Name</th><th>Email</th><th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $user): ?>
+                <tr>
+                    <td><?= htmlspecialchars($user->user_id) ?></td>
+                    <td><?= htmlspecialchars($user->name) ?></td>
+                    <td><?= htmlspecialchars($user->email) ?></td>
+                    <td>
+                        <a href="/admin/user-edit/<?= $user->user_id ?>">Edit</a>
+                        <a href="/admin/user-delete/<?= $user->user_id ?>" onclick="return confirm('Delete user?')">Delete</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <p>No users found.</p>
+<?php endif; ?>
+<a href="/admin/user-create" class="btn btn-primary">Add New User</a>

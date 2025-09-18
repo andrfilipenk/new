@@ -16,7 +16,7 @@ class SessionServiceProvider implements ServiceProvider
             $session = new Session();
             // Configure session settings if provided
             if (!empty($sessionConfig)) {
-                $this->configureSession($session, $sessionConfig);
+                #$this->configureSession($session, $sessionConfig);
             }
             // Inject DI container
             $session->setDI($di);

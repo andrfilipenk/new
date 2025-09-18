@@ -55,7 +55,7 @@ class Application
             // error_log($e->getMessage() . PHP_EOL . $e->getTraceAsString());
 
             // Return a generic error response
-            // var_dump($e->getMessage());
+            # var_dump($e->getMessage());
             return Response::error('An unexpected error occurred.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
