@@ -72,7 +72,7 @@ class User extends Controller
     {
         $id = $this->getDI()->get('dispatcher')->getParam('id');
         $user = Users::find($id);
-        if ($user) {
+        if ($user) { // && $user->delete()
             $this->getDI()->get('session')->flash('success', 'User deleted.');
         } else {
             $this->getDI()->get('session')->flash('error', 'Failed to delete user.');

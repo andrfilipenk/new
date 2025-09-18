@@ -27,6 +27,8 @@ $di->register(new \Module\Provider\SessionServiceProvider());
 $di->register(new \Module\Provider\CookieServiceProvider());
 $di->register(new \Module\Provider\ViewServiceProvider());
 
+$di->set('request', fn() => new \Core\Http\Request);
+
 $di->set('db', fn() => new \Core\Database\Database());
 $di->set('router', function() use ($config) {
     $router = new \Core\Mvc\Router();

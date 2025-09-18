@@ -3,7 +3,7 @@
     <table>
         <thead>
             <tr>
-                <th>ID</th><th>Name</th><th>Email</th><th>Actions</th>
+                <th>ID</th><th>Name</th><th>Email</th><th>KuhnleID</th><th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -12,6 +12,7 @@
                     <td><?= htmlspecialchars($user->user_id) ?></td>
                     <td><?= htmlspecialchars($user->name) ?></td>
                     <td><?= htmlspecialchars($user->email) ?></td>
+                    <td><?= htmlspecialchars($user->kuhnle_id) ?></td>
                     <td>
                         <a href="/admin/user-edit/<?= $user->user_id ?>">Edit</a>
                         <a href="/admin/user-delete/<?= $user->user_id ?>" onclick="return confirm('Delete user?')">Delete</a>

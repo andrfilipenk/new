@@ -7,7 +7,7 @@ use Core\Database\Model;
 class Users extends Model
 {
     protected $table = 'users';
-    protected $fillable = ['name', 'email', 'password', 'created_at', 'updated_at'];
+    protected $fillable = ['name', 'email', 'password', 'kuhnle_id'];
     protected $primaryKey = 'user_id';
     #protected array $with = ['profile']; // Always eager load profile
 
@@ -35,7 +35,6 @@ $users = Users::with([
         name VARCHAR(100) NOT NULL,
         email VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        kuhnle_id INT(11) NOT NULL
     );
      */

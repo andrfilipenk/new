@@ -46,6 +46,11 @@ class Application
 
             $eventsManager->trigger('application:afterHandle', $this);
 
+
+            $content = $response->getContent();
+            $content = str_replace(array("href=\""), array("href=\"/new"), $content);
+            $response = new Response($content);
+
             return $response;
 
         } catch (Exception $e) {
@@ -55,7 +60,6 @@ class Application
             // error_log($e->getMessage() . PHP_EOL . $e->getTraceAsString());
 
             // Return a generic error response
-            # var_dump($e->getMessage());
             return Response::error('An unexpected error occurred.', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

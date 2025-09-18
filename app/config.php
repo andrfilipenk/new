@@ -56,6 +56,7 @@ return [
         ],
         'admin' => [
             'routes' => [
+                // user management routes
                 '/admin/users' => [
                     'controller' => 'Module\Admin\Controller\User',
                     'action' => 'index'
@@ -70,6 +71,24 @@ return [
                 ],
                 '/admin/user-delete/{id}' => [
                     'controller' => 'Module\Admin\Controller\User',
+                    'action' => 'delete'
+                ],
+
+                // task routes
+                '/admin/tasks' => [
+                    'controller' => 'Module\Admin\Controller\Task',
+                    'action' => 'index'
+                ],
+                '/admin/task-create' => [
+                    'controller' => 'Module\Admin\Controller\Task',
+                    'action' => 'create'
+                ],
+                '/admin/task-edit/{id}' => [
+                    'controller' => 'Module\Admin\Controller\Task',
+                    'action' => 'edit'
+                ],
+                '/admin/task-delete/{id}' => [
+                    'controller' => 'Module\Admin\Controller\Task',
                     'action' => 'delete'
                 ],
             ],
