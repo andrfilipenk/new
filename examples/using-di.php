@@ -95,9 +95,9 @@ class EmailService {
 
 // 4. Factory Services (New Instance Each Time)
 // Register a factory service
-$di->set('email.factory', $di->factory(function($di) {
+$di->set('email.factory', function($di) {
     return new EmailService($di->get('config')['mail']);
-}));
+});
 
 // Each call to get() returns a new instance
 $email1 = $di->get('email.factory');
@@ -205,13 +205,13 @@ class PrefixedCache extends Logger {}
 
 // 7. Extending Existing Services
 // Extend the database service to add logging
-$di->extend('database', function($db, $di) {
+$di->set('database', function($db, $di) {
     // Wrap the database connection with a logging decorator
     return new LoggingDatabaseDecorator($db, $di->get('logger'));
 });
 
 // Extend the cache service to add prefixing
-$di->extend('cache', function($cache, $di) {
+$di->set('cache', function($cache, $di) {
     return new PrefixedCache($cache, 'myapp:');
 });
 

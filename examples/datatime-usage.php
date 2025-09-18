@@ -1,8 +1,6 @@
 <?php
 
 use Core\Http\Request;
-
-use Core\Utils\DateTimeFormatter;
 use Core\Utils\DateTimeHelper;
 
 // Integration with Form Processing
@@ -80,8 +78,8 @@ if ($processedData['start_time'] instanceof \DateTimeImmutable) {
 }
 
 // Formatting for display in templates
-echo DateTimeFormatter::humanReadable($processedData['start_time']);
-echo DateTimeFormatter::format($processedData['start_time'], 'F j, Y g:i a');
+echo DateTimeHelper::humanReadable($processedData['start_time']);
+echo DateTimeHelper::createFromFormat($processedData['start_time'], 'F j, Y g:i a');
 
 
 

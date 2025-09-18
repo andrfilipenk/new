@@ -1,12 +1,12 @@
 <?php
 
 // Quick chart creation
-$chart = ChartBuilder::quickBar(['A', 'B', 'C'], [10, 20, 15], 'Sales');
+$chart = \Core\Chart\ChartBuilder::quickBar(['A', 'B', 'C'], [10, 20, 15], 'Sales');
 
 // Advanced configuration
-$chart = ChartBuilder::line()
+$chart = \Core\Chart\ChartBuilder::line()
     ->data($complexData)
-    ->config(ChartThemes::dark())
+    ->config(\Core\Chart\Styles\ChartThemes::dark())
     ->smooth()
     ->showPoints()
     ->style('custom css')

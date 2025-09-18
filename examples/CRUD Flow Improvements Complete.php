@@ -1,7 +1,7 @@
 <?php
 
 // New controller (10 lines vs 80+ before)
-class UserResourceController extends CrudController {
+class UserResourceController extends \Core\Mvc\CrudController {
     protected string $modelClass = Users::class;
     protected string $formClass = UserForm::class;
     protected string $serviceClass = UserService::class;

@@ -42,10 +42,6 @@ $config = require APP_PATH . 'config.php';
 $application = new \Core\Mvc\Application($config);
 
 // Register modules
-if (isset($config['modules'])) {
-    $application->registerModules($config['modules']);
-}
-
 // return $application;
 
 
