@@ -2,12 +2,21 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [Controller.php](file://app/Core/Mvc/Controller.php)
-- [Response.php](file://app/Core/Http/Response.php)
-- [View.php](file://app/Core/Mvc/View.php)
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php)
-- [CrudController.php](file://app/Core/Mvc/CrudController.php)
+- [Controller.php](file://app\Core\Mvc\Controller.php) - *Updated in recent commit*
+- [Response.php](file://app\Core\Http\Response.php) - *Updated in recent commit*
+- [CrudController.php](file://app\Core\Mvc\CrudController.php) - *Added in recent commit*
+- [View.php](file://app\Core\Mvc\View.php)
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php)
 </cite>
+
+## Update Summary
+**Changes Made**   
+- Updated **AJAX Response Handling** section to reflect new `jsonResponse()` method and content negotiation in `CrudController`
+- Added new **Content Negotiation in CRUD Operations** section to document enterprise-level CRUD improvements
+- Enhanced **Response Generation Framework** with updated return type information (`string|Response`)
+- Updated **Controller Helper Methods** to reflect actual implementation details
+- Revised **Troubleshooting Common Issues** with new information about JSON response handling
+- Added new diagram for content negotiation flow in CRUD operations
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -18,7 +27,8 @@
 6. [Response Class Capabilities](#response-class-capabilities)
 7. [Best Practices](#best-practices)
 8. [AJAX Response Handling](#ajax-response-handling)
-9. [Troubleshooting Common Issues](#troubleshooting-common-issues)
+9. [Content Negotiation in CRUD Operations](#content-negotiation-in-crud-operations)
+10. [Troubleshooting Common Issues](#troubleshooting-common-issues)
 
 ## Introduction
 This document provides comprehensive documentation on response generation and redirection mechanisms within the MVC framework. It covers the complete response handling workflow from controller actions to final output delivery, including view rendering, HTTP redirection, and direct response object manipulation. The framework supports multiple response types including HTML content, JSON data, and full Response objects with complete control over status codes and headers.
@@ -31,7 +41,7 @@ The framework implements a flexible response generation system that allows contr
 - **Array responses** for JSON data
 - **Response objects** for complete control over HTTP response
 
-The Application class handles response normalization, ensuring that all controller outputs are properly converted to Response objects before being sent to the client. This allows for consistent response handling regardless of the return type from controller actions.
+The Application class handles response normalization, ensuring that all controller outputs are properly converted to Response objects before being sent to the client. This allows for consistent response handling regardless of the return type from controller actions. With the introduction of `CrudController`, actions can now return either a string (for HTML views) or a Response object (for JSON APIs or redirects), indicated by the return type `string|Response`.
 
 ```mermaid
 flowchart TD
@@ -46,13 +56,13 @@ F --> G[Send Response]
 ```
 
 **Diagram sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L61-L101)
-- [Response.php](file://app/Core/Http/Response.php#L0-L41)
-- [Application.php](file://app/Core/Mvc/Application.php#L40-L70)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L61-L101)
+- [Response.php](file://app\Core\Http\Response.php#L0-L41)
+- [Application.php](file://app\Core\Mvc\Application.php#L40-L70)
 
 **Section sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L9-L124)
-- [Response.php](file://app/Core/Http/Response.php#L4-L137)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L9-L124)
+- [Response.php](file://app\Core\Http\Response.php#L4-L137)
 
 ## Controller Helper Methods
 
@@ -94,12 +104,12 @@ Controller --> View : "uses"
 ```
 
 **Diagram sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L9-L124)
-- [Response.php](file://app/Core/Http/Response.php#L4-L137)
-- [View.php](file://app/Core/Mvc/View.php#L8-L120)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L9-L124)
+- [Response.php](file://app\Core\Http\Response.php#L4-L137)
+- [View.php](file://app\Core\Mvc\View.php#L8-L120)
 
 **Section sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L61-L101)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L61-L101)
 
 ## Redirect Implementation
 
@@ -125,12 +135,12 @@ Client->>Client : Follow redirect to new location
 ```
 
 **Diagram sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L89-L92)
-- [Response.php](file://app/Core/Http/Response.php#L40-L44)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L89-L92)
+- [Response.php](file://app\Core\Http\Response.php#L40-L44)
 
 **Section sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L89-L92)
-- [Response.php](file://app/Core/Http/Response.php#L40-L44)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L89-L92)
+- [Response.php](file://app\Core\Http\Response.php#L40-L44)
 
 ## View Rendering Process
 
@@ -161,12 +171,12 @@ J --> K[Return Final Content]
 ```
 
 **Diagram sources**
-- [View.php](file://app/Core/Mvc/View.php#L8-L120)
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php#L10-L37)
+- [View.php](file://app\Core\Mvc\View.php#L8-L120)
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php#L10-L37)
 
 **Section sources**
-- [View.php](file://app/Core/Mvc/View.php#L8-L120)
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php#L10-L37)
+- [View.php](file://app\Core\Mvc\View.php#L8-L120)
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php#L10-L37)
 
 ## Response Class Capabilities
 
@@ -207,10 +217,10 @@ class Response {
 ```
 
 **Diagram sources**
-- [Response.php](file://app/Core/Http/Response.php#L4-L137)
+- [Response.php](file://app\Core\Http\Response.php#L4-L137)
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L4-L137)
+- [Response.php](file://app\Core\Http\Response.php#L4-L137)
 
 ## Best Practices
 
@@ -255,12 +265,65 @@ F --> G
 ```
 
 **Diagram sources**
-- [CrudController.php](file://app/Core/Mvc/CrudController.php#L354-L357)
-- [UserResourceController.php](file://app/Module/Admin/Controller/UserResourceController.php#L13-L72)
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L354-L357)
+- [UserResourceController.php](file://app\Module\Admin\Controller\UserResourceController.php#L13-L72)
 
 **Section sources**
-- [CrudController.php](file://app/Core/Mvc/CrudController.php#L314-L318)
-- [UserResourceController.php](file://app/Module/Admin/Controller/UserResourceController.php#L50-L72)
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L314-L318)
+- [UserResourceController.php](file://app\Module\Admin\Controller\UserResourceController.php#L50-L72)
+
+## Content Negotiation in CRUD Operations
+
+The enhanced CRUD system implements enterprise-level content negotiation, automatically determining the appropriate response format based on the request type. This allows a single controller to serve both HTML and JSON APIs without code duplication.
+
+### Request Detection
+The `isJsonRequest()` method in `CrudController` detects API requests through multiple indicators:
+- AJAX requests (X-Requested-With header)
+- Accept header set to application/json
+- Format parameter in query string
+
+### Standardized Response Format
+JSON responses follow a consistent format with success status, data payload, and optional messages:
+```json
+{
+    "success": true,
+    "data": {...},
+    "message": "Operation completed successfully"
+}
+```
+
+### Error Response Handling
+The system provides comprehensive error responses with appropriate HTTP status codes and detailed error information:
+```json
+{
+    "success": false,
+    "error": "Validation failed",
+    "details": {...}
+}
+```
+
+```mermaid
+flowchart TD
+A[CRUD Controller Action] --> B{isJsonRequest?}
+B --> |Yes| C[Build JSON Response]
+B --> |No| D[Build HTML Response]
+C --> E[Use jsonResponse() helper]
+E --> F[Set Content-Type: application/json]
+F --> G[Send JSON Response]
+D --> H[Use render() helper]
+H --> I[Return HTML Content]
+I --> J[Send HTML Response]
+G --> K[Response Sent]
+J --> K
+```
+
+**Diagram sources**
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L354-L375)
+- [Response.php](file://app\Core\Http\Response.php#L100-L137)
+
+**Section sources**
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L354-L414)
+- [Response.php](file://app\Core\Http\Response.php#L100-L137)
 
 ## Troubleshooting Common Issues
 
@@ -291,8 +354,9 @@ When returning JSON responses, ensure that:
 - Special characters are handled correctly
 - Large datasets are paginated
 - Circular references are avoided in object graphs
+- Validation errors are properly formatted in responses
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L100-L137)
-- [CrudController.php](file://app/Core/Mvc/CrudController.php#L371-L414)
-- [Controller.php](file://app/Core/Mvc/Controller.php#L102-L124)
+- [Response.php](file://app\Core\Http\Response.php#L100-L137)
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L371-L414)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L102-L124)

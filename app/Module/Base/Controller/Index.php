@@ -19,6 +19,6 @@ class Index extends Controller
     {
         // This is called after the action executes
         // You can modify the response here if needed
-        parent::afterExecute();
+        #parent::afterExecute();
     }
 }

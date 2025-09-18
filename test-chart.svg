@@ -1,0 +1,26 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="800" height="600" fill="#ffffff" />
+<text x="400" y="20" textAnchor="middle" fontSize="16" fontFamily="Arial, sans-serif" fill="#333333" fontWeight="bold">Sales Report</text>
+<line x1="80" y1="40" x2="700" y2="40" stroke="#e0e0e0" strokeWidth="1" />
+<line x1="80" y1="140" x2="700" y2="140" stroke="#e0e0e0" strokeWidth="1" />
+<line x1="80" y1="240" x2="700" y2="240" stroke="#e0e0e0" strokeWidth="1" />
+<line x1="80" y1="340" x2="700" y2="340" stroke="#e0e0e0" strokeWidth="1" />
+<line x1="80" y1="440" x2="700" y2="440" stroke="#e0e0e0" strokeWidth="1" />
+<line x1="80" y1="540" x2="700" y2="540" stroke="#e0e0e0" strokeWidth="1" />
+<rect x="100.66666666667" y="236.9696969697" width="165.33333333333" height="303.0303030303" fill="#3498db" stroke="none" class="bar bar-0-0" />
+<rect x="307.33333333333" y="85.454545454545" width="165.33333333333" height="454.54545454545" fill="#3498db" stroke="none" class="bar bar-0-1" />
+<rect x="514" y="176.36363636364" width="165.33333333333" height="363.63636363636" fill="#3498db" stroke="none" class="bar bar-0-2" />
+<text x="183.33333333333" y="560" textAnchor="middle" fontSize="12" fill="#333333">Product A</text>
+<text x="390" y="560" textAnchor="middle" fontSize="12" fill="#333333">Product B</text>
+<text x="596.66666666667" y="560" textAnchor="middle" fontSize="12" fill="#333333">Product C</text>
+<text x="70" y="540" textAnchor="end" dominantBaseline="middle" fontSize="12" fill="#333333">0.0</text>
+<text x="70" y="440" textAnchor="end" dominantBaseline="middle" fontSize="12" fill="#333333">33.0</text>
+<text x="70" y="340" textAnchor="end" dominantBaseline="middle" fontSize="12" fill="#333333">66.0</text>
+<text x="70" y="240" textAnchor="end" dominantBaseline="middle" fontSize="12" fill="#333333">99.0</text>
+<text x="70" y="140" textAnchor="end" dominantBaseline="middle" fontSize="12" fill="#333333">132.0</text>
+<text x="70" y="40" textAnchor="end" dominantBaseline="middle" fontSize="12" fill="#333333">165.0</text>
+<line x1="80" y1="540" x2="700" y2="540" stroke="#333333" strokeWidth="2" />
+<line x1="80" y1="40" x2="80" y2="540" stroke="#333333" strokeWidth="2" />
+<rect x="720" y="40" width="12" height="12" fill="#3498db" stroke="none" />
+<text x="736" y="49" fontSize="11" fill="#333333" dominantBaseline="middle">Values</text>
+</svg>

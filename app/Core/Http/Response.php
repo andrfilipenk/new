@@ -20,6 +20,7 @@ class Response
     public const HTTP_FORBIDDEN = 403;
     public const HTTP_NOT_FOUND = 404;
     public const HTTP_METHOD_NOT_ALLOWED = 405;
+    public const HTTP_UNPROCESSABLE_ENTITY = 422;
     public const HTTP_INTERNAL_SERVER_ERROR = 500;
 
     public function __construct($content = '', int $statusCode = self::HTTP_OK, array $headers = [])

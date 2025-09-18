@@ -2,15 +2,23 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [Injectable.php](file://app/Core/Di/Injectable.php)
-- [Controller.php](file://app/Core/Mvc/Controller.php)
+- [Injectable.php](file://app/Core/Di/Injectable.php) - *Updated in recent commit*
+- [Controller.php](file://app/Core/Mvc/Controller.php) - *Updated in recent commit*
 - [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php)
 - [User.php](file://app/Module/Admin/Controller/User.php)
-- [Container.php](file://app/Core/Di/Container.php)
-- [CrudController.php](file://app/Core/Mvc/CrudController.php)
+- [Container.php](file://app/Core/Di/Container.php) - *Updated in recent commit*
+- [CrudController.php](file://app/Core/Mvc/CrudController.php) - *Added in recent commit*
 - [UserService.php](file://app/Module/Admin/Services/UserService.php)
 - [BaseService.php](file://app/Core/Services/BaseService.php)
 </cite>
+
+## Update Summary
+**Changes Made**   
+- Added new section on enterprise-level CRUD controller service integration
+- Updated best practices to reflect service layer separation
+- Enhanced testing considerations for service-oriented architecture
+- Added new diagram for CRUD service flow
+- Updated section sources to reflect new and modified files
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -19,13 +27,14 @@
 4. [Accessing Any Registered Service](#accessing-any-registered-service)
 5. [View Data Passing with Dashboard.php](#view-data-passing-with-dashboardphp)
 6. [Form Handling with Request Data in User.php](#form-handling-with-request-data-in-userphp)
-7. [Best Practices for Service Usage](#best-practices-for-service-usage)
-8. [Testing Considerations](#testing-considerations)
-9. [Common Issues and Solutions](#common-issues-and-solutions)
-10. [Conclusion](#conclusion)
+7. [Enterprise CRUD Controller Service Integration](#enterprise-crud-controller-service-integration)
+8. [Best Practices for Service Usage](#best-practices-for-service-usage)
+9. [Testing Considerations](#testing-considerations)
+10. [Common Issues and Solutions](#common-issues-and-solutions)
+11. [Conclusion](#conclusion)
 
 ## Introduction
-This document explains how controllers access framework services through the Dependency Injection (DI) container in the application architecture. It covers the Injectable trait, built-in service shortcuts, and methods for retrieving any registered service. The document uses Dashboard.php to illustrate view data passing and User.php for form handling with request data. Best practices, testing considerations, and common issues are also addressed.
+This document explains how controllers access framework services through the Dependency Injection (DI) container in the application architecture. It covers the Injectable trait, built-in service shortcuts, and methods for retrieving any registered service. The document uses Dashboard.php to illustrate view data passing and User.php for form handling with request data. With the introduction of the enterprise-level CrudController, this documentation has been updated to reflect the new service integration patterns. Best practices, testing considerations, and common issues are also addressed.
 
 **Section sources**
 - [Controller.php](file://app/Core/Mvc/Controller.php#L9-L124)
@@ -146,27 +155,57 @@ F --> |No| H[flashError + Show Form with Data]
 **Section sources**
 - [User.php](file://app/Module/Admin/Controller/User.php#L15-L81)
 
+## Enterprise CRUD Controller Service Integration
+The new CrudController implements enterprise-level service integration patterns. When a service class is defined in the serviceClass property, CRUD operations are delegated to the service layer through the DI container. This separation of concerns allows business logic to be maintained independently of controller responsibilities.
+
+```mermaid
+sequenceDiagram
+participant Controller
+participant DI as DI Container
+participant Service
+participant Model
+Controller->>Controller : getValidatedData()
+Controller->>DI : get(serviceClass)
+DI-->>Controller : Service instance
+Controller->>Service : create/update/delete(data)
+Service->>Model : Execute business logic
+Model-->>Service : Return result
+Service-->>Controller : Return processed record
+Controller->>Controller : Handle response
+```
+
+**Diagram sources**
+- [CrudController.php](file://app/Core/Mvc/CrudController.php#L245-L291)
+- [UserService.php](file://app/Module/Admin/Services/UserService.php#L20-L50)
+
+**Section sources**
+- [CrudController.php](file://app/Core/Mvc/CrudController.php#L245-L291)
+- [UserService.php](file://app/Module/Admin/Services/UserService.php#L20-L50)
+
 ## Best Practices for Service Usage
-When using services through the DI container, avoid tight coupling by depending on interfaces rather than concrete implementations. Use the built-in shortcuts when available, and always check for service existence with has() before retrieval when optional. Register services with meaningful names and avoid direct container access in business logic classes when possible.
+When using services through the DI container, avoid tight coupling by depending on interfaces rather than concrete implementations. Use the built-in shortcuts when available, and always check for service existence with has() before retrieval when optional. Register services with meaningful names and avoid direct container access in business logic classes when possible. With the introduction of the CrudController, business logic should be moved to service classes that are injected via the DI container, keeping controllers focused on request/response handling.
 
 **Section sources**
 - [Controller.php](file://app/Core/Mvc/Controller.php#L9-L124)
 - [Injectable.php](file://app/Core/Di/Injectable.php#L9-L47)
 - [Container.php](file://app/Core/Di/Container.php#L45-L55)
+- [CrudController.php](file://app/Core/Mvc/CrudController.php#L245-L291)
 
 ## Testing Considerations
-For testing controllers that use DI services, mock the container and inject it using setDI(). This allows testing controller logic without requiring the actual services. Test both successful service retrieval and error cases (service not found). Verify that shortcut methods properly delegate to the container.
+For testing controllers that use DI services, mock the container and inject it using setDI(). This allows testing controller logic without requiring the actual services. Test both successful service retrieval and error cases (service not found). Verify that shortcut methods properly delegate to the container. When testing CRUD controllers, ensure that service layer interactions are properly mocked and that the DI container returns the expected service instances for create, update, and delete operations.
 
 **Section sources**
 - [Injectable.php](file://app/Core/Di/Injectable.php#L11-L13)
 - [Controller.php](file://app/Core/Mvc/Controller.php#L9-L124)
+- [CrudController.php](file://app/Core/Mvc/CrudController.php#L245-L291)
 
 ## Common Issues and Solutions
-Common issues include service not found exceptions (check registration and spelling), improper DI container usage (avoid global access), and circular dependencies. Ensure services are registered before use, use dependency injection in constructors when possible, and avoid storing container references in long-lived objects.
+Common issues include service not found exceptions (check registration and spelling), improper DI container usage (avoid global access), and circular dependencies. Ensure services are registered before use, use dependency injection in constructors when possible, and avoid storing container references in long-lived objects. With the new CrudController implementation, ensure that service classes are properly registered in the DI container and that the serviceClass property is correctly defined in the controller.
 
 **Section sources**
 - [Container.php](file://app/Core/Di/Container.php#L70-L75)
 - [Injectable.php](file://app/Core/Di/Injectable.php#L30-L40)
+- [CrudController.php](file://app/Core/Mvc/CrudController.php#L245-L291)
 
 ## Conclusion
-The DI container provides a powerful mechanism for accessing framework services in controllers. The Injectable trait enables getDI() access, while built-in shortcuts simplify common operations. Controllers can retrieve any registered service, pass data to views, and handle form submissions effectively. Following best practices ensures maintainable, testable code with proper separation of concerns.
+The DI container provides a powerful mechanism for accessing framework services in controllers. The Injectable trait enables getDI() access, while built-in shortcuts simplify common operations. Controllers can retrieve any registered service, pass data to views, and handle form submissions effectively. With the introduction of the enterprise-level CrudController, service integration has become a core pattern, promoting separation of concerns and code reuse. Following best practices ensures maintainable, testable code with proper separation of concerns.

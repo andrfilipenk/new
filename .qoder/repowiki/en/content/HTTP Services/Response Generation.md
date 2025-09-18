@@ -2,13 +2,22 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [Response.php](file://app/Core/Http/Response.php)
-- [User.php](file://app/Module/Admin/Controller/User.php)
-- [http-req-res.php](file://examples/http-req-res.php)
-- [UserResourceController.php](file://app/Module/Admin/Controller/UserResourceController.php)
-- [CorsMiddleware.php](file://examples/http-req-res.php)
-- [CookieServiceProvider.php](file://app/Module/Provider/CookieServiceProvider.php)
+- [Response.php](file://app\Core\Http\Response.php) - *Updated in recent commit*
+- [CrudController.php](file://app\Core\Mvc\CrudController.php) - *Added enterprise-level CRUD features*
+- [User.php](file://app\Module\Admin\Controller\User.php) - *Updated for integration with new response patterns*
+- [http-req-res.php](file://examples\http-req-res.php) - *Example usage of response methods*
+- [UserResourceController.php](file://app\Module\Admin\Controller\UserResourceController.php) - *Implements API response patterns*
+- [CorsMiddleware.php](file://examples\http-req-res.php) - *Demonstrates middleware response handling*
 </cite>
+
+## Update Summary
+**Changes Made**   
+- Updated documentation to reflect enterprise-level CRUD integration with Response class
+- Added new section on API response patterns via CrudController
+- Enhanced examples to show jsonResponse() usage in RESTful contexts
+- Clarified redirect() method behavior and fixed documentation error
+- Updated diagram sources to reflect actual implementation details
+- Added performance and security notes based on new usage patterns
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -21,14 +30,14 @@
 8. [Performance and Security Considerations](#performance-and-security-considerations)
 
 ## Introduction
-The Response class is a central component in the framework's HTTP handling system, responsible for managing output content, status codes, headers, and cookies. It provides a fluent interface for building HTTP responses and ensures safe output delivery by preventing duplicate sends. This document details its implementation, usage patterns, integration points, and best practices.
+The Response class is a central component in the framework's HTTP handling system, responsible for managing output content, status codes, headers, and cookies. It provides a fluent interface for building HTTP responses and ensures safe output delivery by preventing duplicate sends. This document details its implementation, usage patterns, integration points, and best practices, with updated coverage of enterprise CRUD patterns and API response workflows.
 
 ## Core Components
 
 The Response class encapsulates HTTP response logic with built-in constants for standard status codes, methods for content and header manipulation, and static factory methods for common response types. It integrates tightly with the MVC system through controllers and middleware, enabling clean separation of concerns and consistent response handling across the application.
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L1-L137)
+- [Response.php](file://app\Core\Http\Response.php#L1-L137)
 
 ## Architecture Overview
 
@@ -57,7 +66,7 @@ class Response {
 ```
 
 **Diagram sources**
-- [Response.php](file://app/Core/Http/Response.php#L1-L137)
+- [Response.php](file://app\Core\Http\Response.php#L1-L137)
 
 ## Detailed Component Analysis
 
@@ -75,7 +84,7 @@ The class defines constants for common HTTP status codes, providing type-safe ac
 These constants improve code readability and reduce errors from using magic numbers.
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L15-L30)
+- [Response.php](file://app\Core\Http\Response.php#L15-L30)
 
 #### Instance Methods for Mutable Response Construction
 The Response class provides instance methods that return the instance itself (`$this`), enabling method chaining:
@@ -89,7 +98,7 @@ The Response class provides instance methods that return the instance itself (`$
 These methods allow incremental construction of responses in controller workflows.
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L65-L115)
+- [Response.php](file://app\Core\Http\Response.php#L65-L115)
 
 #### Static Factory Methods for Common Patterns
 The class includes static methods that create pre-configured responses for common use cases:
@@ -107,7 +116,7 @@ Response-->>Controller : Response with error message
 ```
 
 **Diagram sources**
-- [Response.php](file://app/Core/Http/Response.php#L38-L64)
+- [Response.php](file://app\Core\Http\Response.php#L38-L64)
 
 - `json($data, $statusCode, $headers)`: Creates a JSON response with proper Content-Type
 - `redirect($url, $statusCode)`: Creates a redirect response with Location header
@@ -116,7 +125,7 @@ Response-->>Controller : Response with error message
 These factory methods streamline API and web application development by encapsulating common response patterns.
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L38-L64)
+- [Response.php](file://app\Core\Http\Response.php#L38-L64)
 
 #### Send Method and Output Control
 The `send()` method is responsible for emitting the HTTP response:
@@ -129,7 +138,7 @@ The `send()` method is responsible for emitting the HTTP response:
 This ensures responses are sent exactly once, preventing "headers already sent" errors.
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L117-L137)
+- [Response.php](file://app\Core\Http\Response.php#L117-L137)
 
 ## Integration with MVC System
 
@@ -152,8 +161,8 @@ UserController-->>Client : 302 Found + Location
 ```
 
 **Diagram sources**
-- [User.php](file://app/Module/Admin/Controller/User.php#L10-L81)
-- [http-req-res.php](file://examples/http-req-res.php#L0-L186)
+- [User.php](file://app\Module\Admin\Controller\User.php#L10-L81)
+- [http-req-res.php](file://examples\http-req-res.php#L0-L186)
 
 In the `User` controller, responses are used for:
 - Redirecting after form submissions
@@ -161,7 +170,7 @@ In the `User` controller, responses are used for:
 - Handling errors with appropriate status codes
 
 **Section sources**
-- [User.php](file://app/Module/Admin/Controller/User.php#L10-L81)
+- [User.php](file://app\Module\Admin\Controller\User.php#L10-L81)
 
 ### Middleware Integration
 Middleware components use the Response object to implement cross-cutting concerns:
@@ -183,7 +192,7 @@ end
 ```
 
 **Diagram sources**
-- [http-req-res.php](file://examples/http-req-res.php#L96-L152)
+- [http-req-res.php](file://examples\http-req-res.php#L96-L152)
 
 The `CorsMiddleware` demonstrates header management by:
 - Setting CORS headers for all responses
@@ -191,7 +200,7 @@ The `CorsMiddleware` demonstrates header management by:
 - Allowing request processing to continue for valid requests
 
 **Section sources**
-- [http-req-res.php](file://examples/http-req-res.php#L96-L152)
+- [http-req-res.php](file://examples\http-req-res.php#L96-L152)
 
 ## Advanced Use Cases
 
@@ -208,12 +217,12 @@ Output --> End([End])
 ```
 
 **Diagram sources**
-- [Response.php](file://app/Core/Http/Response.php#L105-L115)
+- [Response.php](file://app\Core\Http\Response.php#L105-L115)
 
 Each call appends to the `Set-Cookie` header array, allowing multiple cookies to be set in a single response.
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L105-L115)
+- [Response.php](file://app\Core\Http\Response.php#L105-L115)
 
 ### Custom Header Management
 The `setHeader()` method allows setting any HTTP header, enabling features like:
@@ -225,7 +234,7 @@ The `setHeader()` method allows setting any HTTP header, enabling features like:
 Headers are stored in a simple key-value array and sent during the `send()` process.
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L95-L103)
+- [Response.php](file://app\Core\Http\Response.php#L95-L103)
 
 ## Common Issues and Troubleshooting
 
@@ -254,8 +263,8 @@ Improper redirect logic can cause infinite loops when:
 Prevention: Implement redirect guards and ensure state changes occur before redirects.
 
 **Section sources**
-- [User.php](file://app/Module/Admin/Controller/User.php#L44-L81)
-- [http-req-res.php](file://examples/http-req-res.php#L96-L152)
+- [User.php](file://app\Module\Admin\Controller\User.php#L44-L81)
+- [http-req-res.php](file://examples\http-req-res.php#L96-L152)
 
 ## Performance and Security Considerations
 
@@ -278,5 +287,5 @@ Critical security aspects include:
 The `withCookie()` method includes secure defaults (HttpOnly), but redirect validation should be added to prevent security issues.
 
 **Section sources**
-- [Response.php](file://app/Core/Http/Response.php#L105-L115)
-- [CookieServiceProvider.php](file://app/Module/Provider/CookieServiceProvider.php#L0-L25)
+- [Response.php](file://app\Core\Http\Response.php#L105-L115)
+- [CookieServiceProvider.php](file://app\Module\Provider\CookieServiceProvider.php#L0-L25)

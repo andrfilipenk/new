@@ -2,248 +2,220 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [config.php](file://app/config.php)
 - [Router.php](file://app/Core/Mvc/Router.php)
+- [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php)
-- [User.php](file://app/Module/Admin/Controller/User.php)
+- [Application.php](file://app/Core/Mvc/Application.php)
+- [UserResourceController.php](file://app/Module/Admin/Controller/UserResourceController.php)
 - [Task.php](file://app/Module/Admin/Controller/Task.php)
-- [bootstrap.php](file://app/bootstrap.php)
 </cite>
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [Route Definition in Configuration](#route-definition-in-configuration)
-3. [Router Class Implementation](#router-class-implementation)
-4. [Route Matching and Parameter Extraction](#route-matching-and-parameter-extraction)
-5. [HTTP Method Constraints](#http-method-constraints)
-6. [Route Types and Usage Examples](#route-types-and-usage-examples)
-7. [Integration with Dispatcher](#integration-with-dispatcher)
-8. [Internal Mechanics of Route Compilation](#internal-mechanics-of-route-compilation)
-9. [Common Issues and Best Practices](#common-issues-and-best-practices)
-10. [Performance Optimization Tips](#performance-optimization-tips)
+2. [Core Routing Components](#core-routing-components)
+3. [Router Implementation](#router-implementation)
+4. [Resource-Based Routing](#resource-based-routing)
+5. [Routing Flow and Dispatch Process](#routing-flow-and-dispatch-process)
+6. [Route Matching Algorithm](#route-matching-algorithm)
+7. [Dispatcher and Controller Execution](#dispatcher-and-controller-execution)
+8. [Practical Usage Examples](#practical-usage-examples)
+9. [Conclusion](#conclusion)
 
 ## Introduction
-This document provides a comprehensive overview of the routing system in the application. It explains how routes are defined, matched, and dispatched to appropriate controllers and actions. The routing mechanism is central to request handling, enabling clean URL patterns, parameterized routes, and RESTful design. The system leverages configuration-driven route definitions and a robust matching algorithm based on regular expressions.
+This document provides a comprehensive analysis of the routing system in the PHP application framework. The routing mechanism serves as the entry point for HTTP requests, mapping URLs to appropriate controller actions. The system combines a flexible pattern-based router with a resource-oriented router that automatically generates CRUD routes, following RESTful conventions and enabling rapid development of web applications and APIs.
 
-## Route Definition in Configuration
+## Core Routing Components
+The routing system consists of three main components working together: the Router, the ResourceRouter, and the Dispatcher. These components are orchestrated by the Application class to handle incoming requests and route them to the appropriate controller actions.
 
-Routes are defined in the `config.php` file under the `'modules' => 'routes'` configuration section. Each module (e.g., `base`, `admin`) can define its own set of routes as key-value pairs where the key is the URL pattern and the value contains the controller, action, and optional HTTP method.
+```mermaid
+graph TB
+Request --> Application
+Application --> Router
+Router --> |Matched Route| Dispatcher
+Dispatcher --> Controller
+Controller --> Response
+ResourceRouter --> |Generates Routes| Router
+classDef component fill:#f9f,stroke:#333;
+class Application,Router,Dispatcher,ResourceRouter component;
+```
 
-The configuration supports:
-- Static routes (e.g., `/admin/users`)
-- Parameterized routes using `{param}` syntax (e.g., `/admin/user-edit/{id}`)
-- HTTP method constraints via the `method` key
-
-These routes are loaded during application bootstrap and registered with the `Router` instance.
+**Diagram sources**
+- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
+- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
+- [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php#L0-L188)
 
 **Section sources**
-- [config.php](file://app/config.php#L50-L99)
+- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
+- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 
-## Router Class Implementation
-
-The `Router` class (`Core\Mvc\Router`) is responsible for managing route definitions and matching incoming requests. It maintains an internal array of routes, each containing:
-- Original pattern
-- Compiled regular expression
-- Configuration (controller, action, method)
-
-New routes are added via the `add()` method, which converts the URL pattern into a regex using `patternToRegex()`.
+## Router Implementation
+The Router class is responsible for matching incoming HTTP requests to route configurations. It uses regular expressions to match URL patterns and supports named parameters, wildcards, and HTTP method constraints. The router converts URL patterns into regex patterns and extracts parameters from the matched segments.
 
 ```mermaid
 classDiagram
 class Router {
++array routes
++array currentRoute
 +add(pattern : string, config : array) : void
 +match(uri : string, method : string) : ?array
 +getCurrentRoute() : ?array
+-patternToRegex(pattern : string) : string
+-buildResult(config : array, params : array) : array
+-replacePlaceholders(value : string, params : array) : string
 }
-Router --> Route : contains
-class Route {
-+pattern : string
-+regex : string
-+config : array
-}
+Router --> Request : matches
+Router --> Dispatcher : provides route config
 ```
 
 **Diagram sources**
-- [Router.php](file://app/Core/Mvc/Router.php#L10-L25)
+- [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 
 **Section sources**
-- [Router.php](file://app/Core/Mvc/Router.php#L10-L91)
+- [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 
-## Route Matching and Parameter Extraction
-
-When a request arrives, the `match()` method iterates through all registered routes and attempts to match the URI against each route's regex pattern. The matching process includes:
-
-1. Trimming leading/trailing slashes from the URI
-2. Checking HTTP method constraint (if specified)
-3. Executing regex match using `preg_match()`
-4. Extracting named parameters using named capture groups
-5. Filtering results to retain only string-keyed matches (named parameters)
-
-For example, a request to `/admin/user-edit/123` matches the pattern `/admin/user-edit/{id}` and extracts `['id' => '123']`.
+## Resource-Based Routing
+The ResourceRouter provides a higher-level abstraction for defining CRUD routes following RESTful conventions. It automatically generates standard routes for common operations (index, create, store, show, edit, update, destroy) based on resource names and controller classes. This eliminates repetitive route definitions and enforces consistent API design.
 
 ```mermaid
 flowchart TD
-Start([Request Received]) --> Normalize["Normalize URI<br/>(trim slashes)"]
-Normalize --> Loop["Iterate Routes"]
-Loop --> CheckMethod["Check HTTP Method"]
-CheckMethod --> |Matches| TryRegex["Execute Regex Match"]
-CheckMethod --> |No Match| NextRoute["Next Route"]
-TryRegex --> |Match Found| ExtractParams["Extract Named Parameters"]
-ExtractParams --> BuildResult["Build Route Result"]
-BuildResult --> StoreCurrent["Store Current Route"]
-StoreCurrent --> ReturnResult["Return Match Result"]
-TryRegex --> |No Match| NextRoute
-NextRoute --> MoreRoutes{"More Routes?"}
-MoreRoutes --> |Yes| Loop
-MoreRoutes --> |No| ReturnNull["Return null (404)"]
+Start([Resource Registration]) --> DefineResource["Define Resource (name, controller, options)"]
+DefineResource --> FilterActions["Filter Actions (only/except)"]
+FilterActions --> GenerateRoutes["Generate Routes for Each Action"]
+subgraph RouteGeneration
+GenerateRoutes --> Index["index: GET /resource"]
+GenerateRoutes --> Create["create: GET /resource/create"]
+GenerateRoutes --> Store["store: POST /resource"]
+GenerateRoutes --> Show["show: GET /resource/{id}"]
+GenerateRoutes --> Edit["edit: GET /resource/{id}/edit"]
+GenerateRoutes --> Update["update: PUT/PATCH /resource/{id}"]
+GenerateRoutes --> Destroy["destroy: DELETE /resource/{id}"]
+end
+GenerateRoutes --> RegisterWithRouter["Register Routes with Router"]
+RegisterWithRouter --> Complete([Route Registration Complete])
+style Start fill:#4CAF50,stroke:#388E3C
+style Complete fill:#4CAF50,stroke:#388E3C
 ```
 
 **Diagram sources**
-- [Router.php](file://app/Core/Mvc/Router.php#L27-L43)
+- [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php#L0-L188)
 
 **Section sources**
-- [Router.php](file://app/Core/Mvc/Router.php#L27-L43)
+- [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php#L0-L188)
 
-## HTTP Method Constraints
-
-Routes can optionally specify an HTTP method constraint using the `method` key in the route configuration. If present, the router checks whether the incoming request method matches (case-insensitive) before attempting a regex match.
-
-For example:
-```php
-'/' => [
-    'controller' => 'Module\Base\Controller\Dashboard',
-    'action' => 'index',
-    'method'     => 'GET'
-]
-```
-
-This ensures that only GET requests to `/` will be routed to the Dashboard controller's index action.
-
-**Section sources**
-- [config.php](file://app/config.php#L58-L60)
-- [Router.php](file://app/Core/Mvc/Router.php#L31-L33)
-
-## Route Types and Usage Examples
-
-### Static Routes
-Used for fixed endpoints with no dynamic segments:
-- `/admin/users` → User controller, index action
-- `/admin/tasks` → Task controller, index action
-
-### Parameterized Routes
-Use `{param}` syntax to capture dynamic values:
-- `/admin/user-edit/{id}` → Captures `id` parameter
-- `/admin/task-delete/{id}` → Captures `id` parameter
-
-These parameters are passed to the controller via the dispatcher.
-
-### RESTful Patterns
-The system supports REST-like routing patterns:
-- `GET /admin/users` → List users
-- `GET /admin/user-create` → Show create form
-- `POST /admin/user-create` → Handle form submission
-- `GET /admin/user-edit/{id}` → Show edit form
-- `POST /admin/user-edit/{id}` → Handle update
-
-Example from Admin module:
-```php
-'/admin/user-edit/{id}' => [
-    'controller' => 'Module\Admin\Controller\User',
-    'action' => 'edit'
-]
-```
-
-**Section sources**
-- [config.php](file://app/config.php#L70-L97)
-- [User.php](file://app/Module/Admin/Controller/User.php#L20-L81)
-- [Task.php](file://app/Module/Admin/Controller/Task.php#L20-L76)
-
-## Integration with Dispatcher
-
-After a successful route match, the result is passed to the `Dispatcher` class, which:
-1. Instantiates the specified controller using the DI container
-2. Calls the `initialize()` method if it exists
-3. Invokes the specified action method (e.g., `editAction`)
-4. Passes parameters via the dispatcher's parameter store
-
-The dispatcher retrieves route parameters using `getParam()`, as seen in the `User` and `Task` controllers:
-
-```php
-$id = $this->getDI()->get('dispatcher')->getParam('id');
-```
+## Routing Flow and Dispatch Process
+The complete routing and dispatch process involves multiple components working in sequence to handle an HTTP request. The Application receives the request, uses the Router to find a matching route, and then delegates to the Dispatcher to execute the appropriate controller action.
 
 ```mermaid
 sequenceDiagram
-participant Request
-participant Router
-participant Dispatcher
-participant Controller
-Request->>Router : match(uri, method)
-Router-->>Request : route config + params
-Request->>Dispatcher : dispatch(route, request)
-Dispatcher->>Dispatcher : set controller & action
-Dispatcher->>Controller : get from DI container
-Controller->>Controller : initialize()
-Dispatcher->>Controller : call actionMethod()
-Controller-->>Dispatcher : response content
-Dispatcher-->>Request : Response object
+participant Client as "Client"
+participant App as "Application"
+participant Router as "Router"
+participant Dispatcher as "Dispatcher"
+participant Controller as "Controller"
+participant Response as "Response"
+Client->>App : HTTP Request
+App->>Router : match(uri, method)
+Router-->>App : Route Config or null
+alt Route Found
+App->>Dispatcher : dispatch(route, request)
+Dispatcher->>Controller : Instantiate Controller
+Dispatcher->>Controller : Call Action Method
+Controller-->>Dispatcher : Return Value
+Dispatcher-->>App : Response Object
+App->>Client : Send Response
+else Route Not Found
+App->>Client : 404 Response
+end
 ```
 
 **Diagram sources**
-- [Router.php](file://app/Core/Mvc/Router.php#L27-L43)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L15-L55)
+- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
+- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 
 **Section sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L15-L83)
-- [User.php](file://app/Module/Admin/Controller/User.php#L30-L31)
-- [Task.php](file://app/Module/Admin/Controller/Task.php#L25-L26)
+- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
+- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 
-## Internal Mechanics of Route Compilation
+## Route Matching Algorithm
+The Router uses a pattern-to-regex conversion algorithm to match incoming URLs against defined routes. It supports named parameters (enclosed in curly braces) and wildcards, converting them to appropriate regex patterns. The algorithm also handles HTTP method constraints and extracts named parameters from the URL for use in controller actions.
 
-The `patternToRegex()` method transforms route patterns into regular expressions:
+```mermaid
+flowchart TD
+A([Incoming URI]) --> B{Trim Slashes}
+B --> C[Loop Through Routes]
+C --> D{Method Match?}
+D --> |No| C
+D --> |Yes| E{Pattern Match?}
+E --> |No| C
+E --> |Yes| F[Extract Named Parameters]
+F --> G[Build Result with Params]
+G --> H[Set Current Route]
+H --> I[Return Route Result]
+C --> J{All Routes Checked?}
+J --> |Yes| K[Return Null]
+```
 
-1. **Pattern Normalization**: Trims slashes and escapes special regex characters
-2. **Wildcard Support**: Converts `*` to `.*` for flexible matching
-3. **Parameter Conversion**: Transforms `{id}` into `(?P<id>[^/]+)` named capture group
-4. **Regex Wrapping**: Encloses pattern with `#^...$#` delimiters
-
-For example:
-- Pattern: `/admin/user-edit/{id}`
-- Regex: `#^admin/user-edit/(?P<id>[^/]+)$#`
-
-The `buildResult()` method merges route configuration with extracted parameters, replacing any placeholders in controller or action names if needed.
-
-**Section sources**
-- [Router.php](file://app/Core/Mvc/Router.php#L55-L91)
-
-## Common Issues and Best Practices
-
-### Route Ordering
-Routes are matched in the order they are defined. More specific routes should be defined before general ones to prevent premature matching.
-
-### Parameter Validation
-Always validate and sanitize route parameters in the controller. The router does not perform validation—only extraction.
-
-### 404 Handling
-When no route matches, `match()` returns `null`. This should be handled by the application to return a proper 404 response.
-
-### Missing Actions
-Ensure that the specified action method (e.g., `editAction`) exists in the target controller, or a runtime exception will be thrown.
+**Diagram sources**
+- [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 
 **Section sources**
-- [Router.php](file://app/Core/Mvc/Router.php#L38-L43)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L35-L40)
+- [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 
-## Performance Optimization Tips
+## Dispatcher and Controller Execution
+The Dispatcher component is responsible for executing the controller action once a route has been matched. It uses the DI container to instantiate the controller, calls the appropriate action method (with 'Action' suffix), and handles the return value by converting it to an appropriate Response object. The Dispatcher also manages controller lifecycle events and parameter injection.
 
-- **Minimize Complex Regex**: Avoid overly complex patterns with many optional segments or lookaheads
-- **Limit Route Count**: Keep the number of registered routes manageable to reduce iteration time
-- **Cache Route Collections**: In production, consider pre-compiling and caching route regex patterns
-- **Use Specific Patterns**: Prefer specific patterns over generic wildcards to reduce false matches
-- **Avoid Redundant Routes**: Eliminate duplicate or overlapping route definitions
+```mermaid
+classDiagram
+class Dispatcher {
++string actionName
++string controllerName
++array params
++dispatch(route : array, request : Request) : Response
++getParam(key : string, default : mixed) : mixed
++getActionName() : string
++getControllerName() : string
+}
+Dispatcher --> Container : get()
+Dispatcher --> Controller : call action method
+Dispatcher --> Response : create from return value
+Dispatcher --> EventManager : trigger events
+```
 
-During bootstrap, all routes from `config.php` are pre-loaded into the router, minimizing runtime configuration overhead.
+**Diagram sources**
+- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 
 **Section sources**
-- [bootstrap.php](file://app/bootstrap.php#L38-L56)
-- [Router.php](file://app/Core/Mvc/Router.php#L15-L24)
+- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
+
+## Practical Usage Examples
+The routing system supports both manual route definition and automatic resource-based route generation. The ResourceRouter can create complete CRUD routes with a single method call, while also supporting API-specific routes that exclude form-related actions like 'create' and 'edit'.
+
+```mermaid
+flowchart LR
+A[ResourceRouter] --> B["resource('users', 'UserController')"]
+A --> C["apiResource('api/users', 'UserController')"]
+A --> D["nestedResource('posts', 'comments', 'CommentController')"]
+B --> E[Generates 7 CRUD routes]
+C --> F[Generates 5 API routes<br>(excludes create/edit)]
+D --> G[Generates nested routes<br>/posts/{post_id}/comments/{id}]
+E --> Router
+F --> Router
+G --> Router
+classDef example fill:#2196F3,stroke:#1976D2;
+class B,C,D example;
+```
+
+**Diagram sources**
+- [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php#L0-L188)
+- [UserResourceController.php](file://app/Module/Admin/Controller/UserResourceController.php#L0-L72)
+
+**Section sources**
+- [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php#L0-L188)
+- [UserResourceController.php](file://app/Module/Admin/Controller/UserResourceController.php#L0-L72)
+
+## Conclusion
+The routing system in this PHP framework provides a robust and flexible foundation for handling HTTP requests. By combining a low-level pattern-matching router with a high-level resource-based router, it supports both fine-grained control over individual routes and rapid development of RESTful APIs and CRUD interfaces. The integration with the Dispatcher and DI container enables clean separation of concerns and promotes maintainable code organization. This routing architecture follows modern PHP practices while maintaining simplicity and performance.

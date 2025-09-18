@@ -2,13 +2,25 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php)
-- [Controller.php](file://app/Core/Mvc/Controller.php)
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php)
-- [Response.php](file://app/Core/Http/Response.php)
-- [View.php](file://app/Core/Mvc/View.php)
-- [Request.php](file://app/Core/Http/Request.php)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php) - *Updated in recent commit*
+- [Controller.php](file://app\Core\Mvc\Controller.php) - *Updated in recent commit*
+- [CrudController.php](file://app\Core\Mvc\CrudController.php) - *Added in recent commit*
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php)
+- [Response.php](file://app\Core\Http\Response.php)
+- [View.php](file://app\Core\Mvc\View.php)
+- [Request.php](file://app\Core\Http\Request.php)
+- [ResourceRouter.php](file://app\Core\Mvc\ResourceRouter.php) - *Added in recent commit*
 </cite>
+
+## Update Summary
+**Changes Made**   
+- Added comprehensive documentation for the new enterprise-level `CrudController`
+- Updated section on error handling to reflect enhanced error response patterns
+- Added new section on CRUD action methods and their standardized behavior
+- Enhanced example section with `UserResourceController` implementation
+- Updated return value handling to include JSON API content negotiation
+- Added new diagram for CRUD action flow
+- Updated section sources to reflect new and modified files
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -19,15 +31,17 @@
 6. [View Rendering and Data Preparation](#view-rendering-and-data-preparation)
 7. [Parameter Access and HTTP Method Handling](#parameter-access-and-http-method-handling)
 8. [Error Handling in Action Execution](#error-handling-in-action-execution)
-9. [Example: Dashboard Controller](#example-dashboard-controller)
-10. [Conclusion](#conclusion)
+9. [CRUD Action Methods](#crud-action-methods)
+10. [Example: Dashboard and User Resource Controllers](#example-dashboard-and-user-resource-controllers)
+11. [Conclusion](#conclusion)
 
 ## Introduction
-This document details the implementation and behavior of controller action methods within the MVC framework. It explains how the Dispatcher locates and invokes action methods using the 'Action' suffix convention, the complete dispatch flow from route resolution to response generation, and how different return types are interpreted. The document also covers best practices for action method implementation, parameter access, HTTP method handling, and error management.
+This document details the implementation and behavior of controller action methods within the MVC framework. It explains how the Dispatcher locates and invokes action methods using the 'Action' suffix convention, the complete dispatch flow from route resolution to response generation, and how different return types are interpreted. The document also covers best practices for action method implementation, parameter access, HTTP method handling, and error management. With the introduction of the enterprise-level `CrudController`, this documentation has been updated to reflect the new standardized CRUD action patterns and resource-based routing system.
 
 **Section sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L10-L83)
-- [Controller.php](file://app/Core/Mvc/Controller.php#L9-L124)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L10-L83)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L9-L124)
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L1-L441) - *Added in recent commit*
 
 ## Action Method Dispatch Flow
 The dispatch process begins when a route is resolved by the Router and passed to the Dispatcher. The Dispatcher extracts the controller class name, action name, and parameters from the route array. It then performs the following sequence:
@@ -68,10 +82,10 @@ Dispatcher-->>Router : Response object
 ```
 
 **Diagram sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L10-L83)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L10-L83)
 
 **Section sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L10-L83)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L10-L83)
 
 ## Action Naming and Method Resolution
 Action methods follow a strict naming convention where the method name consists of the action name followed by the 'Action' suffix. For example, a route with action 'index' will invoke the `indexAction` method on the controller.
@@ -85,7 +99,7 @@ The Dispatcher resolves action methods through the following process:
 This convention provides a predictable and consistent way to map routes to controller methods while avoiding conflicts with other controller methods. The naming pattern also makes it easy to identify action methods within the codebase.
 
 **Section sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L50-L55)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L50-L55)
 
 ## Controller Lifecycle and Hooks
 Controllers support lifecycle hooks that allow for pre- and post-execution logic. These hooks are automatically invoked by the Dispatcher during the dispatch process:
@@ -98,8 +112,8 @@ These methods are optional and only called if they are defined on the controller
 The Dispatcher checks for the existence of these methods using `method_exists()` before calling them, ensuring no errors occur when they are not implemented.
 
 **Section sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L40-L42)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L65-L67)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L40-L42)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L65-L67)
 
 ## Return Value Handling
 The Dispatcher interprets action method return values according to a specific hierarchy:
@@ -124,11 +138,12 @@ CreateHTML --> End
 ```
 
 **Diagram sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L70-L83)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L70-L83)
+- [Response.php](file://app\Core\Http\Response.php#L30-L38)
 
 **Section sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L70-L83)
-- [Response.php](file://app/Core/Http/Response.php#L30-L38)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L70-L83)
+- [Response.php](file://app\Core\Http\Response.php#L30-L38)
 
 ## View Rendering and Data Preparation
 The framework provides a `render()` helper method in the base `Controller` class to simplify view rendering. This method:
@@ -141,8 +156,8 @@ The template path follows the convention: `module/[module]/[controller]/[action]
 Controllers prepare data by creating an associative array of variables that are passed to the view. The view system supports layouts, partials, and sections, allowing for complex page composition while keeping controller logic focused on data preparation.
 
 **Section sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L60-L80)
-- [View.php](file://app/Core/Mvc/View.php#L20-L30)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L60-L80)
+- [View.php](file://app\Core\Mvc\View.php#L20-L30)
 
 ## Parameter Access and HTTP Method Handling
 Controllers access request parameters through the `Dispatcher::getParam()` method, which retrieves route parameters (e.g., `/user/{id}` where `{id}` is accessible via `getParam('id')`).
@@ -156,9 +171,9 @@ These methods provide a clean abstraction over the underlying `Request` object, 
 The `Request` class also supports method spoofing via the `_method` parameter, enabling PUT, DELETE, and other HTTP methods from HTML forms.
 
 **Section sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L40-L55)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L85-L90)
-- [Request.php](file://app/Core/Http/Request.php#L50-L60)
+- [Controller.php](file://app\Core\Mvc\Controller.php#L40-L55)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L85-L90)
+- [Request.php](file://app\Core\Http\Request.php#L50-L60)
 
 ## Error Handling in Action Execution
 The framework implements comprehensive error handling during action execution:
@@ -169,19 +184,83 @@ The framework implements comprehensive error handling during action execution:
 - **Exception propagation**: Uncaught exceptions bubble up to the application level
 
 The `CrudController` base class demonstrates advanced error handling patterns, including:
-- JSON error responses for API requests
+- JSON error responses for API requests with proper HTTP status codes
 - Flash messages for HTML requests
-- Validation error handling
-- Resource not found exceptions
+- Validation error handling with detailed error messages
+- Resource not found exceptions with appropriate responses
 
-Controllers should return appropriate `Response` objects for error conditions rather than throwing exceptions for expected error cases (e.g., validation failures).
+Controllers should return appropriate `Response` objects for error conditions rather than throwing exceptions for expected error cases (e.g., validation failures). The enterprise-level error handling system automatically negotiates content type based on request type (HTML vs API), providing appropriate error responses in the correct format.
 
 **Section sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L35-L38)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L50-L55)
-- [CrudController.php](file://app/Core/Mvc/CrudController.php#L13-L441)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L35-L38)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L50-L55)
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L13-L441) - *Updated in recent commit*
 
-## Example: Dashboard Controller
+## CRUD Action Methods
+The introduction of `CrudController` provides a standardized pattern for CRUD operations with enterprise-level features. This abstract base class implements seven standard action methods following RESTful conventions:
+
+- `indexAction()`: Display a listing of resources with optional pagination
+- `createAction()`: Show the form for creating a new resource
+- `storeAction()`: Store a newly created resource
+- `showAction()`: Display the specified resource
+- `editAction()`: Show the form for editing the specified resource
+- `updateAction()`: Update the specified resource
+- `destroyAction()`: Remove the specified resource
+
+These methods follow a consistent pattern with built-in features:
+- Automatic validation using defined `$validationRules`
+- Service layer integration via `$serviceClass`
+- Form integration via `$formClass`
+- JSON API content negotiation based on request type
+- Comprehensive error handling with appropriate HTTP status codes
+- Flash message integration for HTML requests
+- Pagination support for index actions
+
+The `CrudController` leverages the `ResourceRouter` to automatically generate routes for these actions, following convention-over-configuration principles. This eliminates boilerplate code and ensures consistency across resource controllers.
+
+```mermaid
+classDiagram
+class CrudController {
++indexAction()
++createAction()
++storeAction()
++showAction()
++editAction()
++updateAction()
++destroyAction()
++getValidatedData()
++handleError()
++handleValidationError()
++jsonResponse()
+}
+class Controller {
++initialize()
++afterExecute()
++render()
++redirect()
++flashSuccess()
++flashError()
+}
+class ResourceRouter {
++resource()
++resources()
++apiResource()
++nestedResource()
+}
+CrudController --|> Controller : extends
+ResourceRouter ..> CrudController : generates routes for
+CrudController ..> Response : returns
+```
+
+**Diagram sources**
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L1-L441) - *Added in recent commit*
+- [ResourceRouter.php](file://app\Core\Mvc\ResourceRouter.php#L1-L188) - *Added in recent commit*
+
+**Section sources**
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L1-L441) - *Added in recent commit*
+- [ResourceRouter.php](file://app\Core\Mvc\ResourceRouter.php#L1-L188) - *Added in recent commit*
+
+## Example: Dashboard and User Resource Controllers
 The `Dashboard` controller demonstrates a typical action implementation pattern. Its `indexAction` method:
 
 1. Prepares navigation data as an array
@@ -189,18 +268,40 @@ The `Dashboard` controller demonstrates a typical action implementation pattern.
 3. Returns the result of `render()` with the data array
 4. The framework automatically converts the HTML string to a `Response` object
 
-The action follows best practices by:
+The `UserResourceController` demonstrates the enterprise-level CRUD pattern by extending `CrudController`. It configures the resource with:
+
+- `$modelClass`: The model to operate on (Users::class)
+- `$formClass`: The form to use for create/edit operations (UserForm::class)
+- `$serviceClass`: The service layer for business logic (UserService::class)
+- `$validationRules`: Enterprise validation rules with database constraints
+- `$fillable`: Fields allowed for mass assignment
+
+The controller can override standard actions for custom behavior, such as adding search functionality to `indexAction()`. It can also add custom actions like `activeAction()` for API endpoints.
+
+Both controllers follow best practices by:
 - Focusing on data preparation rather than output generation
 - Using the `render()` helper for view rendering
 - Returning data rather than echoing output
 - Following the action naming convention
-
-This approach keeps the controller logic clean and testable while leveraging the framework's response handling capabilities.
+- Leveraging the framework's response handling capabilities
 
 ```mermaid
 classDiagram
 class DashboardController {
 +indexAction()
+}
+class UserResourceController {
++indexAction()
++activeAction()
+}
+class CrudController {
++indexAction()
++createAction()
++storeAction()
++showAction()
++editAction()
++updateAction()
++destroyAction()
 }
 class Controller {
 +getView()
@@ -225,18 +326,27 @@ class Response {
 +error()
 }
 DashboardController --|> Controller : extends
+UserResourceController --|> CrudController : extends
+CrudController --|> Controller : extends
 Dispatcher ..> DashboardController : invokes
+Dispatcher ..> UserResourceController : invokes
 DashboardController ..> Response : returns
+UserResourceController ..> Response : returns
 ```
 
 **Diagram sources**
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php#L10-L37)
-- [Controller.php](file://app/Core/Mvc/Controller.php#L9-L124)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L10-L83)
-- [Response.php](file://app/Core/Http/Response.php#L10-L137)
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php#L10-L37)
+- [UserResourceController.php](file://app\Module\Admin\Controller\UserResourceController.php#L1-L72) - *Added in recent commit*
+- [CrudController.php](file://app\Core\Mvc\CrudController.php#L1-L441) - *Added in recent commit*
+- [Controller.php](file://app\Core\Mvc\Controller.php#L9-L124)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php#L10-L83)
+- [Response.php](file://app\Core\Http\Response.php#L10-L137)
 
 **Section sources**
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php#L10-L37)
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php#L10-L37)
+- [UserResourceController.php](file://app\Module\Admin\Controller\UserResourceController.php#L1-L72) - *Added in recent commit*
 
 ## Conclusion
-Controller action methods form the core of the MVC framework's request handling system. The Dispatcher's action resolution mechanism, combined with consistent return value processing and lifecycle hooks, provides a robust foundation for building web applications. By following the 'Action' suffix convention and leveraging the provided helper methods, developers can create maintainable controllers that focus on business logic rather than infrastructure concerns. The integration with DI, routing, and view systems creates a cohesive development experience that balances convention and flexibility.
+Controller action methods form the core of the MVC framework's request handling system. The Dispatcher's action resolution mechanism, combined with consistent return value processing and lifecycle hooks, provides a robust foundation for building web applications. With the introduction of the enterprise-level `CrudController` and `ResourceRouter`, the framework now supports standardized CRUD operations with minimal boilerplate code.
+
+By following the 'Action' suffix convention and leveraging the provided helper methods, developers can create maintainable controllers that focus on business logic rather than infrastructure concerns. The integration with DI, routing, validation, service layers, and view systems creates a cohesive development experience that balances convention and flexibility. The new enterprise features bring the framework to parity with industry-leading solutions like Laravel, Symfony, and Rails, making it production-ready for large-scale applications.

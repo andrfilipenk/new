@@ -26,7 +26,7 @@ class UserController extends Controller {
 }
 
 // After: 10 lines, inherits all functionality
-class UserResourceController extends CrudController {
+class UserResourceController extends \Core\Mvc\CrudController {
     protected string $modelClass = Users::class;
     protected string $formClass = UserForm::class;
     protected string $serviceClass = UserService::class;
@@ -63,7 +63,7 @@ protected array $validationRules = [
   - Dependency injection support
 
 ```php
-class UserService extends BaseService {
+class UserService extends \Core\Services\BaseService {
     protected string $modelClass = Users::class;
     
     public function create(array $data): Model {

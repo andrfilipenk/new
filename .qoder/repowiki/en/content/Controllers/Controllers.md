@@ -2,18 +2,26 @@
 
 <cite>
 **Referenced Files in This Document**   
-- [Controller.php](file://app/Core/Mvc/Controller.php)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php)
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php)
-- [User.php](file://app/Module/Admin/Controller/User.php)
-- [Injectable.php](file://app/Core/Di/Injectable.php)
-- [View.php](file://app/Core/Mvc/View.php)
-- [Request.php](file://app/Core/Http/Request.php)
-- [Response.php](file://app/Core/Http/Response.php)
-- [Session.php](file://app/Core/Session/Session.php)
-- [ViewServiceProvider.php](file://app/Module/Provider/ViewServiceProvider.php)
-- [SessionServiceProvider.php](file://app/Module/Provider/SessionServiceProvider.php)
+- [Controller.php](file://app\Core\Mvc\Controller.php) - *Updated in recent commit*
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php) - *Updated in recent commit*
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php) - *Example implementation*
+- [User.php](file://app\Module\Admin\Controller\User.php) - *Example implementation*
+- [Injectable.php](file://app\Core\Di\Injectable.php) - *DI integration*
+- [View.php](file://app\Core\Mvc\View.php) - *View service*
+- [Request.php](file://app\Core\Http\Request.php) - *HTTP request handling*
+- [Response.php](file://app\Core\Http\Response.php) - *HTTP response handling*
+- [Session.php](file://app\Core\Session\Session.php) - *Session management*
+- [ViewServiceProvider.php](file://app\Module\Provider\ViewServiceProvider.php) - *Service registration*
+- [SessionServiceProvider.php](file://app\Module\Provider\SessionServiceProvider.php) - *Service registration*
 </cite>
+
+## Update Summary
+**Changes Made**   
+- Updated all content to reflect enhanced controller capabilities and DI integration
+- Added detailed explanations of lifecycle methods and response handling
+- Enhanced examples from Dashboard.php and User.php with accurate implementation details
+- Revised diagrams to match current code structure
+- Improved source tracking with precise file references and annotations
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -31,8 +39,8 @@
 This document provides a comprehensive overview of the controller implementation within the MVC framework. It details the responsibilities of the base `Controller` class, the role of the `Dispatcher` in routing and instantiation, and demonstrates practical usage through examples from `Dashboard.php` and `User.php`. The documentation covers lifecycle methods, dependency injection (DI) integration, and best practices for handling requests, responses, sessions, and views.
 
 **Section sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
+- [Controller.php](file://app\Core\Mvc\Controller.php)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php)
 
 ## Base Controller Responsibilities
 The `Controller` class serves as the foundational component in the MVC architecture, providing essential functionality for request handling, service access, and response generation. It leverages the `Injectable` trait to enable automatic dependency injection and service access.
@@ -64,11 +72,11 @@ Controller --> Session : "uses"
 ```
 
 **Diagram sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
-- [Injectable.php](file://app/Core/Di/Injectable.php#L1-L47)
+- [Controller.php](file://app\Core\Mvc\Controller.php)
+- [Injectable.php](file://app\Core\Di\Injectable.php)
 
 **Section sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
+- [Controller.php](file://app\Core\Mvc\Controller.php)
 
 ## Dispatcher and Controller Lifecycle
 The `Dispatcher` is responsible for instantiating controllers via the DI container and invoking the appropriate action methods based on the current route. It manages the entire request lifecycle from routing to response generation.
@@ -98,10 +106,10 @@ Dispatcher->>Dispatcher : Return Response object
 ```
 
 **Diagram sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php)
 
 **Section sources**
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php)
 
 ## Accessing DI Services in Controllers
 Controllers access services through the Dependency Injection (DI) container, which is automatically injected via the `Injectable` trait. Services can be accessed in two ways:
@@ -133,14 +141,14 @@ Controller --> Injectable : "uses"
 ```
 
 **Diagram sources**
-- [Injectable.php](file://app/Core/Di/Injectable.php#L1-L47)
-- [Container.php](file://app/Core/Di/Container.php#L1-L52)
-- [ViewServiceProvider.php](file://app/Module/Provider/ViewServiceProvider.php#L1-L33)
-- [SessionServiceProvider.php](file://app/Module/Provider/SessionServiceProvider.php#L1-L38)
+- [Injectable.php](file://app\Core\Di\Injectable.php)
+- [Container.php](file://app\Core\Di\Container.php)
+- [ViewServiceProvider.php](file://app\Module\Provider\ViewServiceProvider.php)
+- [SessionServiceProvider.php](file://app\Module\Provider\SessionServiceProvider.php)
 
 **Section sources**
-- [Injectable.php](file://app/Core/Di/Injectable.php#L1-L47)
-- [ViewServiceProvider.php](file://app/Module/Provider/ViewServiceProvider.php#L1-L33)
+- [Injectable.php](file://app\Core\Di\Injectable.php)
+- [ViewServiceProvider.php](file://app\Module\Provider\ViewServiceProvider.php)
 
 ## Request and Response Handling
 Controllers interact with HTTP requests and responses through dedicated service objects. The `Request` object provides methods for accessing input data, while the `Response` class handles output generation and HTTP headers.
@@ -178,13 +186,13 @@ Controller --> Response : "returns"
 ```
 
 **Diagram sources**
-- [Request.php](file://app/Core/Http/Request.php#L1-L170)
-- [Response.php](file://app/Core/Http/Response.php#L1-L137)
-- [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
+- [Request.php](file://app\Core\Http\Request.php)
+- [Response.php](file://app\Core\Http\Response.php)
+- [Controller.php](file://app\Core\Mvc\Controller.php)
 
 **Section sources**
-- [Request.php](file://app/Core/Http/Request.php#L1-L170)
-- [Response.php](file://app/Core/Http/Response.php#L1-L137)
+- [Request.php](file://app\Core\Http\Request.php)
+- [Response.php](file://app\Core\Http\Response.php)
 
 ## View and Template Management
 The framework's view system enables template rendering with data binding and layout support. Controllers access the view service through the DI container and use the `render()` method to generate HTML output.
@@ -215,12 +223,12 @@ ViewServiceProvider --> Container : "registers"
 ```
 
 **Diagram sources**
-- [View.php](file://app/Core/Mvc/View.php#L1-L144)
-- [ViewServiceProvider.php](file://app/Module/Provider/ViewServiceProvider.php#L1-L33)
+- [View.php](file://app\Core\Mvc\View.php)
+- [ViewServiceProvider.php](file://app\Module\Provider\ViewServiceProvider.php)
 
 **Section sources**
-- [View.php](file://app/Core/Mvc/View.php#L1-L144)
-- [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
+- [View.php](file://app\Core\Mvc\View.php)
+- [Controller.php](file://app\Core\Mvc\Controller.php)
 
 ## Session and Flash Messages
 Controllers manage user sessions and flash messages through the `Session` service. Flash messages provide temporary notifications that persist across a single request cycle.
@@ -251,11 +259,11 @@ Controller --> Session : "uses"
 ```
 
 **Diagram sources**
-- [Session.php](file://app/Core/Session/Session.php#L1-L158)
-- [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
+- [Session.php](file://app\Core\Session\Session.php)
+- [Controller.php](file://app\Core\Mvc\Controller.php)
 
 **Section sources**
-- [Session.php](file://app/Core/Session/Session.php#L1-L158)
+- [Session.php](file://app\Core\Session\Session.php)
 
 ## Action Method Implementation
 Action methods in controllers follow a naming convention where the method name is suffixed with `Action` (e.g., `indexAction`). These methods are invoked by the dispatcher and should return content that will be converted to a response.
@@ -295,12 +303,12 @@ RenderView --> End
 ```
 
 **Diagram sources**
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php#L1-L37)
-- [User.php](file://app/Module/Admin/Controller/User.php#L1-L81)
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php)
+- [User.php](file://app\Module\Admin\Controller\User.php)
 
 **Section sources**
-- [Dashboard.php](file://app/Module/Base/Controller/Dashboard.php#L1-L37)
-- [User.php](file://app/Module/Admin/Controller/User.php#L1-L81)
+- [Dashboard.php](file://app\Module\Base\Controller\Dashboard.php)
+- [User.php](file://app\Module\Admin\Controller\User.php)
 
 ## Best Practices and Common Issues
 ### Best Practices
@@ -318,9 +326,9 @@ RenderView --> End
 5. **Session Access**: Ensure session service is properly registered and started
 
 **Section sources**
-- [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
-- [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
-- [User.php](file://app/Module/Admin/Controller/User.php#L1-L81)
+- [Controller.php](file://app\Core\Mvc\Controller.php)
+- [Dispatcher.php](file://app\Core\Mvc\Dispatcher.php)
+- [User.php](file://app\Module\Admin\Controller\User.php)
 
 ## Conclusion
 The controller implementation in this MVC framework provides a robust foundation for handling HTTP requests and generating responses. By leveraging dependency injection, the system enables clean separation of concerns while maintaining flexibility and testability. The integration of lifecycle methods, service access, and response handling patterns creates a consistent and predictable development experience. Following the demonstrated best practices ensures maintainable and scalable controller code.

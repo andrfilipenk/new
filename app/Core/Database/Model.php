@@ -400,7 +400,7 @@ abstract class Model
         
         // Apply soft delete scope
         if ($instance->softDeletes) {
-            $query->whereNull($instance->deletedAt);
+            $query->where($instance->deletedAt, null);
         }
         
         return $query;
@@ -421,7 +421,7 @@ abstract class Model
     public static function onlyTrashed(): Database
     {
         $instance = static::getInstance();
-        return self::db()->table($instance->table)->whereNotNull($instance->deletedAt);
+        return self::db()->table($instance->table)->where($instance->deletedAt, '!=', null);
     }
 
     /**
