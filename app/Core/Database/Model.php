@@ -18,6 +18,12 @@ abstract class Model
     protected bool $exists = false;
     protected array $with = [];
     protected array $fillable = [];
+    protected array $guarded = [];
+    protected array $hidden = [];
+    protected array $casts = [];
+    protected array $dates = [];
+    protected bool $softDeletes = false;
+    protected string $deletedAt = 'deleted_at';
     
     private static array $instances = [];
 
@@ -83,24 +89,114 @@ abstract class Model
 
     public function save(): bool
     {
+        // Fire before save events
+        $this->fireEvent('saving');
+        
         if ($this->exists) {
+            $this->fireEvent('updating');
             $dirty = $this->getDirty();
             if (!empty($dirty)) {
+                // Add updated_at timestamp
+                if ($this->usesTimestamps() && !isset($dirty['updated_at'])) {
+                    $dirty['updated_at'] = date('Y-m-d H:i:s');
+                    $this->setData('updated_at', $dirty['updated_at']);
+                }
+                
                 $affected = static::query()->where($this->primaryKey, $this->getKey())->update($dirty);
-                return $affected > 0;
+                if ($affected > 0) {
+                    $this->syncOriginal();
+                    $this->fireEvent('updated');
+                    $this->fireEvent('saved');
+                    return true;
+                }
             }
             return true; // No changes to save
         } else {
+            $this->fireEvent('creating');
+            
+            // Add timestamps
+            if ($this->usesTimestamps()) {
+                $now = date('Y-m-d H:i:s');
+                if (!isset($this->attributes['created_at'])) {
+                    $this->setData('created_at', $now);
+                }
+                if (!isset($this->attributes['updated_at'])) {
+                    $this->setData('updated_at', $now);
+                }
+            }
+            
             $id = static::query()->insert($this->attributes);
             if ($id) {
                 $this->setData($this->primaryKey, $id);
                 $this->exists = true;
                 $this->syncOriginal();
+                $this->fireEvent('created');
+                $this->fireEvent('saved');
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Delete the model
+     */
+    public function delete(): bool
+    {
+        if (!$this->exists) {
+            return false;
+        }
+        
+        $this->fireEvent('deleting');
+        
+        if ($this->softDeletes) {
+            // Soft delete
+            $this->setData($this->deletedAt, date('Y-m-d H:i:s'));
+            $result = $this->save();
+        } else {
+            // Hard delete
+            $result = static::query()->where($this->primaryKey, $this->getKey())->delete() > 0;
+            if ($result) {
+                $this->exists = false;
+            }
+        }
+        
+        if ($result) {
+            $this->fireEvent('deleted');
+        }
+        
+        return $result;
+    }
+
+    /**
+     * Restore a soft-deleted model
+     */
+    public function restore(): bool
+    {
+        if (!$this->softDeletes) {
+            return false;
+        }
+        
+        $this->setData($this->deletedAt, null);
+        return $this->save();
+    }
+
+    /**
+     * Force delete (hard delete) a model
+     */
+    public function forceDelete(): bool
+    {
+        $this->fireEvent('deleting');
+        
+        $result = static::query()->where($this->primaryKey, $this->getKey())->delete() > 0;
+        
+        if ($result) {
+            $this->exists = false;
+            $this->fireEvent('deleted');
+        }
+        
+        return $result;
     }
 
     // Relationship methods - Fixed to work with Relations
@@ -271,5 +367,98 @@ abstract class Model
     public static function __callStatic(string $method, array $parameters): mixed
     {
         return static::query()->$method(...$parameters);
+    }
+
+    /**
+     * Check if model uses timestamps
+     */
+    protected function usesTimestamps(): bool
+    {
+        return in_array('created_at', array_keys($this->attributes)) || 
+               in_array('updated_at', array_keys($this->attributes)) ||
+               property_exists($this, 'timestamps') && $this->timestamps !== false;
+    }
+
+    /**
+     * Fire model events
+     */
+    protected function fireEvent(string $event): void
+    {
+        $eventManager = Container::getDefault()->get('eventsManager');
+        if ($eventManager) {
+            $eventManager->trigger('model:' . $event, $this);
+        }
+    }
+
+    /**
+     * Get a query builder with global scopes applied
+     */
+    public static function queryWithScopes(): Database
+    {
+        $instance = static::getInstance();
+        $query = self::db()->table($instance->table);
+        
+        // Apply soft delete scope
+        if ($instance->softDeletes) {
+            $query->whereNull($instance->deletedAt);
+        }
+        
+        return $query;
+    }
+
+    /**
+     * Query including soft deleted records
+     */
+    public static function withTrashed(): Database
+    {
+        $instance = static::getInstance();
+        return self::db()->table($instance->table);
+    }
+
+    /**
+     * Query only soft deleted records
+     */
+    public static function onlyTrashed(): Database
+    {
+        $instance = static::getInstance();
+        return self::db()->table($instance->table)->whereNotNull($instance->deletedAt);
+    }
+
+    /**
+     * Cast attributes to their proper types
+     */
+    protected function castAttribute(string $key, $value)
+    {
+        if (!isset($this->casts[$key])) {
+            return $value;
+        }
+        
+        $castType = $this->casts[$key];
+        
+        return match($castType) {
+            'int', 'integer' => (int) $value,
+            'real', 'float', 'double' => (float) $value,
+            'string' => (string) $value,
+            'bool', 'boolean' => (bool) $value,
+            'array', 'json' => is_string($value) ? json_decode($value, true) : $value,
+            'date', 'datetime' => $value instanceof \DateTime ? $value : new \DateTime($value),
+            default => $value
+        };
+    }
+
+    /**
+     * Check if an attribute is fillable
+     */
+    protected function isFillable(string $key): bool
+    {
+        if (!empty($this->fillable)) {
+            return in_array($key, $this->fillable);
+        }
+        
+        if (!empty($this->guarded)) {
+            return !in_array($key, $this->guarded);
+        }
+        
+        return true;
     }
 }
