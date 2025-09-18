@@ -1,5 +1,4 @@
 <?php
-// app/Core/Database/QueryBuilder.php
 namespace Core\Database;
 
 class QueryBuilder
@@ -11,7 +10,7 @@ class QueryBuilder
     public function __construct(string $model, array $relations = [])
     {
         $this->model = $model;
-        $this->relations = $relations;
+        $this->relations = $this->normalizeRelations($relations);
         $this->query = $this->model::query();
     }
 
@@ -45,7 +44,7 @@ class QueryBuilder
         $models = array_map([$this->model, 'newFromBuilder'], $results);
 
         if (!empty($this->relations) && !empty($models)) {
-            $this->eagerLoadRelations($models);
+            $this->eagerLoadRelations($models, $this->relations);
         }
 
         return $models;
@@ -59,32 +58,80 @@ class QueryBuilder
         $model = $this->model::newFromBuilder($result);
 
         if (!empty($this->relations)) {
-            $this->eagerLoadRelations([$model]);
+            $this->eagerLoadRelations([$model], $this->relations);
         }
 
         return $model;
     }
 
-    private function eagerLoadRelations(array $models): void
+    /**
+     * Normalize relation input to array with constraints
+     */
+    private function normalizeRelations(array $relations): array
     {
-        foreach ($this->relations as $relation) {
-            $this->loadRelation($models, $relation);
+        $normalized = [];
+        foreach ($relations as $key => $value) {
+            if (is_int($key)) {
+                // ['posts', 'profile']
+                $normalized[$value] = null;
+            } else {
+                // ['posts' => $fn]
+                $normalized[$key] = $value;
+            }
         }
+        return $normalized;
     }
 
-    private function loadRelation(array $models, string $relation): void
+    /**
+     * Eager load relations, recursively if needed
+     */
+    private function eagerLoadRelations(array $models, array $relations): void
     {
-        if (empty($models)) return;
+        foreach ($relations as $relation => $constraint) {
+            $nested = explode('.', $relation, 2);
+            $name = $nested[0];
+            $nestedRelations = isset($nested[1]) ? [$nested[1] => $constraint] : [];
 
-        $relationInstance = $models[0]->$relation();
-        $relationInstance->addEagerConstraints($models);
+            // build dictionary for nested relations
+            $relationInstances = [];
+            foreach ($models as $model) {
+                if (!method_exists($model, $name)) continue;
+                $relationInstances[] = $model->$name();
+            }
+            if (empty($relationInstances)) continue;
+            $relationInstance = $relationInstances[0];
 
-        $results = $relationInstance->getQuery()->get();
-        $relationModels = array_map(
-            [get_class($relationInstance->getRelated()), 'newFromBuilder'],
-            $results
-        );
+            // Apply eager constraints
+            $relationInstance->addEagerConstraints($models);
+            if ($constraint && is_callable($constraint)) {
+                $constraint($relationInstance->getQuery());
+            }
 
-        $relationInstance->match($models, $relationModels, $relation);
+            $results = $relationInstance->getQuery()->get();
+            $relationModels = array_map(
+                [get_class($relationInstance->getRelated()), 'newFromBuilder'],
+                $results
+            );
+
+            // Match models to parents
+            $relationInstance->match($models, $relationModels, $name);
+
+            // Nested eager load
+            if ($nestedRelations) {
+                // Gather all related models (flatten array if hasMany/belongsToMany)
+                $related = [];
+                foreach ($models as $model) {
+                    $rel = $model->getData($name);
+                    if (is_array($rel)) {
+                        foreach ($rel as $item) $related[] = $item;
+                    } elseif ($rel) {
+                        $related[] = $rel;
+                    }
+                }
+                if (!empty($related)) {
+                    $this->eagerLoadRelations($related, $nestedRelations);
+                }
+            }
+        }
     }
 }

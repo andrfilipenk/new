@@ -17,6 +17,7 @@ abstract class Model
     protected array $original = [];
     protected array $relations = [];
     protected bool $exists = false;
+    protected array $with = [];
     
     private static array $instances = [];
 
@@ -52,7 +53,9 @@ abstract class Model
     public static function find(mixed $id): Model|null
     {
         if ($id === null) return null;
-
+        if (!empty(static::getInstance()->with)) {
+            return static::with(static::getInstance()->with)->where(static::getInstance()->primaryKey, $id)->first();
+        }
         $result = static::query()->where(static::getInstance()->primaryKey, $id)->first();
         return $result ? static::newFromBuilder($result) : null;
     }
@@ -67,6 +70,9 @@ abstract class Model
 
     public static function all(): array
     {
+        if (!empty(static::getInstance()->with)) {
+            return static::with(static::getInstance()->with)->get();
+        }
         $results = static::query()->get();
         return array_map([static::class, 'newFromBuilder'], $results);
     }
