@@ -1,10 +1,14 @@
-<?php $session = $this->getDI()->get('session'); ?><!DOCTYPE html>
+<?php 
+/** @var \Core\Utils\Url $url */
+$url        = $this->getDI()->get('url'); 
+$session    = $this->getDI()->get('session'); 
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="<?= $url->get('css/app.css') ?>">
 </head>
 <body>
     <div class="app-container">
@@ -54,7 +58,6 @@
             </main>
         </div>
     </div>
-    <script src="js/app.js"></script>
+    <script src="<?= $url->get('js/app.js') ?>"></script>
 </body>
 </html>
-
