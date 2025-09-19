@@ -21,13 +21,15 @@ class Exists implements RuleInterface
         $column = $parameters[1];
         
         /**
-         * @var Database $database
+         * @var Database $db
          */
-        $database = Container::getDefault()->get('db');
-        $query = "SELECT COUNT(*) as count FROM {$table} WHERE {$column} = ?";
-        $result = $database->execute($query, [$value]);
+        $db = Container::getDefault()->get('db');
+        $result = $db->table($table)
+        ->select(['COUNT(*) as count'])
+        ->where($column, $value)
+        ->first();
         
-        return $result[0]['count'] > 0;
+        return $result['count'] > 0;
     }
 
     public function message(string $attribute, $value, array $parameters = []): string

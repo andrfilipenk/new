@@ -28,18 +28,12 @@ class Container implements ContainerInterface
         $this->set(ContainerInterface::class, $this);
         $this->set(get_class($this), $this);
     }
-
-    /**
-     * Set the default container instance
-     */
+    
     public static function setDefault(ContainerInterface $container): void
     {
         self::$default = $container;
     }
 
-    /**
-     * Get the default container instance
-     */
     public static function getDefault(): ContainerInterface
     {
         if (self::$default === null) {
@@ -48,9 +42,6 @@ class Container implements ContainerInterface
         return self::$default;
     }
 
-    /**
-     * Register a service definition
-     */
     public function set(string $id, $concrete): void
     {
         unset($this->instances[$id], $this->factories[$id]);
@@ -61,9 +52,6 @@ class Container implements ContainerInterface
         }
     }
 
-    /**
-     * Get a service from the container
-     */
     public function get(string $id)
     {
         if (isset($this->instances[$id])) {
@@ -80,9 +68,6 @@ class Container implements ContainerInterface
         throw new NotFound("Service '{$id}' not found or cannot be resolved.");
     }
 
-    /**
-     * Check if service exists
-     */
     public function has(string $id): bool
     {
         return isset($this->definitions[$id]) || isset($this->instances[$id]) || $this->isResolvable($id);
@@ -124,13 +109,34 @@ class Container implements ContainerInterface
     protected function resolveParameter(ReflectionParameter $param)
     {
         $type = $param->getType();
-        if ($type && !$type->isBuiltin()) {
-            return $this->get($type->getName());
+        if ($type && !$this->isBuiltinType($type)) {
+            return $this->get($this->getTypeName($type));
         }
         if ($param->isDefaultValueAvailable()) {
             return $param->getDefaultValue();
         }
         throw new ContainerException("Cannot resolve constructor parameter '{$param->getName()}' for class '{$param->getDeclaringClass()->getName()}'.");
+    }
+
+    protected function isBuiltinType($type): bool
+    {
+        if (method_exists($type, 'isBuiltin')) {
+            return $type->isBuiltin();
+        }
+        $typeName = $this->getTypeName($type);
+        $builtinTypes = [
+            'array', 'callable', 'bool', 'float', 'int', 'string',
+            'iterable', 'object', 'mixed', 'void', 'null', 'false', 'true'
+        ];
+        return in_array(strtolower($typeName), $builtinTypes, true);
+    }
+    
+    protected function getTypeName($type): string
+    {
+        if (method_exists($type, 'getName')) {
+            return $type->getName();
+        }
+        return (string) $type;
     }
 
     public function register($provider): void
