@@ -1,25 +1,29 @@
 <?php
+// app/Module/Admin/Models/Users.php
 namespace Module\Admin\Models;
 
 use Core\Database\Model;
-#use Module\Admin\Models\Profiles;
 
 class Users extends Model
 {
     protected $table = 'users';
-    protected array $fillable = ['name', 'email', 'password', 'kuhnle_id'];
     protected $primaryKey = 'user_id';
-    #protected array $with = ['profile']; // Always eager load profile
+    protected array $fillable = ['name', 'email', 'password', 'kuhnle_id'];
+    protected array $with = ['tasks']; // Always eager load task
 
-    #public function profile()
-    #{
-    #    return $this->hasOne(Profiles::class, 'user_id', 'user_id');
-    #}
+    public function createdTasks()
+    {
+        return $this->hasMany(Tasks::class, 'created_by', 'user_id');
+    }
+
+    public function assignedTasks()
+    {
+        return $this->hasMany(Tasks::class, 'assigned_to', 'user_id');
+    }
 }
 
 
 /*
-
 // In controller or elsewhere:
 $users = Users::with([
     'profile', 
@@ -28,13 +32,3 @@ $users = Users::with([
 ])->get();
 
 */
-
-/* 
-    CREATE TABLE users (
-        user_id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(255) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        kuhnle_id INT(11) NOT NULL
-    );
-     */

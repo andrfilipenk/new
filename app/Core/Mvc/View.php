@@ -119,27 +119,3 @@ class View implements ViewInterface
         return $this->vars[$name] ?? null;
     }
 }
-
-/*
-// example usage in a template:
-// <x-alert type="success" message="Operation completed!" />
-// example component registration
-// $view->registerComponent('alert', function($data, $view) {
-//     return '<div class="alert alert-' . htmlspecialchars($data['type']) . '">' .
-    //            htmlspecialchars($data['message']) . '</div>';
-    // });
-// example usage view service provider
-// Register the service provider in your application bootstrap or configuration 
-// add this line in your bootstrap file after creating the DI container
-// $di->register(new \Core\View\ViewServiceProvider());
-// example usage in a controller
-// $this->di->get('view')->render('template', ['var' => 'value']);
-// ...existing code...
-$view->composer('dashboard', function($view, &$data) {
-    $data['notifications'] = NotificationService::getUnread();
-});
-//-->
-$view->registerComponent('navbar', function($data, $view) {
-    return "<nav>Welcome, {$data['user']}</nav>";
-}); 
-*/

@@ -4,22 +4,25 @@ namespace Module\Provider;
 
 use Core\Session\Session;
 use Core\Di\Interface\ServiceProvider;
-use Core\Di\Interface\Container;
+use Core\Di\Interface\Container as ContainerInterface;
 
 class SessionServiceProvider implements ServiceProvider
 {
-    public function register(Container $di): void
+    public function register(ContainerInterface $container): void
     {
-        $di->set('session', function() use ($di) {
+        $container->set('session', function($di) {
             $config = $di->get('config');
             $sessionConfig = $config['session'] ?? [];
             $session = new Session();
+
             // Configure session settings if provided
             if (!empty($sessionConfig)) {
                 #$this->configureSession($session, $sessionConfig);
             }
+
             // Inject DI container
             $session->setDI($di);
+            
             // Inject events manager if available
             if ($di->has('eventsManager')) {
                 $session->setEventsManager($di->get('eventsManager'));

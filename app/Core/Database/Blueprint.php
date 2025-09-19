@@ -46,6 +46,11 @@ class Blueprint
         return $this->addColumn('TEXT', $name);
     }
 
+    public function date(string $name): ColumnDefinition
+    {
+        return $this->addColumn('DATE', $name);
+    }
+
     public function timestamp(string $name): ColumnDefinition
     {
         return $this->addColumn('TIMESTAMP', $name);
@@ -53,8 +58,8 @@ class Blueprint
 
     public function timestamps(): void
     {
-        $this->timestamp('created_at')->nullable()->default('CURRENT_TIMESTAMP');
-        $this->timestamp('updated_at')->nullable()->default('CURRENT_TIMESTAMP');
+        $this->timestamp('created_at')->default('CURRENT_TIMESTAMP');
+        $this->timestamp('updated_at')->default('CURRENT_TIMESTAMP');
     }
 
     public function foreign(string $column): ColumnDefinition

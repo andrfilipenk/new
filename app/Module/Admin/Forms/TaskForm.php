@@ -14,14 +14,13 @@ class TaskForm
         $users = Users::all();
         $userOptions = [];
         foreach ($users as $user) {
-            $userOptions[$user->user_id] = $user->name . ' (' . $user->email . ')';
+            $userOptions[$user->user_id] = $user->name . ' (' . $user->kuhnle_id . ')';
         }
 
         $builder
             ->addSelect('created_by', $userOptions, 'Created By', ['required' => true])
             ->addSelect('assigned_to', $userOptions, 'Assigned To', ['required' => true])
             ->addText('title', 'Task Title', ['required' => true])
-            ->addDate('created_date', 'Created Date', ['required' => true])
             ->addDate('begin_date', 'Begin Date')
             ->addDate('end_date', 'End Date')
             ->addSelect('status', [

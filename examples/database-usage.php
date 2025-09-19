@@ -11,7 +11,7 @@ class UserService
 
     public function __construct()
     {
-        $this->db = $this->container->get(Database::class);
+        $this->db = $this->getDI()->get(Database::class);
     }
 
     public function getActiveUsers()

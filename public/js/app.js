@@ -8,7 +8,7 @@ class App {
 
     init() {
         // Load navigation
-        this.loadNavigation();
+        // this.loadNavigation();
         
         // Setup event listeners
         this.setupEventListeners();

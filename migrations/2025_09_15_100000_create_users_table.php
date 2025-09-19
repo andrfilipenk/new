@@ -1,5 +1,5 @@
 <?php
-// 2023_10_15_123456_create_users_table.php
+use Core\Database\Blueprint;
 use Core\Database\Migration;
 
 class CreateUsersTable extends Migration
@@ -7,10 +7,12 @@ class CreateUsersTable extends Migration
     public function up()
     {
         $this->createTable('users', function($table) {
-            $table->id()->primary_key();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('password');
+            /** @var Blueprint $table */
+            $table->id('user_id');
+            $table->string('name', 32);
+            $table->string('email', 64);
+            $table->integer('kuhnle_id', 4);
+            $table->string('password')->nullable();
             $table->timestamps();
         });
     }

@@ -30,9 +30,9 @@ class LineChart extends AbstractChart
 
     protected function renderChart(): void
     {
-        $chartArea = $this->getChartArea();
-        $datasets = $this->data['datasets'];
-        $labels = $this->data['labels'];
+        $chartArea  = $this->getChartArea();
+        $datasets   = $this->data['datasets'];
+        $labels     = $this->data['labels'];
         
         $this->renderGridForLine($chartArea, $labels, $datasets);
         $this->renderAxes();
@@ -42,7 +42,7 @@ class LineChart extends AbstractChart
     protected function renderGridForLine(array $chartArea, array $labels, array $datasets): void
     {
         $labelCount = count($labels);
-        $maxValue = $this->getMaxValue($datasets);
+        $maxValue   = $this->getMaxValue($datasets);
         
         // Vertical grid lines (X-axis)
         $xLines = [];
@@ -67,10 +67,10 @@ class LineChart extends AbstractChart
     private function renderLines(array $chartArea, array $datasets, array $labels): void
     {
         $labelCount = count($labels);
-        $maxValue = $this->getMaxValue($datasets);
+        $maxValue   = $this->getMaxValue($datasets);
         
         foreach ($datasets as $datasetIndex => $dataset) {
-            $color = $this->getColor($datasetIndex);
+            $color  = $this->getColor($datasetIndex);
             $points = [];
             
             // Calculate points
@@ -97,8 +97,8 @@ class LineChart extends AbstractChart
 
     private function renderLine(array $points, string $color, array $dataset, int $datasetIndex): void
     {
-        $smooth = $dataset['smooth'] ?? $this->config['smooth'] ?? false;
-        $strokeWidth = $dataset['strokeWidth'] ?? $this->config['strokeWidth'] ?? 2;
+        $smooth         = $dataset['smooth'] ?? $this->config['smooth'] ?? false;
+        $strokeWidth    = $dataset['strokeWidth'] ?? $this->config['strokeWidth'] ?? 2;
         
         if ($smooth) {
             $path = $this->createSmoothPath($points);
@@ -107,10 +107,10 @@ class LineChart extends AbstractChart
         }
         
         $this->renderer->addPath($path, [
-            'stroke' => $color,
-            'strokeWidth' => $strokeWidth,
-            'fill' => 'none',
-            'class' => "line line-{$datasetIndex}"
+            'stroke'        => $color,
+            'strokeWidth'   => $strokeWidth,
+            'fill'          => 'none',
+            'class'         => "line line-{$datasetIndex}"
         ]);
     }
 
@@ -120,10 +120,10 @@ class LineChart extends AbstractChart
         
         foreach ($points as $pointIndex => $point) {
             $this->renderer->addCircle($point[0], $point[1], $pointRadius, [
-                'fill' => $color,
-                'stroke' => '#ffffff',
-                'strokeWidth' => 1,
-                'class' => "point point-{$datasetIndex}-{$pointIndex}"
+                'fill'          => $color,
+                'stroke'        => '#ffffff',
+                'strokeWidth'   => 1,
+                'class'         => "point point-{$datasetIndex}-{$pointIndex}"
             ]);
             
             // Add value labels if enabled
@@ -134,9 +134,9 @@ class LineChart extends AbstractChart
                     $point[1] - 10,
                     (string)$value,
                     [
-                        'textAnchor' => 'middle',
-                        'fontSize' => $this->config['labels']['fontSize'] - 1,
-                        'fill' => $this->config['labels']['color']
+                        'textAnchor'    => 'middle',
+                        'fontSize'      => $this->config['labels']['fontSize'] - 1,
+                        'fill'          => $this->config['labels']['color']
                     ]
                 );
             }
@@ -148,7 +148,7 @@ class LineChart extends AbstractChart
         $path = $this->createLinearPath($points);
         
         // Close the path to create area
-        $lastPoint = end($points);
+        $lastPoint  = end($points);
         $firstPoint = reset($points);
         $path .= " L {$lastPoint[0]} " . ($chartArea['y'] + $chartArea['height']);
         $path .= " L {$firstPoint[0]} " . ($chartArea['y'] + $chartArea['height']);
@@ -157,9 +157,9 @@ class LineChart extends AbstractChart
         $fillColor = $this->adjustColorOpacity($color, 0.3);
         
         $this->renderer->addPath($path, [
-            'fill' => $fillColor,
-            'stroke' => 'none',
-            'class' => "area area-{$datasetIndex}"
+            'fill'      => $fillColor,
+            'stroke'    => 'none',
+            'class'     => "area area-{$datasetIndex}"
         ]);
     }
 
@@ -209,23 +209,23 @@ class LineChart extends AbstractChart
             $y = $chartArea['y'] + $chartArea['height'] + 20;
             
             $this->renderer->addText($x, $y, $label, [
-                'textAnchor' => 'middle',
-                'fontSize' => $this->config['labels']['fontSize'],
-                'fill' => $this->config['labels']['color']
+                'textAnchor'    => 'middle',
+                'fontSize'      => $this->config['labels']['fontSize'],
+                'fill'          => $this->config['labels']['color']
             ]);
         }
         
         // Y-axis labels
         for ($i = 0; $i <= 5; $i++) {
-            $value = ($maxValue / 5) * $i;
-            $y = $chartArea['y'] + $chartArea['height'] - ($i * $chartArea['height'] / 5);
-            $x = $chartArea['x'] - 10;
+            $value  = ($maxValue / 5) * $i;
+            $y      = $chartArea['y'] + $chartArea['height'] - ($i * $chartArea['height'] / 5);
+            $x      = $chartArea['x'] - 10;
             
             $this->renderer->addText($x, $y, number_format($value, 1), [
-                'textAnchor' => 'end',
-                'dominantBaseline' => 'middle',
-                'fontSize' => $this->config['labels']['fontSize'],
-                'fill' => $this->config['labels']['color']
+                'textAnchor'        => 'end',
+                'dominantBaseline'  => 'middle',
+                'fontSize'          => $this->config['labels']['fontSize'],
+                'fill'              => $this->config['labels']['color']
             ]);
         }
     }
@@ -236,9 +236,9 @@ class LineChart extends AbstractChart
             return;
         }
 
-        $legend = $this->config['legend'];
-        $legendX = $this->width - $this->config['padding']['right'] + 20;
-        $legendY = $this->config['padding']['top'];
+        $legend     = $this->config['legend'];
+        $legendX    = $this->width - $this->config['padding']['right'] + 20;
+        $legendY    = $this->config['padding']['top'];
         
         foreach ($this->data['datasets'] as $index => $dataset) {
             $color = $this->getColor($index);
@@ -258,9 +258,9 @@ class LineChart extends AbstractChart
             
             // Legend text
             $this->renderer->addText($legendX + 20, $legendY + ($index * 20) + 9, $label, [
-                'fontSize' => $legend['fontSize'],
-                'fill' => $legend['color'],
-                'dominantBaseline' => 'middle'
+                'fontSize'          => $legend['fontSize'],
+                'fill'              => $legend['color'],
+                'dominantBaseline'  => 'middle'
             ]);
         }
     }
@@ -281,10 +281,10 @@ class LineChart extends AbstractChart
     {
         // Convert hex to rgba for opacity
         if (strpos($color, '#') === 0) {
-            $hex = ltrim($color, '#');
-            $r = hexdec(substr($hex, 0, 2));
-            $g = hexdec(substr($hex, 2, 2));
-            $b = hexdec(substr($hex, 4, 2));
+            $hex    = ltrim($color, '#');
+            $r      = hexdec(substr($hex, 0, 2));
+            $g      = hexdec(substr($hex, 2, 2));
+            $b      = hexdec(substr($hex, 4, 2));
             return "rgba({$r}, {$g}, {$b}, {$opacity})";
         }
         return $color;

@@ -30,9 +30,9 @@ class BarChart extends AbstractChart
 
     protected function renderChart(): void
     {
-        $chartArea = $this->getChartArea();
-        $datasets = $this->data['datasets'];
-        $labels = $this->data['labels'];
+        $chartArea  = $this->getChartArea();
+        $datasets   = $this->data['datasets'];
+        $labels     = $this->data['labels'];
         
         $isHorizontal = $this->config['orientation'] ?? 'vertical' === 'horizontal';
         
@@ -47,14 +47,14 @@ class BarChart extends AbstractChart
 
     private function renderVerticalBars(array $chartArea, array $datasets, array $labels): void
     {
-        $labelCount = count($labels);
-        $datasetCount = count($datasets);
-        $groupWidth = $chartArea['width'] / $labelCount;
-        $barWidth = $groupWidth / $datasetCount * 0.8; // 80% of available width
-        $maxValue = $this->getMaxValue($datasets);
+        $labelCount     = count($labels);
+        $datasetCount   = count($datasets);
+        $groupWidth     = $chartArea['width'] / $labelCount;
+        $barWidth       = $groupWidth / $datasetCount * 0.8; // 80% of available width
+        $maxValue       = $this->getMaxValue($datasets);
         
         // Calculate Y scale
-        $yScale = $chartArea['height'] / $maxValue;
+        $yScale         = $chartArea['height'] / $maxValue;
         
         // Render grid lines
         $yLines = [];
@@ -69,14 +69,14 @@ class BarChart extends AbstractChart
             $color = $this->getColor($datasetIndex);
             
             foreach ($dataset['data'] as $labelIndex => $value) {
-                $x = $chartArea['x'] + ($labelIndex * $groupWidth) + ($datasetIndex * $barWidth) + ($groupWidth - $datasetCount * $barWidth) / 2;
+                $x      = $chartArea['x'] + ($labelIndex * $groupWidth) + ($datasetIndex * $barWidth) + ($groupWidth - $datasetCount * $barWidth) / 2;
                 $height = $value * $yScale;
-                $y = $chartArea['y'] + $chartArea['height'] - $height;
+                $y      = $chartArea['y'] + $chartArea['height'] - $height;
                 
                 $this->renderer->addRect($x, $y, $barWidth, $height, [
-                    'fill' => $color,
-                    'stroke' => 'none',
-                    'class' => "bar bar-{$datasetIndex}-{$labelIndex}"
+                    'fill'      => $color,
+                    'stroke'    => 'none',
+                    'class'     => "bar bar-{$datasetIndex}-{$labelIndex}"
                 ]);
                 
                 // Add value labels if enabled
@@ -86,9 +86,9 @@ class BarChart extends AbstractChart
                         $y - 5,
                         (string)$value,
                         [
-                            'textAnchor' => 'middle',
-                            'fontSize' => $this->config['labels']['fontSize'] - 1,
-                            'fill' => $this->config['labels']['color']
+                            'textAnchor'    => 'middle',
+                            'fontSize'      => $this->config['labels']['fontSize'] - 1,
+                            'fill'          => $this->config['labels']['color']
                         ]
                     );
                 }
@@ -101,37 +101,37 @@ class BarChart extends AbstractChart
             $y = $chartArea['y'] + $chartArea['height'] + 20;
             
             $this->renderer->addText($x, $y, $label, [
-                'textAnchor' => 'middle',
-                'fontSize' => $this->config['labels']['fontSize'],
-                'fill' => $this->config['labels']['color']
+                'textAnchor'    => 'middle',
+                'fontSize'      => $this->config['labels']['fontSize'],
+                'fill'          => $this->config['labels']['color']
             ]);
         }
         
         // Render Y-axis labels
         for ($i = 0; $i <= 5; $i++) {
-            $value = ($maxValue / 5) * $i;
-            $y = $chartArea['y'] + $chartArea['height'] - ($i * $chartArea['height'] / 5);
-            $x = $chartArea['x'] - 10;
+            $value  = ($maxValue / 5) * $i;
+            $y      = $chartArea['y'] + $chartArea['height'] - ($i * $chartArea['height'] / 5);
+            $x      = $chartArea['x'] - 10;
             
             $this->renderer->addText($x, $y, number_format($value, 1), [
-                'textAnchor' => 'end',
-                'dominantBaseline' => 'middle',
-                'fontSize' => $this->config['labels']['fontSize'],
-                'fill' => $this->config['labels']['color']
+                'textAnchor'        => 'end',
+                'dominantBaseline'  => 'middle',
+                'fontSize'          => $this->config['labels']['fontSize'],
+                'fill'              => $this->config['labels']['color']
             ]);
         }
     }
 
     private function renderHorizontalBars(array $chartArea, array $datasets, array $labels): void
     {
-        $labelCount = count($labels);
-        $datasetCount = count($datasets);
-        $groupHeight = $chartArea['height'] / $labelCount;
-        $barHeight = $groupHeight / $datasetCount * 0.8;
-        $maxValue = $this->getMaxValue($datasets);
+        $labelCount     = count($labels);
+        $datasetCount   = count($datasets);
+        $groupHeight    = $chartArea['height'] / $labelCount;
+        $barHeight      = $groupHeight / $datasetCount * 0.8;
+        $maxValue       = $this->getMaxValue($datasets);
         
         // Calculate X scale
-        $xScale = $chartArea['width'] / $maxValue;
+        $xScale         = $chartArea['width'] / $maxValue;
         
         // Render grid lines
         $xLines = [];
@@ -146,14 +146,14 @@ class BarChart extends AbstractChart
             $color = $this->getColor($datasetIndex);
             
             foreach ($dataset['data'] as $labelIndex => $value) {
-                $y = $chartArea['y'] + ($labelIndex * $groupHeight) + ($datasetIndex * $barHeight) + ($groupHeight - $datasetCount * $barHeight) / 2;
-                $width = $value * $xScale;
-                $x = $chartArea['x'];
+                $y      = $chartArea['y'] + ($labelIndex * $groupHeight) + ($datasetIndex * $barHeight) + ($groupHeight - $datasetCount * $barHeight) / 2;
+                $width  = $value * $xScale;
+                $x      = $chartArea['x'];
                 
                 $this->renderer->addRect($x, $y, $width, $barHeight, [
-                    'fill' => $color,
-                    'stroke' => 'none',
-                    'class' => "bar bar-{$datasetIndex}-{$labelIndex}"
+                    'fill'      => $color,
+                    'stroke'    => 'none',
+                    'class'     => "bar bar-{$datasetIndex}-{$labelIndex}"
                 ]);
                 
                 // Add value labels if enabled
@@ -163,9 +163,9 @@ class BarChart extends AbstractChart
                         $y + $barHeight / 2,
                         (string)$value,
                         [
-                            'dominantBaseline' => 'middle',
-                            'fontSize' => $this->config['labels']['fontSize'] - 1,
-                            'fill' => $this->config['labels']['color']
+                            'dominantBaseline'  => 'middle',
+                            'fontSize'          => $this->config['labels']['fontSize'] - 1,
+                            'fill'              => $this->config['labels']['color']
                         ]
                     );
                 }
@@ -178,23 +178,23 @@ class BarChart extends AbstractChart
             $x = $chartArea['x'] - 10;
             
             $this->renderer->addText($x, $y, $label, [
-                'textAnchor' => 'end',
-                'dominantBaseline' => 'middle',
-                'fontSize' => $this->config['labels']['fontSize'],
-                'fill' => $this->config['labels']['color']
+                'textAnchor'        => 'end',
+                'dominantBaseline'  => 'middle',
+                'fontSize'          => $this->config['labels']['fontSize'],
+                'fill'              => $this->config['labels']['color']
             ]);
         }
         
         // Render X-axis labels (values)
         for ($i = 0; $i <= 5; $i++) {
-            $value = ($maxValue / 5) * $i;
-            $x = $chartArea['x'] + ($i * $chartArea['width'] / 5);
-            $y = $chartArea['y'] + $chartArea['height'] + 20;
+            $value  = ($maxValue / 5) * $i;
+            $x      = $chartArea['x'] + ($i * $chartArea['width'] / 5);
+            $y      = $chartArea['y'] + $chartArea['height'] + 20;
             
             $this->renderer->addText($x, $y, number_format($value, 1), [
-                'textAnchor' => 'middle',
-                'fontSize' => $this->config['labels']['fontSize'],
-                'fill' => $this->config['labels']['color']
+                'textAnchor'    => 'middle',
+                'fontSize'      => $this->config['labels']['fontSize'],
+                'fill'          => $this->config['labels']['color']
             ]);
         }
     }
@@ -205,9 +205,9 @@ class BarChart extends AbstractChart
             return;
         }
 
-        $legend = $this->config['legend'];
-        $legendX = $this->width - $this->config['padding']['right'] + 20;
-        $legendY = $this->config['padding']['top'];
+        $legend     = $this->config['legend'];
+        $legendX    = $this->width - $this->config['padding']['right'] + 20;
+        $legendY    = $this->config['padding']['top'];
         
         foreach ($this->data['datasets'] as $index => $dataset) {
             $color = $this->getColor($index);
@@ -215,15 +215,15 @@ class BarChart extends AbstractChart
             
             // Legend color box
             $this->renderer->addRect($legendX, $legendY + ($index * 20), 12, 12, [
-                'fill' => $color,
-                'stroke' => 'none'
+                'fill'      => $color,
+                'stroke'    => 'none'
             ]);
             
             // Legend text
             $this->renderer->addText($legendX + 16, $legendY + ($index * 20) + 9, $label, [
-                'fontSize' => $legend['fontSize'],
-                'fill' => $legend['color'],
-                'dominantBaseline' => 'middle'
+                'fontSize'          => $legend['fontSize'],
+                'fill'              => $legend['color'],
+                'dominantBaseline'  => 'middle'
             ]);
         }
     }

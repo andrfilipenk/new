@@ -4,7 +4,13 @@
 return [
     'app' => [
         'name' => 'My Application',
-        'version' => '1.0.0'
+        'version' => '1.0.0',
+        'base_path' => BASE_PATH,
+    ],
+
+    'migrations' => [
+        'path' => APP_PATH . '../migrations',
+        'table' => 'migrations'
     ],
 
     'db' => [

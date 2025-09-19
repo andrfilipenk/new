@@ -15,43 +15,21 @@ spl_autoload_register(function ($class) {
     return false;
 });
 
-
 // Load configuration
 $config = require APP_PATH . 'config.php';
 $di = new \Core\Di\Container();
-
-// --- Register Core Services ---
 $di->set('config', fn() => $config);
-
-$di->register(new \Module\Provider\SessionServiceProvider());
-$di->register(new \Module\Provider\CookieServiceProvider());
-$di->register(new \Module\Provider\ViewServiceProvider());
-
+$di->register(new \Module\Provider\SessionServiceProvider);
+$di->register(new \Module\Provider\CookieServiceProvider);
+$di->register(new \Module\Provider\ViewServiceProvider);
+$di->register(new \Module\Provider\RouterServiceProvider);
+$di->set('url', fn() => new \Core\Utils\Url);
 $di->set('request', fn() => new \Core\Http\Request);
+$di->set('db', fn() => new \Core\Database\Database);
+$di->set('dispatcher', fn() => new \Core\Mvc\Dispatcher);
+$di->set('eventsManager', fn() => new \Core\Events\Manager);
+$di->set('migrationRepository', fn() => new \Core\Database\MigrationRepository);
+$di->set('migrator', fn() => new \Core\Database\Migrator);
 
-$di->set('db', fn() => new \Core\Database\Database());
-$di->set('router', function() use ($config) {
-    $router = new \Core\Mvc\Router();
-    if (isset($config['modules'])) {
-        foreach ($config['modules'] as $module) {
-            if (isset($module['routes'])) {
-                foreach ($module['routes'] as $pattern => $routeConfig) {
-                    $router->add($pattern, $routeConfig);
-                }
-            }
-        }
-    }
-    return $router;
-});
-
-
-$di->set('dispatcher', fn() => new \Core\Mvc\Dispatcher());
-$di->set('eventsManager', fn() => new \Core\Events\Manager());
-
-$di->set(\Core\Database\MigrationRepository::class, fn() => new \Core\Database\MigrationRepository());
-$di->set(\Core\Database\Migrator::class, fn() => new \Core\Database\Migrator());
-
-// Create application instance
 $app = new \Core\Mvc\Application($di);
-
 return $app;

@@ -6,7 +6,7 @@ $migrator->run();
 return [
     // ... other config
     'migrations' => [
-        'path' => APP_PATH . '/migrations',
+        'path' => APP_PATH . '../migrations',
         'table' => 'migrations'
     ]
 ];

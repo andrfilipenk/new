@@ -85,7 +85,6 @@ body {
     color: #ecf0f1;
     text-decoration: none;
     border-radius: 4px;
-    transition: background-color 0.2s;
 }
 
 .main-nav a:hover,

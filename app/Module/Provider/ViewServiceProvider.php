@@ -8,15 +8,17 @@ use Core\Di\Interface\Container as ContainerInterface;
 
 class ViewServiceProvider implements ServiceProvider
 {
-    public function register(ContainerInterface $di): void
+    public function register(ContainerInterface $container): void
     {
-        $di->set('view', function() use ($di) {
+        $container->set('view', function($di) {
             $config = $di->get('config')['view'];
+
             // The constructor now only needs the template path.
             $view = new View($config['path']);
             if (isset($config['layout'])) {
                 $view->setLayout($config['layout']);
             }
+            
             $view->setDI($di);
             if ($di->has('eventsManager')) {
                 $view->setEventsManager($di->get('eventsManager'));

@@ -34,38 +34,38 @@ class PieChart extends AbstractChart
 
     protected function renderChart(): void
     {
-        $chartArea = $this->getChartArea();
-        $values = $this->data['values'];
-        $labels = $this->data['labels'];
+        $chartArea  = $this->getChartArea();
+        $values     = $this->data['values'];
+        $labels     = $this->data['labels'];
         
-        $centerX = $chartArea['x'] + $chartArea['width'] / 2;
-        $centerY = $chartArea['y'] + $chartArea['height'] / 2;
-        $radius = min($chartArea['width'], $chartArea['height']) / 2 - 20;
+        $centerX    = $chartArea['x'] + $chartArea['width'] / 2;
+        $centerY    = $chartArea['y'] + $chartArea['height'] / 2;
+        $radius     = min($chartArea['width'], $chartArea['height']) / 2 - 20;
         
-        $isDonut = $this->config['donut'] ?? false;
-        $innerRadius = $isDonut ? $radius * 0.6 : 0;
+        $isDonut        = $this->config['donut'] ?? false;
+        $innerRadius    = $isDonut ? $radius * 0.6 : 0;
         
         $this->renderSlices($centerX, $centerY, $radius, $innerRadius, $values, $labels);
     }
 
     private function renderSlices(float $centerX, float $centerY, float $radius, float $innerRadius, array $values, array $labels): void
     {
-        $total = array_sum($values);
-        $currentAngle = -90; // Start from top
+        $total          = array_sum($values);
+        $currentAngle   = -90; // Start from top
         
         foreach ($values as $index => $value) {
             $percentage = $value / $total;
-            $angle = $percentage * 360;
-            $color = $this->getColor($index);
+            $angle      = $percentage * 360;
+            $color      = $this->getColor($index);
             
             // Create slice path
-            $path = $this->createSlicePath($centerX, $centerY, $radius, $innerRadius, $currentAngle, $angle);
+            $path       = $this->createSlicePath($centerX, $centerY, $radius, $innerRadius, $currentAngle, $angle);
             
             $this->renderer->addPath($path, [
-                'fill' => $color,
-                'stroke' => '#ffffff',
-                'strokeWidth' => 2,
-                'class' => "slice slice-{$index}"
+                'fill'          => $color,
+                'stroke'        => '#ffffff',
+                'strokeWidth'   => 2,
+                'class'         => "slice slice-{$index}"
             ]);
             
             // Add percentage labels if enabled
@@ -79,23 +79,23 @@ class PieChart extends AbstractChart
         // Add center label for donut charts
         if ($innerRadius > 0 && !empty($this->config['centerLabel'])) {
             $this->renderer->addText($centerX, $centerY, $this->config['centerLabel'], [
-                'textAnchor' => 'middle',
-                'dominantBaseline' => 'middle',
-                'fontSize' => $this->config['labels']['fontSize'] + 2,
-                'fontWeight' => 'bold',
-                'fill' => $this->config['labels']['color']
+                'textAnchor'        => 'middle',
+                'dominantBaseline'  => 'middle',
+                'fontSize'          => $this->config['labels']['fontSize'] + 2,
+                'fontWeight'        => 'bold',
+                'fill'              => $this->config['labels']['color']
             ]);
         }
     }
 
     private function createSlicePath(float $centerX, float $centerY, float $radius, float $innerRadius, float $startAngle, float $angle): string
     {
-        $endAngle = $startAngle + $angle;
-        $largeArcFlag = $angle > 180 ? 1 : 0;
+        $endAngle       = $startAngle + $angle;
+        $largeArcFlag   = $angle > 180 ? 1 : 0;
         
         // Convert degrees to radians
-        $startRad = deg2rad($startAngle);
-        $endRad = deg2rad($endAngle);
+        $startRad       = deg2rad($startAngle);
+        $endRad         = deg2rad($endAngle);
         
         // Calculate outer arc points
         $x1 = $centerX + $radius * cos($startRad);
@@ -128,9 +128,9 @@ class PieChart extends AbstractChart
 
     private function renderSliceLabel(float $centerX, float $centerY, float $radius, float $innerRadius, float $startAngle, float $angle, float $percentage): void
     {
-        $labelRadius = $innerRadius > 0 ? ($radius + $innerRadius) / 2 : $radius * 0.7;
-        $labelAngle = $startAngle + $angle / 2;
-        $labelRad = deg2rad($labelAngle);
+        $labelRadius    = $innerRadius > 0 ? ($radius + $innerRadius) / 2 : $radius * 0.7;
+        $labelAngle     = $startAngle + $angle / 2;
+        $labelRad       = deg2rad($labelAngle);
         
         $labelX = $centerX + $labelRadius * cos($labelRad);
         $labelY = $centerY + $labelRadius * sin($labelRad);
@@ -138,11 +138,11 @@ class PieChart extends AbstractChart
         $percentageText = number_format($percentage * 100, 1) . '%';
         
         $this->renderer->addText($labelX, $labelY, $percentageText, [
-            'textAnchor' => 'middle',
-            'dominantBaseline' => 'middle',
-            'fontSize' => $this->config['labels']['fontSize'],
-            'fill' => '#ffffff',
-            'fontWeight' => 'bold'
+            'textAnchor'        => 'middle',
+            'dominantBaseline'  => 'middle',
+            'fontSize'          => $this->config['labels']['fontSize'],
+            'fill'              => '#ffffff',
+            'fontWeight'        => 'bold'
         ]);
     }
 
@@ -152,28 +152,28 @@ class PieChart extends AbstractChart
             return;
         }
 
-        $legend = $this->config['legend'];
-        $legendX = $this->width - $this->config['padding']['right'] + 20;
-        $legendY = $this->config['padding']['top'];
+        $legend     = $this->config['legend'];
+        $legendX    = $this->width - $this->config['padding']['right'] + 20;
+        $legendY    = $this->config['padding']['top'];
         
         foreach ($this->data['labels'] as $index => $label) {
-            $color = $this->getColor($index);
-            $value = $this->data['values'][$index] ?? 0;
-            $total = array_sum($this->data['values']);
+            $color      = $this->getColor($index);
+            $value      = $this->data['values'][$index] ?? 0;
+            $total      = array_sum($this->data['values']);
             $percentage = $total > 0 ? ($value / $total) * 100 : 0;
             
             // Legend color box
             $this->renderer->addRect($legendX, $legendY + ($index * 20), 12, 12, [
-                'fill' => $color,
-                'stroke' => 'none'
+                'fill'      => $color,
+                'stroke'    => 'none'
             ]);
             
             // Legend text with percentage
             $legendText = $label . ' (' . number_format($percentage, 1) . '%)';
             $this->renderer->addText($legendX + 16, $legendY + ($index * 20) + 9, $legendText, [
-                'fontSize' => $legend['fontSize'],
-                'fill' => $legend['color'],
-                'dominantBaseline' => 'middle'
+                'fontSize'          => $legend['fontSize'],
+                'fill'              => $legend['color'],
+                'dominantBaseline'  => 'middle'
             ]);
         }
     }

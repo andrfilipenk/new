@@ -86,7 +86,11 @@ class ColumnDefinition
         if (array_key_exists('default', $this->attributes)) {
             $default = $this->get('default');
             if (is_string($default)) {
-                $sql .= " DEFAULT '{$default}'";
+                if ($default === 'CURRENT_TIMESTAMP') {
+                    $sql .= " DEFAULT {$default}";
+                } else {
+                    $sql .= " DEFAULT '{$default}'";
+                }
             } else if ($default === null) {
                 $sql .= " DEFAULT NULL";
             } else {

@@ -11,12 +11,17 @@ class MigrationRepository
 {
     use Injectable;
 
+    /**
+     * Holds db instance
+     *
+     * @var \Core\Database\Database
+     */
     protected $db;
     protected $table = 'migrations';
 
     public function __construct()
     {
-        $this->db = $this->di->get(Database::class);
+        $this->db = $this->getDI()->get('db');
         $this->createMigrationsTable();
     }
 
@@ -47,7 +52,7 @@ class MigrationRepository
             ->get();
             
         return array_map(function($item) {
-            return $item->migration;
+            return $item['migration'];
         }, $results);
     }
 
@@ -72,10 +77,10 @@ class MigrationRepository
     public function getLastBatchNumber()
     {
         $result = $this->db->table($this->table)
-            ->select([$this->db->raw('MAX(batch) as last_batch')])
+            ->select(['MAX(batch) as last_batch'])
             ->first();
             
-        return $result ? $result->last_batch : 0;
+        return $result ? $result['last_batch'] : 0;
     }
 
     /**

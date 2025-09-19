@@ -22,7 +22,7 @@ class Task extends Controller
             $task = new Tasks($data);
             if ($task->save()) {
                 $this->flashSuccess('Task created.');
-                return $this->redirect('/admin/tasks');
+                return $this->redirect('admin/tasks');
             } else {
                 $this->flashError('Failed to create task.');
             }
@@ -40,7 +40,7 @@ class Task extends Controller
         $task = Tasks::find($id);
         if ($task === null) {
             $this->flashError('Task not found');
-            $response = $this->redirect('/admin/tasks');
+            $response = $this->redirect('admin/tasks');
             var_dump($response);
             return $response;
         }
@@ -50,7 +50,7 @@ class Task extends Controller
             $task->fill($data);
             if ($task->save()) {
                 $this->flashSuccess('Task updated.');
-                return $this->redirect('/admin/tasks');
+                return $this->redirect('admin/tasks');
             } else {
                 $this->flashError('Failed to update task.');
             }
@@ -72,6 +72,6 @@ class Task extends Controller
         } else {
             $this->flashError('Failed to delete task.');
         }
-        return $this->redirect('/admin/tasks');
+        return $this->redirect('admin/tasks');
     }
 }

@@ -87,9 +87,10 @@ class Controller
      *
      * @return Response
      */
-    protected function redirect(string $url, int $statusCode = 302): Response
+    protected function redirect(string $to, int $statusCode = 302): Response
     {
-        return Response::redirect('/new' . $url, $statusCode)->send();
+        $url = $this->getDI()->get('url');
+        return Response::redirect($url->get($to), $statusCode)->send();
     }
 
     public function flashSuccess($message)

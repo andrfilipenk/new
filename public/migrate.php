@@ -3,10 +3,11 @@
 
 // This file is your command-line entry point for migrations.
 
-require __DIR__ . '/app/bootstrap.php';
+require __DIR__ . '/../app/bootstrap.php';
 
 $di = \Core\Di\Container::getDefault();
-$migrator = $di->get(\Core\Database\Migrator::class);
+/** @var \Core\Database\Migrator $migrator */
+$migrator = $di->get('migrator');
 
 $command = $argv[1] ?? 'help';
 

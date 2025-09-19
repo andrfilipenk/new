@@ -26,7 +26,7 @@ class User extends Controller
             $user = new Users($data);
             if ($user->save()) {
                 $this->getDI()->get('session')->flash('success', 'User created.');
-                return $this->redirect('/admin/users');
+                return $this->redirect('admin/users');
             } else {
                 $this->getDI()->get('session')->flash('error', 'Failed to create user.');
             }
@@ -44,7 +44,7 @@ class User extends Controller
         $id = $this->getDI()->get('dispatcher')->getParam('id');
         $user = Users::find($id);
         if (!$user) {
-            return $this->redirect('/admin/users');
+            return $this->redirect('admin/users');
         }
 
         $form = UserForm::build($user->getData());
@@ -54,7 +54,7 @@ class User extends Controller
             $user->fill($data);
             if ($user->save()) {
                 $this->getDI()->get('session')->flash('success', 'User updated.');
-                return $this->redirect('/admin/users');
+                return $this->redirect('admin/users');
             } else {
                 $this->getDI()->get('session')->flash('error', 'Failed to update user.');
             }
@@ -77,6 +77,6 @@ class User extends Controller
         } else {
             $this->getDI()->get('session')->flash('error', 'Failed to delete user.');
         }
-        return $this->redirect('/admin/users');
+        return $this->redirect('admin/users');
     }
 }
