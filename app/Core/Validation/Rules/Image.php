@@ -8,22 +8,20 @@ class Image implements RuleInterface
 {
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
-        if (is_null($value)) {
-            return true; // Use 'required' rule for required validation
+        if ($value === null) {
+            return true;
         }
-        
-        // Handle UploadedFile objects
         if ($value instanceof UploadedFile) {
-            $mimeType = $value->getMimeType();
+            $mimeType = $value->getServerMimeType();
+            if (empty($mimeType)) {
+                $mimeType = $value->getMimeType();
+            }
             return $this->isImageMimeType($mimeType);
         }
-        
-        // Handle file paths
         if (is_string($value) && file_exists($value)) {
             $imageInfo = getimagesize($value);
             return $imageInfo !== false;
         }
-        
         return false;
     }
 
@@ -43,7 +41,6 @@ class Image implements RuleInterface
             'image/svg+xml',
             'image/bmp'
         ];
-        
         return in_array($mimeType, $allowedMimeTypes);
     }
 }

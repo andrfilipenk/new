@@ -7,7 +7,6 @@ class Confirmed implements RuleInterface
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
         $confirmationField = $attribute . '_confirmation';
-        
         return isset($data[$confirmationField]) && $value === $data[$confirmationField];
     }
 

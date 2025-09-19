@@ -11,22 +11,18 @@ class In implements RuleInterface
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
         if ($value === null || $value === '') {
-            return true; // Let required rule handle empty values
+            return true;
         }
-        
         if (empty($parameters)) {
             return false; // No valid options provided
         }
-        
         // Convert value to string for comparison to handle type differences
         $stringValue = (string) $value;
-        
         foreach ($parameters as $option) {
             if ($stringValue === (string) $option) {
                 return true;
             }
         }
-        
         return false;
     }
     

@@ -6,18 +6,15 @@ class Required implements RuleInterface
 {
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
-        if (is_null($value)) {
+        if ($value === null) {
             return false;
         }
-        
         if (is_string($value) && trim($value) === '') {
             return false;
         }
-        
         if (is_array($value) && empty($value)) {
             return false;
         }
-        
         return true;
     }
 

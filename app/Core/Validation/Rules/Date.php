@@ -6,20 +6,16 @@ class Date implements RuleInterface
 {
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
-        if (is_null($value) || $value === '') {
-            return true; // Use 'required' rule for required validation
+        if ($value === null || $value === '') {
+            return true;
         }
-        
         // Try to parse the date
         $timestamp = strtotime($value);
-        
         if ($timestamp === false) {
             return false;
         }
-        
         // Check if the date is valid by formatting it back
         $date = date('Y-m-d', $timestamp);
-        
         return strtotime($date) !== false;
     }
 

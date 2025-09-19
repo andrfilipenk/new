@@ -6,10 +6,9 @@ class StringRule implements RuleInterface
 {
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
-        if (is_null($value)) {
-            return true; // Use 'required' rule for required validation
+        if ($value === null) {
+            return true;
         }
-        
         return is_string($value);
     }
 

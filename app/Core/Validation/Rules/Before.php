@@ -6,24 +6,19 @@ class Before implements RuleInterface
 {
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
-        if (is_null($value) || $value === '') {
-            return true; // Use 'required' rule for required validation
+        if ($value === null || $value === '') {
+            return true;
         }
-        
         if (empty($parameters[0])) {
             throw new \InvalidArgumentException('Before rule requires a date parameter');
         }
-        
         $beforeDate = $parameters[0];
-        
         // Convert values to timestamps for comparison
         $valueTimestamp = strtotime($value);
         $beforeTimestamp = strtotime($beforeDate);
-        
         if ($valueTimestamp === false || $beforeTimestamp === false) {
             return false;
         }
-        
         return $valueTimestamp < $beforeTimestamp;
     }
 

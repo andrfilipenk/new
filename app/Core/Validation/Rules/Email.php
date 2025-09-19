@@ -6,10 +6,9 @@ class Email implements RuleInterface
 {
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
-        if (is_null($value) || $value === '') {
-            return true; // Use 'required' rule for required validation
+        if ($value === null || $value === '') {
+            return true;
         }
-        
         return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
 

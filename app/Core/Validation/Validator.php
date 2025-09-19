@@ -13,7 +13,7 @@ class Validator
     protected array $data;
     protected array $rules;
     protected array $errors = [];
-    protected array $customMessages = [];
+    protected array $messages = [];
     
     // Built-in validation rules
     protected array $ruleMap = [
@@ -36,28 +36,25 @@ class Validator
         'file'          => Rules\File::class,
     ];
 
-    public function __construct(array $data, array $rules, array $customMessages = [])
+    public function __construct(array $data, array $rules, array $messages = [])
     {
-        $this->data = $data;
-        $this->rules = $rules;
-        $this->customMessages = $customMessages;
+        $this->data     = $data;
+        $this->rules    = $rules;
+        $this->messages = $messages;
     }
 
     public function passes(): bool
     {
         $this->errors = [];
-        
         foreach ($this->rules as $field => $fieldRules) {
             $value = $this->data[$field] ?? null;
             $rules = $this->parseRules($fieldRules);
-            
             foreach ($rules as $rule) {
                 if (!$this->validateRule($field, $value, $rule)) {
                     break; // Stop on first failure for this field
                 }
             }
         }
-        
         return empty($this->errors);
     }
 
@@ -76,36 +73,28 @@ class Validator
         if ($field) {
             return $this->errors[$field][0] ?? null;
         }
-        
         foreach ($this->errors as $fieldErrors) {
             return $fieldErrors[0] ?? null;
         }
-        
         return null;
     }
 
     protected function validateRule(string $field, $value, array $rule): bool
     {
-        $ruleName = $rule['name'];
+        $ruleName   = $rule['name'];
         $parameters = $rule['parameters'];
-        
         if (!isset($this->ruleMap[$ruleName])) {
             throw new ValidationException("Unknown validation rule: {$ruleName}");
         }
-        
-        $ruleClass = $this->ruleMap[$ruleName];
-        $ruleInstance = new $ruleClass();
-        
+        $ruleClass      = $this->ruleMap[$ruleName];
+        $ruleInstance   = new $ruleClass();
         if (!$ruleInstance instanceof RuleInterface) {
             throw new ValidationException("Rule {$ruleName} must implement RuleInterface");
         }
-        
         $passes = $ruleInstance->passes($field, $value, $parameters, $this->data);
-        
         if (!$passes) {
             $this->addError($field, $ruleInstance->message($field, $value, $parameters));
         }
-        
         return $passes;
     }
 
@@ -114,9 +103,7 @@ class Validator
         if (is_string($rules)) {
             $rules = explode('|', $rules);
         }
-        
         $parsed = [];
-        
         foreach ($rules as $rule) {
             if (is_string($rule)) {
                 $parsed[] = $this->parseStringRule($rule);
@@ -124,7 +111,6 @@ class Validator
                 $parsed[] = ['name' => get_class($rule), 'parameters' => [], 'instance' => $rule];
             }
         }
-        
         return $parsed;
     }
 
@@ -137,7 +123,6 @@ class Validator
             $name = $rule;
             $parameters = [];
         }
-        
         return ['name' => $name, 'parameters' => $parameters];
     }
 
@@ -146,7 +131,6 @@ class Validator
         if (!isset($this->errors[$field])) {
             $this->errors[$field] = [];
         }
-        
         $this->errors[$field][] = $message;
     }
 
@@ -169,11 +153,9 @@ class Validator
     public static function validate(array $data, array $rules, array $messages = []): array
     {
         $validator = static::make($data, $rules, $messages);
-        
         if ($validator->fails()) {
             throw new ValidationException('Validation failed', $validator->errors());
         }
-        
         return $data;
     }
 }

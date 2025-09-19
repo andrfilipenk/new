@@ -20,10 +20,7 @@ class UploadedFile
         $this->error = $file['error'];
         $this->size = $file['size'];
     }
-
-    /**
-     * Move the uploaded file to a new location.
-     */
+    
     public function moveTo(string $targetPath): bool
     {
         if (!$this->isValid()) {
@@ -55,5 +52,26 @@ class UploadedFile
     public function getError(): int
     {
         return $this->error;
+    }
+
+    public function getMimeType(): string
+    {
+        return $this->getClientMimeType();
+    }
+
+    public function getServerMimeType(): string
+    {
+        if (!$this->isValid() || !file_exists($this->tmpName)) {
+            return '';
+        }
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $this->tmpName);
+        finfo_close($finfo);
+        return $mimeType ?: '';
+    }
+
+    public function getTmpName(): string
+    {
+        return $this->tmpName;
     }
 }

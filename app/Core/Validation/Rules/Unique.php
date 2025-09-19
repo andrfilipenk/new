@@ -9,26 +9,22 @@ class Unique implements RuleInterface
 {
     public function passes(string $attribute, $value, array $parameters = [], array $data = []): bool
     {
-        if (is_null($value) || $value === '') {
+        if ($value === null || $value === '') {
             return true;
         }
-        
-        $table = $parameters[0] ?? null;
+        $table  = $parameters[0] ?? null;
         $column = $parameters[1] ?? $attribute;
         $except = $parameters[2] ?? null;
         $exceptColumn = $parameters[3] ?? 'id';
-        
         if (!$table) {
             return false;
         }
-        
-        $query = Container::getDefault()->get('db')->table($table)
+        $query = Container::getDefault()->get('db')
+            ->table($table)
             ->where($column, $value);
-            
         if ($except) {
             $query->where($exceptColumn, '!=', $except);
         }
-        
         return $query->first() === null;
     }
 
