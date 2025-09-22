@@ -13,6 +13,8 @@ class Dashboard extends Controller
 
         $url = $this->getDI()->get('url');
 
+        $this->flashSuccess('This is success Message');
+
         // Prepare navigation items
         $navigation = [
             ['text' => 'Dashboard', 'url' => $url->get(''), 'active' => true],

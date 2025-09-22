@@ -14,16 +14,10 @@ class SessionServiceProvider implements ServiceProvider
             $config = $di->get('config');
             $sessionConfig = $config['session'] ?? [];
             $session = new Session();
-
-            // Configure session settings if provided
             if (!empty($sessionConfig)) {
-                #$this->configureSession($session, $sessionConfig);
+                $this->configureSession($session, $sessionConfig);
             }
-
-            // Inject DI container
             $session->setDI($di);
-            
-            // Inject events manager if available
             if ($di->has('eventsManager')) {
                 $session->setEventsManager($di->get('eventsManager'));
             }

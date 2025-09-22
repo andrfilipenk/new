@@ -12,13 +12,10 @@ class ViewServiceProvider implements ServiceProvider
     {
         $container->set('view', function($di) {
             $config = $di->get('config')['view'];
-
-            // The constructor now only needs the template path.
             $view = new View($config['path']);
             if (isset($config['layout'])) {
                 $view->setLayout($config['layout']);
             }
-            
             $view->setDI($di);
             if ($di->has('eventsManager')) {
                 $view->setEventsManager($di->get('eventsManager'));

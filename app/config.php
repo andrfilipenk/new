@@ -24,22 +24,22 @@ return [
     ],
 
     'session' => [
-        'name' => 'MYAPP_SESSID',
-        'lifetime' => 3600, // 1 hour
-        'cookie_lifetime' => 3600,
-        'cookie_path' => '/',
-        'cookie_domain' => '',
-        'cookie_secure' => false,
-        'cookie_httponly' => true
+        #'name'              => 'MYAPP_SESSID',
+        #'lifetime'          => 3600, // 1 hour
+        #'cookie_lifetime'   => 3600,
+        #'cookie_path'       => '/',
+        #'cookie_domain'     => '',
+        #'cookie_secure'     => false,
+        #'cookie_httponly'   => true
     ],
 
     'cookie' => [
-        'expires' => 30, // 30 days
-        'path' => '/',
-        'domain' => '',
-        'secure' => false,
-        'httponly' => true,
-        'samesite' => 'Lax'
+        'expires'   => 30, // 30 days
+        'path'      => '/',
+        'domain'    => '',
+        'secure'    => false,
+        'httponly'  => true,
+        'samesite'  => 'Lax'
     ],
 
     'view' => [

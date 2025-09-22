@@ -29,7 +29,7 @@ class Session implements SessionInterface
         }
         $this->fireEvent('session:beforeStart', $this);
         $this->started = session_start();
-        if ($this->started) {
+        if ($this->isStarted()) {
             $this->fireEvent('session:afterStart', $this);
         }
         return $this->started;
