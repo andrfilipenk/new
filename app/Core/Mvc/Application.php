@@ -45,7 +45,20 @@ class Application
             // In production, you would log the error
             // error_log($e->getMessage() . PHP_EOL . $e->getTraceAsString());
             // Return a generic error response
-            return Response::error('An unexpected error occurred. <br><br>' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            $config = $this->di->get('config');
+            if ($config['app']['debug'] ?? false) {
+                return Response::error(
+                    "Error: " . $e->getMessage() . 
+                    "<br><br>File: " . $e->getFile() . 
+                    "<br>Line: " . $e->getLine() . 
+                    "<br><br>Stack Trace:<br>" . nl2br($e->getTraceAsString()),
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
+            } else {
+                // Generic error in production
+                return Response::error('An unexpected error occurred.', Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
+
         }
     }
 

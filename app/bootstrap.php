@@ -24,6 +24,7 @@ $di->register(new \Module\Provider\SessionServiceProvider);
 $di->register(new \Module\Provider\CookieServiceProvider);
 $di->register(new \Module\Provider\ViewServiceProvider);
 $di->register(new \Module\Provider\RouterServiceProvider);
+$di->register(new \Module\Provider\NavigationServiceProvider);
 $di->set('url', fn() => new \Core\Utils\Url);
 $di->set('request', fn() => new \Core\Http\Request);
 $di->set('db', fn() => new \Core\Database\Database);

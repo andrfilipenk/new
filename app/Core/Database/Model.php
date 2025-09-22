@@ -45,7 +45,6 @@ abstract class Model
         return self::db()->table($this->table);
     }
 
-
     public static function query(): Database
     {
         $instance = static::getInstance();
@@ -397,5 +396,26 @@ abstract class Model
             return !in_array($key, $this->guarded);
         }
         return true;
+    }
+
+    public function withCount($relations)
+    {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+        foreach ($relations as $relation) {
+            if (!method_exists($this, $relation)) {
+                throw new DatabaseException("Relationship method {$relation} does not exist.");
+            }
+            $relationInstance   = $this->$relation();
+            $relatedTable       = $relationInstance->getRelatedInstance()->getTable();
+            $foreignKey         = $relationInstance->getForeignKey();
+            $this->query->selectSub(function($query) use ($relatedTable, $foreignKey) {
+                $query->from($relatedTable)
+                    ->selectRaw('COUNT(*)')
+                    ->whereColumn("{$relatedTable}.{$foreignKey}", "{$this->table}.{$this->primaryKey}");
+            }, "{$relation}_count");
+        }
+        return $this;
     }
 }

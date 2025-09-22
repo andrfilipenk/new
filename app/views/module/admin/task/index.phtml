@@ -1,5 +1,9 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url        = $this->getDI()->get('url'); 
+?>
 <h1>Task List</h1>
-<a href="/admin/task-create" class="btn btn-primary mb-2">Add New Task</a>
+<a href="<?= $url->get('admin/task-create') ?>" class="btn btn-primary mb-2">Add New Task</a>
 <table>
     <thead>
         <tr>
@@ -16,7 +20,7 @@
     <tbody>
         <?php foreach ($tasks as $task): ?>
             <tr>
-                <td><?= htmlspecialchars($task->task_id) ?></td>
+                <td><?= htmlspecialchars($task->id) ?></td>
                 <td><?= htmlspecialchars($task->title) ?></td>
                 <td><?= htmlspecialchars($task->creator ? $task->creator->name : 'Unknown') ?></td>
                 <td><?= htmlspecialchars($task->assigned ? $task->assigned->name : 'Unknown') ?></td>
@@ -28,8 +32,8 @@
                     End: <?= htmlspecialchars($task->end_date) ?>
                 </td>
                 <td>
-                    <a href="/admin/task-edit/<?= $task->task_id ?>">Edit</a>
-                    <a href="/admin/task-delete/<?= $task->task_id ?>" onclick="return confirm('Delete this task?')">Delete</a>
+                    <a href="<?= $url->get('admin/task-edit/' . $task->id) ?>">Edit</a>
+                    <a href="<?= $url->get('admin/task-delete/' . $task->id) ?>" onclick="return confirm('Delete this task?')">Delete</a>
                 </td>
             </tr>
         <?php endforeach; ?>

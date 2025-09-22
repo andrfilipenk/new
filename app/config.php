@@ -23,6 +23,13 @@ return [
         'persistent'    => true, // for connection pooling
     ],
 
+    'navigation' => [
+        'Dashboard' => '',
+        'Users'     => 'admin/users',
+        'Tasks'     => 'admin/tasks',
+        'Log'       => 'admin/logs'
+    ],
+
     'session' => [
         #'name'              => 'MYAPP_SESSID',
         #'lifetime'          => 3600, // 1 hour

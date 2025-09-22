@@ -1,4 +1,9 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url        = $this->getDI()->get('url'); 
+?>
 <h1>User List</h1>
+<a href="<?= $url->get('admin/user-create') ?>" class="btn btn-primary mb-2">Add User</a>
 <?php if (!empty($users)): ?>
     <table>
         <thead>
@@ -14,8 +19,8 @@
                     <td><?= htmlspecialchars($user->email) ?></td>
                     <td><?= htmlspecialchars($user->kuhnle_id) ?></td>
                     <td>
-                        <a href="/admin/user-edit/<?= $user->user_id ?>">Edit</a>
-                        <a href="/admin/user-delete/<?= $user->user_id ?>" onclick="return confirm('Delete user?')">Delete</a>
+                        <a href="<?= $url->get('admin/user-edit/' . $user->user_id) ?>">Edit</a>
+                        <a href="<?= $url->get('admin/user-delete/' . $user->user_id) ?>" onclick="return confirm('Delete user?')">Delete</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -24,4 +29,3 @@
 <?php else: ?>
     <p>No users found.</p>
 <?php endif; ?>
-<a href="/admin/user-create" class="btn btn-primary">Add New User</a>

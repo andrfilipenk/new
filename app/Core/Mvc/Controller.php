@@ -5,7 +5,6 @@ namespace Core\Mvc;
 use Core\Di\Injectable;
 use Core\Events\EventAware;
 use Core\Http\Response;
-use Core\Mvc\ViewInterface;
 
 class Controller
 {
@@ -13,38 +12,85 @@ class Controller
     
     /** @var \Core\Mvc\View $view */
     protected $view;
-
         
     // public function initialize() {}
     // public function afterExecute() {}
     
+    /**
+     * Returns view instance
+     *
+     * @return \Core\Mvc\View $view
+     */
     public function getView()
     {
         if (null === $this->view) {
-            /** @var \Core\Mvc\View $view */
             $view = $this->getDI()->get('view');
             $this->view = $view;
         }
         return $this->view;
     }
 
+    /**
+     * Returns request instance
+     *
+     * @return \Core\Http\Request
+     */
     public function getRequest()
     {
-        /** @var \Core\Http\Request $request */
-        $request = $this->getDI()->get('request');
-        return $request;
+        return $this->getDI()->get('request');
     }
 
+    /**
+     * Returns session instance
+     *
+     * @return \Core\Session\Session
+     */
+    public function getSession()
+    {
+        return $this->getDI()->get('session');
+    }
+
+    /**
+     * Returns url instance or url
+     *
+     * @param string|null $to
+     * @return \Core\Utils\Url|string
+     */
+    protected function url($to = null)
+    {
+        /** @var \Core\Utils\Url $url */
+        $url = $this->getDI()->get('url');
+        if ($to === null) {
+            return $url;
+        }
+        return $url->get($to);
+    }
 
     public function isPost()
     {
         return $this->getRequest()->isMethod('post');
     }
 
-
     public function getPost($key = null, $default = null)
     {
         return $this->getRequest()->post($key, $default);
+    }
+
+    public function flashSuccess($message)
+    {
+        $this->getSession()->flash('success', $message);
+        return $this;
+    }
+
+    public function flashError($message)
+    {
+        $this->getSession()->flash('error', $message);
+        return $this;
+    }
+
+    protected function redirect(string $to, int $statusCode = 302): Response
+    {
+        return Response::redirect($this->url($to), $statusCode)->send();
     }
 
     protected function render(string $template = null, array $data = []): string
@@ -58,24 +104,6 @@ class Controller
             $template = $this->getTemplateName();
         }
         return $this->getView()->render($template, $data);
-    }
-    
-    protected function redirect(string $to, int $statusCode = 302): Response
-    {
-        $url = $this->getDI()->get('url');
-        return Response::redirect($url->get($to), $statusCode)->send();
-    }
-
-    public function flashSuccess($message)
-    {
-        $this->getDI()->get('session')->flash('success', $message);
-        return $this;
-    }
-
-    public function flashError($message)
-    {
-        $this->getDI()->get('session')->flash('error', $message);
-        return $this;
     }
 
     protected function getTemplateName(): string

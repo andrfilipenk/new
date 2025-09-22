@@ -1,7 +1,8 @@
 <?php 
 /** @var \Core\Utils\Url $url */
 $url        = $this->getDI()->get('url'); 
-$session    = $this->getDI()->get('session'); 
+$session    = $this->getDI()->get('session');
+$navigation = $this->getDI()->get('navigation');
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,7 +34,7 @@ $session    = $this->getDI()->get('session');
                             <ul>
                                 <?php foreach ($navigation as $item): ?>
                                     <li class="<?= $item['active'] ?? false ? 'active' : '' ?>">
-                                        <a href="<?= htmlspecialchars($item['url']) ?>"><?= htmlspecialchars($item['text']) ?></a>
+                                        <a href="<?= $item['url'] ?>"><?= $item['label'] ?></a>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
