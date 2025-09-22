@@ -33,7 +33,6 @@ abstract class Migration
     {
         $blueprint = new Blueprint($tableName);
         $callback($blueprint);
-        
         $sql = $blueprint->toSql();
         self::db()->execute($sql);
     }
@@ -53,7 +52,6 @@ abstract class Migration
     {
         $table = new Blueprint($tableName);
         $callback($table);
-        
         $sql = $table->toSql();
         if (!empty($sql)) {
             self::db()->execute($sql);

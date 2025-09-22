@@ -12,7 +12,7 @@ class Url
 
     public function __construct() {
         $config = $this->getDI()->get('config');
-        $this->base_path = $config['app'] . DIRECTORY_SEPARATOR;
+        $this->base_path = '/' . $config['app']['base_path'] . '/';
     }
 
     public function get($url) {

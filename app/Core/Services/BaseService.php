@@ -36,11 +36,9 @@ abstract class BaseService
     public function getAll(array $with = []): array
     {
         $with = array_merge($this->defaultWith, $with);
-        
         if (!empty($with)) {
             return $this->modelClass::with($with)->get();
         }
-        
         return $this->modelClass::all();
     }
 
@@ -54,7 +52,6 @@ abstract class BaseService
                 ->where($this->getModelInstance()->getKeyName(), $id)
                 ->first();
         }
-        
         return $this->modelClass::find($id);
     }
 
@@ -64,17 +61,12 @@ abstract class BaseService
     public function create(array $data): Model
     {
         $this->validateData($data);
-        
         $this->beforeCreate($data);
-        
         $record = new $this->modelClass($data);
-        
         if (!$record->save()) {
             throw new \Exception("Failed to create record");
         }
-        
         $this->afterCreate($record, $data);
-        
         return $record;
     }
 
@@ -84,17 +76,12 @@ abstract class BaseService
     public function update(Model $record, array $data): Model
     {
         $this->validateData($data, $record->getKey());
-        
         $this->beforeUpdate($record, $data);
-        
         $record->fill($data);
-        
         if (!$record->save()) {
             throw new \Exception("Failed to update record");
         }
-        
         $this->afterUpdate($record, $data);
-        
         return $record;
     }
 
@@ -104,13 +91,10 @@ abstract class BaseService
     public function delete(Model $record): bool
     {
         $this->beforeDelete($record);
-        
         $result = $record->delete();
-        
         if ($result) {
             $this->afterDelete($record);
         }
-        
         return $result;
     }
 
@@ -122,7 +106,6 @@ abstract class BaseService
         if (!method_exists($record, 'restore')) {
             throw new \Exception("Model does not support soft deletes");
         }
-        
         return $record->restore();
     }
 
@@ -133,11 +116,9 @@ abstract class BaseService
     {
         $with = array_merge($this->defaultWith, $with);
         $offset = ($page - 1) * $perPage;
-        
         $query = !empty($with) ? 
             $this->modelClass::with($with) : 
             $this->modelClass::query();
-            
         return $query->limit($perPage)->offset($offset)->get();
     }
 
@@ -147,17 +128,14 @@ abstract class BaseService
     public function search(array $filters = [], array $with = []): array
     {
         $with = array_merge($this->defaultWith, $with);
-        
         $query = !empty($with) ? 
             $this->modelClass::with($with) : 
             $this->modelClass::query();
-        
         foreach ($filters as $field => $value) {
             if ($value !== null && $value !== '') {
                 $query->where($field, $value);
             }
         }
-        
         return $query->get();
     }
 
@@ -169,15 +147,12 @@ abstract class BaseService
         if (empty($this->validationRules)) {
             return;
         }
-        
         // Add ID to unique rules for updates
         $rules = $this->validationRules;
         if ($excludeId) {
             $rules = $this->addExcludeIdToUniqueRules($rules, $excludeId);
         }
-        
         $validator = new Validator($data, $rules);
-        
         if ($validator->fails()) {
             throw new \Exception('Validation failed: ' . json_encode($validator->errors()));
         }
@@ -192,16 +167,13 @@ abstract class BaseService
             if (is_string($fieldRules)) {
                 $fieldRules = explode('|', $fieldRules);
             }
-            
             foreach ($fieldRules as &$rule) {
                 if (is_string($rule) && strpos($rule, 'unique:') === 0) {
                     $rule .= ",{$excludeId}";
                 }
             }
-            
             $rules[$field] = $fieldRules;
         }
-        
         return $rules;
     }
 

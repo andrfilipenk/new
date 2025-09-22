@@ -6,8 +6,8 @@ class Response
 {
     protected $content;
     protected $statusCode;
-    protected $headers = [];
-    protected $sent = false;
+    protected $headers  = [];
+    protected $sent     = false;
 
     // --- HTTP Status Codes ---
     public const HTTP_OK = 200;
@@ -25,12 +25,10 @@ class Response
 
     public function __construct($content = '', int $statusCode = self::HTTP_OK, array $headers = [])
     {
-        $this->content = $content;
-        $this->statusCode = $statusCode;
-        $this->headers = array_merge(['Content-Type' => 'text/html; charset=UTF-8'], $headers);
+        $this->content      = $content;
+        $this->statusCode   = $statusCode;
+        $this->headers      = array_merge(['Content-Type' => 'text/html; charset=UTF-8'], $headers);
     }
-
-    // --- Static Factory Methods ---
 
     public static function json($data, int $statusCode = self::HTTP_OK, array $headers = []): self
     {
@@ -49,8 +47,6 @@ class Response
     {
         return new static($message, $statusCode);
     }
-
-    // --- Instance Methods ---
 
     public function setContent($content): self
     {
@@ -95,7 +91,6 @@ class Response
             . ($domain ? '; domain=' . $domain : '')
             . ($secure ? '; secure' : '')
             . ($httpOnly ? '; httponly' : '');
-        
         $this->headers['Set-Cookie'][] = $cookieHeader;
         return $this;
     }
@@ -105,10 +100,8 @@ class Response
         if ($this->sent) {
             return $this;
         }
-
         // Send status code
         http_response_code($this->statusCode);
-
         // Send headers
         foreach ($this->headers as $name => $value) {
             if (is_array($value)) {
@@ -122,7 +115,6 @@ class Response
 
         // Send content
         echo $this->content;
-
         $this->sent = true;
         return $this;
     }

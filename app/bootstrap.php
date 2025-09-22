@@ -1,7 +1,8 @@
 <?php
 // app/bootstrap.php
-define('BASE_PATH', dirname(__DIR__) . DIRECTORY_SEPARATOR);
-define('APP_PATH', BASE_PATH . 'app' . DIRECTORY_SEPARATOR);
+
+
+define('APP_PATH', dirname(__FILE__) . DIRECTORY_SEPARATOR);
 define('APP_DIR', dirname($_SERVER['SCRIPT_NAME'],2));
 
 // Register autoloader

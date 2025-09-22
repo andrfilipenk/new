@@ -14,9 +14,9 @@ use ReflectionParameter;
  */
 class Container implements ContainerInterface
 {
-    protected $definitions = [];
-    protected $instances = [];
-    protected $factories = [];
+    protected $definitions  = [];
+    protected $instances    = [];
+    protected $factories    = [];
     protected static $default;
 
     public function __construct(array $definitions = [])

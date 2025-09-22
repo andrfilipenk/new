@@ -16,11 +16,3 @@ interface ViewInterface
     public function endSection(): void;
     public function yield(string $name, string $default = ''): string;
 }
-
-// example to setup custom view template engine
-// $view = new \Core\View\YourCustomViewEngine($config['view']);
-// $application->setView($view);
-// $application->run();
-// Note: You need to implement the actual view rendering logic in YourCustomViewEngine class.
-// The above is just an interface definition.
-// The actual view rendering logic would depend on your chosen templating engine or custom implementation.

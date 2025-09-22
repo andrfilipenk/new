@@ -41,16 +41,19 @@ class DateTimeHelper
     public static function humanReadable(DateTimeInterface $datetime): string
     {
         $diff = (new DateTimeImmutable())->diff($datetime);
-        
-        $periods = ['y' => 'year', 'm' => 'month', 'd' => 'day', 'h' => 'hour', 'i' => 'minute'];
-        
+        $periods = [
+            'y' => 'year', 
+            'm' => 'month', 
+            'd' => 'day', 
+            'h' => 'hour', 
+            'i' => 'minute'
+        ];
         foreach ($periods as $key => $period) {
             if ($diff->$key > 0) {
                 $unit = $period . ($diff->$key > 1 ? 's' : '');
                 return $diff->invert ? "{$diff->$key} {$unit} ago" : "in {$diff->$key} {$unit}";
             }
         }
-        
         return 'Just now';
     }
 
@@ -59,11 +62,10 @@ class DateTimeHelper
         $options = [];
         foreach (DateTimeZone::listIdentifiers() as $tz) {
             $options[] = Tag::option($tz, [
-                'value' => $tz,
-                'selected' => $selected === $tz
+                'value'     => $tz,
+                'selected'  => $selected === $tz
             ]);
         }
-        
         return Tag::select($options, array_merge($attributes, ['name' => $name]));
     }
 

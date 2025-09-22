@@ -12,9 +12,9 @@ class View implements ViewInterface
 
     protected string $templatePath;
     protected string $layout = 'default';
-    protected bool $layoutEnabled = true;
     protected array $vars = [];
     protected array $sections = [];
+    protected bool $layoutEnabled = true;
     protected ?string $activeSection = null;
 
     public function __construct(string $templatePath)
@@ -25,13 +25,13 @@ class View implements ViewInterface
     public function render(string $template, array $data = []): string
     {
         $this->fireEvent('view:beforeRender', $this);
-        $this->vars = array_merge($this->vars, $data);
-        $templateFile = $this->findTemplate($template);
-        $content = $this->capture($templateFile, $this->vars);
+        $this->vars     = array_merge($this->vars, $data);
+        $templateFile   = $this->findTemplate($template);
+        $content        = $this->capture($templateFile, $this->vars);
         if ($this->layoutEnabled && $this->layout) {
             $this->sections['content'] = $content;
             $layoutFile = $this->findTemplate('layouts' . DIRECTORY_SEPARATOR . $this->layout);
-            $content = $this->capture($layoutFile, $this->vars);
+            $content    = $this->capture($layoutFile, $this->vars);
         }
         $this->fireEvent('view:afterRender', [$this,
             [

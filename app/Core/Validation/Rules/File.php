@@ -11,11 +11,9 @@ class File implements RuleInterface
         if ($value === null) {
             return true;
         }
-        // Handle UploadedFile objects
         if ($value instanceof UploadedFile) {
             return $value->isValid();
         }
-        // Handle file paths
         if (is_string($value)) {
             return file_exists($value) && is_file($value);
         }

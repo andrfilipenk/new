@@ -5,7 +5,7 @@ class InsertTestData extends Migration
 {
     protected $userList = [
         // [user_id, name, email, password, kuhnle_id]
-        [1, 'Andrej Filipenko', 'john.smith@email.com', 'pass123', 4521],
+        [1, 'Andrej Filipenko', 'andrej.filipenko@email.com', 'pass123', 2020],
         [2, 'Emma Johnson', 'emma.johnson@email.com', 'secure', 7894],
         [3, 'Michael Brown', 'michael.b@email.com', 'mypass', 1236],
         [4, 'Sarah Davis', 'sarah.d@email.com', 'password', 9874],

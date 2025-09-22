@@ -6,19 +6,19 @@ class Builder
 {
     private Form $form;
     private static array $typeMap = [
-        'text' => 'text',
-        'email' => 'email',
-        'password' => 'password',
-        'number' => 'number',
-        'date' => 'date',
-        'time' => 'time',
-        'datetime' => 'datetime',
-        'textarea' => 'textarea',
-        'select' => 'select',
-        'radio' => 'radio',
-        'checkbox' => 'checkbox',
-        'button' => 'button', // Added button type
-        'hidden' => 'hidden', // Added hidden type
+        'text'      => 'text',
+        'email'     => 'email',
+        'password'  => 'password',
+        'number'    => 'number',
+        'date'      => 'date',
+        'time'      => 'time',
+        'datetime'  => 'datetime',
+        'textarea'  => 'textarea',
+        'select'    => 'select',
+        'radio'     => 'radio',
+        'checkbox'  => 'checkbox',
+        'button'    => 'button', // Added button type
+        'hidden'    => 'hidden', // Added hidden type
     ];
 
     public function __construct()
@@ -37,7 +37,6 @@ class Builder
         }
         $fieldName  = $args[0];
         $options    = [];
-
         // Normalize attributes: merge all options into 'attributes'
         $attributes = [];
         // For select/radio: args[3], for button: args[2], otherwise: args[2]
@@ -48,7 +47,6 @@ class Builder
         } else {
             $attributes = $args[2] ?? [];
         }
-
         // Move standard HTML attributes from options to 'attributes'
         foreach (['required', 'placeholder', 'class', 'id', 'min', 'max', 'step', 'readonly', 'disabled', 'autocomplete', 'pattern'] as $attrKey) {
             if (isset($attributes[$attrKey])) {
@@ -59,7 +57,6 @@ class Builder
                 $attributes[$attrKey] = $args[2][$attrKey];
             }
         }
-
         if (in_array($type, ['select', 'radio'])) {
             $options = [
                 'options'       => $args[1] ?? [],

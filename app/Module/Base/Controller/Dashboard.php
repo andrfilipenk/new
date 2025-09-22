@@ -11,9 +11,11 @@ class Dashboard extends Controller
         // Set the layout for this action
         // $this->getView()->setLayout('app');
 
+        $url = $this->getDI()->get('url');
+
         // Prepare navigation items
         $navigation = [
-            ['text' => 'Dashboard', 'url' => '/dashboard', 'active' => true],
+            ['text' => 'Dashboard', 'url' => $url->get(''), 'active' => true],
             ['text' => 'Users', 'url' => '/users'],
             ['text' => 'Settings', 'url' => '/settings'],
             ['text' => 'Reports', 'url' => '/reports']

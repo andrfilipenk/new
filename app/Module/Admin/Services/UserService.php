@@ -31,7 +31,6 @@ class UserService extends BaseService
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
         }
-        
         return parent::create($data);
     }
 
@@ -47,7 +46,6 @@ class UserService extends BaseService
             // Remove empty password from update data
             unset($data['password']);
         }
-        
         return parent::update($record, $data);
     }
 

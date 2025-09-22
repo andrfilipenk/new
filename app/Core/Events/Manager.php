@@ -20,7 +20,6 @@ class Manager
         if (empty($this->listeners[$event])) {
             return;
         }
-
         foreach ($this->listeners[$event] as $priority => &$listeners) {
             if (($key = array_search($listener, $listeners, true)) !== false) {
                 unset($listeners[$key]);
@@ -45,31 +44,25 @@ class Manager
         if (is_string($event)) {
             $event = new Event($event, $data);
         }
-
         if (!$event instanceof Event) {
             throw new InvalidArgumentException('Event must be a string or an instance of Core\Events\Event');
         }
-
         foreach ($this->getListenersForEvent($event) as $listener) {
             if ($event->isPropagationStopped()) {
                 break;
             }
             $listener($event);
         }
-
         return $event;
     }
 
     public function getListenersForEvent(Event $event): iterable
     {
         $eventName = $event->getName();
-
         if (!isset($this->sorted[$eventName])) {
             $this->sortListeners($eventName);
         }
-
         $listeners = $this->sorted[$eventName] ?? [];
-
         // Add wildcard listeners
         foreach ($this->listeners as $eventPattern => $priorityListeners) {
             if (str_ends_with($eventPattern, '*') && str_starts_with($eventName, rtrim($eventPattern, '*'))) {
@@ -79,14 +72,12 @@ class Manager
                 $listeners = array_merge($listeners, $this->sorted[$eventPattern]);
             }
         }
-        
         // Re-sort if wildcards were added
         if (count($listeners) > count($this->sorted[$eventName] ?? [])) {
             // This is a simplified sort for the combined list.
             // A more robust implementation would re-sort based on original priorities.
             return $listeners;
         }
-
         return $listeners;
     }
 
@@ -96,7 +87,6 @@ class Manager
         if (empty($this->listeners[$event])) {
             return;
         }
-
         krsort($this->listeners[$event]);
         $this->sorted[$event] = array_merge(...array_values($this->listeners[$event]));
     }

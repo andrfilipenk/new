@@ -13,12 +13,12 @@ class Request
 
     public function __construct()
     {
-        $this->get = $_GET;
-        $this->post = $_POST;
-        $this->server = $_SERVER;
-        $this->headers = $this->extractHeaders();
-        $this->files = $this->normalizeFiles($_FILES);
-        $this->json = $this->parseJsonBody();
+        $this->get      = $_GET;
+        $this->post     = $_POST;
+        $this->server   = $_SERVER;
+        $this->headers  = $this->extractHeaders();
+        $this->files    = $this->normalizeFiles($_FILES);
+        $this->json     = $this->parseJsonBody();
     }
 
     public function get(string $key = null, $default = null)
@@ -33,9 +33,6 @@ class Request
         return $this->post[$key] ?? $default;
     }
 
-    /**
-     * Get input from POST, JSON, or GET, in that order.
-     */
     public function input(string $key, $default = null)
     {
         return $this->post[$key] 
@@ -43,10 +40,7 @@ class Request
             ?? $this->get[$key] 
             ?? $default;
     }
-
-    /**
-     * Get all input data from POST, JSON, and GET.
-     */
+    
     public function all(): array
     {
         return array_merge($this->get, $this->post, $this->json);
@@ -56,18 +50,12 @@ class Request
     {
         return isset($this->get[$key]) || isset($this->post[$key]) || isset($this->json[$key]);
     }
-
-    /**
-     * Get an uploaded file by its key.
-     */
+    
     public function file(string $key): ?UploadedFile
     {
         return $this->files[$key] ?? null;
     }
 
-    /**
-     * Get the request method, supporting method spoofing.
-     */
     public function method(): string
     {
         if (isset($this->post['_method'])) {
@@ -119,7 +107,6 @@ class Request
         if (function_exists('getallheaders')) {
             return array_change_key_case(getallheaders(), CASE_LOWER);
         }
-
         $headers = [];
         foreach ($this->server as $key => $value) {
             if (str_starts_with($key, 'HTTP_')) {
@@ -144,14 +131,13 @@ class Request
         $normalized = [];
         foreach ($files as $key => $file) {
             if (is_array($file['name'])) {
-                // Handle array of files
                 foreach ($file['name'] as $i => $name) {
                     $normalized[$key][$i] = new UploadedFile([
-                        'name' => $name,
-                        'type' => $file['type'][$i],
-                        'tmp_name' => $file['tmp_name'][$i],
-                        'error' => $file['error'][$i],
-                        'size' => $file['size'][$i],
+                        'name'      => $name,
+                        'type'      => $file['type'][$i],
+                        'tmp_name'  => $file['tmp_name'][$i],
+                        'error'     => $file['error'][$i],
+                        'size'      => $file['size'][$i],
                     ]);
                 }
             } else {
@@ -161,11 +147,3 @@ class Request
         return $normalized;
     }
 }
-
-// example usage in application code:
-// $request = new \Core\Http\Request();
-// $name = $request->input('name', 'Guest');
-// $file = $request->file('avatar');
-// if ($file && $file->isValid()) {
-//     $file->moveTo('/path/to/uploads/' . $file->getClientOriginalName());
-// }

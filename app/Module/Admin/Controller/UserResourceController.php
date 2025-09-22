@@ -13,16 +13,16 @@ use Module\Admin\Services\UserService;
  */
 class UserResourceController extends CrudController
 {
-    protected string $modelClass = Users::class;
-    protected string $formClass = UserForm::class;
-    protected string $serviceClass = UserService::class;
-    protected string $routePrefix = '/admin/users';
+    protected string $modelClass    = Users::class;
+    protected string $formClass     = UserForm::class;
+    protected string $serviceClass  = UserService::class;
+    protected string $routePrefix   = '/admin/users';
     
     protected array $validationRules = [
-        'name' => 'required|string|min:2|max:100',
-        'email' => 'required|email|unique:users,email',
+        'name'      => 'required|string|min:2|max:100',
+        'email'     => 'required|email|unique:users,email',
         'kuhnle_id' => 'required|numeric|min:1|max:9999|unique:users,kuhnle_id',
-        'password' => 'required|string|min:6'
+        'password'  => 'required|string|min:6'
     ];
     
     protected array $fillable = ['name', 'email', 'kuhnle_id', 'password'];
@@ -34,25 +34,22 @@ class UserResourceController extends CrudController
     public function indexAction(): string|\Core\Http\Response
     {
         $search = $this->getRequest()->get('search');
-        
         if ($search) {
             /** @var UserService $service */
-            $service = $this->getDI()->get($this->serviceClass);
-            $users = $service->searchUsers($search);
+            $service    = $this->getDI()->get($this->serviceClass);
+            $users      = $service->searchUsers($search);
         } else {
             $users = Users::all();
         }
-        
         if ($this->isJsonRequest()) {
             return $this->jsonResponse([
-                'success' => true,
-                'data' => $users
+                'success'   => true,
+                'data'      => $users
             ]);
         }
-        
         return $this->render('index', [
-            'users' => $users,
-            'search' => $search
+            'users'     => $users,
+            'search'    => $search
         ]);
     }
     
@@ -62,12 +59,11 @@ class UserResourceController extends CrudController
     public function activeAction(): \Core\Http\Response
     {
         /** @var UserService $service */
-        $service = $this->getDI()->get($this->serviceClass);
-        $users = $service->getActiveUsers();
-        
+        $service    = $this->getDI()->get($this->serviceClass);
+        $users      = $service->getActiveUsers();
         return $this->jsonResponse([
-            'success' => true,
-            'data' => $users
+            'success'   => true,
+            'data'      => $users
         ]);
     }
 }

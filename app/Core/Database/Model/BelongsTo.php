@@ -4,9 +4,6 @@ namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
 
-/**
- * BelongsTo Relationship
- */
 class BelongsTo extends Relation
 {
     protected $foreignKey;
@@ -15,7 +12,6 @@ class BelongsTo extends Relation
     public function __construct(DbModel $related, DbModel $parent, $foreignKey, $ownerKey)
     {
         parent::__construct($related, $parent);
-        
         $this->foreignKey = $foreignKey;
         $this->ownerKey = $ownerKey;
     }
@@ -31,7 +27,6 @@ class BelongsTo extends Relation
         $keys = array_unique(array_filter(array_map(function ($model) {
             return $model->getData($this->foreignKey);
         }, $models)));
-
         $this->query->whereIn($this->ownerKey, $keys);
     }
 
@@ -41,17 +36,12 @@ class BelongsTo extends Relation
         foreach ($results as $result) {
             $dictionary[$result->getData($this->ownerKey)] = $result;
         }
-
         foreach ($models as $model) {
             $key = $model->getData($this->foreignKey);
             if (isset($dictionary[$key])) {
                 $model->setRelation($relation, $dictionary[$key]);
             }
         }
-
         return $models;
     }
 }
-
-
-

@@ -4,9 +4,6 @@ namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
 
-/**
- * BelongsToMany Relationship
- */
 class BelongsToMany extends Relation
 {
     protected $table;
@@ -16,7 +13,6 @@ class BelongsToMany extends Relation
     public function __construct(DbModel $related, DbModel $parent, $table, $foreignPivotKey, $relatedPivotKey)
     {
         parent::__construct($related, $parent);
-        
         $this->table = $table;
         $this->foreignPivotKey = $foreignPivotKey;
         $this->relatedPivotKey = $relatedPivotKey;
@@ -25,7 +21,6 @@ class BelongsToMany extends Relation
     public function getResults()
     {
         $this->addJoin();
-        
         return $this->query
             ->where($this->table . '.' . $this->foreignPivotKey, $this->parent->getKey())
             ->get();
@@ -43,14 +38,12 @@ class BelongsToMany extends Relation
             $pivotKey = $result->pivot->{$this->foreignPivotKey};
             $dictionary[$pivotKey][] = $result;
         }
-
         foreach ($models as $model) {
             $key = $model->getKey();
             if (isset($dictionary[$key])) {
                 $model->setRelation($relation, $dictionary[$key]);
             }
         }
-
         return $models;
     }
 

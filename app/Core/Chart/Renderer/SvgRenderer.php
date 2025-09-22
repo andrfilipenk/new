@@ -8,17 +8,17 @@ namespace Core\Chart\Renderer;
  */
 class SvgRenderer
 {
-    private int $width = 800;
-    private int $height = 600;
+    private int $width      = 800;
+    private int $height     = 600;
     private string $background = '#ffffff';
     private array $elements = [];
-    private array $styles = [];
-    private array $scripts = [];
+    private array $styles   = [];
+    private array $scripts  = [];
 
     public function setDimensions(int $width, int $height): self
     {
-        $this->width = $width;
-        $this->height = $height;
+        $this->width    = $width;
+        $this->height   = $height;
         return $this;
     }
 
@@ -37,12 +37,11 @@ class SvgRenderer
     public function addRect(float $x, float $y, float $width, float $height, array $attributes = []): self
     {
         $attrs = $this->buildAttributes(array_merge([
-            'x' => $x,
-            'y' => $y,
-            'width' => $width,
-            'height' => $height
+            'x'         => $x,
+            'y'         => $y,
+            'width'     => $width,
+            'height'    => $height
         ], $attributes));
-
         $this->elements[] = "<rect {$attrs} />";
         return $this;
     }
@@ -50,11 +49,10 @@ class SvgRenderer
     public function addCircle(float $cx, float $cy, float $r, array $attributes = []): self
     {
         $attrs = $this->buildAttributes(array_merge([
-            'cx' => $cx,
-            'cy' => $cy,
-            'r' => $r
+            'cx'    => $cx,
+            'cy'    => $cy,
+            'r'     => $r
         ], $attributes));
-
         $this->elements[] = "<circle {$attrs} />";
         return $this;
     }
@@ -67,7 +65,6 @@ class SvgRenderer
             'x2' => $x2,
             'y2' => $y2
         ], $attributes));
-
         $this->elements[] = "<line {$attrs} />";
         return $this;
     }
@@ -85,7 +82,6 @@ class SvgRenderer
             'x' => $x,
             'y' => $y
         ], $attributes));
-
         $escapedText = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
         $this->elements[] = "<text {$attrs}>{$escapedText}</text>";
         return $this;
@@ -93,18 +89,16 @@ class SvgRenderer
 
     public function addPolygon(array $points, array $attributes = []): self
     {
-        $pointsStr = implode(' ', array_map(fn($p) => "{$p[0]},{$p[1]}", $points));
-        $attrs = $this->buildAttributes(array_merge(['points' => $pointsStr], $attributes));
-        
+        $pointsStr  = implode(' ', array_map(fn($p) => "{$p[0]},{$p[1]}", $points));
+        $attrs      = $this->buildAttributes(array_merge(['points' => $pointsStr], $attributes));
         $this->elements[] = "<polygon {$attrs} />";
         return $this;
     }
 
     public function addGroup(array $elements, array $attributes = []): self
     {
-        $attrs = $this->buildAttributes($attributes);
-        $content = implode("\n    ", $elements);
-        
+        $attrs      = $this->buildAttributes($attributes);
+        $content    = implode("\n    ", $elements);
         $this->elements[] = "<g {$attrs}>\n    {$content}\n</g>";
         return $this;
     }
@@ -125,21 +119,17 @@ class SvgRenderer
     {
         $stopElements = [];
         foreach ($stops as $stop) {
-            $offset = $stop['offset'] ?? 0;
-            $color = $stop['color'] ?? '#000000';
-            $opacity = isset($stop['opacity']) ? " stop-opacity=\"{$stop['opacity']}\"" : '';
+            $offset     = $stop['offset'] ?? 0;
+            $color      = $stop['color'] ?? '#000000';
+            $opacity    = isset($stop['opacity']) ? " stop-opacity=\"{$stop['opacity']}\"" : '';
             $stopElements[] = "<stop offset=\"{$offset}%\" stop-color=\"{$color}\"{$opacity} />";
         }
-
         $stopStr = implode("\n    ", $stopElements);
-        
         if ($type === 'radial') {
             $gradient = "<radialGradient id=\"{$id}\">\n    {$stopStr}\n</radialGradient>";
         } else {
             $gradient = "<linearGradient id=\"{$id}\">\n    {$stopStr}\n</linearGradient>";
         }
-
-        // Add to defs section
         $this->elements[] = "<defs>{$gradient}</defs>";
         return $this;
     }
@@ -153,29 +143,19 @@ class SvgRenderer
     public function render(): string
     {
         $svg = $this->buildSvgHeader();
-        
-        // Add styles
-        if (!empty($this->styles)) {
+        if (!empty($this->styles)) { // Add styles
             $styleContent = implode("\n", $this->styles);
             $svg .= "\n<style><![CDATA[\n{$styleContent}\n]]></style>";
         }
-
-        // Add background
-        if ($this->background !== 'transparent') {
+        if ($this->background !== 'transparent') { // Add background
             $svg .= "\n<rect width=\"{$this->width}\" height=\"{$this->height}\" fill=\"{$this->background}\" />";
         }
-
-        // Add elements
-        $svg .= "\n" . implode("\n", $this->elements);
-
-        // Add scripts
-        if (!empty($this->scripts)) {
+        $svg .= "\n" . implode("\n", $this->elements); // Add elements
+        if (!empty($this->scripts)) { // Add scripts
             $scriptContent = implode("\n", $this->scripts);
             $svg .= "\n<script><![CDATA[\n{$scriptContent}\n]]></script>";
         }
-
         $svg .= "\n</svg>";
-
         return $svg;
     }
 

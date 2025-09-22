@@ -21,7 +21,6 @@ trait Injectable
         if ($this->di === null) {
             $this->di = Container::getDefault();
         }
-        
         return $this->di;
     }
 
@@ -33,7 +32,6 @@ trait Injectable
         if ($this->di && $this->di->has($property)) {
             return $this->di->get($property);
         }
-        
         trigger_error("Undefined property: $property", E_USER_NOTICE);
         return null;
     }

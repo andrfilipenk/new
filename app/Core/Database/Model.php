@@ -10,19 +10,19 @@ use Core\Database\Model\BelongsToMany;
 
 abstract class Model
 {
-    protected $table = '';
-    protected $primaryKey = 'id';
-    protected array $attributes = [];
-    protected array $original = [];
-    protected array $relations = [];
-    protected bool $exists = false;
-    protected array $with = [];
-    protected array $fillable = [];
-    protected array $guarded = [];
-    protected array $hidden = [];
-    protected array $casts = [];
-    protected array $dates = [];
+    protected $table            = '';
+    protected $primaryKey       = 'id';
+    protected bool $exists      = false;
     protected bool $softDeletes = false;
+    protected array $attributes = [];
+    protected array $original   = [];
+    protected array $relations  = [];
+    protected array $with       = [];
+    protected array $fillable   = [];
+    protected array $guarded    = [];
+    protected array $hidden     = [];
+    protected array $casts      = [];
+    protected array $dates      = [];
     protected string $deletedAt = 'deleted_at';
     
     private static array $instances = [];
@@ -168,7 +168,6 @@ abstract class Model
         return $result;
     }
 
-    // Relationship methods - Fixed to work with Relations
     public function hasOne(string $related, ?string $foreignKey = null, ?string $localKey = null): HasOne
     {
         return new HasOne(

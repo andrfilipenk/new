@@ -14,11 +14,11 @@ class UploadedFile
 
     public function __construct(array $file)
     {
-        $this->name = $file['name'];
-        $this->type = $file['type'];
-        $this->tmpName = $file['tmp_name'];
-        $this->error = $file['error'];
-        $this->size = $file['size'];
+        $this->name     = $file['name'];
+        $this->type     = $file['type'];
+        $this->tmpName  = $file['tmp_name'];
+        $this->error    = $file['error'];
+        $this->size     = $file['size'];
     }
     
     public function moveTo(string $targetPath): bool
@@ -64,8 +64,8 @@ class UploadedFile
         if (!$this->isValid() || !file_exists($this->tmpName)) {
             return '';
         }
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mimeType = finfo_file($finfo, $this->tmpName);
+        $finfo      = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType   = finfo_file($finfo, $this->tmpName);
         finfo_close($finfo);
         return $mimeType ?: '';
     }

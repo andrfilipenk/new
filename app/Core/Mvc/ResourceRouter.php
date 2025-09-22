@@ -16,25 +16,20 @@ class ResourceRouter
      */
     public function resource(string $name, string $controller, array $options = []): array
     {
-        $prefix = $options['prefix'] ?? '';
-        $only = $options['only'] ?? $this->defaultActions;
-        $except = $options['except'] ?? [];
-        $as = $options['as'] ?? '';
-        
+        $prefix     = $options['prefix'] ?? '';
+        $only       = $options['only'] ?? $this->defaultActions;
+        $except     = $options['except'] ?? [];
+        $as         = $options['as'] ?? '';
         // Filter actions
-        $actions = array_diff($only, $except);
-        
-        $routes = [];
-        
+        $actions    = array_diff($only, $except);
+        $routes     = [];
         foreach ($actions as $action) {
             $route = $this->generateRoute($name, $action, $controller, $prefix, $as);
             if ($route) {
                 $routes[] = $route;
             }
         }
-        
         $this->resources[$name] = $routes;
-        
         return $routes;
     }
     
@@ -44,7 +39,6 @@ class ResourceRouter
     public function resources(array $resources): array
     {
         $allRoutes = [];
-        
         foreach ($resources as $name => $config) {
             if (is_string($config)) {
                 // Simple case: name => controller
@@ -55,10 +49,8 @@ class ResourceRouter
                 $options = $config[1] ?? [];
                 $routes = $this->resource($name, $controller, $options);
             }
-            
             $allRoutes = array_merge($allRoutes, $routes);
         }
-        
         return $allRoutes;
     }
     
@@ -104,20 +96,17 @@ class ResourceRouter
                 'action' => 'destroy'
             ]
         ];
-        
         if (!isset($routeMap[$action])) {
             return null;
         }
-        
-        $route = $routeMap[$action];
-        $name = $as ? "{$as}.{$action}" : "{$resource}.{$action}";
-        
+        $route  = $routeMap[$action];
+        $name   = $as ? "{$as}.{$action}" : "{$resource}.{$action}";
         return [
-            'pattern' => $route['pattern'],
-            'controller' => $controller,
-            'action' => $route['action'],
-            'method' => $route['method'],
-            'name' => $name
+            'pattern'       => $route['pattern'],
+            'controller'    => $controller,
+            'action'        => $route['action'],
+            'method'        => $route['method'],
+            'name'          => $name
         ];
     }
     
@@ -143,25 +132,21 @@ class ResourceRouter
     public function toRouterConfig(): array
     {
         $config = [];
-        
         foreach ($this->resources as $resourceName => $routes) {
             foreach ($routes as $route) {
                 $pattern = $route['pattern'];
-                
                 // Handle multiple HTTP methods
                 $methods = is_array($route['method']) ? $route['method'] : [$route['method']];
-                
                 foreach ($methods as $method) {
                     $key = strtoupper($method) . ' ' . $pattern;
                     $config[$key] = [
-                        'controller' => $route['controller'],
-                        'action' => $route['action'],
-                        'method' => strtoupper($method)
+                        'controller'    => $route['controller'],
+                        'action'        => $route['action'],
+                        'method'        => strtoupper($method)
                     ];
                 }
             }
         }
-        
         return $config;
     }
     
@@ -172,7 +157,6 @@ class ResourceRouter
     {
         // API resources typically don't need create/edit forms
         $options['except'] = array_merge($options['except'] ?? [], ['create', 'edit']);
-        
         return $this->resource($name, $controller, $options);
     }
     
@@ -183,7 +167,6 @@ class ResourceRouter
     {
         $prefix = $options['prefix'] ?? '';
         $options['prefix'] = "{$prefix}{$parent}/{parent_id}/";
-        
         return $this->resource($child, $controller, $options);
     }
 }

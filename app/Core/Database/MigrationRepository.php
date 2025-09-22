@@ -17,6 +17,7 @@ class MigrationRepository
      * @var \Core\Database\Database
      */
     protected $db;
+    
     protected $table = 'migrations';
 
     public function __construct()
@@ -50,7 +51,6 @@ class MigrationRepository
             ->orderBy('batch', 'ASC')
             ->orderBy('migration', 'ASC')
             ->get();
-            
         return array_map(function($item) {
             return $item['migration'];
         }, $results);
@@ -65,7 +65,6 @@ class MigrationRepository
             ->where('batch', $batch)
             ->orderBy('migration', 'ASC')
             ->get();
-            
         return array_map(function($item) {
             return $item->migration;
         }, $results);
@@ -79,7 +78,6 @@ class MigrationRepository
         $result = $this->db->table($this->table)
             ->select(['MAX(batch) as last_batch'])
             ->first();
-            
         return $result ? $result['last_batch'] : 0;
     }
 

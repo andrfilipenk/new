@@ -45,7 +45,6 @@ abstract class CrudController extends Controller
         if (!$this->modelClass) {
             throw new Exception("Model class must be defined in " . static::class);
         }
-        
         if (!$this->routePrefix) {
             $this->routePrefix = $this->generateRoutePrefix();
         }
@@ -58,30 +57,25 @@ abstract class CrudController extends Controller
     {
         try {
             $query = $this->getModelQuery();
-            
             // Apply eager loading
             if (!empty($this->with)) {
                 $query = $this->modelClass::with($this->with);
             }
-            
             // Handle pagination
-            $page = (int) $this->getRequest()->get('page', 1);
-            $records = $this->paginate($query, $page);
-            
+            $page       = (int) $this->getRequest()->get('page', 1);
+            $records    = $this->paginate($query, $page);
             // Handle JSON API requests
             if ($this->isJsonRequest()) {
                 return $this->jsonResponse([
-                    'success' => true,
-                    'data' => $records,
-                    'meta' => $this->getPaginationMeta($records, $page)
+                    'success'   => true,
+                    'data'      => $records,
+                    'meta'      => $this->getPaginationMeta($records, $page)
                 ]);
             }
-            
             return $this->render('index', [
-                'records' => $records,
-                'pagination' => $this->getPaginationData($records, $page)
+                'records'       => $records,
+                'pagination'    => $this->getPaginationData($records, $page)
             ]);
-            
         } catch (Exception $e) {
             return $this->handleError($e, 'Failed to fetch records');
         }
@@ -94,18 +88,16 @@ abstract class CrudController extends Controller
     {
         if ($this->isJsonRequest()) {
             return $this->jsonResponse([
-                'success' => true,
-                'data' => [],
-                'validation_rules' => $this->validationRules
+                'success'           => true,
+                'data'              => [],
+                'validation_rules'  => $this->validationRules
             ]);
         }
-        
         $form = $this->buildForm();
-        
         return $this->render('form', [
-            'form' => $form->render(),
-            'record' => null,
-            'action' => 'create'
+            'form'      => $form->render(),
+            'record'    => null,
+            'action'    => 'create'
         ]);
     }
 
@@ -115,21 +107,17 @@ abstract class CrudController extends Controller
     public function storeAction(): Response
     {
         try {
-            $data = $this->getValidatedData();
-            
+            $data   = $this->getValidatedData();
             $record = $this->createRecord($data);
-            
             if ($this->isJsonRequest()) {
                 return $this->jsonResponse([
-                    'success' => true,
-                    'data' => $record->getData(),
-                    'message' => $this->getSuccessMessage('created')
+                    'success'   => true,
+                    'data'      => $record->getData(),
+                    'message'   => $this->getSuccessMessage('created')
                 ], Response::HTTP_CREATED);
             }
-            
             $this->flashSuccess($this->getSuccessMessage('created'));
             return $this->redirect($this->routePrefix);
-            
         } catch (Exception $e) {
             return $this->handleValidationError($e, 'create');
         }
@@ -141,18 +129,15 @@ abstract class CrudController extends Controller
     public function showAction(): string|Response
     {
         try {
-            $id = $this->getRouteParam('id');
+            $id     = $this->getRouteParam('id');
             $record = $this->findRecord($id);
-            
             if ($this->isJsonRequest()) {
                 return $this->jsonResponse([
-                    'success' => true,
-                    'data' => $record->getData()
+                    'success'   => true,
+                    'data'      => $record->getData()
                 ]);
             }
-            
             return $this->render('show', ['record' => $record]);
-            
         } catch (Exception $e) {
             return $this->handleError($e, 'Record not found');
         }
@@ -164,25 +149,21 @@ abstract class CrudController extends Controller
     public function editAction(): string|Response
     {
         try {
-            $id = $this->getRouteParam('id');
+            $id     = $this->getRouteParam('id');
             $record = $this->findRecord($id);
-            
             if ($this->isJsonRequest()) {
                 return $this->jsonResponse([
-                    'success' => true,
-                    'data' => $record->getData(),
-                    'validation_rules' => $this->validationRules
+                    'success'           => true,
+                    'data'              => $record->getData(),
+                    'validation_rules'  => $this->validationRules
                 ]);
             }
-            
             $form = $this->buildForm($record->getData());
-            
             return $this->render('form', [
-                'form' => $form->render(),
-                'record' => $record,
-                'action' => 'edit'
+                'form'      => $form->render(),
+                'record'    => $record,
+                'action'    => 'edit'
             ]);
-            
         } catch (Exception $e) {
             return $this->handleError($e, 'Record not found');
         }
@@ -194,23 +175,19 @@ abstract class CrudController extends Controller
     public function updateAction(): Response
     {
         try {
-            $id = $this->getRouteParam('id');
+            $id     = $this->getRouteParam('id');
             $record = $this->findRecord($id);
-            $data = $this->getValidatedData();
-            
+            $data   = $this->getValidatedData();
             $this->updateRecord($record, $data);
-            
             if ($this->isJsonRequest()) {
                 return $this->jsonResponse([
-                    'success' => true,
-                    'data' => $record->getData(),
-                    'message' => $this->getSuccessMessage('updated')
+                    'success'   => true,
+                    'data'      => $record->getData(),
+                    'message'   => $this->getSuccessMessage('updated')
                 ]);
             }
-            
             $this->flashSuccess($this->getSuccessMessage('updated'));
             return $this->redirect($this->routePrefix);
-            
         } catch (Exception $e) {
             return $this->handleValidationError($e, 'edit');
         }
@@ -222,18 +199,15 @@ abstract class CrudController extends Controller
     public function destroyAction(): Response
     {
         try {
-            $id = $this->getRouteParam('id');
+            $id     = $this->getRouteParam('id');
             $record = $this->findRecord($id);
-            
             $this->deleteRecord($record);
-            
             if ($this->isJsonRequest()) {
                 return $this->jsonResponse([
                     'success' => true,
                     'message' => $this->getSuccessMessage('deleted')
                 ]);
             }
-            
             $this->flashSuccess($this->getSuccessMessage('deleted'));
             return $this->redirect($this->routePrefix);
             
@@ -254,13 +228,10 @@ abstract class CrudController extends Controller
         $query = !empty($this->with) ? 
             $this->modelClass::with($this->with) : 
             $this->modelClass::query();
-            
         $record = $query->where($this->getModelInstance()->getKeyName(), $id)->first();
-        
         if (!$record) {
             throw new Exception("Record not found with ID: {$id}");
         }
-        
         return $this->modelClass::newFromBuilder($record);
     }
     
@@ -270,13 +241,10 @@ abstract class CrudController extends Controller
             $service = $this->getDI()->get($this->serviceClass);
             return $service->create($data);
         }
-        
         $record = new $this->modelClass($data);
-        
         if (!$record->save()) {
             throw new Exception("Failed to create record");
         }
-        
         return $record;
     }
     
@@ -286,13 +254,10 @@ abstract class CrudController extends Controller
             $service = $this->getDI()->get($this->serviceClass);
             return $service->update($record, $data);
         }
-        
         $record->fill($data);
-        
         if (!$record->save()) {
             throw new Exception("Failed to update record");
         }
-        
         return $record;
     }
     
@@ -302,31 +267,25 @@ abstract class CrudController extends Controller
             $service = $this->getDI()->get($this->serviceClass);
             return $service->delete($record);
         }
-        
         if (method_exists($record, 'delete')) {
             return $record->delete();
         }
-        
         throw new Exception("Delete method not implemented");
     }
     
     protected function getValidatedData(): array
     {
         $data = $this->getRequest()->all();
-        
         if (!empty($this->validationRules)) {
             $validator = new Validator($data, $this->validationRules);
-            
             if (!$validator->passes()) {
                 $this->throwValidationException($validator->errors());
             }
         }
-        
         // Filter only fillable fields
         if (!empty($this->fillable)) {
             $data = array_intersect_key($data, array_flip($this->fillable));
         }
-        
         return $data;
     }
     
@@ -335,7 +294,6 @@ abstract class CrudController extends Controller
         if (!$this->formClass) {
             throw new Exception("Form class not defined");
         }
-        
         return $this->formClass::build($values);
     }
     
@@ -364,10 +322,9 @@ abstract class CrudController extends Controller
     
     protected function generateRoutePrefix(): string
     {
-        $parts = explode('\\', static::class);
+        $parts      = explode('\\', static::class);
         $controller = end($parts);
-        $module = strtolower($parts[1] ?? 'base');
-        
+        $module     = strtolower($parts[1] ?? 'base');
         return "/{$module}/" . strtolower(str_replace('Controller', '', $controller));
     }
     
@@ -393,12 +350,11 @@ abstract class CrudController extends Controller
     {
         if ($this->isJsonRequest()) {
             return $this->jsonResponse([
-                'success' => false,
-                'error' => $message,
-                'details' => $e->getMessage()
+                'success'   => false,
+                'error'     => $message,
+                'details'   => $e->getMessage()
             ], Response::HTTP_NOT_FOUND);
         }
-        
         $this->flashError($message);
         return $this->redirect($this->routePrefix);
     }
@@ -407,14 +363,12 @@ abstract class CrudController extends Controller
     {
         if ($this->isJsonRequest()) {
             return $this->jsonResponse([
-                'success' => false,
-                'error' => 'Validation failed',
-                'details' => $e->getMessage()
+                'success'   => false,
+                'error'     => 'Validation failed',
+                'details'   => $e->getMessage()
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        
         $this->flashError('Please correct the errors below.');
-        
         // Redirect back to form with errors
         return $action === 'create' ? 
             $this->redirect($this->routePrefix . '/create') :
@@ -429,9 +383,9 @@ abstract class CrudController extends Controller
     protected function getPaginationMeta(array $records, int $page): array
     {
         return [
-            'current_page' => $page,
-            'per_page' => $this->perPage,
-            'total' => count($records)
+            'current_page'  => $page,
+            'per_page'      => $this->perPage,
+            'total'         => count($records)
         ];
     }
     

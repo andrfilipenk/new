@@ -63,13 +63,12 @@ class Tag
         if (empty($this->attributes)) {
             return '';
         }
-        
         $attrs = [];
         foreach ($this->attributes as $name => $value) {
             if ($value === true) {
                 $attrs[] = $name;
             } elseif ($value !== false && $value !== null) {
-                $attrs[] = $name . '="' . htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8') . '"';
+                $attrs[] = $name . '="' . $this->escape((string)$value) . '"';
             }
         }
         
@@ -81,7 +80,7 @@ class Tag
         $content = '';
         foreach ($this->content as $item) {
             if (is_string($item)) {
-                $content .= $this->escapeContent ? htmlspecialchars($item, ENT_QUOTES, 'UTF-8') : $item;
+                $content .= $this->escapeContent ? $this->escape($item) : $item;
             } elseif (is_object($item) && method_exists($item, '__toString')) {
                 $content .= (string)$item;
             } elseif (is_array($item)) {
@@ -99,14 +98,13 @@ class Tag
         $content = '';
         foreach ($items as $item) {
             if (is_string($item)) {
-                $content .= $this->escapeContent ? htmlspecialchars($item, ENT_QUOTES, 'UTF-8') : $item;
+                $content .= $this->escapeContent ? $this->escape($item) : $item;
             } elseif (is_object($item) && method_exists($item, '__toString')) {
                 $content .= (string)$item;
             } else {
                 $content .= (string)$item;
             }
         }
-        
         return $content;
     }
 
@@ -118,7 +116,6 @@ class Tag
     public static function __callStatic(string $name, array $args): self
     {
         $tag = new self($name);
-
         // Void tags should treat first argument as attributes.
         if (in_array($tag->tag, self::$voidTags)) {
             if (isset($args[0]) && is_array($args[0])) {
@@ -153,9 +150,9 @@ class Tag
     public static function stylesheet(string $href, array $attrs = []): self
     {
         return self::__callStatic('link', [])->attrs(array_merge([
-            'rel' => 'stylesheet',
-            'href' => $href,
-            'type' => 'text/css'
+            'rel'   => 'stylesheet',
+            'href'  => $href,
+            'type'  => 'text/css'
         ], $attrs));
     }
 
@@ -169,8 +166,8 @@ class Tag
     public static function meta(string $name, string $content, array $attrs = []): self
     {
         return self::metaTag(array_merge([
-            'name' => $name,
-            'content' => $content
+            'name'      => $name,
+            'content'   => $content
         ], $attrs));
     }
 
@@ -189,7 +186,11 @@ class Tag
 
     public static function csrfField(string $token): self
     {
-        return self::input(['type' => 'hidden', 'name' => '_token', 'value' => $token]);
+        return self::input([
+            'type'  => 'hidden', 
+            'name'  => '_token', 
+            'value' => $token
+        ]);
     }
 
     public static function join(array $tags, string $separator = ''): string
@@ -202,7 +203,6 @@ class Tag
                 $result .= (string)$tag . $separator;
             }
         }
-        
         return $result;
     }
 
@@ -216,57 +216,3 @@ class Tag
         return htmlspecialchars_decode($content, ENT_QUOTES);
     }
 }
-
-/*
-
-// Basic usage
-echo Tag::div('Hello World', ['class' => 'container']);
-// <div class="container">Hello World</div>
-
-// Multiple attributes
-echo Tag::input([
-    'type' => 'text',
-    'name' => 'username',
-    'placeholder' => 'Enter username'
-]);
-
-// Raw content
-echo Tag::div()->rawContent('<strong>Bold text</strong>');
-// <div><strong>Bold text</strong></div>
-
-// Helper methods
-echo Tag::link('/about', 'About Us', ['class' => 'nav-link']);
-// <a href="/about" class="nav-link">About Us</a>
-
-// CSRF protection
-echo Tag::csrfMetaTag($token);
-// <meta name="csrf-token" content="...">
-
-echo Tag::csrfField($token);
-// <input type="hidden" name="_token" value="...">
-
-// Joining tags
-$tags = [
-    Tag::li('Item 1'),
-    Tag::li('Item 2'),
-    Tag::li('Item 3')
-];
-echo Tag::ul(Tag::join($tags));
-// <ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>
-
-
-// This will now correctly generate:
-// <link rel="stylesheet" href="/css/app.css" type="text/css">
-echo Tag::stylesheet('/css/app.css');
-
-// With additional attributes:
-echo Tag::stylesheet('/css/app.css', [
-    'media' => 'screen',
-    'integrity' => 'sha256-hash'
-]);
-
-
-
-
-
-*/

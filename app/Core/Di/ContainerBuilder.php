@@ -8,8 +8,8 @@ use Core\Di\Interface\Container as ContainerInterface;
  */
 class ContainerBuilder
 {
-    protected $definitions = [];
-    protected $providers = [];
+    protected $definitions  = [];
+    protected $providers    = [];
 
     public function addDefinition(string $id, $concrete): self
     {
@@ -32,12 +32,10 @@ class ContainerBuilder
     public function build(): ContainerInterface
     {
         $container = new Container($this->definitions);
-        
         // Register providers
         foreach ($this->providers as $provider) {
             $container->register($provider);
         }
-        
         return $container;
     }
 }

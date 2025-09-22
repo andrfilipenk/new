@@ -14,17 +14,16 @@ use Core\Chart\Exception\ChartException;
 class ChartBuilder
 {
     private ?ChartInterface $chart = null;
-    private array $data = [];
-    private array $config = [];
-    private int $width = 800;
-    private int $height = 600;
-    private string $title = '';
+    private int $width      = 800;
+    private int $height     = 600;
+    private array $data     = [];
+    private array $config   = [];
+    private string $title   = '';
     
-    // Available chart types
     private const CHART_TYPES = [
-        'bar' => BarChart::class,
-        'line' => LineChart::class,
-        'pie' => PieChart::class
+        'bar'   => BarChart::class,
+        'line'  => LineChart::class,
+        'pie'   => PieChart::class
     ];
 
     /**
@@ -35,10 +34,8 @@ class ChartBuilder
         if (!isset(self::CHART_TYPES[$type])) {
             throw new ChartException("Unsupported chart type: {$type}");
         }
-        
         $chartClass = self::CHART_TYPES[$type];
         $this->chart = new $chartClass();
-        
         return $this;
     }
 
@@ -112,10 +109,10 @@ class ChartBuilder
     public function padding(int $top, int $right, int $bottom, int $left): self
     {
         $this->config['padding'] = [
-            'top' => $top,
-            'right' => $right,
-            'bottom' => $bottom,
-            'left' => $left
+            'top'       => $top,
+            'right'     => $right,
+            'bottom'    => $bottom,
+            'left'      => $left
         ];
         return $this;
     }
@@ -155,7 +152,6 @@ class ChartBuilder
         if (!in_array($orientation, ['vertical', 'horizontal'])) {
             throw new ChartException("Invalid orientation: {$orientation}");
         }
-        
         $this->config['orientation'] = $orientation;
         return $this;
     }
@@ -204,13 +200,11 @@ class ChartBuilder
         if ($this->chart === null) {
             throw new ChartException('Chart type must be set before building');
         }
-
         $this->chart
             ->setData($this->data)
             ->setConfig($this->config)
             ->setDimensions($this->width, $this->height)
             ->setTitle($this->title);
-
         return $this->chart;
     }
 
@@ -261,8 +255,11 @@ class ChartBuilder
     {
         return self::bar()
             ->data([
-                'labels' => $labels,
-                'datasets' => [['data' => $values, 'label' => 'Values']]
+                'labels'    => $labels,
+                'datasets'  => [[
+                    'data'      => $values, 
+                    'label'     => 'Values'
+                    ]]
             ])
             ->title($title)
             ->render();
@@ -275,8 +272,11 @@ class ChartBuilder
     {
         return self::line()
             ->data([
-                'labels' => $labels,
-                'datasets' => [['data' => $values, 'label' => 'Values']]
+                'labels'    => $labels,
+                'datasets'  => [[
+                    'data'      => $values, 
+                    'label'     => 'Values'
+                    ]]
             ])
             ->title($title)
             ->render();
@@ -304,23 +304,18 @@ class ChartBuilder
         if (isset($chartConfig['type'])) {
             $this->type($chartConfig['type']);
         }
-
         if (isset($chartConfig['data'])) {
             $this->data($chartConfig['data']);
         }
-
         if (isset($chartConfig['width'], $chartConfig['height'])) {
             $this->size($chartConfig['width'], $chartConfig['height']);
         }
-
         if (isset($chartConfig['title'])) {
             $this->title($chartConfig['title']);
         }
-
         if (isset($chartConfig['config'])) {
             $this->config($chartConfig['config']);
         }
-
         return $this;
     }
 
@@ -330,12 +325,12 @@ class ChartBuilder
     public function toConfig(): array
     {
         return [
-            'type' => $this->chart ? $this->chart->getType() : null,
-            'data' => $this->data,
-            'config' => $this->config,
-            'width' => $this->width,
-            'height' => $this->height,
-            'title' => $this->title
+            'type'      => $this->chart ? $this->chart->getType() : null,
+            'data'      => $this->data,
+            'config'    => $this->config,
+            'width'     => $this->width,
+            'height'    => $this->height,
+            'title'     => $this->title
         ];
     }
 }

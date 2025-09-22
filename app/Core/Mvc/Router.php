@@ -9,32 +9,22 @@ class Router
     
     public function add(string $pattern, array $config): void
     {
-        // Convert pattern to regex
         $regex = $this->patternToRegex($pattern);
-        
         $this->routes[] = [
-            'pattern' => $pattern,
-            'regex' => $regex,
-            'config' => $config
+            'pattern'   => $pattern,
+            'regex'     => $regex,
+            'config'    => $config
         ];
     }
     
     public function match(string $uri, string $method): ?array
     {
         $uri = trim($uri, '/');
-        
         foreach ($this->routes as $route) {
-            // Check if HTTP method matches (if specified in route config)
             $methodMatch = !isset($route['config']['method']) || strcasecmp($route['config']['method'], $method) === 0;
-
             if ($methodMatch && preg_match($route['regex'], $uri, $matches)) {
-                // Filter out numeric keys (keep only named captures)
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
-                
-                // Store current route
                 $this->currentRoute = $route;
-                
-                // Merge params with config
                 return $this->buildResult($route['config'], $params);
             }
         }
@@ -48,23 +38,15 @@ class Router
     
     protected function patternToRegex(string $pattern): string
     {
-        // Escape forward slashes
         $regex = preg_quote(trim($pattern, '/'), '#');
-        
-        // Handle wildcards
         $regex = str_replace('\*', '.*', $regex);
-        
-        // Handle named parameters
         $regex = preg_replace('/\\\{([a-zA-Z_][a-zA-Z0-9_]*)\\\}/', '(?P<$1>[^/]+)', $regex);
-        
         return '#^' . $regex . '$#';
     }
     
     protected function buildResult(array $config, array $params): array
     {
         $result = $config;
-        
-        // Replace placeholders in controller and action
         foreach (['controller', 'action'] as $key) {
             if (isset($result[$key])) {
                 $result[$key] = $this->replacePlaceholders($result[$key], $params);
@@ -73,10 +55,7 @@ class Router
                 unset($params[$key]);
             }
         }
-        
-        // Add params to result
         $result['params'] = $params;
-        
         return $result;
     }
     

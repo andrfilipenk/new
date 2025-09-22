@@ -2,13 +2,10 @@
 // app/Core/Database/Blueprint.php
 namespace Core\Database;
 
-/**
- * Schema Blueprint for table creation and modification
- */
 class Blueprint
 {
     protected $table;
-    protected $columns = [];
+    protected $columns  = [];
     protected $commands = [];
 
     public function __construct($table)
@@ -69,9 +66,9 @@ class Blueprint
 
     public function toSql(): string
     {
-        $columnsSql = [];
-        $primaryKeys = [];
-        $foreignKeys = [];
+        $columnsSql     = [];
+        $primaryKeys    = [];
+        $foreignKeys    = [];
         foreach ($this->columns as $column) {
             if ($column->get('type') === 'FOREIGN') {
                 $foreignKeys[] = $column->toSql();

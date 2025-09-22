@@ -14,13 +14,11 @@ class Session implements SessionInterface
 
     public function __construct()
     {
-        // Auto-start session if not already started
         if (session_status() === PHP_SESSION_NONE) {
             $this->start();
         } else {
             $this->started = true;
         }
-        // Initialize flash messages
         $this->initFlash();
     }
 
@@ -29,11 +27,9 @@ class Session implements SessionInterface
         if ($this->started) {
             return true;
         }
-        // Trigger beforeStart event
         $this->fireEvent('session:beforeStart', $this);
         $this->started = session_start();
         if ($this->started) {
-            // Trigger afterStart event
             $this->fireEvent('session:afterStart', $this);
         }
         return $this->started;
@@ -121,18 +117,15 @@ class Session implements SessionInterface
     public function destroy()
     {
         if ($this->started) {
-            // Trigger beforeDestroy event
             $this->fireEvent('session:beforeDestroy', $this);
             session_destroy();
             $this->started = false;
-            // Trigger afterDestroy event
             $this->fireEvent('session:afterDestroy', $this);
         }
     }
 
     public function __destruct()
     {
-        // Move new flash messages to old for next request
         $this->ageFlash();
     }
 

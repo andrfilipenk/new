@@ -4,9 +4,6 @@ namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
 
-/**
- * Base Relation class
- */
 abstract class Relation
 {
     protected $related;
@@ -15,9 +12,9 @@ abstract class Relation
     
     public function __construct(DbModel $related, DbModel $parent)
     {
-        $this->related = $related;
-        $this->parent = $parent;
-        $this->query = $related->newQuery();
+        $this->related  = $related;
+        $this->parent   = $parent;
+        $this->query    = $related->newQuery();
     }
     
     abstract public function getResults();
@@ -25,7 +22,7 @@ abstract class Relation
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param  DbModel[]  $models
      * @return void
      */
     abstract public function addEagerConstraints(array $models);
@@ -33,9 +30,9 @@ abstract class Relation
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
+     * @param  DbModel[]   $models
      * @param  array   $results
-     * @param  string  $relation
+     * @param  DbModel[]  $relation
      * @return array
      */
     abstract public function match(array $models, array $results, $relation);

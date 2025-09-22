@@ -120,10 +120,13 @@ class Validator
             [$name, $parameters] = explode(':', $rule, 2);
             $parameters = explode(',', $parameters);
         } else {
-            $name = $rule;
+            $name       = $rule;
             $parameters = [];
         }
-        return ['name' => $name, 'parameters' => $parameters];
+        return [
+            'name'          => $name, 
+            'parameters'    => $parameters
+        ];
     }
 
     protected function addError(string $field, string $message): void
@@ -147,9 +150,6 @@ class Validator
         return new static($data, $rules, $messages);
     }
 
-    /**
-     * Validate data and return it or throw exception
-     */
     public static function validate(array $data, array $rules, array $messages = []): array
     {
         $validator = static::make($data, $rules, $messages);

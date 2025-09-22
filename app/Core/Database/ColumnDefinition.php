@@ -2,9 +2,6 @@
 // app/Core/Database/ColumnDefinition.php
 namespace Core\Database;
 
-/**
- * Represents a single column definition in a blueprint.
- */
 class ColumnDefinition
 {
     protected $attributes = [];
@@ -77,7 +74,6 @@ class ColumnDefinition
                 $this->get('references')
             );
         }
-
         $sql = "`{$this->get('name')}` {$this->get('type')}";
         if ($this->get('unsigned')) $sql .= ' UNSIGNED';
         $sql .= $this->get('nullable') ? ' NULL' : ' NOT NULL';

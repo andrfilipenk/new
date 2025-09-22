@@ -156,34 +156,34 @@ class ChartThemes
     {
         return [
             'colors' => ['#ff4757', '#2ed573', '#1e90ff', '#ffa502', '#ff6348', '#5352ed'],
-            'background' => '#ffffff',
-            'grid' => [
-                'show' => true,
-                'color' => '#f1f2f6',
-                'strokeWidth' => 1
+            'background'    => '#ffffff',
+            'grid'          => [
+                'show'          => true,
+                'color'         => '#f1f2f6',
+                'strokeWidth'   => 1
             ],
-            'axis' => [
-                'show' => true,
-                'color' => '#57606f',
-                'strokeWidth' => 2
+            'axis'          => [
+                'show'          => true,
+                'color'         => '#57606f',
+                'strokeWidth'   => 2
             ],
-            'labels' => [
-                'show' => true,
-                'color' => '#2f3542',
-                'fontSize' => 12,
-                'fontFamily' => 'Arial, sans-serif'
+            'labels'        => [
+                'show'          => true,
+                'color'         => '#2f3542',
+                'fontSize'      => 12,
+                'fontFamily'    => 'Arial, sans-serif'
             ],
-            'legend' => [
-                'show' => true,
-                'position' => 'right',
-                'color' => '#2f3542',
-                'fontSize' => 11
+            'legend'        => [
+                'show'          => true,
+                'position'      => 'right',
+                'color'         => '#2f3542',
+                'fontSize'      => 11
             ],
-            'padding' => [
-                'top' => 40,
-                'right' => 120,
-                'bottom' => 60,
-                'left' => 80
+            'padding'       => [
+                'top'           => 40,
+                'right'         => 120,
+                'bottom'        => 60,
+                'left'          => 80
             ]
         ];
     }
@@ -194,11 +194,11 @@ class ChartThemes
     public static function all(): array
     {
         return [
-            'modern' => self::modern(),
-            'dark' => self::dark(),
-            'minimal' => self::minimal(),
+            'modern'    => self::modern(),
+            'dark'      => self::dark(),
+            'minimal'   => self::minimal(),
             'corporate' => self::corporate(),
-            'vibrant' => self::vibrant()
+            'vibrant'   => self::vibrant()
         ];
     }
 
@@ -208,11 +208,9 @@ class ChartThemes
     public static function get(string $theme): array
     {
         $themes = self::all();
-        
         if (!isset($themes[$theme])) {
             throw new \InvalidArgumentException("Unknown theme: {$theme}");
         }
-        
         return $themes[$theme];
     }
 }

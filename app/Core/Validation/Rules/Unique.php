@@ -19,7 +19,9 @@ class Unique implements RuleInterface
         if (!$table) {
             return false;
         }
-        $query = Container::getDefault()->get('db')
+        /** @var \Core\Database\Database $db */
+        $db = Container::getDefault()->get('db');
+        $query = $db
             ->table($table)
             ->where($column, $value);
         if ($except) {

@@ -9,9 +9,9 @@ class QueryBuilder
 
     public function __construct(string $model, array $relations = [])
     {
-        $this->model = $model;
-        $this->relations = $this->normalizeRelations($relations);
-        $this->query = $this->model::query();
+        $this->model        = $model;
+        $this->relations    = $this->normalizeRelations($relations);
+        $this->query        = $this->model::query();
     }
 
     public function where(string $column, mixed $operator = null, mixed $value = null): self
@@ -42,11 +42,9 @@ class QueryBuilder
     {
         $results = $this->query->get();
         $models = array_map([$this->model, 'newFromBuilder'], $results);
-
         if (!empty($this->relations) && !empty($models)) {
             $this->eagerLoadRelations($models, $this->relations);
         }
-
         return $models;
     }
 
@@ -54,13 +52,10 @@ class QueryBuilder
     {
         $result = $this->query->first();
         if (!$result) return null;
-
         $model = $this->model::newFromBuilder($result);
-
         if (!empty($this->relations)) {
             $this->eagerLoadRelations([$model], $this->relations);
         }
-
         return $model;
     }
 
@@ -91,7 +86,6 @@ class QueryBuilder
             $nested = explode('.', $relation, 2);
             $name = $nested[0];
             $nestedRelations = isset($nested[1]) ? [$nested[1] => $constraint] : [];
-
             // build dictionary for nested relations
             $relationInstances = [];
             foreach ($models as $model) {
@@ -100,22 +94,18 @@ class QueryBuilder
             }
             if (empty($relationInstances)) continue;
             $relationInstance = $relationInstances[0];
-
             // Apply eager constraints
             $relationInstance->addEagerConstraints($models);
             if ($constraint && is_callable($constraint)) {
                 $constraint($relationInstance->getQuery());
             }
-
             $results = $relationInstance->getQuery()->get();
             $relationModels = array_map(
                 [get_class($relationInstance->getRelatedInstance()), 'newFromBuilder'],
                 $results
             );
-
             // Match models to parents
             $relationInstance->match($models, $relationModels, $name);
-
             // Nested eager load
             if ($nestedRelations) {
                 // Gather all related models (flatten array if hasMany/belongsToMany)

@@ -11,15 +11,17 @@ class Database
     use Injectable;
 
     private ?PDO $pdo = null;
+    
     private string $table = '';
+
     private array $query = [
-        'select' => ['*'],
-        'where' => [],
-        'bindings' => [],
-        'order' => [],
-        'limit' => null,
-        'offset' => null,
-        'join' => []
+        'select'    => ['*'],
+        'where'     => [],
+        'bindings'  => [],
+        'order'     => [],
+        'limit'     => null,
+        'offset'    => null,
+        'join'      => []
     ];
 
     public function __construct()
@@ -30,11 +32,9 @@ class Database
     private function connect(): void
     {
         if ($this->pdo) return;
-
         try {
             $config = $this->getDI()->get('config')['db'];
             $dsn = "{$config['driver']}:host={$config['host']};dbname={$config['database']};charset=utf8mb4";
-            
             $this->pdo = new PDO($dsn, $config['username'], $config['password'], [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -57,13 +57,13 @@ class Database
     private function resetQuery(): void
     {
         $this->query = [
-            'select' => ['*'],
-            'where' => [],
-            'bindings' => [],
-            'order' => [],
-            'limit' => null,
-            'offset' => null,
-            'join' => []
+            'select'    => ['*'],
+            'where'     => [],
+            'bindings'  => [],
+            'order'     => [],
+            'limit'     => null,
+            'offset'    => null,
+            'join'      => []
         ];
     }
 
@@ -80,12 +80,10 @@ class Database
             $operator = '=';
         }
         $this->query['where'][] = [$column, $operator, $value, 'AND'];
-
         // Only add binding if value is not null and not an array (for IN clause)
         if ($value !== null && !is_array($value)) {
             $this->query['bindings'][] = $value;
         }
-
         return $this;
     }
 
@@ -95,20 +93,16 @@ class Database
             $value = $operator;
             $operator = '=';
         }
-
         $this->query['where'][] = [$column, $operator, $value, 'OR'];
-
         if ($value !== null && !is_array($value)) {
             $this->query['bindings'][] = $value;
         }
-
         return $this;
     }
 
     public function whereIn(string $column, array $values): self
     {
         if (empty($values)) return $this;
-
         $this->query['where'][] = [$column, 'IN', $values, 'AND'];
         $this->query['bindings'] = array_merge($this->query['bindings'], array_values($values));
         return $this;
@@ -156,13 +150,10 @@ class Database
         if (empty($data)) {
             throw new DatabaseException("Cannot insert empty data");
         }
-
         $columns = implode(',', array_keys($data));
         $placeholders = str_repeat('?,', count($data) - 1) . '?';
-
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
         $this->execute($sql, array_values($data));
-
         return $this->pdo->lastInsertId();
     }
 
@@ -171,10 +162,8 @@ class Database
         if (empty($data)) {
             throw new DatabaseException("Cannot update with empty data");
         }
-
         $set = implode(' = ?,', array_keys($data)) . ' = ?';
         $sql = "UPDATE {$this->table} SET {$set}" . $this->buildWhere();
-
         $bindings = array_merge(array_values($data), $this->query['bindings']);
         return $this->execute($sql, $bindings)->rowCount();
     }
@@ -188,17 +177,13 @@ class Database
     private function buildSelect(): string
     {
         $sql = "SELECT " . implode(',', $this->query['select']) . " FROM {$this->table}";
-
         if ($this->query['join']) {
             $sql .= ' ' . implode(' ', $this->query['join']);
         }
-
         $sql .= $this->buildWhere();
-
         if ($this->query['order']) {
             $sql .= ' ORDER BY ' . implode(',', $this->query['order']);
         }
-
         if ($this->query['limit']) {
             $sql .= " LIMIT {$this->query['limit']}";
             if ($this->query['offset']) {
@@ -213,11 +198,9 @@ class Database
         if (empty($this->query['where'])) {
             return '';
         }
-
         $conditions = [];
         foreach ($this->query['where'] as $i => [$column, $operator, $value, $boolean]) {
             $prefix = $i > 0 ? " {$boolean} " : '';
-
             if ($operator === 'IN') {
                 if (is_array($value) && !empty($value)) {
                     $placeholders = str_repeat('?,', count($value) - 1) . '?';
@@ -227,7 +210,6 @@ class Database
                 $conditions[] = "{$prefix}{$column} {$operator} ?";
             }
         }
-
         return $conditions ? ' WHERE ' . implode('', $conditions) : '';
     }
 
@@ -239,9 +221,8 @@ class Database
             return $stmt;
         } catch (PDOException $e) {
             // Debug information
-            $paramCount = substr_count($sql, '?');
-            $providedCount = count($params);
-
+            $paramCount     = substr_count($sql, '?');
+            $providedCount  = count($params);
             throw new DatabaseException(
                 "Query failed: {$e->getMessage()}\n" .
                 "SQL: {$sql}\n" .

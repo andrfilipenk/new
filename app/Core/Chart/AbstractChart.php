@@ -11,51 +11,58 @@ use Core\Chart\Exception\ChartException;
  */
 abstract class AbstractChart implements ChartInterface
 {
-    protected array $data = [];
+    protected int $width    = 800;
+    protected int $height   = 600;
+    protected array $data   = [];
     protected array $config = [];
-    protected int $width = 800;
-    protected int $height = 600;
     protected string $title = '';
     protected SvgRenderer $renderer;
     
     // Default configuration
     protected array $defaultConfig = [
-        'colors' => ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'],
-        'background' => '#ffffff',
-        'grid' => [
-            'show' => true,
-            'color' => '#e0e0e0',
-            'strokeWidth' => 1
+        'colors'        => [
+            '#3498db', 
+            '#e74c3c', 
+            '#2ecc71', 
+            '#f39c12', 
+            '#9b59b6', 
+            '#1abc9c'
         ],
-        'axis' => [
-            'show' => true,
-            'color' => '#333333',
-            'strokeWidth' => 2
+        'background'    => '#ffffff',
+        'grid'          => [
+            'show'          => true,
+            'color'         => '#e0e0e0',
+            'strokeWidth'   => 1
         ],
-        'labels' => [
-            'show' => true,
-            'color' => '#333333',
-            'fontSize' => 12,
-            'fontFamily' => 'Arial, sans-serif'
+        'axis'          => [
+            'show'          => true,
+            'color'         => '#333333',
+            'strokeWidth'   => 2
         ],
-        'legend' => [
-            'show' => true,
-            'position' => 'right',
-            'color' => '#333333',
-            'fontSize' => 11
+        'labels'        => [
+            'show'          => true,
+            'color'         => '#333333',
+            'fontSize'      => 12,
+            'fontFamily'    => 'Arial, sans-serif'
         ],
-        'padding' => [
-            'top' => 40,
-            'right' => 100,
-            'bottom' => 60,
-            'left' => 80
+        'legend'        => [
+            'show'          => true,
+            'position'      => 'right',
+            'color'         => '#333333',
+            'fontSize'      => 11
+        ],
+        'padding'       => [
+            'top'           => 40,
+            'right'         => 100,
+            'bottom'        => 60,
+            'left'          => 80
         ]
     ];
 
     public function __construct(SvgRenderer $renderer = null)
     {
         $this->renderer = $renderer ?? new SvgRenderer();
-        $this->config = $this->defaultConfig;
+        $this->config   = $this->defaultConfig;
     }
 
     public function setData(array $data): ChartInterface
@@ -72,8 +79,8 @@ abstract class AbstractChart implements ChartInterface
 
     public function setDimensions(int $width, int $height): ChartInterface
     {
-        $this->width = $width;
-        $this->height = $height;
+        $this->width    = $width;
+        $this->height   = $height;
         return $this;
     }
 
@@ -93,34 +100,27 @@ abstract class AbstractChart implements ChartInterface
         if (empty($this->data)) {
             throw new ChartException('Chart data cannot be empty');
         }
-
         if ($this->width <= 0 || $this->height <= 0) {
             throw new ChartException('Chart dimensions must be positive');
         }
-
         return $this->validateSpecific();
     }
 
     public function render(): string
     {
         $this->validate();
-        
         $this->renderer->setDimensions($this->width, $this->height);
         $this->renderer->setBackground($this->config['background'] ?? '#ffffff');
-        
         // Add title
         if (!empty($this->title)) {
             $this->renderTitle();
         }
-
         // Render chart-specific content
         $this->renderChart();
-
         // Add legend if enabled
         if ($this->config['legend']['show']) {
             $this->renderLegend();
         }
-
         return $this->renderer->render();
     }
 
@@ -130,12 +130,11 @@ abstract class AbstractChart implements ChartInterface
     protected function getChartArea(): array
     {
         $padding = $this->config['padding'];
-        
         return [
-            'x' => $padding['left'],
-            'y' => $padding['top'],
-            'width' => $this->width - $padding['left'] - $padding['right'],
-            'height' => $this->height - $padding['top'] - $padding['bottom']
+            'x'         => $padding['left'],
+            'y'         => $padding['top'],
+            'width'     => $this->width - $padding['left'] - $padding['right'],
+            'height'    => $this->height - $padding['top'] - $padding['bottom']
         ];
     }
 
@@ -155,17 +154,16 @@ abstract class AbstractChart implements ChartInterface
     {
         $titleY = $this->config['padding']['top'] / 2;
         $titleX = $this->width / 2;
-        
         $this->renderer->addText(
             $titleX,
             $titleY,
             $this->title,
             [
-                'textAnchor' => 'middle',
-                'fontSize' => $this->config['labels']['fontSize'] + 4,
-                'fontFamily' => $this->config['labels']['fontFamily'],
-                'fill' => $this->config['labels']['color'],
-                'fontWeight' => 'bold'
+                'textAnchor'    => 'middle',
+                'fontSize'      => $this->config['labels']['fontSize'] + 4,
+                'fontFamily'    => $this->config['labels']['fontFamily'],
+                'fill'          => $this->config['labels']['color'],
+                'fontWeight'    => 'bold'
             ]
         );
     }
@@ -178,15 +176,12 @@ abstract class AbstractChart implements ChartInterface
         if (!$this->config['grid']['show']) {
             return;
         }
-
-        $chartArea = $this->getChartArea();
+        $chartArea  = $this->getChartArea();
         $gridConfig = [
-            'stroke' => $this->config['grid']['color'],
-            'strokeWidth' => $this->config['grid']['strokeWidth']
+            'stroke'        => $this->config['grid']['color'],
+            'strokeWidth'   => $this->config['grid']['strokeWidth']
         ];
-
-        // Vertical grid lines
-        foreach ($xLines as $x) {
+        foreach ($xLines as $x) { // Vertical grid lines
             $this->renderer->addLine(
                 $x,
                 $chartArea['y'],
@@ -195,9 +190,7 @@ abstract class AbstractChart implements ChartInterface
                 $gridConfig
             );
         }
-
-        // Horizontal grid lines
-        foreach ($yLines as $y) {
+        foreach ($yLines as $y) { // Horizontal grid lines
             $this->renderer->addLine(
                 $chartArea['x'],
                 $y,
@@ -216,24 +209,19 @@ abstract class AbstractChart implements ChartInterface
         if (!$this->config['axis']['show']) {
             return;
         }
-
-        $chartArea = $this->getChartArea();
+        $chartArea  = $this->getChartArea();
         $axisConfig = [
-            'stroke' => $this->config['axis']['color'],
-            'strokeWidth' => $this->config['axis']['strokeWidth']
+            'stroke'        => $this->config['axis']['color'],
+            'strokeWidth'   => $this->config['axis']['strokeWidth']
         ];
-
-        // X-axis
-        $this->renderer->addLine(
+        $this->renderer->addLine( // X-axis
             $chartArea['x'],
             $chartArea['y'] + $chartArea['height'],
             $chartArea['x'] + $chartArea['width'],
             $chartArea['y'] + $chartArea['height'],
             $axisConfig
         );
-
-        // Y-axis
-        $this->renderer->addLine(
+        $this->renderer->addLine( // Y-axis
             $chartArea['x'],
             $chartArea['y'],
             $chartArea['x'],

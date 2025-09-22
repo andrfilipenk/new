@@ -19,7 +19,6 @@ class ChartFactory
     public function create(array $config): ChartInterface
     {
         $builder = new ChartBuilder();
-        
         return $builder->fromConfig($config)->build();
     }
 
@@ -44,20 +43,16 @@ class ChartFactory
      */
     public function fromDatabase(string $query, array $params = [], array $config = []): string
     {
-        $db = $this->getDI()->get('db');
-        $results = $db->query($query, $params)->fetchAll();
-        
+        $db         = $this->getDI()->get('db');
+        $results    = $db->query($query, $params)->fetchAll();
         if (empty($results)) {
             throw new ChartException('No data returned from database query');
         }
-
         // Extract labels and values from results
         $labels = array_column($results, array_keys($results[0])[0]);
         $values = array_column($results, array_keys($results[0])[1]);
-        
-        $type = $config['type'] ?? 'bar';
-        $title = $config['title'] ?? 'Database Chart';
-        
+        $type   = $config['type'] ?? 'bar';
+        $title  = $config['title'] ?? 'Database Chart';
         switch ($type) {
             case 'pie':
                 return ChartBuilder::quickPie($labels, $values, $title);
@@ -75,22 +70,17 @@ class ChartFactory
     {
         $model = new $modelClass();
         $results = $model::all();
-        
         if (empty($results)) {
             throw new ChartException('No data found in model');
         }
-
         $labels = [];
         $values = [];
-        
         foreach ($results as $record) {
             $labels[] = $record->getData($labelField);
             $values[] = $record->getData($valueField);
         }
-        
         $type = $config['type'] ?? 'bar';
         $title = $config['title'] ?? 'Model Chart';
-        
         switch ($type) {
             case 'pie':
                 return ChartBuilder::quickPie($labels, $values, $title);
@@ -107,7 +97,6 @@ class ChartFactory
     public function dashboard(array $chartsConfig): string
     {
         $svg = '<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">';
-        
         $chartWidth = 580;
         $chartHeight = 380;
         $positions = [
@@ -119,26 +108,20 @@ class ChartFactory
         
         foreach ($chartsConfig as $index => $chartConfig) {
             if ($index >= 4) break; // Max 4 charts in dashboard
-            
             $position = $positions[$index];
             $chartConfig['width'] = $chartWidth;
             $chartConfig['height'] = $chartHeight;
-            
             $chart = $this->create($chartConfig);
             $chartSvg = $chart->render();
-            
             // Extract content from SVG (remove svg wrapper)
             $content = preg_replace('/<svg[^>]*>/', '', $chartSvg);
             $content = str_replace('</svg>', '', $content);
-            
             // Wrap in group with translation
             $svg .= "<g transform=\"translate({$position[0]}, {$position[1]})\">";
             $svg .= $content;
             $svg .= '</g>';
         }
-        
         $svg .= '</svg>';
-        
         return $svg;
     }
 }

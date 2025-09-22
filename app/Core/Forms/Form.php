@@ -26,8 +26,8 @@ class Form implements FormInterface
             'select'    => fn($n, $f, $v) => $this->selectRenderer($n, $f, $v),
             'checkbox'  => fn($n, $f, $v) => $this->checkboxRenderer($n, $f, $v),
             'radio'     => fn($n, $f, $v) => $this->radioRenderer($n, $f, $v),
-            'button' => fn($n, $f, $v) => $this->buttonRenderer($n, $f, $v),
-            'hidden' => fn($n, $f, $v) => $this->inputRenderer('hidden')($n, $f, $v),
+            'button'    => fn($n, $f, $v) => $this->buttonRenderer($n, $f, $v),
+            'hidden'    => fn($n, $f, $v) => $this->inputRenderer('hidden')($n, $f, $v),
         ];
     }
 
@@ -83,7 +83,6 @@ class Form implements FormInterface
     public function render(): string
     {
         $output = $this->template;
-        
         // Replace individual field placeholders first
         foreach (array_keys($this->fields) as $name) {
             $placeholder = '{field_' . $name . '}';
@@ -91,7 +90,6 @@ class Form implements FormInterface
                 $output = str_replace($placeholder, $this->renderField($name), $output);
             }
         }
-        
         // Then replace the general {fields} placeholder with any remaining fields
         $remainingFields = '';
         foreach (array_keys($this->fields) as $name) {
@@ -100,7 +98,6 @@ class Form implements FormInterface
                 $remainingFields .= $this->renderField($name);
             }
         }
-        
         return str_replace('{fields}', $remainingFields, $output);
     }
 
@@ -110,7 +107,7 @@ class Form implements FormInterface
         if (!$field) return '';
         $value      = $this->values[$name] ?? null;
         $renderer   = $field['renderer'] ?? $this->renderers[$field['type']] ?? $this->renderers['text'];
-        $fieldHtml = $renderer($name, $field, $value);
+        $fieldHtml  = $renderer($name, $field, $value);
         if ($field['type'] === 'button' || $field['type'] === 'hidden') {
             return $fieldHtml;
         }
@@ -164,16 +161,13 @@ class Form implements FormInterface
     private function attrs(string $name, array $field): array
     {
         $attrs = $field['attributes'] ?? [];
-        // Set id if not present
         if (!isset($attrs['id'])) {
             $attrs['id'] = $name;
         }
-        // Set required if present in attributes or field
         if (!empty($attrs['required']) || !empty($field['required'])) {
             $attrs['required'] = 'required';
         }
         if ($field['type'] !== 'button') {
-            // Always set name
             $attrs['name'] = $name;
         }
         return $attrs;

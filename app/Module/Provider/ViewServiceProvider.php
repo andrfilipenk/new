@@ -27,10 +27,3 @@ class ViewServiceProvider implements ServiceProvider
         });
     }
 }
-
-// example usage view service provider
-// Register the service provider in your application bootstrap or configuration
-// add this line in your bootstrap file after creating the DI container
-// $di->register(new \Core\View\ViewServiceProvider());
-// example usage in a controller
-// 
