@@ -6,6 +6,7 @@ return [
         'name' => 'My Application',
         'version' => '1.0.0',
         'base_path' => BASE_PATH,
+        'debug' => true
     ],
 
     'migrations' => [

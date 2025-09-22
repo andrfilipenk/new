@@ -42,7 +42,10 @@ class User extends Controller
     public function editAction()
     {
         $id = $this->getDI()->get('dispatcher')->getParam('id');
+
         $user = Users::find($id);
+        var_dump($user);
+
         if (!$user) {
             return $this->redirect('admin/users');
         }

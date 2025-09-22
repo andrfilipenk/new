@@ -9,7 +9,7 @@ class Users extends Model
     protected $table = 'users';
     protected $primaryKey = 'user_id';
     protected array $fillable = ['name', 'email', 'password', 'kuhnle_id'];
-    protected array $with = ['tasks']; // Always eager load task
+    #protected array $with = ['tasks']; // Always eager load task
 
     public function createdTasks()
     {
