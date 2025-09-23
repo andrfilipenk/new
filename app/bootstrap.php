@@ -20,16 +20,19 @@ spl_autoload_register(function ($class) {
 $config = require APP_PATH . 'config.php';
 $di = new \Core\Di\Container();
 $di->set('config', fn() => $config);
+$di->set('eventsManager', fn() => new \Core\Events\Manager);
+$di->set('url', fn() => new \Core\Utils\Url);
+$di->set('request', fn() => new \Core\Http\Request);
+$di->set('response', fn() => new \Core\Http\Response);
+$di->set('db', fn() => new \Core\Database\Database);
+$di->set('dispatcher', fn() => new \Core\Mvc\Dispatcher);
 $di->register(new \Module\Provider\DatabaseSessionServiceProvider);
 $di->register(new \Module\Provider\CookieServiceProvider);
 $di->register(new \Module\Provider\ViewServiceProvider);
 $di->register(new \Module\Provider\RouterServiceProvider);
 $di->register(new \Module\Provider\NavigationServiceProvider);
-$di->set('url', fn() => new \Core\Utils\Url);
-$di->set('request', fn() => new \Core\Http\Request);
-$di->set('db', fn() => new \Core\Database\Database);
-$di->set('dispatcher', fn() => new \Core\Mvc\Dispatcher);
-$di->set('eventsManager', fn() => new \Core\Events\Manager);
+$di->register(new \Module\Provider\AclServiceProvider);
+
 $di->set('migrationRepository', fn() => new \Core\Database\MigrationRepository);
 $di->set('migrator', fn() => new \Core\Database\Migrator);
 

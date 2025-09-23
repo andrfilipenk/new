@@ -47,7 +47,7 @@ class Router
     protected function buildResult(array $config, array $params): array
     {
         $result = $config;
-        foreach (['controller', 'action'] as $key) {
+        foreach (['module', 'controller', 'action'] as $key) {
             if (isset($result[$key])) {
                 $result[$key] = $this->replacePlaceholders($result[$key], $params);
             }

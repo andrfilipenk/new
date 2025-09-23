@@ -2,7 +2,6 @@
 // app/Core/Mvc/Dispatcher.php
 namespace Core\Mvc;
 
-use Core\Di\Interface\Container as ContainerInterface;
 use Core\Di\Injectable;
 use Core\Events\EventAware;
 use Core\Http\Request;
@@ -12,37 +11,42 @@ class Dispatcher
 {
     use Injectable, EventAware;
 
+    protected $moduleName;
     protected $actionName;
+    protected $controller;
     protected $controllerName;
     protected $params = [];
 
     public function dispatch(array $route, Request $request)
     {
-        $handlerClass = $route['controller'];
-        $action = $route['action'];
-        $params = $route['params'] ?? [];
-        $this->actionName = $action;
-        $this->controllerName = $handlerClass;
-        $this->params = $params;
-        $this->fireEvent('core:beforeDispatch', $this);
+        $this->moduleName = $route['module'];
+        $this->controllerName = $route['controller'];
+        $this->actionName = $route['action'];
+        $this->params = $route['params'] ?? [];
+
+        $eventsManager = $this->getDI()->get('eventsManager');
+        $eventsManager->trigger('core:beforeDispatch', $this);
+
+        $handlerClass = $this->getHandlerClass();
         if (!class_exists($handlerClass)) {
             throw new \Exception("Controller {$handlerClass} not found");
         }
         // Use the DI container to build the controller, enabling autowiring
-        $handler = $this->getDI()->get($handlerClass);
+        $handler = $this->getDI()->get($this->getHandlerClass());
         if (method_exists($handler, 'initialize')) {
             $handler->initialize();
         }
-        $actionMethod = $action . 'Action';
+        $actionMethod = $this->actionName . 'Action';
         if (!method_exists($handler, $actionMethod)) {
             throw new \Exception("Action {$actionMethod} not found in {$handlerClass}");
         }
-        $this->fireEvent('core:beforeExecuteRoute', $handler);
+        $eventsManager->trigger('core:beforeExecuteRoute', $handler);
         // Execute the action and get the return value
         $responseContent = call_user_func([$handler, $actionMethod]);
         if (method_exists($handler, 'afterExecute')) {
             $handler->afterExecute();
         }
+        $eventsManager->trigger('core:afterDispatch', $this);
         // If the controller action returns a full Response object, use it directly
         if ($responseContent instanceof Response) {
             return $responseContent;
@@ -52,6 +56,32 @@ class Dispatcher
             return Response::json($responseContent);
         }
         return new Response($responseContent);
+    }
+
+    public function getHandlerClass()
+    {
+        return sprintf(
+            "Module\\%s\\Controller\\%s", 
+            ucfirst($this->moduleName),
+            ucfirst($this->controllerName)
+        );
+    }
+
+    public function setControllerName($name) {
+        $this->controllerName = $name;
+        return $this;
+    }
+
+    public function setModuleName($name)
+    {
+        $this->moduleName = $name;
+        return $this;
+    }
+    
+    public function setActionName($name)
+    {
+        $this->actionName = $name;
+        return $this;
     }
 
     public function getParam($key, $default = null)
@@ -67,5 +97,10 @@ class Dispatcher
     public function getControllerName(): string
     {
         return $this->controllerName;
+    }
+
+    public function getModuleName(): string
+    {
+        return $this->moduleName;
     }
 }

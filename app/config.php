@@ -56,18 +56,33 @@ return [
         'path' => APP_PATH . 'views/',
         'layout' => 'default'
     ],
+
+    'acl' => [
+        'allowed' => [
+            'guest.base.dashboard.index',
+            'guest.base.dashboard.login',
+            'guest.base.dashboard.error'
+        ],
+        'denied' => [
+            'module'     => 'base',
+            'controller' => 'dashboard',
+            'action'     => 'login',
+        ]
+    ],
     
     'modules' => [
         'base' => [
             'routes' => [
                 '/' => [
-                    'controller' => 'Module\Base\Controller\Dashboard',
-                    'action' => 'index',
+                    'module'     => 'base',
+                    'controller' => 'dashboard',
+                    'action'     => 'index',
                     'method'     => 'GET'
                 ],
                 '/login' => [
-                    'controller' => 'Module\Base\Controller\Dashboard',
-                    'action' => 'login',
+                    'module'     => 'base',
+                    'controller' => 'dashboard',
+                    'action'     => 'login',
                     'method'     => 'GET'
                 ]
             ],
@@ -79,38 +94,46 @@ return [
             'routes' => [
                 // user management routes
                 '/admin/users' => [
-                    'controller' => 'Module\Admin\Controller\User',
+                    'module'     => 'admin',
+                    'controller' => 'user',
                     'action' => 'index'
                 ],
                 '/admin/user-create' => [
-                    'controller' => 'Module\Admin\Controller\User',
-                    'action' => 'create'
+                    'module'     => 'admin',
+                    'controller' => 'user',
+                    'action'     => 'create'
                 ],
                 '/admin/user-edit/{id}' => [
-                    'controller' => 'Module\Admin\Controller\User',
-                    'action' => 'edit'
+                    'module'     => 'admin',
+                    'controller' => 'user',
+                    'action'     => 'edit'
                 ],
                 '/admin/user-delete/{id}' => [
-                    'controller' => 'Module\Admin\Controller\User',
-                    'action' => 'delete'
+                    'module'     => 'admin',
+                    'controller' => 'user',
+                    'action'     => 'delete'
                 ],
 
                 // task routes
                 '/admin/tasks' => [
-                    'controller' => 'Module\Admin\Controller\Task',
-                    'action' => 'index'
+                    'module'     => 'admin',
+                    'controller' => 'task',
+                    'action'     => 'index'
                 ],
                 '/admin/task-create' => [
-                    'controller' => 'Module\Admin\Controller\Task',
-                    'action' => 'create'
+                    'module'     => 'admin',
+                    'controller' => 'task',
+                    'action'     => 'create'
                 ],
                 '/admin/task-edit/{id}' => [
-                    'controller' => 'Module\Admin\Controller\Task',
-                    'action' => 'edit'
+                    'module'     => 'admin',
+                    'controller' => 'task',
+                    'action'     => 'edit'
                 ],
                 '/admin/task-delete/{id}' => [
-                    'controller' => 'Module\Admin\Controller\Task',
-                    'action' => 'delete'
+                    'module'     => 'admin',
+                    'controller' => 'task',
+                    'action'     => 'delete'
                 ],
             ],
             'services' => [

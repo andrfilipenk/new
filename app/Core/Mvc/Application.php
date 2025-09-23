@@ -20,11 +20,12 @@ class Application
     public function handle(Request $request): Response
     {
         /** @var \Core\Events\Manager $eventsManager */
-        $eventsManager = $this->di->get('eventsManager');
+        $eventsManager = $this->getDI()->get('eventsManager');
         /** @var Router $router */
-        $router = $this->di->get('router');
+        $router = $this->getDI()->get('router');
         /** @var Dispatcher $dispatcher */
-        $dispatcher = $this->di->get('dispatcher');
+        $dispatcher = $this->getDI()->get('dispatcher');
+        $dispatcher->setDI($this->getDI());
         try {
             $eventsManager->trigger('application:beforeHandle', $this);
             $route = $router->match($request->uri(), $request->method());
@@ -32,7 +33,6 @@ class Application
                 $eventsManager->trigger('application:beforeNotFound', $this);
                 return Response::error('Page Not Found', Response::HTTP_NOT_FOUND);
             }
-            $dispatcher->setDI($this->di);
             $response = $dispatcher->dispatch($route, $request);
             if (!$response instanceof Response) {
                 // If controller doesn't return a Response, wrap its output
@@ -45,7 +45,7 @@ class Application
             // In production, you would log the error
             // error_log($e->getMessage() . PHP_EOL . $e->getTraceAsString());
             // Return a generic error response
-            $config = $this->di->get('config');
+            $config = $this->getDI()->get('config');
             if ($config['app']['debug'] ?? false) {
                 return Response::error(
                     "Error: " . $e->getMessage() . 

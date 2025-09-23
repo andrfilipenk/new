@@ -4,6 +4,7 @@ namespace Module\Provider;
 
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container as ContainerInterface;
+use Core\Events\Event;
 use Core\Session\DatabaseSession;
 use Core\Session\DatabaseSessionHandler;
 
@@ -25,10 +26,13 @@ class DatabaseSessionServiceProvider implements ServiceProvider
             if (isset($config['session']['name'])) {
                 $session->setName($config['session']['name']);
             }
+            $eventsManager = $di->get('eventsManager');
             $session->setDI($di);
-            if ($di->has('eventsManager')) {
-                $session->setEventsManager($di->get('eventsManager'));
-            }
+            $session->setEventsManager($eventsManager);
+
+            $eventsManager->attach('core:afterDispatch', function(Event $event) use ($session) {
+                $session->writeClose();
+            });
             return $session;
         });
     }

@@ -118,11 +118,15 @@ class Controller
     protected function getTemplateName(): string
     {
         $dispatcher = $this->getDI()->get('dispatcher');
-        $calledClass = $dispatcher->getControllerName();
+        $moduleName = $dispatcher->getModuleName();
+        $controller = $dispatcher->getControllerName();
         $action     = $dispatcher->getActionName();
-        $parts      = explode('\\', $calledClass);
-        $module     = 'module' . DIRECTORY_SEPARATOR . strtolower($parts[1]) . DIRECTORY_SEPARATOR;
-        $controller = strtolower(str_replace('Controller', '', end($parts)));
-        return $module . DIRECTORY_SEPARATOR . $controller . DIRECTORY_SEPARATOR . $action;
+
+        $path = 'module' . DIRECTORY_SEPARATOR 
+            . $moduleName . DIRECTORY_SEPARATOR 
+            . $controller . DIRECTORY_SEPARATOR 
+            . $action;
+        
+        return $path;
     }
 }

@@ -37,7 +37,10 @@ class DatabaseSession implements SessionInterface
             [$this->handler, 'destroy'],
             [$this->handler, 'gc']
         );
-        register_shutdown_function('session_write_close');
+    }
+
+    public function writeClose() {
+        return @session_write_close();
     }
 
     public function start(): bool
