@@ -51,13 +51,16 @@ abstract class Model
         return self::db()->table($instance->table);
     }
 
-    public static function find(mixed $id): Model|null
+    public static function find(mixed $id, $column = null): Model|null
     {
         if ($id === null) return null;
-        if (!empty(static::getInstance()->with)) {
-            return static::with(static::getInstance()->with)->where(static::getInstance()->primaryKey, $id)->first();
+        if ($column === null) {
+            $column = static::getInstance()->primaryKey;
         }
-        $result = static::query()->where(static::getInstance()->primaryKey, $id)->first();
+        if (!empty(static::getInstance()->with)) {
+            return static::with(static::getInstance()->with)->where($column, $id)->first();
+        }
+        $result = static::query()->where($column, $id)->first();
         return $result ? static::newFromBuilder($result) : null;
     }
 
@@ -276,7 +279,7 @@ abstract class Model
         return $this->attributes[$this->primaryKey] ?? null;
     }
 
-    public function setRelation(string $key, mixed $value): void
+    public function setRelation($key, mixed $value): void
     {
         $this->relations[$key] = $value;
     }

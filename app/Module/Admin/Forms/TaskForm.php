@@ -2,7 +2,7 @@
 namespace Module\Admin\Forms;
 
 use Core\Forms\Builder;
-use Module\Admin\Models\Users;
+use Module\Admin\Models\User;
 
 class TaskForm
 {
@@ -11,7 +11,7 @@ class TaskForm
         $builder = new Builder();
 
         // User options for selects
-        $users = Users::all();
+        $users = User::all();
         $userOptions = [];
         foreach ($users as $user) {
             $userOptions[$user->user_id] = $user->name . ' (' . $user->kuhnle_id . ')';

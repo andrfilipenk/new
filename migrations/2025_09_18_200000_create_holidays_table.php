@@ -24,9 +24,9 @@ class CreateHolidaysTable extends Migration
             '2025-12-25' => '1. Weihnachtstag',
             '2025-12-26' => '2. Weihnachtstag'
         ];
-        $table = self::db()->table('holidays');
+        $query = self::db()->table('holidays');
         foreach ($holidays as $date => $title) {
-            $table->insert([
+            $query->insert([
                 'date_on' => $date,
                 'title'   => $title
             ]);

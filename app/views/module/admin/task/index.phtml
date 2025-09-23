@@ -27,7 +27,7 @@ $url        = $this->getDI()->get('url');
                 <td><?= htmlspecialchars($task->status) ?></td>
                 <td><?= htmlspecialchars($task->priority) ?></td>
                 <td>
-                    Created: <?= htmlspecialchars($task->created_date) ?><br>
+                    Created: <?= htmlspecialchars($task->created_at) ?><br>
                     Begin: <?= htmlspecialchars($task->begin_date) ?><br>
                     End: <?= htmlspecialchars($task->end_date) ?>
                 </td>

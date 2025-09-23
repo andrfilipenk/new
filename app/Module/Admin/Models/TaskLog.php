@@ -6,11 +6,11 @@ use Core\Database\Model;
 
 class TaskLog extends Model
 {
-    protected $table = 'tasks_log';
+    protected $table = 'task_log';
     protected $primaryKey = 'id';
     
     public function task()
     {
-        return $this->belongsTo(Tasks::class, 'task_id', 'id');
+        return $this->belongsTo(Task::class, 'task_id', 'id');
     }
 }

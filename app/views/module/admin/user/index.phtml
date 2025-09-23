@@ -14,13 +14,13 @@ $url        = $this->getDI()->get('url');
         <tbody>
             <?php foreach ($users as $user): ?>
                 <tr>
-                    <td><?= htmlspecialchars($user->user_id) ?></td>
+                    <td><?= htmlspecialchars($user->id) ?></td>
                     <td><?= htmlspecialchars($user->name) ?></td>
                     <td><?= htmlspecialchars($user->email) ?></td>
                     <td><?= htmlspecialchars($user->kuhnle_id) ?></td>
                     <td>
-                        <a href="<?= $url->get('admin/user-edit/' . $user->user_id) ?>">Edit</a>
-                        <a href="<?= $url->get('admin/user-delete/' . $user->user_id) ?>" onclick="return confirm('Delete user?')">Delete</a>
+                        <a href="<?= $url->get('admin/user-edit/' . $user->id) ?>">Edit</a>
+                        <a href="<?= $url->get('admin/user-delete/' . $user->id) ?>" onclick="return confirm('Delete user?')">Delete</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

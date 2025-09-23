@@ -57,4 +57,17 @@ abstract class Migration
             self::db()->execute($sql);
         }
     }
+
+    /**
+     * Insert data array
+     */
+    protected function insertDataArray($table, $columns, $values)
+    {
+        $query = self::db()->table($table);
+        foreach ($values as $row) {
+            $data = array_combine($columns, $row);
+            $query->insert($data);
+        }
+        return $this;
+    }
 }

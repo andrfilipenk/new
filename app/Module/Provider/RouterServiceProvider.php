@@ -2,7 +2,6 @@
 // app/Module/Provider/RouterServiceProvider.php
 namespace Module\Provider;
 
-use Core\Cookie\Cookie;
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container as ContainerInterface;
 

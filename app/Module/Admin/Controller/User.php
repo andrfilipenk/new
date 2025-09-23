@@ -2,7 +2,7 @@
 namespace Module\Admin\Controller;
 
 use Core\Mvc\Controller;
-use Module\Admin\Models\Users;
+use Module\Admin\Models\User as UserModel;
 use Module\Admin\Forms\UserForm;
 
 class User extends Controller
@@ -10,7 +10,7 @@ class User extends Controller
     // List all users
     public function indexAction()
     {
-        $users = Users::all();
+        $users = UserModel::all();
         return $this->render('user/index', ['users' => $users]);
     }
 
@@ -23,7 +23,7 @@ class User extends Controller
             $data = $this->getRequest()->all();
 
             // You should add validation here!
-            $user = new Users($data);
+            $user = new UserModel($data);
             if ($user->save()) {
                 $this->getDI()->get('session')->flash('success', 'User created.');
                 return $this->redirect('admin/users');
@@ -43,7 +43,7 @@ class User extends Controller
     {
         $id = $this->getDI()->get('dispatcher')->getParam('id');
 
-        $user = Users::find($id);
+        $user = UserModel::find($id);
         var_dump($user);
 
         if (!$user) {
@@ -74,7 +74,7 @@ class User extends Controller
     public function deleteAction()
     {
         $id = $this->getDI()->get('dispatcher')->getParam('id');
-        $user = Users::find($id);
+        $user = UserModel::find($id);
         if ($user) { // && $user->delete()
             $this->getDI()->get('session')->flash('success', 'User deleted.');
         } else {

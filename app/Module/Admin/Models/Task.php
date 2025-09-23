@@ -1,13 +1,13 @@
 <?php
-// app/Module/Admin/Models/Tasks.php
+// app/Module/Admin/Models/Task.php
 namespace Module\Admin\Models;
 
 use Core\Database\Model;
-use Module\Admin\Models\Users;
+use Module\Admin\Models\User;
 
-class Tasks extends Model
+class Task extends Model
 {
-    protected $table = 'tasks';
+    protected $table = 'task';
     protected $primaryKey = 'id';
     protected array $fillable = [
         'title', 
@@ -21,16 +21,16 @@ class Tasks extends Model
     
     public function creator()
     {
-        return $this->belongsTo(Users::class, 'created_by', 'user_id');
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
     public function assigned()
     {
-        return $this->belongsTo(Users::class, 'assigned_to', 'user_id');
+        return $this->belongsTo(User::class, 'assigned_to', 'id');
     }
 
     public function logs()
     {
-        return $this->hasMany(Tasks::class, 'task_id', 'id');
+        return $this->hasMany(TaskLog::class, 'task_id', 'id');
     }
 }
