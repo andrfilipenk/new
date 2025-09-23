@@ -41,6 +41,16 @@ class Controller
     }
 
     /**
+     * Returns response instance
+     *
+     * @return \Core\Http\Response
+     */
+    public function getResponse()
+    {
+        return $this->getDI()->get('response');
+    }
+
+    /**
      * Returns session instance
      *
      * @return \Core\Session\DatabaseSession
@@ -99,8 +109,7 @@ class Controller
 
     protected function redirect(string $to, int $statusCode = 302): Response
     {
-        $response = $this->getDI()->get('response');
-        return $response->redirect($this->url($to), $statusCode)->send();
+        return $this->getResponse()->redirect($this->url($to), $statusCode)->send();
     }
 
     protected function render(string $template = null, array $data = []): string

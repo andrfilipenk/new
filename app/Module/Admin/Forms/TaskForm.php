@@ -14,7 +14,7 @@ class TaskForm
         $users = User::all();
         $userOptions = [];
         foreach ($users as $user) {
-            $userOptions[$user->user_id] = $user->name . ' (' . $user->kuhnle_id . ')';
+            $userOptions[$user->id] = $user->name . ' (' . $user->kuhnle_id . ')';
         }
 
         $builder

@@ -5,7 +5,7 @@ return [
     'app' => [
         'name'              => 'My Application',
         'version'           => '1.0.0',
-        'base_path'         => BASE_PATH,
+        'base'              => '/new/',
         'debug'             => true,
     ],
 
@@ -63,11 +63,13 @@ return [
             'guest.base.dashboard.login',
             'guest.base.dashboard.error',
             'guest.admin.user.index',
+            'guest.admin.task.index',
+            'guest.admin.task.edit',
         ],
         'denied' => [
             'module'     => 'base',
-            'controller' => 'dashboard',
-            'action'     => 'login',
+            'controller' => 'error',
+            'action'     => 'denied',
         ]
     ],
     

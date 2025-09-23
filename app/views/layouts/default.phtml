@@ -9,9 +9,25 @@ $navigation = $this->getDI()->get('navigation');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
-    <link rel="stylesheet" href="<?= $url->get('css/app.css') ?>">
+    <link rel="stylesheet" href="<?= $url->get('css/pico.min.css') ?>">
 </head>
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><strong>Acme Corp</strong></li>
+            </ul>
+            <ul>
+                <li><a href="#" class="contrast">About</a></li>
+                <li><a href="#" class="contrast">Services</a></li>
+                <li><a href="#" class="contrast">Products</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="container">
+        
+    </main>
+
     <div class="app-container">
         <!-- Top Identity Bar -->
         <header class="top-bar">

@@ -1,9 +1,5 @@
 <?php
 // filepath: c:\xampp\htdocs\new\migrate.php
-$dir = dirname(__DIR__);
-define('BASE_PATH', substr($dir, strrpos($dir, DIRECTORY_SEPARATOR) + 1));
-
-// This file is your command-line entry point for migrations.
 
 require '../app/bootstrap.php';
 

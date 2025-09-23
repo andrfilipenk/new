@@ -19,7 +19,7 @@ class Dispatcher
 
     public function __construct(){}
 
-    public function getRouteData($route)
+    public function prepare($route)
     {
         if (isset($route['module'])) {
             $this->setModuleName($route['module']);
@@ -33,15 +33,20 @@ class Dispatcher
         if (isset($route['params'])) {
             $this->params = $route['params'];
         }
+        return $this;
+    }
+
+    public function forward($route)
+    {
+        $this->prepare($route);
+        return $this->dispatch($route);
     }
 
     public function dispatch($route)
     {
-        $this->getRouteData($route);
-
         $eventsManager = $this->getDI()->get('eventsManager');
         $handlerClass = $this->getHandlerClass();
-        $eventsManager->trigger('core:beforeDispatch', $this);
+        #$eventsManager->trigger('core:beforeDispatch', $this);
 
         if (!class_exists($handlerClass)) {
             throw new \Exception("Controller {$handlerClass} not found");

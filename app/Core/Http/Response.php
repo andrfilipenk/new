@@ -2,63 +2,74 @@
 // app/Core/Http/Response.php
 namespace Core\Http;
 
+/**
+ * Optimized Response class with reduced memory usage and faster operations
+ */
 class Response
 {
-    protected $content;
-    protected $statusCode;
-    protected $headers  = [];
-    protected $sent     = false;
+    private string $content = '';
+    private int $statusCode = 200;
+    private array $headers = [];
+    private bool $sent = false;
 
-    // --- HTTP Status Codes ---
-    public const HTTP_OK = 200;
-    public const HTTP_CREATED = 201;
-    public const HTTP_NO_CONTENT = 204;
-    public const HTTP_MOVED_PERMANENTLY = 301;
-    public const HTTP_FOUND = 302;
-    public const HTTP_BAD_REQUEST = 400;
-    public const HTTP_UNAUTHORIZED = 401;
-    public const HTTP_FORBIDDEN = 403;
-    public const HTTP_NOT_FOUND = 404;
-    public const HTTP_METHOD_NOT_ALLOWED = 405;
-    public const HTTP_UNPROCESSABLE_ENTITY = 422;
-    public const HTTP_INTERNAL_SERVER_ERROR = 500;
+    // Common status codes as static properties to reduce memory
+    public const STATUS_CODES = [
+        200 => 'OK',
+        201 => 'Created',
+        204 => 'No Content',
+        301 => 'Moved Permanently',
+        302 => 'Found',
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        405 => 'Method Not Allowed',
+        422 => 'Unprocessable Entity',
+        500 => 'Internal Server Error'
+    ];
 
-    public function __construct($content = '', int $statusCode = self::HTTP_OK, array $headers = [])
+    public function __construct(string $content = '', int $statusCode = 200, array $headers = [])
     {
-        $this->content      = $content;
-        $this->statusCode   = $statusCode;
-        $this->headers      = array_merge(['Content-Type' => 'text/html; charset=UTF-8'], $headers);
+        $this->content = $content;
+        $this->statusCode = $statusCode;
+        $this->headers = $headers + ['Content-Type' => 'text/html; charset=UTF-8'];
     }
 
-    public function json($data, int $statusCode = self::HTTP_OK, array $headers = []): self
+    public static function create(string $content = '', int $statusCode = 200): self
     {
-        $this->setStatusCode($statusCode);
-        $this->setHeader('Content-Type', 'application/json');
-        $this->setContent(json_encode($data));
+        return new self($content, $statusCode);
+    }
+
+    public function json($data, int $statusCode = 200): self
+    {
+        $this->statusCode = $statusCode;
+        $this->headers['Content-Type'] = 'application/json';
+        $this->content = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         return $this;
     }
 
-    public function redirect(string $url, int $statusCode = self::HTTP_FOUND): self
+    public function redirect(string $url, int $statusCode = 302): self
     {
-        $this->setHeader('Location', $url);
-        $this->setStatusCode($statusCode);
+        $this->headers['Location'] = $url;
+        $this->statusCode = $statusCode;
+        $this->content = '';
         return $this;
     }
 
-    public function error(string $message = 'Error', int $statusCode = self::HTTP_INTERNAL_SERVER_ERROR): self
+    public function error(string $message = 'Error', int $statusCode = 500): self
     {
-        $this->setStatusCode($statusCode);
-        $this->setContent($message);
+        $this->statusCode = $statusCode;
+        $this->content = $message;
         return $this;
     }
 
-    public function setContent($content): self
+    public function setContent(string $content): self
     {
         $this->content = $content;
         return $this;
     }
 
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
@@ -80,33 +91,51 @@ class Response
         return $this;
     }
 
+    public function setHeaders(array $headers): self
+    {
+        $this->headers = array_merge($this->headers, $headers);
+        return $this;
+    }
+
     public function getHeaders(): array
     {
         return $this->headers;
     }
 
-    public function withCookie(string $name, string $value = '', int $expire = 0, string $path = '/', string $domain = '', bool $secure = false, bool $httpOnly = true): self
+    public function getHeader(string $name): ?string
     {
-        // This method sets the header directly, which is easier for testing
-        // and avoids calling the global setcookie() function prematurely.
-        $cookieHeader = urlencode($name) . '=' . urlencode($value)
-            . ($expire ? '; expires=' . gmdate('D, d M Y H:i:s T', $expire) : '')
-            . ($path ? '; path=' . $path : '')
-            . ($domain ? '; domain=' . $domain : '')
-            . ($secure ? '; secure' : '')
-            . ($httpOnly ? '; httponly' : '');
-        $this->headers['Set-Cookie'][] = $cookieHeader;
+        return $this->headers[$name] ?? null;
+    }
+
+    public function withCookie(
+        string $name, 
+        string $value = '', 
+        int $expire = 0, 
+        string $path = '/', 
+        string $domain = '', 
+        bool $secure = false, 
+        bool $httpOnly = true
+    ): self {
+        // Use more efficient cookie header building
+        $cookie = $name . '=' . $value;
+        if ($expire) $cookie .= '; expires=' . gmdate('D, d M Y H:i:s T', $expire);
+        if ($path !== '/') $cookie .= '; path=' . $path;
+        if ($domain) $cookie .= '; domain=' . $domain;
+        if ($secure) $cookie .= '; secure';
+        if ($httpOnly) $cookie .= '; httponly';
+        if (!isset($this->headers['Set-Cookie'])) {
+            $this->headers['Set-Cookie'] = [];
+        }
+        $this->headers['Set-Cookie'][] = $cookie;
         return $this;
     }
 
-    public function send(): self
+    public function send(): void
     {
-        if ($this->isSent()) {
-            return $this;
-        }
+        if ($this->sent) return;
         // Send status code
         http_response_code($this->statusCode);
-        // Send headers
+        // Send headers efficiently
         foreach ($this->headers as $name => $value) {
             if (is_array($value)) {
                 foreach ($value as $v) {
@@ -116,11 +145,14 @@ class Response
                 header("$name: $value");
             }
         }
-
         // Send content
         echo $this->content;
         $this->sent = true;
-        return $this;
+        // Optional: flush output buffer for faster response
+        if (ob_get_level()) {
+            ob_end_flush();
+        }
+        flush();
     }
 
     public function isSent(): bool
@@ -128,8 +160,18 @@ class Response
         return $this->sent;
     }
 
+    public function getSize(): int
+    {
+        return strlen($this->content);
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->content === '';
+    }
+
     public function __toString(): string
     {
-        return (string) $this->content;
+        return $this->content;
     }
 }

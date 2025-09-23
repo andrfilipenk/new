@@ -28,7 +28,7 @@ class Router
                 return $this->buildResult($route['config'], $params);
             }
         }
-        return false;
+        return null;
     }
     
     public function getCurrentRoute(): ?array

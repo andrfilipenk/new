@@ -25,8 +25,7 @@ class AclServiceProvider implements ServiceProvider
                 $action     = $dispatcher->getActionName();
                 if (!$access->isAllowed($role, $module, $controller, $action)) {
                     $event->stopPropagation();
-                    $response = new Response('Access denied.', 403);
-                    return $response->redirect('login')->send();
+                    return $dispatcher->forward($config['acl']['denied']);
                 }
                 return true;
             });
