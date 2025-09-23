@@ -3,65 +3,66 @@
 
 return [
     'app' => [
-        'name' => 'My Application',
-        'version' => '1.0.0',
-        'base_path' => BASE_PATH,
-        'debug' => true
+        'name'              => 'My Application',
+        'version'           => '1.0.0',
+        'base_path'         => BASE_PATH,
+        'debug'             => true,
     ],
 
     'migrations' => [
-        'path' => APP_PATH . '../migrations',
-        'table' => 'migrations'
+        'path'              => APP_PATH . '../migrations',
+        'table'             => 'migrations'
     ],
 
     'db' => [
-        'driver'        => 'mysql',
-        'host'          => 'localhost',
-        'database'      => 'web',
-        'username'      => 'root',
-        'password'      => '',
-        'charset'       => 'utf8mb4',
-        'persistent'    => true, // for connection pooling
+        'driver'            => 'mysql',
+        'host'              => 'localhost',
+        'database'          => 'web',
+        'username'          => 'root',
+        'password'          => '',
+        'charset'           => 'utf8mb4',
+        'persistent'        => true, // for connection pooling
     ],
 
     'navigation' => [
-        'Dashboard' => '',
-        'Users'     => 'admin/users',
-        'Tasks'     => 'admin/tasks',
-        'Log'       => 'admin/logs'
+        'Dashboard'         => '',
+        'Users'             => 'admin/users',
+        'Tasks'             => 'admin/tasks',
+        'Log'               => 'admin/logs'
     ],
 
     'session' => [
-        'driver' => 'database', // 'database' or 'native'
-        'table' => 'sessions',
-        'lifetime' => 3600,
-        'cookie_lifetime' => 3600,
-        'cookie_path' => '/',
-        'cookie_domain' => '',
-        'cookie_secure' => false,
-        'cookie_httponly' => true,
-        'cookie_samesite' => 'Lax'
+        'driver'            => 'database', // 'database' or 'native'
+        'table'             => 'sessions',
+        'lifetime'          => 3600,
+        'cookie_lifetime'   => 3600,
+        'cookie_path'       => '/',
+        'cookie_domain'     => '',
+        'cookie_secure'     => false,
+        'cookie_httponly'   => true,
+        'cookie_samesite'   => 'Lax'
     ],
 
     'cookie' => [
-        'expires'   => 30, // 30 days
-        'path'      => '/',
-        'domain'    => '',
-        'secure'    => false,
-        'httponly'  => true,
-        'samesite'  => 'Lax'
+        'expires'           => 30, // 30 days
+        'path'              => '/',
+        'domain'            => '',
+        'secure'            => false,
+        'httponly'          => true,
+        'samesite'          => 'Lax'
     ],
 
     'view' => [
-        'path' => APP_PATH . 'views/',
-        'layout' => 'default'
+        'path'              => APP_PATH . 'views/',
+        'layout'            => 'default'
     ],
 
     'acl' => [
         'allowed' => [
             'guest.base.dashboard.index',
             'guest.base.dashboard.login',
-            'guest.base.dashboard.error'
+            'guest.base.dashboard.error',
+            'guest.admin.user.index',
         ],
         'denied' => [
             'module'     => 'base',

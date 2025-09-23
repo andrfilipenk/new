@@ -99,16 +99,17 @@ class Controller
 
     protected function redirect(string $to, int $statusCode = 302): Response
     {
-        return Response::redirect($this->url($to), $statusCode)->send();
+        $response = $this->getDI()->get('response');
+        return $response->redirect($this->url($to), $statusCode)->send();
     }
 
     protected function render(string $template = null, array $data = []): string
     {
         if ($template !== null) {
             $dispatcher     = $this->getDI()->get('dispatcher');
-            $calledClass    = $dispatcher->getControllerName();
-            $parts          = explode('\\', strtolower($calledClass));
-            $template       = 'module' . DIRECTORY_SEPARATOR . $parts[1] . DIRECTORY_SEPARATOR . $template;
+            $module         = $dispatcher->getModuleName();
+
+            $template       = 'module' . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . $template;
         } else {
             $template = $this->getTemplateName();
         }

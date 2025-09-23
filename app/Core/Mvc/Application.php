@@ -26,19 +26,28 @@ class Application
         /** @var Dispatcher $dispatcher */
         $dispatcher = $this->getDI()->get('dispatcher');
         $dispatcher->setDI($this->getDI());
+
+        /** @var Response $response */
+        $response = $this->getDI()->get('response');
         try {
             $eventsManager->trigger('application:beforeHandle', $this);
             $route = $router->match($request->uri(), $request->method());
+
             if (!$route) {
-                $eventsManager->trigger('application:beforeNotFound', $this);
-                return Response::error('Page Not Found', Response::HTTP_NOT_FOUND);
+                throw new \Exception("Route not found");
             }
-            $response = $dispatcher->dispatch($route, $request);
-            if (!$response instanceof Response) {
-                // If controller doesn't return a Response, wrap its output
-                $response = new Response($response);
+            $event = $eventsManager->trigger('application:beforeDispatch', $dispatcher);
+            $dispatcher = $event->getData();
+            $result = $dispatcher->dispatch($route, $request);
+            $event = $eventsManager->trigger('application:afterDispatch', $result);
+            $result = $event->getData();
+            if ($result instanceof Response) {
+                return $result;
             }
-            $eventsManager->trigger('application:afterHandle', $this);
+            if (is_array($result)) {
+                return $response->json($result);
+            }
+            $response->setContent($result);
             return $response;
         } catch (Exception $e) {
             $event = $eventsManager->trigger('application:onException', [$this, $e]);
@@ -47,7 +56,7 @@ class Application
             // Return a generic error response
             $config = $this->getDI()->get('config');
             if ($config['app']['debug'] ?? false) {
-                return Response::error(
+                return $response->error(
                     "Error: " . $e->getMessage() . 
                     "<br><br>File: " . $e->getFile() . 
                     "<br>Line: " . $e->getLine() . 
@@ -56,7 +65,7 @@ class Application
                 );
             } else {
                 // Generic error in production
-                return Response::error('An unexpected error occurred.', Response::HTTP_INTERNAL_SERVER_ERROR);
+                return $response->error('An unexpected error occurred.', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
         }

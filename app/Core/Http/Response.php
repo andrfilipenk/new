@@ -30,22 +30,26 @@ class Response
         $this->headers      = array_merge(['Content-Type' => 'text/html; charset=UTF-8'], $headers);
     }
 
-    public static function json($data, int $statusCode = self::HTTP_OK, array $headers = []): self
+    public function json($data, int $statusCode = self::HTTP_OK, array $headers = []): self
     {
-        $headers['Content-Type'] = 'application/json';
-        $content = json_encode($data);
-        return new static($content, $statusCode, $headers);
+        $this->setStatusCode($statusCode);
+        $this->setHeader('Content-Type', 'application/json');
+        $this->setContent(json_encode($data));
+        return $this;
     }
 
-    public static function redirect(string $url, int $statusCode = self::HTTP_FOUND): self
+    public function redirect(string $url, int $statusCode = self::HTTP_FOUND): self
     {
-        $response = new static('', $statusCode, ['Location' => $url]);
-        return $response->send();
+        $this->setHeader('Location', $url);
+        $this->setStatusCode($statusCode);
+        return $this;
     }
 
-    public static function error(string $message = 'Error', int $statusCode = self::HTTP_INTERNAL_SERVER_ERROR): self
+    public function error(string $message = 'Error', int $statusCode = self::HTTP_INTERNAL_SERVER_ERROR): self
     {
-        return new static($message, $statusCode);
+        $this->setStatusCode($statusCode);
+        $this->setContent($message);
+        return $this;
     }
 
     public function setContent($content): self
@@ -97,7 +101,7 @@ class Response
 
     public function send(): self
     {
-        if ($this->sent) {
+        if ($this->isSent()) {
             return $this;
         }
         // Send status code

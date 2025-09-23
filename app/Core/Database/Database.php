@@ -5,10 +5,11 @@ namespace Core\Database;
 use PDO;
 use PDOException;
 use Core\Di\Injectable;
+use Core\Events\EventAware;
 
 class Database
 {
-    use Injectable;
+    use Injectable, EventAware;
 
     private ?PDO $pdo = null;
     
@@ -307,12 +308,20 @@ class Database
 
     public function execute(string $sql, array $params = []): \PDOStatement
     {
+        $eventsManager = $this->getDI()->get('eventsManager');
+        $start = microtime(true);
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute($params);
+            $time = microtime(true) - $start;
+            $eventsManager->trigger('db:afterExecute', [
+                'sql'       => $sql, 
+                'params'    => $params,
+                'stmt'      => $stmt,
+                'time'      => $time
+            ]);
             return $stmt;
         } catch (PDOException $e) {
-            // Debug information
             $paramCount     = substr_count($sql, '?');
             $providedCount  = count($params);
             throw new DatabaseException(
