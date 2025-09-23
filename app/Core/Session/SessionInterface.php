@@ -15,10 +15,5 @@ interface SessionInterface
     public function set(string $key, $value);
     public function remove(string $key);
     public function clear();
-    public function flash(string $key, $value);
-    public function getFlash(string $key, $default = null);
-    public function hasFlash(string $key): bool;
-    public function removeFlash(string $key);
-    public function clearFlash();
     public function destroy();
 }

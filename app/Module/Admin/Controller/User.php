@@ -44,7 +44,6 @@ class User extends Controller
         $id = $this->getDI()->get('dispatcher')->getParam('id');
 
         $user = UserModel::find($id);
-        var_dump($user);
 
         if (!$user) {
             return $this->redirect('admin/users');

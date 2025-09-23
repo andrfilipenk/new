@@ -43,7 +43,7 @@ class Controller
     /**
      * Returns session instance
      *
-     * @return \Core\Session\Session
+     * @return \Core\Session\DatabaseSession
      */
     public function getSession()
     {
@@ -76,16 +76,25 @@ class Controller
         return $this->getRequest()->post($key, $default);
     }
 
+    public function flashMessage($type, $message)
+    {
+        $messages = $this->getSession()->get('messages', []);
+        $messages[] = [
+            'type'      => $type,
+            'message'   => $message
+        ];
+        $this->getSession()->set('messages', $messages);
+        return $this;
+    }
+
     public function flashSuccess($message)
     {
-        $this->getSession()->flash('success', $message);
-        return $this;
+        return $this->flashMessage('success', $message);
     }
 
     public function flashError($message)
     {
-        $this->getSession()->flash('error', $message);
-        return $this;
+        return $this->flashMessage('error', $message);
     }
 
     protected function redirect(string $to, int $statusCode = 302): Response

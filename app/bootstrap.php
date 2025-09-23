@@ -20,7 +20,7 @@ spl_autoload_register(function ($class) {
 $config = require APP_PATH . 'config.php';
 $di = new \Core\Di\Container();
 $di->set('config', fn() => $config);
-$di->register(new \Module\Provider\SessionServiceProvider);
+$di->register(new \Module\Provider\DatabaseSessionServiceProvider);
 $di->register(new \Module\Provider\CookieServiceProvider);
 $di->register(new \Module\Provider\ViewServiceProvider);
 $di->register(new \Module\Provider\RouterServiceProvider);

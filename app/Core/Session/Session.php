@@ -10,7 +10,6 @@ class Session implements SessionInterface
     use Injectable, EventAware;
 
     protected $started  = false;
-    protected $flashKey = '_flash';
 
     public function __construct()
     {
@@ -19,7 +18,6 @@ class Session implements SessionInterface
         } else {
             $this->started = true;
         }
-        $this->initFlash();
     }
 
     public function start(): bool
@@ -85,35 +83,6 @@ class Session implements SessionInterface
         session_unset();
     }
 
-    public function flash(string $key, $value)
-    {
-        $this->set($this->flashKey . '.new.' . $key, $value);
-    }
-
-    public function getFlash(string $key, $default = null)
-    {
-        $value = $this->get($this->flashKey . '.old.' . $key, $default);
-        $this->removeFlash($key);
-        return $value;
-    }
-
-    public function hasFlash(string $key): bool
-    {
-        return $this->has($this->flashKey . '.old.' . $key);
-    }
-
-    public function removeFlash(string $key)
-    {
-        $this->remove($this->flashKey . '.old.' . $key);
-        $this->remove($this->flashKey . '.new.' . $key);
-    }
-
-    public function clearFlash()
-    {
-        $this->remove($this->flashKey . '.old');
-        $this->remove($this->flashKey . '.new');
-    }
-
     public function destroy()
     {
         if ($this->started) {
@@ -121,32 +90,6 @@ class Session implements SessionInterface
             session_destroy();
             $this->started = false;
             $this->fireEvent('session:afterDestroy', $this);
-        }
-    }
-
-    public function __destruct()
-    {
-        $this->ageFlash();
-    }
-
-    protected function initFlash()
-    {
-        if (!isset($_SESSION[$this->flashKey])) {
-            $_SESSION[$this->flashKey] = [
-                'old' => [],
-                'new' => []
-            ];
-        }
-    }
-
-    protected function ageFlash()
-    {
-        if (isset($_SESSION[$this->flashKey]['old'])) {
-            unset($_SESSION[$this->flashKey]['old']);
-        }
-        if (isset($_SESSION[$this->flashKey]['new'])) {
-            $_SESSION[$this->flashKey]['old'] = $_SESSION[$this->flashKey]['new'];
-            unset($_SESSION[$this->flashKey]['new']);
         }
     }
 }

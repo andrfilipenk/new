@@ -1,5 +1,5 @@
 <?php
-// app/Core/Mvc/View.php
+// app/Core/Mvc/View.php (modified)
 namespace Core\Mvc;
 
 use Core\Di\Injectable;
@@ -16,28 +16,28 @@ class View implements ViewInterface
     protected array $sections = [];
     protected bool $layoutEnabled = true;
     protected ?string $activeSection = null;
+    protected array $helpers = []; // New: array of helper functions
 
-    public function __construct(string $templatePath)
+    public function __construct($config = [])
     {
+        $templatePath = $config['path'] ?? 'views/';
+        $layout = $config['layout'] ?? 'default';
+        $this->setLayout($layout);
         $this->templatePath = rtrim($templatePath, '/\\') . DIRECTORY_SEPARATOR;
     }
 
     public function render(string $template, array $data = []): string
     {
         $this->fireEvent('view:beforeRender', $this);
-        $this->vars     = array_merge($this->vars, $data);
-        $templateFile   = $this->findTemplate($template);
-        $content        = $this->capture($templateFile, $this->vars);
+        $this->vars = array_merge($this->vars, $data);
+        $templateFile = $this->findTemplate($template);
+        $content = $this->capture($templateFile, $this->vars);
         if ($this->layoutEnabled && $this->layout) {
             $this->sections['content'] = $content;
             $layoutFile = $this->findTemplate('layouts' . DIRECTORY_SEPARATOR . $this->layout);
-            $content    = $this->capture($layoutFile, $this->vars);
+            $content = $this->capture($layoutFile, $this->vars);
         }
-        $this->fireEvent('view:afterRender', [$this,
-            [
-                'output' => $content
-            ]
-        ]);
+        $this->fireEvent('view:afterRender', [$this, [ 'output' => $content ] ]);
         return $content;
     }
 
@@ -49,15 +49,20 @@ class View implements ViewInterface
 
     protected function capture(string $templateFile, array $data): string
     {
-        extract($data, EXTR_SKIP);
-        ob_start();
-        try {
-            include $templateFile;
-        } catch (Exception $e) {
-            ob_end_clean();
-            throw $e;
-        }
-        return ob_get_clean();
+        $view = $this; // For binding
+        $capture = function () use ($templateFile, $data, $view) {
+            extract($data, EXTR_SKIP);
+            ob_start();
+            try {
+                include $templateFile;
+            } catch (Exception $e) {
+                ob_end_clean();
+                throw $e;
+            }
+            return ob_get_clean();
+        };
+        // Bind $this to the View instance in the closure
+        return $capture->call($view);
     }
 
     protected function findTemplate(string $template): string
@@ -117,5 +122,23 @@ class View implements ViewInterface
     public function getVar(string $name)
     {
         return $this->vars[$name] ?? null;
+    }
+
+    // New: Register a helper function
+    public function registerHelper(string $name, callable $helper): void
+    {
+        $this->helpers[$name] = $helper;
+    }
+
+    // New: Magic call for helpers and existing methods
+    public function __call(string $name, array $arguments)
+    {
+        if (isset($this->helpers[$name])) {
+            return call_user_func_array($this->helpers[$name], $arguments);
+        }
+        if (method_exists($this, $name)) {
+            return $this->$name(...$arguments);
+        }
+        throw new Exception("Method or helper '{$name}' not found in View.");
     }
 }

@@ -32,13 +32,15 @@ return [
     ],
 
     'session' => [
-        #'name'              => 'MYAPP_SESSID',
-        #'lifetime'          => 3600, // 1 hour
-        #'cookie_lifetime'   => 3600,
-        #'cookie_path'       => '/',
-        #'cookie_domain'     => '',
-        #'cookie_secure'     => false,
-        #'cookie_httponly'   => true
+        'driver' => 'database', // 'database' or 'native'
+        'table' => 'sessions',
+        'lifetime' => 3600,
+        'cookie_lifetime' => 3600,
+        'cookie_path' => '/',
+        'cookie_domain' => '',
+        'cookie_secure' => false,
+        'cookie_httponly' => true,
+        'cookie_samesite' => 'Lax'
     ],
 
     'cookie' => [
@@ -61,6 +63,11 @@ return [
                 '/' => [
                     'controller' => 'Module\Base\Controller\Dashboard',
                     'action' => 'index',
+                    'method'     => 'GET'
+                ],
+                '/login' => [
+                    'controller' => 'Module\Base\Controller\Dashboard',
+                    'action' => 'login',
                     'method'     => 'GET'
                 ]
             ],
