@@ -16,7 +16,7 @@ class AclServiceProvider implements ServiceProvider
             $config = $di->get('config');
             $access = new Access($config['acl']);
             $eventsManager = $di->get('eventsManager');
-            $eventsManager->attach('core:beforeDispatch', function(Event $event) use ($di, $access, $config) {
+            $eventsManager->attach('application:beforeDispatch', function(Event $event) use ($di, $access, $config) {
                 /** @var Dispatcher $dispatcher */
                 $dispatcher = $event->getData();
                 $role       = $di->get('session')->get('role', 'guest');
@@ -26,7 +26,7 @@ class AclServiceProvider implements ServiceProvider
                 if (!$access->isAllowed($role, $module, $controller, $action)) {
                     $event->stopPropagation();
                     $response = new Response('Access denied.', 403);
-                    return $response->redirect('login');
+                    return $response->redirect('login')->send();
                 }
                 return true;
             });
