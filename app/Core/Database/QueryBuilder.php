@@ -38,6 +38,77 @@ class QueryBuilder
         return $this;
     }
 
+    public function selectRaw(string $expression): self
+    {
+        $this->query->selectRaw($expression);
+        return $this;
+    }
+
+    public function count(): int
+    {
+        return $this->query->select(['COUNT(*)'])->first()['COUNT(*)'] ?? 0;
+    }
+
+    public function offset(int $offset): self
+    {
+        $this->query->offset($offset);
+        return $this;
+    }
+
+    public function whereNotIn(string $column, array $values): self
+    {
+        $this->query->whereNotIn($column, $values);
+        return $this;
+    }
+
+    public function whereNull(string $column): self
+    {
+        $this->query->whereNull($column);
+        return $this;
+    }
+
+    public function whereNotNull(string $column): self
+    {
+        $this->query->whereNotNull($column);
+        return $this;
+    }
+
+    public function whereRaw(string $sql, array $bindings = []): self
+    {
+        $this->query->whereRaw($sql, $bindings);
+        return $this;
+    }
+
+    public function groupBy(string $column): self
+    {
+        $this->query->groupBy($column);
+        return $this;
+    }
+
+    public function having(string $column, string $operator = null, $value = null): self
+    {
+        $this->query->having($column, $operator, $value);
+        return $this;
+    }
+
+    public function join(string $table, string $first, string $operator = null, string $second = null): self
+    {
+        $this->query->join($table, $first, $operator, $second);
+        return $this;
+    }
+
+    public function leftJoin(string $table, string $first, string $operator = null, string $second = null): self
+    {
+        $this->query->leftJoin($table, $first, $operator, $second);
+        return $this;
+    }
+
+    public function select(array $columns = ['*']): self
+    {
+        $this->query->select($columns);
+        return $this;
+    }
+
     public function get(): array
     {
         $results = $this->query->get();

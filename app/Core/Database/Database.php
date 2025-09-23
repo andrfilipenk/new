@@ -63,13 +63,21 @@ class Database
             'order'     => [],
             'limit'     => null,
             'offset'    => null,
-            'join'      => []
+            'join'      => [],
+            'group'     => [],
+            'having'    => []
         ];
     }
 
     public function select(array|string $columns = '*'): self
     {
         $this->query['select'] = is_array($columns) ? $columns : func_get_args();
+        return $this;
+    }
+
+    public function selectRaw(string $expression): self
+    {
+        $this->query['select'] = [$expression];
         return $this;
     }
 
@@ -105,6 +113,58 @@ class Database
         if (empty($values)) return $this;
         $this->query['where'][] = [$column, 'IN', $values, 'AND'];
         $this->query['bindings'] = array_merge($this->query['bindings'], array_values($values));
+        return $this;
+    }
+
+    public function whereNotIn(string $column, array $values): self
+    {
+        if (empty($values)) return $this;
+        $this->query['where'][] = [$column, 'NOT IN', $values, 'AND'];
+        $this->query['bindings'] = array_merge($this->query['bindings'], array_values($values));
+        return $this;
+    }
+
+    public function whereNull(string $column): self
+    {
+        $this->query['where'][] = [$column, 'IS NULL', null, 'AND'];
+        return $this;
+    }
+
+    public function whereNotNull(string $column): self
+    {
+        $this->query['where'][] = [$column, 'IS NOT NULL', null, 'AND'];
+        return $this;
+    }
+
+    public function whereRaw(string $sql, array $bindings = []): self
+    {
+        $this->query['where'][] = ['RAW', $sql, $bindings, 'AND'];
+        $this->query['bindings'] = array_merge($this->query['bindings'], $bindings);
+        return $this;
+    }
+
+    public function groupBy(string $column): self
+    {
+        $this->query['group'][] = $column;
+        return $this;
+    }
+
+    public function having(string $column, string $operator = null, $value = null): self
+    {
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+        $this->query['having'][] = [$column, $operator, $value];
+        if ($value !== null) {
+            $this->query['bindings'][] = $value;
+        }
+        return $this;
+    }
+
+    public function leftJoin(string $table, string $first, string $operator, string $second): self
+    {
+        $this->query['join'][] = "LEFT JOIN {$table} ON {$first} {$operator} {$second}";
         return $this;
     }
 
@@ -145,6 +205,15 @@ class Database
         return $result[0] ?? null;
     }
 
+    public function count(): int
+    {
+        $originalSelect = $this->query['select'];
+        $this->query['select'] = ['COUNT(*)'];
+        $result = $this->first();
+        $this->query['select'] = $originalSelect;
+        return (int) ($result['COUNT(*)'] ?? 0);
+    }
+
     public function insert(array $data): string
     {
         if (empty($data)) {
@@ -181,6 +250,12 @@ class Database
             $sql .= ' ' . implode(' ', $this->query['join']);
         }
         $sql .= $this->buildWhere();
+        if ($this->query['group']) {
+            $sql .= ' GROUP BY ' . implode(',', $this->query['group']);
+        }
+        if ($this->query['having']) {
+            $sql .= $this->buildHaving();
+        }
         if ($this->query['order']) {
             $sql .= ' ORDER BY ' . implode(',', $this->query['order']);
         }
@@ -201,16 +276,33 @@ class Database
         $conditions = [];
         foreach ($this->query['where'] as $i => [$column, $operator, $value, $boolean]) {
             $prefix = $i > 0 ? " {$boolean} " : '';
-            if ($operator === 'IN') {
+            if ($operator === 'RAW') {
+                $conditions[] = "{$prefix}{$column}";
+            } elseif ($operator === 'IN' || $operator === 'NOT IN') {
                 if (is_array($value) && !empty($value)) {
                     $placeholders = str_repeat('?,', count($value) - 1) . '?';
-                    $conditions[] = "{$prefix}{$column} IN ({$placeholders})";
+                    $conditions[] = "{$prefix}{$column} {$operator} ({$placeholders})";
                 }
+            } elseif ($operator === 'IS NULL' || $operator === 'IS NOT NULL') {
+                $conditions[] = "{$prefix}{$column} {$operator}";
             } else {
                 $conditions[] = "{$prefix}{$column} {$operator} ?";
             }
         }
         return $conditions ? ' WHERE ' . implode('', $conditions) : '';
+    }
+
+    private function buildHaving(): string
+    {
+        if (empty($this->query['having'])) {
+            return '';
+        }
+        $conditions = [];
+        foreach ($this->query['having'] as $i => [$column, $operator, $value]) {
+            $prefix = $i > 0 ? ' AND ' : '';
+            $conditions[] = "{$prefix}{$column} {$operator} ?";
+        }
+        return $conditions ? ' HAVING ' . implode('', $conditions) : '';
     }
 
     public function execute(string $sql, array $params = []): \PDOStatement
