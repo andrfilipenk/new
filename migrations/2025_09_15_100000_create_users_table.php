@@ -39,11 +39,11 @@ class CreateUsersTable extends Migration
     protected function getTestUserList() {
         return [
             // [id, name, email, password, custom_id]
-            [1, 'System User', 'sys.user@email.com', 'user', 1000],
-            [2, 'Worker Johnson', 'emma.johnson@email.com', 'worker', 2000],
-            [3, 'Leader Brown', 'michael.b@email.com', 'leader', 3000],
-            [4, 'Admin Davis', 'sarah.d@email.com', 'admin', 4000],
-            [5, 'David Wilson', 'david.w@email.com', 'tester', 2020],
+            [1, 'System User', 'system.user@email.com', 'user', 1000],
+            [2, 'Worker Johnson', 'worker.johnson@email.com', 'worker', 2000],
+            [3, 'Leader Brown', 'leader.b@email.com', 'leader', 3000],
+            [4, 'Admin Davis', 'Admin.d@email.com', 'admin', 4000],
+            [5, 'Andrej Filipenko', 'andrej.f@email.com', 'tester', 2020],
             [6, 'Jennifer Miller', 'jennifer.m@email.com', 'jenny', 3217],
             [7, 'Christopher Taylor', 'chris.t@email.com', 'chrispass', 2589],
             [8, 'Jessica Anderson', 'jessica.a@email.com', 'jess123', 7456],

@@ -3,6 +3,7 @@
 namespace Module\Admin\Models;
 
 use Core\Database\Model;
+use Module\Base\Model\Task;
 
 class User extends \Core\Acl\User
 {
@@ -16,6 +17,11 @@ class User extends \Core\Acl\User
     public function assignedTasks()
     {
         return $this->hasMany(Task::class, 'assigned_to', 'id');
+    }
+
+    public function taskComments()
+    {
+        return $this->hasMany(TaskComment::class, 'user_id', 'id');
     }
     
 }

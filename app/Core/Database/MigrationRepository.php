@@ -66,7 +66,7 @@ class MigrationRepository
             ->orderBy('migration', 'ASC')
             ->get();
         return array_map(function($item) {
-            return $item->migration;
+            return $item['migration'];
         }, $results);
     }
 

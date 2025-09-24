@@ -1,12 +1,16 @@
 <?php
-// app/Module/Admin/Models/Task.php
-namespace Module\Admin\Models;
+// app/Module/Base/Model/Task.php
+namespace Module\Base\Model;
 
 use Core\Database\Model;
 use Module\Admin\Models\User;
 
 class Task extends Model
 {
+    const STATUS_OPEN = 1;
+    const STATUS_PROGRESS = 2;
+    const STATUS_DONE = 3;
+
     protected $table = 'task';
     protected $primaryKey = 'id';
     protected array $fillable = [
@@ -32,5 +36,10 @@ class Task extends Model
     public function logs()
     {
         return $this->hasMany(TaskLog::class, 'task_id', 'id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(TaskComment::class, 'task_id', 'id');
     }
 }

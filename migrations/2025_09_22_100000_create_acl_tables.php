@@ -17,11 +17,6 @@ class CreateAclTables extends Migration
             $table->timestamps();
         });
 
-        $userID = $this->insertData('acl_role', ['name' => 'user', 'display_name' => 'Benutzer']);
-        $workerID = $this->insertData('acl_role', ['name' => 'worker', 'display_name' => 'Bearbeiter']);
-        $leaderID = $this->insertData('acl_role', ['name' => 'leader', 'display_name' => 'Leiter']);
-        $adminID = $this->insertData('acl_role', ['name' => 'admin', 'display_name' => 'Administrator']);
-
         // Create permission table
         $this->createTable('acl_permission', function(Blueprint $table) {
             $table->id();
@@ -33,14 +28,6 @@ class CreateAclTables extends Migration
             $table->string('action', 16)->nullable();   // edit
             $table->timestamps();
         });
-
-        $taskListID = $this->insertData('acl_permission', ['name' => 'task-list', 'display_name' => 'List Tasks', 'module' => 'base', 'controller' => 'task', 'action' => 'list']);
-        $taskViewID = $this->insertData('acl_permission', ['name' => 'task-view', 'display_name' => 'View Task', 'module' => 'base', 'controller' => 'task', 'action' => 'view']);
-        $taskCreateID = $this->insertData('acl_permission', ['name' => 'task-create', 'display_name' => 'Create Task', 'module' => 'base', 'controller' => 'task', 'action' => 'create']);
-        $taskEditID = $this->insertData('acl_permission', ['name' => 'task-edit', 'display_name' => 'Edit Task', 'module' => 'base', 'controller' => 'task', 'action' => 'edit']);
-        $taskDeleteID = $this->insertData('acl_permission', ['name' => 'task-delete', 'display_name' => 'Delete Task', 'module' => 'base', 'controller' => 'task', 'action' => 'delete']);
-        $taskMoveID = $this->insertData('acl_permission', ['name' => 'task-move', 'display_name' => 'Move Task', 'module' => 'base', 'controller' => 'task', 'action' => 'move']);
-        $taskAssignID = $this->insertData('acl_permission', ['name' => 'task-assign', 'display_name' => 'Assign Task', 'module' => 'base', 'controller' => 'task', 'action' => 'assign']);
 
         // Create role_permission junction table
         $this->createTable('acl_role_permission', function(Blueprint $table) {
@@ -75,6 +62,30 @@ class CreateAclTables extends Migration
             $table->foreign('user_id')->references('id')->on('user');  
             $table->foreign('permission_id')->references('id')->on('acl_permission');
         });
+
+        $sql = "INSERT INTO `acl_role` VALUES(1, 'user', 'Benutzer', 'Einfacher Nutzer der bestimmte Bereiche nur sehen kann.', '2025-09-24 20:03:53', '2025-09-24 20:03:53');
+            INSERT INTO `acl_role` VALUES(2, 'worker', 'Mitarbeiter', 'Internet Mitarbeiter des Betriebes', '2025-09-24 20:04:31', '2025-09-24 20:04:31');
+            INSERT INTO `acl_role` VALUES(3, 'leader', 'Abteilungsleiter', 'Leiter Produktion, Montage sowie Transport', '2025-09-24 20:04:52', '2025-09-24 20:04:52');
+            INSERT INTO `acl_role` VALUES(4, 'admin', 'Administrator', NULL, '2025-09-24 20:05:22', '2025-09-24 20:05:22');
+            INSERT INTO `acl_role` VALUES(5, 'master', 'Master', NULL, '2025-09-24 20:05:22', '2025-09-24 20:05:22');
+
+            INSERT INTO `acl_permission` VALUES(1, 'task-list', 'List Tasks', NULL, 'base', 'task', 'list', '2025-09-24 20:07:29', '2025-09-24 20:07:29');
+            INSERT INTO `acl_permission` VALUES(2, 'task-view', 'View Task Details', NULL, 'base', 'task', 'view', '2025-09-24 20:08:06', '2025-09-24 20:08:06');
+            INSERT INTO `acl_permission` VALUES(3, 'task-create', 'Create new Task', NULL, 'base', 'task', 'create', '2025-09-24 20:08:40', '2025-09-24 20:08:40');
+            INSERT INTO `acl_permission` VALUES(4, 'task-edit', 'Edit Task', NULL, 'base', 'task', 'edit', '2025-09-24 20:09:50', '2025-09-24 20:09:50');
+            INSERT INTO `acl_permission` VALUES(5, 'task-delete', 'Delete Task', NULL, 'base', 'task', 'delete', '2025-09-24 20:10:38', '2025-09-24 20:10:38');
+            INSERT INTO `acl_permission` VALUES(6, 'task-status', 'Change Task Status', NULL, 'base', 'task', 'status', '2025-09-24 20:11:40', '2025-09-24 20:11:40');
+            INSERT INTO `acl_permission` VALUES(7, 'task-assign', 'Assign Task', NULL, 'base', 'task', 'assign', '2025-09-24 20:12:25', '2025-09-24 20:12:25');
+            INSERT INTO `acl_permission` VALUES(8, 'task-comment', 'Task comments', NULL, 'base', 'task', 'comment', '2025-09-24 20:12:25', '2025-09-24 20:12:25');
+            
+            INSERT INTO `acl_user_role` VALUES(1, 1, 1, '2025-09-24 22:15:08', '2025-09-24 22:15:08');
+            INSERT INTO `acl_user_role` VALUES(2, 2, 2, '2025-09-24 22:15:21', '2025-09-24 22:15:21');
+            INSERT INTO `acl_user_role` VALUES(3, 3, 3, '2025-09-24 22:15:33', '2025-09-24 22:15:33');
+            INSERT INTO `acl_user_role` VALUES(4, 4, 4, '2025-09-24 22:16:00', '2025-09-24 22:16:00');
+            INSERT INTO `acl_user_role` VALUES(5, 5, 5, '2025-09-24 22:17:34', '2025-09-24 22:17:34');";
+
+        $sql = str_replace(["\r", "\n"], "", $sql);
+        $this->db()->getPdo()->exec($sql);
     }
 
     public function down(): void

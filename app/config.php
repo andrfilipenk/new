@@ -10,6 +10,15 @@ return [
         'hash_algo'         => PASSWORD_BCRYPT
     ],
 
+    'data' => [
+        'accounts' => [
+            '1000' => 'user',
+            '2000' => 'worker',
+            '3000' => 'leader',
+            '4000' => 'admin',
+        ]
+    ],
+
     'migrations' => [
         'path'              => APP_PATH . '../migrations',
         'table'             => 'migrations'

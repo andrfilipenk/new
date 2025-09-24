@@ -1,9 +1,9 @@
 <?php
-namespace Module\Admin\Controller;
+namespace Module\Base\Controller;
 
 use Core\Mvc\Controller;
-use Module\Admin\Models\Task as TaskModel;
-use Module\Admin\Forms\TaskForm;
+use Module\Base\Model\Task as TaskModel;
+use Module\Base\Form\TaskForm;
 
 class Task extends Controller
 {
@@ -40,9 +40,7 @@ class Task extends Controller
         $task = TaskModel::find($id);
         if ($task === null) {
             $this->flashError('Task not found');
-            $response = $this->redirect('admin/tasks');
-            var_dump($response);
-            return $response;
+            return $this->redirect('admin/tasks');
         }
         $form = TaskForm::build($task->getData());
         if ($this->isPost()) {

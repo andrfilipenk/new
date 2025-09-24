@@ -29,8 +29,21 @@ class CreateTasksTable extends Migration
             $table->string('content', 255);
             $table->timestamp('created_at')->default('CURRENT_TIMESTAMP');
 
-            $table->foreign('task_id')->references('id')->on('task');
+            $table->foreign(column: 'task_id')->references('id')->on('task');
         });
+
+        $this->createTable('task_comment', function($table) {
+            /** @var Blueprint $table */
+            $table->id();
+            $table->integer('task_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+            $table->text('content');
+            $table->timestamps();
+
+            $table->foreign(column: 'user_id')->references('id')->on('user');
+            $table->foreign(column: 'task_id')->references('id')->on('task');
+        });
+
 
         $this->insertDataArray(
             'task', 
@@ -47,6 +60,7 @@ class CreateTasksTable extends Migration
 
     public function down()
     {
+        $this->dropTable('task_comment');
         $this->dropTable('task_log');
         $this->dropTable('task');
     }
@@ -55,28 +69,28 @@ class CreateTasksTable extends Migration
     {
         return [
             // [created_by, assigned_to, title, begin_date, end_date, status, priority]
-            [3, 1, 'Website Redesign', '2025-09-08', '2025-09-25', 'in-progress', 7],
-            [5, 1, 'Database Optimization', '2025-09-06', '2025-09-20', 'done', 8],
-            [7, 1, 'API Documentation', '2025-09-12', '2025-09-28', 'open', 5],
-            [12, 1, 'Client Presentation', '2025-09-05', '2025-09-19', 'done', 9],
-            [18, 1, 'Bug Fixing', '2025-09-15', '2025-09-26', 'in-progress', 6],
-            [9, 1, 'Security Audit', '2025-09-10', '2025-09-30', 'open', 8],
-            [14, 1, 'Content Migration', '2025-09-14', '2025-09-27', 'in-progress', 4],
-            [20, 1, 'Training Materials', '2025-09-16', '2025-10-02', 'open', 3],
-            [1, 4, 'Mobile App Development', '2025-09-09', '2025-10-05', 'in-progress', 9],
-            [1, 7, 'Server Maintenance', '2025-09-07', '2025-09-18', 'done', 7],
-            [1, 12, 'SEO Optimization', '2025-09-13', '2025-10-03', 'open', 6],
-            [1, 3, 'Payment Integration', '2025-09-08', '2025-09-24', 'in-progress', 8],
-            [1, 15, 'User Testing', '2025-09-17', '2025-10-01', 'open', 5],
-            [1, 8, 'Email Campaign', '2025-09-11', '2025-09-26', 'in-progress', 4],
-            [1, 19, 'Data Backup', '2025-09-06', '2025-09-17', 'done', 6],
-            [1, 6, 'Dashboard Design', '2025-09-18', '2025-10-06', 'open', 7],
-            [1, 11, 'Performance Testing', '2025-09-19', '2025-10-08', 'in-progress', 8],
-            [1, 2, 'Documentation Update', '2025-09-05', '2025-09-22', 'done', 3],
-            [1, 17, 'Social Media Strategy', '2025-09-20', '2025-10-09', 'open', 5],
-            [1, 10, 'Customer Support', '2025-09-21', '2025-10-04', 'in-progress', 6],
-            [1, 13, 'Bug Reports Analysis', '2025-09-22', '2025-10-07', 'open', 4],
-            [1, 16, 'Feature Planning', '2025-09-23', '2025-10-10', 'in-progress', 9]
+            [3, 5, 'Website Redesign', '2025-09-08', '2025-09-25', 'in-progress', 7],
+            [5, 6, 'Database Optimization', '2025-09-06', '2025-09-20', 'done', 8],
+            [7, 5, 'API Documentation', '2025-09-12', '2025-09-28', 'open', 5],
+            [12, 5, 'Client Presentation', '2025-09-05', '2025-09-19', 'done', 9],
+            [18, 2, 'Bug Fixing', '2025-09-15', '2025-09-26', 'in-progress', 6],
+            [9, 2, 'Security Audit', '2025-09-10', '2025-09-30', 'open', 8],
+            [14, 2, 'Content Migration', '2025-09-14', '2025-09-27', 'in-progress', 4],
+            [20, 2, 'Training Materials', '2025-09-16', '2025-10-02', 'open', 3],
+            [5, 4, 'Mobile App Development', '2025-09-09', '2025-10-05', 'in-progress', 9],
+            [5, 7, 'Server Maintenance', '2025-09-07', '2025-09-18', 'done', 7],
+            [5, 12, 'SEO Optimization', '2025-09-13', '2025-10-03', 'open', 6],
+            [5, 3, 'Payment Integration', '2025-09-08', '2025-09-24', 'in-progress', 8],
+            [5, 15, 'User Testing', '2025-09-17', '2025-10-01', 'open', 5],
+            [5, 8, 'Email Campaign', '2025-09-11', '2025-09-26', 'in-progress', 4],
+            [5, 19, 'Data Backup', '2025-09-06', '2025-09-17', 'done', 6],
+            [5, 6, 'Dashboard Design', '2025-09-18', '2025-10-06', 'open', 7],
+            [5, 11, 'Performance Testing', '2025-09-19', '2025-10-08', 'in-progress', 8],
+            [5, 2, 'Documentation Update', '2025-09-05', '2025-09-22', 'done', 3],
+            [5, 17, 'Social Media Strategy', '2025-09-20', '2025-10-09', 'open', 5],
+            [5, 10, 'Customer Support', '2025-09-21', '2025-10-04', 'in-progress', 6],
+            [5, 13, 'Bug Reports Analysis', '2025-09-22', '2025-10-07', 'open', 4],
+            [5, 16, 'Feature Planning', '2025-09-23', '2025-10-10', 'in-progress', 9]
         ];
     }
 
