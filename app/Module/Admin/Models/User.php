@@ -6,8 +6,10 @@ use Core\Database\Model;
 
 class User extends \Core\Acl\User
 {
+
     public function createdTasks()
     {
+        #return $this->belongsTo(Task::class, 'created_by', 'id')->getResults();
         return $this->hasMany(Task::class, 'created_by', 'id');
     }
 

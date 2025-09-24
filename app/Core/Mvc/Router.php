@@ -6,10 +6,13 @@ class Router
 {
     protected $routes = [];
     protected $currentRoute;
+
     
     public function add(string $pattern, array $config): void
     {
         $regex = $this->patternToRegex($pattern);
+        $method = $config['method'] ?? ['GET'];
+        $config['method'] = is_string($method) ? [$method] : $method;
         $this->routes[] = [
             'pattern'   => $pattern,
             'regex'     => $regex,
@@ -21,7 +24,8 @@ class Router
     {
         $uri = trim($uri, '/');
         foreach ($this->routes as $route) {
-            $methodMatch = !isset($route['config']['method']) || strcasecmp($route['config']['method'], $method) === 0;
+            $methodMatch = in_array($method, $route['config']['method']);
+            #$methodMatch = !isset($route['config']['method']) || strcasecmp($route['config']['method'], $method) === 0;
             if ($methodMatch && preg_match($route['regex'], $uri, $matches)) {
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
                 $this->currentRoute = $route;
@@ -30,11 +34,7 @@ class Router
         }
         return null;
     }
-    
-    public function getCurrentRoute(): ?array
-    {
-        return $this->currentRoute;
-    }
+ 
     
     protected function patternToRegex(string $pattern): string
     {
@@ -67,5 +67,11 @@ class Router
             }, 
             $value
         );
+    }
+
+       
+    public function getCurrentRoute(): ?array
+    {
+        return $this->currentRoute;
     }
 }

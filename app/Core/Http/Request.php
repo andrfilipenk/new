@@ -27,6 +27,15 @@ class Request
     public static function capture(): self
     {
         if (!self::$instance) {
+            $uri    = $_SERVER['REQUEST_URI'];
+            $query  = $_SERVER['QUERY_STRING'];
+            $params = [];
+            parse_str($query, $params);
+            $url = '/' . str_replace(['new/', '?' . $query], '', $uri);
+            $url = str_replace('//', '/', $url);
+            $_GET = $params ?? [];
+            $_SERVER['REQUEST_URI'] = $url;
+
             self::$instance = new self();
         }
         return self::$instance;

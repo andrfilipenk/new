@@ -7,6 +7,7 @@ return [
         'version'           => '1.0.0',
         'base'              => '/new/',
         'debug'             => true,
+        'hash_algo'         => PASSWORD_BCRYPT
     ],
 
     'migrations' => [
@@ -59,12 +60,10 @@ return [
 
     'acl' => [
         'allowed' => [
-            'guest.base.dashboard.index',
-            'guest.base.dashboard.login',
-            'guest.base.dashboard.error',
-            'guest.admin.user.index',
-            'guest.admin.task.index',
-            'guest.admin.task.edit',
+            'guest.base.auth.login',
+            'guest.base.auth.kuhnle',
+            'guest.base.error.notfound',
+            'guest.base.error.denied',
         ],
         'denied' => [
             'module'     => 'base',
@@ -84,10 +83,16 @@ return [
                 ],
                 '/login' => [
                     'module'     => 'base',
-                    'controller' => 'dashboard',
+                    'controller' => 'auth',
                     'action'     => 'login',
+                    'method'     => ['GET', 'POST']
+                ],
+                '/kuhnle-{id}' => [
+                    'module'     => 'base',
+                    'controller' => 'auth',
+                    'action'     => 'kuhnle',
                     'method'     => 'GET'
-                ]
+                ],
             ],
             'services' => [
                 #'baseService' => 'Module\Base\Service\BaseService'

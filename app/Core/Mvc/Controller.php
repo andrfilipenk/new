@@ -61,6 +61,16 @@ class Controller
     }
 
     /**
+     * Returns dispatcher instance
+     *
+     * @return \Core\Mvc\Dispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->getDI()->get('dispatcher');
+    }
+
+    /**
      * Returns url instance or url
      *
      * @param string|null $to
@@ -107,36 +117,21 @@ class Controller
         return $this->flashMessage('error', $message);
     }
 
-    protected function redirect(string $to, int $statusCode = 302): Response
+    protected function redirect(string $to, int $statusCode = 302)
     {
         return $this->getResponse()->redirect($this->url($to), $statusCode)->send();
     }
 
     protected function render(string $template = null, array $data = []): string
     {
+        $dispatcher = $this->getDispatcher();
         if ($template !== null) {
-            $dispatcher     = $this->getDI()->get('dispatcher');
-            $module         = $dispatcher->getModuleName();
-
-            $template       = 'module' . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . $template;
+            $template = $dispatcher->getModuleName() . DIRECTORY_SEPARATOR . $template;
         } else {
-            $template = $this->getTemplateName();
+            $template = $dispatcher->getModuleName() . DIRECTORY_SEPARATOR 
+                . $dispatcher->getControllerName() . DIRECTORY_SEPARATOR 
+                . $dispatcher->getActionName();
         }
         return $this->getView()->render($template, $data);
-    }
-
-    protected function getTemplateName(): string
-    {
-        $dispatcher = $this->getDI()->get('dispatcher');
-        $moduleName = $dispatcher->getModuleName();
-        $controller = $dispatcher->getControllerName();
-        $action     = $dispatcher->getActionName();
-
-        $path = 'module' . DIRECTORY_SEPARATOR 
-            . $moduleName . DIRECTORY_SEPARATOR 
-            . $controller . DIRECTORY_SEPARATOR 
-            . $action;
-        
-        return $path;
     }
 }

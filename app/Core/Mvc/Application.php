@@ -36,7 +36,9 @@ class Application
         try {
             $this->eventsManager->trigger('application:beforeHandle', $this);
             $base = $this->config['app']['base'] ?? '';
-            $route = $this->router->match($request->uri($base), $request->method());
+            $uri = $request->uri($base);
+            $route = $this->router->match($uri, $request->method());
+
             if (!$route) {
                 $response = $this->di->get('response');
                 $response->setStatusCode(404);

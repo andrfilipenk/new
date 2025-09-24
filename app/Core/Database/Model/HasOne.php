@@ -1,5 +1,5 @@
 <?php
-// app/Core/Database/Model/HasOne.php
+
 namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
@@ -8,9 +8,10 @@ class HasOne extends HasMany
 {
     public function getResults()
     {
-        return $this->query
+        $result = $this->query
             ->where($this->foreignKey, $this->parent->getData($this->localKey))
             ->first();
+        return $result ? $this->related::newFromBuilder($result) : null;
     }
 
     public function match(array $models, array $results, $relation)

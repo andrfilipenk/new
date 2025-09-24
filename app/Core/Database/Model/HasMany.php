@@ -1,5 +1,5 @@
 <?php
-// app/Core/Database/Model/HasMany.php
+
 namespace Core\Database\Model;
 
 use Core\Database\Model as DbModel;
@@ -8,19 +8,20 @@ class HasMany extends Relation
 {
     protected $foreignKey;
     protected $localKey;
-    
+
     public function __construct(DbModel $related, DbModel $parent, $foreignKey, $localKey)
     {
         parent::__construct($related, $parent);
         $this->foreignKey = $foreignKey;
         $this->localKey = $localKey;
     }
-    
+
     public function getResults()
     {
-        return $this->query
+        $results = $this->query
             ->where($this->foreignKey, $this->parent->getData($this->localKey))
             ->get();
+        return array_map(fn($row) => $this->related::newFromBuilder($row), $results);
     }
 
     public function addEagerConstraints(array $models)

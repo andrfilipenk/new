@@ -3,14 +3,35 @@
 namespace Core\Acl;
 
 use Core\Database\Model;
+use Core\Di\Container;
 
 class User extends Model
 {
     protected $table = 'user';
     protected $primaryKey = 'id';
-    protected array $fillable = ['name', 'email', 'password', 'kuhnle_id'];
+    protected array $fillable = ['name', 'email', 'password', 'custom_id'];
     
     // protected array $with = ['tasks']; // Always eager load task
+
+    public function save(): bool
+    {
+        if (isset($this->attributes['password']) && $this->isDirty('password')) {
+            $config = Container::getDefault()->get('config');
+            $this->attributes['password'] = password_hash($this->attributes['password'], $config['app']['hash_algo']);
+        }
+        return parent::save();
+    }
+
+    public function verifyPassword(string $password): bool
+    {
+        return password_verify($password, $this->attributes['password']);
+    }
+
+    protected function isDirty(string $attribute): bool
+    {
+        return !isset($this->original[$attribute]) || 
+               $this->attributes[$attribute] !== $this->original[$attribute];
+    }
     
     public function roles()
     {

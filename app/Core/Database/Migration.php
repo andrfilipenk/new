@@ -58,6 +58,13 @@ abstract class Migration
         }
     }
 
+    protected function insertData($table, $data = [])
+    {
+        $query = self::db()->table($table);
+        $query->insert($data);
+        return $this;
+    }
+
     /**
      * Insert data array
      */

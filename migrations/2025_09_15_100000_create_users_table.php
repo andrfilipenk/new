@@ -11,31 +11,39 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->string('name', 32);
             $table->string('email', 64);
-            $table->integer('kuhnle_id');
-            $table->string('password')->nullable();
+            $table->integer('custom_id');
+            $table->string('password', 255)->nullable();
             $table->timestamps();
         });
 
+        $users  = $this->getTestUserList();
+        $config = $this->getDI()->get('config');
+        $algo   = $config['app']['hash_algo'];
+
+        foreach ($users as $i => $row) {
+            $users[$i][3] = password_hash($row[3], $algo);
+        }
+
         $this->insertDataArray(
             'user', 
-            ['id', 'name', 'email', 'password', 'kuhnle_id'], 
-            $this->getTestUserList()
+            ['id', 'name', 'email', 'password', 'custom_id'], 
+            $users
         );
     }
 
     public function down()
     {
-        $this->dropTable('user');
+        $this->dropTable('user');;
     }
 
     protected function getTestUserList() {
         return [
-            // [id, name, email, password, kuhnle_id]
-            [1, 'Andrej Filipenko', 'andrej.filipenko@email.com', 'pass123', 2020],
-            [2, 'Emma Johnson', 'emma.johnson@email.com', 'secure', 7894],
-            [3, 'Michael Brown', 'michael.b@email.com', 'mypass', 1236],
-            [4, 'Sarah Davis', 'sarah.d@email.com', 'password', 9874],
-            [5, 'David Wilson', 'david.w@email.com', 'david123', 6542],
+            // [id, name, email, password, custom_id]
+            [1, 'System User', 'sys.user@email.com', 'user', 1000],
+            [2, 'Worker Johnson', 'emma.johnson@email.com', 'worker', 2000],
+            [3, 'Leader Brown', 'michael.b@email.com', 'leader', 3000],
+            [4, 'Admin Davis', 'sarah.d@email.com', 'admin', 4000],
+            [5, 'David Wilson', 'david.w@email.com', 'tester', 2020],
             [6, 'Jennifer Miller', 'jennifer.m@email.com', 'jenny', 3217],
             [7, 'Christopher Taylor', 'chris.t@email.com', 'chrispass', 2589],
             [8, 'Jessica Anderson', 'jessica.a@email.com', 'jess123', 7456],

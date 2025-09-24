@@ -1,11 +1,11 @@
 <?php
-// app/Module/Base/Controller/Dashboard.php
+// app/Module/Base/Controller/Auth.php
 namespace Module\Base\Controller;
 
 use Core\Mvc\Controller;
 use Module\Admin\Models\User;
 
-class Dashboard extends Controller
+class Auth extends Controller
 {
     public function indexAction()
     {
@@ -35,11 +35,29 @@ class Dashboard extends Controller
 
     public function loginAction()
     {
-        $user = User::find(1);
-        if ($user) {
-            // Store user ID in session
-            $this->getSession()->set('user', $user->getData());
-            $this->flashSuccess('Login successful!');
+        if ($this->isPost()) {
+            $id = $this->getPost('id');
+            $pw = $this->getPost('password');
+            if (null !== $id && null !== $pw) {
+                $user = User::find($id, 'custom_id');
+                if ($user) var_dump($user->name);
+                if ($user->verifyPassword($pw)) var_dump("password ok");
+                foreach ($user->createdTasks as $task) {
+                    var_dump($task->creator);
+                }
+
+
+                exit;
+            }
         }
+        
+        #if ($user)  $this->getSession()->set('user', $user->getData());
+        $this->getView()->setLayout('window');
+        return $this->render('auth/login');
+    }
+
+    public function kuhnleAction()
+    {
+
     }
 }

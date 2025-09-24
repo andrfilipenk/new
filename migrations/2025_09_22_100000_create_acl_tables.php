@@ -17,16 +17,30 @@ class CreateAclTables extends Migration
             $table->timestamps();
         });
 
+        $userID = $this->insertData('acl_role', ['name' => 'user', 'display_name' => 'Benutzer']);
+        $workerID = $this->insertData('acl_role', ['name' => 'worker', 'display_name' => 'Bearbeiter']);
+        $leaderID = $this->insertData('acl_role', ['name' => 'leader', 'display_name' => 'Leiter']);
+        $adminID = $this->insertData('acl_role', ['name' => 'admin', 'display_name' => 'Administrator']);
+
         // Create permission table
         $this->createTable('acl_permission', function(Blueprint $table) {
             $table->id();
             $table->string('name', 100)->unique();
             $table->string('display_name', 150);
             $table->text('description')->nullable();
-            $table->string('resource', 50)->nullable(); // e.g., 'users', 'posts', 'admin'
-            $table->string('action', 50)->nullable();   // e.g., 'create', 'read', 'update', 'delete'
+            $table->string('module', 16)->nullable(); // base
+            $table->string('controller', 16)->nullable(); // task
+            $table->string('action', 16)->nullable();   // edit
             $table->timestamps();
         });
+
+        $taskListID = $this->insertData('acl_permission', ['name' => 'task-list', 'display_name' => 'List Tasks', 'module' => 'base', 'controller' => 'task', 'action' => 'list']);
+        $taskViewID = $this->insertData('acl_permission', ['name' => 'task-view', 'display_name' => 'View Task', 'module' => 'base', 'controller' => 'task', 'action' => 'view']);
+        $taskCreateID = $this->insertData('acl_permission', ['name' => 'task-create', 'display_name' => 'Create Task', 'module' => 'base', 'controller' => 'task', 'action' => 'create']);
+        $taskEditID = $this->insertData('acl_permission', ['name' => 'task-edit', 'display_name' => 'Edit Task', 'module' => 'base', 'controller' => 'task', 'action' => 'edit']);
+        $taskDeleteID = $this->insertData('acl_permission', ['name' => 'task-delete', 'display_name' => 'Delete Task', 'module' => 'base', 'controller' => 'task', 'action' => 'delete']);
+        $taskMoveID = $this->insertData('acl_permission', ['name' => 'task-move', 'display_name' => 'Move Task', 'module' => 'base', 'controller' => 'task', 'action' => 'move']);
+        $taskAssignID = $this->insertData('acl_permission', ['name' => 'task-assign', 'display_name' => 'Assign Task', 'module' => 'base', 'controller' => 'task', 'action' => 'assign']);
 
         // Create role_permission junction table
         $this->createTable('acl_role_permission', function(Blueprint $table) {
