@@ -26,6 +26,12 @@ class View implements ViewInterface
         $this->templatePath = rtrim($templatePath, '/\\') . DIRECTORY_SEPARATOR;
     }
 
+    public function setTemplatePath($path)
+    {
+        $this->templatePath = $path;
+        return $this;
+    }
+
     public function render(string $template, array $data = []): string
     {
         $this->fireEvent('view:beforeRender', $this);

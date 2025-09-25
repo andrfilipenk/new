@@ -26,12 +26,12 @@ $di->set('request', fn() => \Core\Http\Request::capture());
 $di->set('response', fn() => \Core\Http\Response::create());
 $di->set('db', fn() => new \Core\Database\Database);
 $di->set('dispatcher', fn() => new \Core\Mvc\Dispatcher);
-$di->register(new \Module\Provider\DatabaseSessionServiceProvider);
-$di->register(new \Module\Provider\CookieServiceProvider);
-$di->register(new \Module\Provider\ViewServiceProvider);
-$di->register(new \Module\Provider\RouterServiceProvider);
-$di->register(new \Module\Provider\NavigationServiceProvider);
-$di->register(new \Module\Provider\AclServiceProvider);
+$di->register(new \Module\Base\Provider\DatabaseSessionServiceProvider);
+$di->register(new \Module\Base\Provider\CookieServiceProvider);
+$di->register(new \Module\Base\Provider\ViewServiceProvider);
+$di->register(new \Module\Base\Provider\RouterServiceProvider);
+$di->register(new \Module\Base\Provider\NavigationServiceProvider);
+$di->register(new \Module\Base\Provider\AclServiceProvider);
 
 $di->set('migrationRepository', fn() => new \Core\Database\MigrationRepository);
 $di->set('migrator', fn() => new \Core\Database\Migrator);

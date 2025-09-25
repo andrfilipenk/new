@@ -1,5 +1,5 @@
 <?php
-namespace Module\Provider;
+namespace Module\Base\Provider;
 
 use Core\Acl\Access;
 use Core\Di\Interface\Container as ContainerInterface;

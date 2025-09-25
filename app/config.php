@@ -73,6 +73,7 @@ return [
             'guest.base.auth.kuhnle',
             'guest.base.error.notfound',
             'guest.base.error.denied',
+            'guest.base.task.index'
         ],
         'denied' => [
             'module'     => 'base',
@@ -100,6 +101,12 @@ return [
                     'module'     => 'base',
                     'controller' => 'auth',
                     'action'     => 'kuhnle',
+                    'method'     => 'GET'
+                ],
+                '/tasks' => [
+                    'module'     => 'base',
+                    'controller' => 'task',
+                    'action'     => 'index',
                     'method'     => 'GET'
                 ],
             ],

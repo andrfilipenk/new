@@ -1,6 +1,6 @@
 <?php
 // app/Module/Provider/ViewServiceProvider.php
-namespace Module\Provider;
+namespace Module\Base\Provider;
 
 use Core\Mvc\View;
 use Core\Di\Interface\ServiceProvider;

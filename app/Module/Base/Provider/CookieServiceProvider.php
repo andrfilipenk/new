@@ -1,6 +1,6 @@
 <?php
 // app/Module/Provider/CookieServiceProvider.php
-namespace Module\Provider;
+namespace Module\Base\Provider;
 
 use Core\Cookie\Cookie;
 use Core\Di\Interface\ServiceProvider;

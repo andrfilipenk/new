@@ -12,7 +12,7 @@ $navigation = $this->getDI()->get('navigation');
     <link rel="stylesheet" href="<?= $url->get('css/pico.min.css') ?>">
 </head>
 <body>
-    <header>
+    <header class="pico">
         <nav>
             <ul>
                 <li><strong>Acme Corp</strong></li>
@@ -25,25 +25,14 @@ $navigation = $this->getDI()->get('navigation');
         </nav>
     </header>
     <main class="container">
-        
+        <?php foreach($this->messages() as $msg): ?>
+                        <div class="alert alert-<?= $msg['type'] ?>"><?= $msg['message'] ?></div>
+                    <?php endforeach; ?>
+
+
+                    <?php echo $this->yield('content'); ?>
     </main>
-
-    <div class="app-container">
-        <!-- Top Identity Bar -->
-        <header class="top-bar">
-            <div class="brand">
-                <h1><?= htmlspecialchars($brand ?? 'Our Framework') ?></h1>
-            </div>
-            <div class="user-menu">
-                <span class="user-name"><?= htmlspecialchars($user_name ?? 'Guest') ?></span>
-                <button class="menu-toggle" id="menuToggle">☰</button>
-            </div>
-        </header>
-
-        <!-- Main Content Area -->
-        <div class="main-container">
-            <!-- Sidebar -->
-            <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar">
                 <div class="sidebar-content">
                     <nav class="main-nav" id="mainNav">
                         <?php if (!empty($navigation)): ?>
@@ -60,18 +49,6 @@ $navigation = $this->getDI()->get('navigation');
                     </nav>
                 </div>
             </aside>
-
-            <!-- Content Area -->
-            <main class="content" id="content">
-                <?php foreach($this->messages() as $msg): ?>
-                    <div class="alert alert-<?= $msg['type'] ?>"><?= $msg['message'] ?></div>
-                <?php endforeach; ?>
-
-
-                <?php echo $this->yield('content'); ?>
-            </main>
-        </div>
-    </div>
     <script src="<?= $url->get('js/app.js') ?>"></script>
 </body>
 </html>

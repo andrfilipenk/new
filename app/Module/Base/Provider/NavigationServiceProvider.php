@@ -1,6 +1,6 @@
 <?php
 // app/Module/Provider/NavigationServiceProvider.php
-namespace Module\Provider;
+namespace Module\Base\Provider;
 
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container as ContainerInterface;
