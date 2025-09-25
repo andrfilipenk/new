@@ -10,6 +10,10 @@ $navigation = $this->getDI()->get('navigation');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
     <link rel="stylesheet" href="<?= $url->get('css/pico.min.css') ?>">
+    <style>
+        table {width: 100%;}
+        table thead tr th {text-align: left;}
+    </style>
 </head>
 <body>
     <header class="pico">
@@ -24,14 +28,15 @@ $navigation = $this->getDI()->get('navigation');
             </ul>
         </nav>
     </header>
-    <main class="container">
+    <main class="pico container">
         <?php foreach($this->messages() as $msg): ?>
-                        <div class="alert alert-<?= $msg['type'] ?>"><?= $msg['message'] ?></div>
-                    <?php endforeach; ?>
+            <div class="alert alert-<?= $msg['type'] ?>"><?= $msg['message'] ?></div>
+        <?php endforeach; ?>
 
 
-                    <?php echo $this->yield('content'); ?>
+        <?php echo $this->yield('content'); ?>
     </main>
+    <!-- 
     <aside class="sidebar" id="sidebar">
                 <div class="sidebar-content">
                     <nav class="main-nav" id="mainNav">
@@ -48,7 +53,7 @@ $navigation = $this->getDI()->get('navigation');
                         <?php endif; ?>
                     </nav>
                 </div>
-            </aside>
+            </aside> -->
     <script src="<?= $url->get('js/app.js') ?>"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@ $url        = $this->getDI()->get('url');
             <th>Creator</th>
             <th>Assigned</th>
             <th>Status</th>
-            <th>Priority</th>
+            <th>Prio</th>
             <th>Dates</th>
             <th>Actions</th>
         </tr>
@@ -34,8 +34,8 @@ $url        = $this->getDI()->get('url');
                     End: <?= htmlspecialchars($task->end_date) ?>
                 </td>
                 <td>
-                    <a href="<?= $url->get('admin/task-edit/' . $task->id) ?>">Edit</a>
-                    <a href="<?= $url->get('admin/task-delete/' . $task->id) ?>" onclick="return confirm('Delete this task?')">Delete</a>
+                    <a href="<?= $url->get('admin/task-edit/' . $task->id) ?>">E</a>
+                    <a href="<?= $url->get('admin/task-delete/' . $task->id) ?>" onclick="return confirm('Delete this task?')">X</a>
                 </td>
             </tr>
         <?php endforeach; ?>
