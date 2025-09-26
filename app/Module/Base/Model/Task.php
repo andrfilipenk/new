@@ -7,10 +7,10 @@ use Module\Admin\Models\User;
 
 class Task extends Model
 {
-    const STATUS_OPEN = 1;
-    const STATUS_PROGRESS = 2;
-    const STATUS_DONE = 3;
-
+    const STATUS_OPEN       = 1;
+    const STATUS_PROGRESS   = 2;
+    const STATUS_DONE       = 3;
+    
     protected $table = 'task';
     protected $primaryKey = 'id';
     protected array $fillable = [

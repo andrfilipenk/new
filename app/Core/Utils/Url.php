@@ -15,7 +15,20 @@ class Url
         $this->base_path = $config['app']['base'];
     }
 
-    public function get($url) {
-        return $this->base_path . $url;
+    public function get($url, $params = [], $reset = false) {
+        $url = $this->base_path . $url;
+        if ($reset) $_GET = [];
+        $params = array_merge($_GET, $params);
+        if (count($params) > 0) {
+            foreach ($params as $k => $v) {
+                if ($v === null || empty($v)) {
+                    unset($params[$k]);
+                }
+            }
+            if (count($params) > 0) {
+                $url .= http_build_query($params);
+            }
+        }
+        return $url;
     }
 }

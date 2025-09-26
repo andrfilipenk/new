@@ -7,10 +7,17 @@ use Module\Base\Form\TaskForm;
 
 class Task extends Controller
 {
+    protected $_statusLabels = [
+        TaskModel::STATUS_OPEN      => 'Open',
+        TaskModel::STATUS_PROGRESS  => 'Progress',
+        TaskModel::STATUS_DONE      => 'Done'
+    ];
+
+    
     public function indexAction()
     {
         $tasks = TaskModel::with(['creator', 'assigned'])->get();
-        return $this->render('task/index', ['tasks' => $tasks]);
+        return $this->render('task/tasklist', ['tasks' => $tasks]);
     }
 
     public function createAction()

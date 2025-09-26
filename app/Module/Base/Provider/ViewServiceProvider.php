@@ -17,10 +17,17 @@ class ViewServiceProvider implements ServiceProvider
             if ($di->has('eventsManager')) {
                 $view->setEventsManager($di->get('eventsManager'));
             }
-            // New: Register 'url' helper
-            $view->registerHelper('url', function ($to = null) use ($di) {
-                return $di->get('url')->get($to);
+            $view->registerHelper('url', function ($to = null, $params = [], $reset = false) use ($di) {
+                return $di->get('url')->get($to, $params, $reset);
             });
+            $view->registerHelper('items', function ($items, $template) use ($view) {
+                $result = '';
+                foreach ($items as $item) {
+                    $result .= $view->partial($template, ['item' => $item]);
+                }
+                return $result;
+            });
+
             $view->registerHelper('messages', function () use ($di) {
                 $messages = [];
                 $session  = $di->get('session');
