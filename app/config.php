@@ -81,6 +81,12 @@ return [
             'action'     => 'denied',
         ]
     ],
+
+    'module' => [
+        'Base',
+        'Intranet',
+        'Crm'
+    ],
     
     'modules' => [
         'base' => [

@@ -2,22 +2,32 @@
 // app/Core/Mvc/Router.php
 namespace Core\Mvc;
 
+use App\Core\Mvc\Router\Route;
+
 class Router
 {
     protected $routes = [];
     protected $currentRoute;
 
     
-    public function add(string $pattern, array $config): void
+    public function add(string $pattern, array $config)
     {
         $regex = $this->patternToRegex($pattern);
         $method = $config['method'] ?? ['GET'];
         $config['method'] = is_string($method) ? [$method] : $method;
-        $this->routes[] = [
-            'pattern'   => $pattern,
-            'regex'     => $regex,
-            'config'    => $config
-        ];
+        $config['pattern'] = $pattern;
+        $config['regex'] = $regex;
+        $route = Route::fromArray($config);
+        $this->routes[] = $route;
+        return $route;
+    }
+
+    public function addRoutes(array $routes)
+    {
+        foreach ($routes as $pattern => $config) {
+            $this->add($pattern, $config);
+        }
+        return $this;
     }
     
     public function match(string $uri, string $method): ?array

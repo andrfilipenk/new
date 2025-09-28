@@ -2,7 +2,10 @@
 // app/Core/Mvc/Application.php
 namespace Core\Mvc;
 
+use App\Core\Mvc\AbstractModule;
+use Core\Di\Injectable;
 use Core\Di\Interface\Container as ContainerInterface;
+use Core\Events\EventAware;
 use Core\Http\Request;
 use Core\Http\Response;
 use Exception;
@@ -12,23 +15,47 @@ use Exception;
  */
 class Application
 {
-    private ContainerInterface $di;
-    private $eventsManager;
-    private $router;
+    use Injectable, EventAware;
     private $dispatcher;
     private $config;
+    /**
+     * Holds all registred Modules
+     * @var \App\Core\Mvc\AbstractModule[]
+     */
+    protected $modules = [];
 
-    public function __construct(ContainerInterface $di)
+
+
+    public function collectModuleRoutes()
     {
-        $this->di = $di;
-        $this->di->set('application', $this);
-        
-        // Cache frequently used services
-        $this->eventsManager = $this->di->get('eventsManager');
-        $this->router = $this->di->get('router');
-        $this->dispatcher = $this->di->get('dispatcher');
-        $this->dispatcher->setDI($this->di);
-        $this->config = $this->di->get('config');
+        $config  = $this->getDI()->get('config');
+        $routes  = $config['app']['routes'];
+        $modules = $config['app']['modules'];
+        foreach ($modules as $module) {
+            /** @var AbstractModule $moduleInstance */
+            $moduleNs       = $module . '\\';
+            $moduleClass    = $moduleNs . 'Module';
+            $configFile     = $moduleNs . 'config.php';
+            $moduleInstance = $this->getDI()->get($moduleClass);
+            if (file_exists($configFile)) {
+                $moduleConfig = require $configFile;
+                $moduleRoutes = $moduleConfig['routes'] ?? false;
+                if ($moduleRoutes) {
+                    $routes = array_merge($routes, $moduleRoutes);
+                    unset($moduleConfig['routes']);
+                }
+                $moduleInstance->setConfig($moduleConfig);
+            }
+            $moduleInstance->initialize();
+            $this->fireEvent('application:afterModuleInit', $moduleInstance);
+        }
+        return $routes;
+    }
+
+
+
+    public function run(Request $request, ContainerInterface  $container)
+    {
     }
 
     public function handle(Request $request): Response
@@ -98,10 +125,5 @@ class Application
         }
         $response->setContent('An unexpected error occurred.');
         return $response;
-    }
-
-    public function getDI(): ContainerInterface
-    {
-        return $this->di;
     }
 }

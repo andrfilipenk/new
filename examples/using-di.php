@@ -250,7 +250,7 @@ class OrderProcessor
 }
 
 // Register the order processor with all dependencies
-$di->set('orderProcessor', function($di) {
+$di->set('orderProcessor', concrete: function($di) {
     return new OrderProcessor(
         $di->get('database'),
         $di->get('cache'),
