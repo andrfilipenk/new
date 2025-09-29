@@ -1,9 +1,9 @@
 <?php
-// app/Module/Base/Model/Task.php
-namespace Module\Base\Model;
+// app/Intern/Model/Task.php
+namespace Intern\Model;
 
 use Core\Database\Model;
-use Module\Admin\Models\User;
+use Admin\Model\User;
 
 class Task extends Model
 {

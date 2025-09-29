@@ -4,30 +4,28 @@ namespace Core\Mvc;
 
 use Core\Di\Injectable;
 use Core\Events\EventAware;
-use Core\Http\Response;
 
 class Controller
 {
     use Injectable, EventAware;
-    
-    /** @var \Core\Mvc\View $view */
-    protected $view;
         
-    // public function initialize() {}
-    // public function afterExecute() {}
+    public function initialize() {
+        $dispatcher = $this->getDispatcher();
+        $viewPath   = APP_PATH . $dispatcher->getModule() . '/views/';
+        $this->getView()->setTemplatePath($viewPath);
+    }
+
+    public function beforeExecute() {}
+    public function afterExecute() {}
     
     /**
      * Returns view instance
      *
-     * @return \Core\Mvc\View $view
+     * @return \Core\Mvc\View
      */
     public function getView()
     {
-        if (null === $this->view) {
-            $view = $this->getDI()->get('view');
-            $this->view = $view;
-        }
-        return $this->view;
+        return $this->getDI()->get('\Core\Mvc\View');
     }
 
     /**
@@ -67,7 +65,7 @@ class Controller
      */
     public function getDispatcher()
     {
-        return $this->getDI()->get('dispatcher');
+        return $this->getDI()->get('\Core\Mvc\Dispatcher');
     }
 
     /**
@@ -119,18 +117,32 @@ class Controller
 
     protected function redirect(string $to, int $statusCode = 302)
     {
-        return $this->getResponse()->redirect($this->url($to), $statusCode)->send();
+        return $this->getResponse()->redirect($this->url($to), $statusCode);
     }
 
+    /**
+     * Forward to other controller / action
+     *
+     * @param array $route
+     * @return void
+     */
+    protected function forward($route = []) 
+    {
+        return $this->getDispatcher()->forward($route);
+    }
+
+    /**
+     * Render template with vars
+     *
+     * @param string $template
+     * @param array $data
+     * @return string
+     */
     protected function render(string $template = null, array $data = []): string
     {
-        $dispatcher = $this->getDispatcher();
-        if ($template !== null) {
-            $template = $dispatcher->getModuleName() . DIRECTORY_SEPARATOR . $template;
-        } else {
-            $template = $dispatcher->getModuleName() . DIRECTORY_SEPARATOR 
-                . $dispatcher->getControllerName() . DIRECTORY_SEPARATOR 
-                . $dispatcher->getActionName();
+        if ($template === null) {
+            $dispatcher = $this->getDispatcher();
+            $template = $dispatcher->getController() . '/' . $dispatcher->getAction();
         }
         return $this->getView()->render($template, $data);
     }

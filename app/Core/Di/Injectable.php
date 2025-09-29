@@ -9,6 +9,11 @@ use Core\Di\Interface\Container as ContainerInterface;
  */
 trait Injectable
 {
+    /**
+     * Holds Container
+     *
+     * @var Container
+     */
     protected $di;
 
     public function setDI(ContainerInterface $di): void
@@ -16,6 +21,11 @@ trait Injectable
         $this->di = $di;
     }
 
+    /**
+     * Returns di-container
+     *
+     * @return Container
+     */
     public function getDI(): ContainerInterface
     {
         if ($this->di === null) {

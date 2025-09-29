@@ -21,15 +21,14 @@ $di = new \Core\Di\Container();
 $di->set('config', fn() => $config);
 $di->set('eventsManager', fn() => new \Core\Events\Manager);
 $di->set('db', fn() => new \Core\Database\Database);
-$di->set('url', fn() => new \Core\Utils\Url);
+$di->set('url', '\Core\Utils\Url');
+$di->set('view', '\Core\Mvc\View');
 $di->set('request', fn() => \Core\Http\Request::capture());
 $di->set('response', fn() => \Core\Http\Response::create());
 
-$di->register(new \Module\Base\Provider\DatabaseSessionServiceProvider);
-$di->register(new \Module\Base\Provider\CookieServiceProvider);
-$di->register(new \Module\Base\Provider\ViewServiceProvider);
-$di->register(new \Module\Base\Provider\RouterServiceProvider);
-$di->register(new \Module\Base\Provider\NavigationServiceProvider);
+#$di->register(new \Module\Base\Provider\CookieServiceProvider);
+#$di->register(new \Module\Base\Provider\RouterServiceProvider);
+#$di->register(new \Module\Base\Provider\NavigationServiceProvider);
 #$di->register(new \Module\Base\Provider\AclServiceProvider);
 
 $di->set('migrationRepository', fn() => new \Core\Database\MigrationRepository);

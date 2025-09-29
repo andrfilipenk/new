@@ -1,9 +1,7 @@
 <?php
-namespace App\Core\Mvc;
-
-use Core\Di\Interface\Container as ContainerInterface;
+namespace Core\Mvc;
 
 interface ModuleInterface
 {
-    public function register(ContainerInterface $container);
+    public function initialize();
 }

@@ -1,6 +1,6 @@
 <?php
-// app/Module/Provider/DatabaseSessionServiceProvider.php
-namespace Module\Base\Provider;
+// app/Base/Provider/SessionServiceProvider.php
+namespace Base\Provider;
 
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container as ContainerInterface;
@@ -8,7 +8,7 @@ use Core\Events\Event;
 use Core\Session\DatabaseSession;
 use Core\Session\DatabaseSessionHandler;
 
-class DatabaseSessionServiceProvider implements ServiceProvider
+class SessionServiceProvider implements ServiceProvider
 {
     public function register(ContainerInterface $container): void
     {
@@ -30,7 +30,7 @@ class DatabaseSessionServiceProvider implements ServiceProvider
             $session->setDI($di);
             $session->setEventsManager($eventsManager);
 
-            $eventsManager->attach('core:afterDispatch', function(Event $event) use ($session) {
+            $eventsManager->attach('application:beforeResponse', function(Event $event) use ($session) {
                 $session->writeClose();
             });
             return $session;

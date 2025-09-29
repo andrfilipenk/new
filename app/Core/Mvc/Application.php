@@ -2,7 +2,7 @@
 // app/Core/Mvc/Application.php
 namespace Core\Mvc;
 
-use App\Core\Mvc\AbstractModule;
+use Core\Mvc\AbstractModule;
 use Core\Di\Injectable;
 use Core\Di\Interface\Container as ContainerInterface;
 use Core\Events\EventAware;
@@ -17,93 +17,86 @@ class Application
 {
     use Injectable, EventAware;
     private $dispatcher;
-    private $config;
+
     /**
      * Holds all registred Modules
-     * @var \App\Core\Mvc\AbstractModule[]
+     * @var \Core\Mvc\AbstractModule[]
      */
     protected $modules = [];
 
-
-
-    public function collectModuleRoutes()
+    /**
+     * Register modules & configs
+     *
+     * @return $this
+     */
+    public function initModules()
     {
-        $config  = $this->getDI()->get('config');
-        $routes  = $config['app']['routes'];
-        $modules = $config['app']['modules'];
-        foreach ($modules as $module) {
-            /** @var AbstractModule $moduleInstance */
+        $config = $this->getDI()->get('config');
+        foreach ($config['app']['module'] as $module) {
+            
+            $moduleConfig   = [];
             $moduleNs       = $module . '\\';
             $moduleClass    = $moduleNs . 'Module';
-            $configFile     = $moduleNs . 'config.php';
-            $moduleInstance = $this->getDI()->get($moduleClass);
+            $configFile     = APP_PATH . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . 'config.php';
+            if (!class_exists($moduleClass)) {
+                continue;
+            }
             if (file_exists($configFile)) {
                 $moduleConfig = require $configFile;
-                $moduleRoutes = $moduleConfig['routes'] ?? false;
-                if ($moduleRoutes) {
-                    $routes = array_merge($routes, $moduleRoutes);
-                    unset($moduleConfig['routes']);
-                }
-                $moduleInstance->setConfig($moduleConfig);
             }
+            /** @var AbstractModule $moduleInstance */
+            $moduleInstance = $this->getDI()->get($moduleClass);
+            $moduleInstance->setup($module, $moduleConfig);
             $moduleInstance->initialize();
+
             $this->fireEvent('application:afterModuleInit', $moduleInstance);
+            $this->modules[] = $moduleInstance;
         }
-        return $routes;
+        return $this;
     }
 
-
-
-    public function run(Request $request, ContainerInterface  $container)
+    public function run()
     {
-    }
+        $di = $this->getDI();
+        $this->initModules();
+        /** @var \Core\Http\Request $request */
+        $request    = $di->get('request');
+        /** @var \Core\Http\Response $response */
+        $response   = $di->get('response');
+        
+        /** @var \Core\Mvc\Router $router */
+        $router     = $di->get('\Core\Mvc\Router');
+        /** @var \Core\Mvc\Dispatcher $dispatcher */
+        $dispatcher = $di->get('\Core\Mvc\Dispatcher');
 
-    public function handle(Request $request): Response
-    {
-        try {
-            $this->eventsManager->trigger('application:beforeHandle', $this);
-            $base = $this->config['app']['base'] ?? '';
-            $uri = $request->uri($base);
-            $route = $this->router->match($uri, $request->method());
-
-            if (!$route) {
-                $response = $this->di->get('response');
-                $response->setStatusCode(404);
-                $response->setContent('Route not found');
-                
-                $event = $this->eventsManager->trigger('application:beforeNotFound', $response);
-                $response = $event->getData() ?: $response;
-                return $response;
+        $route = false;
+        foreach ($this->modules as $module) {
+            if ($routes = $module->getConfig('routes')) {
+                $router->addRoutes($routes);
+                $route = $router->match($request->uri(), $request->method());
+                if ($route) {
+                    break;
+                }
             }
-
-            $dispatcher = $this->dispatcher->prepare($route);
-
-            $event = $this->eventsManager->trigger('application:beforeDispatch', $dispatcher);
-            $dispatcher = $event->getData();
-            
-            $dispatcher->prepare($route);
-            $result = $dispatcher->dispatch($route, $request);
-            
-            $event = $this->eventsManager->trigger('application:afterDispatch', $result);
-            $result = $event->getData();
-
-            return $this->createResponse($result);
-        } catch (Exception $e) {
-            $this->eventsManager->trigger('application:onException', [$this, $e]);
-            return $this->createErrorResponse($e);
         }
-    }
 
-    private function createResponse($result): Response
-    {
-        if ($result instanceof Response) {
-            return $result;
-        }
-        $response = $this->di->get('response');
+        $dispatcher->prepare($route);
+        $result = $dispatcher->dispatch();
         if (is_array($result)) {
-            return $response->json($result);
+            $response->json($result);
         }
-        return $response->setContent((string)$result);
+        if (is_string($result)) {
+            $response->setContent($result);
+        }
+        if (is_object($result)) {
+            if ($result instanceof \Core\Http\Response) {
+                $response = $result;
+            }
+        }
+        $this->fireEvent('application:beforeResponse', $this);
+
+        $response->send();
+        return;
     }
 
     private function createErrorResponse(Exception $e): Response

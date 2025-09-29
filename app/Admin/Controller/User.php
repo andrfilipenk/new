@@ -1,9 +1,9 @@
 <?php
-namespace Module\Admin\Controller;
+namespace Admin\Controller;
 
 use Core\Mvc\Controller;
-use Module\Admin\Models\User as UserModel;
-use Module\Admin\Forms\UserForm;
+use Admin\Model\User as UserModel;
+use Admin\Form\UserForm;
 
 class User extends Controller
 {

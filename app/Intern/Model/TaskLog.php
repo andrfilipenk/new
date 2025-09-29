@@ -1,6 +1,6 @@
 <?php
-// app/Module/Base/Model/TaskLog.php
-namespace Module\Base\Model;
+// app/Intern/Model/TaskLog.php
+namespace Intern\Model;
 
 use Core\Database\Model;
 

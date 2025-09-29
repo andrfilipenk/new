@@ -1,9 +1,9 @@
 <?php
-// app/Module/Admin/Models/User.php
-namespace Module\Admin\Models;
+// app/Admin/Model/User.php
+namespace Admin\Model;
 
 use Core\Database\Model;
-use Module\Base\Model\Task;
+use Base\Model\Task;
 
 class User extends \Core\Acl\User
 {

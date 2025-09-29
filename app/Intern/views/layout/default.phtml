@@ -1,0 +1,63 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url        = $this->getDI()->get('url'); 
+$session    = $this->getDI()->get('session');
+$navigation = [];
+?><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
+    <link rel="stylesheet" href="<?= $url->get('css/pico.min.css', [], true) ?>">
+    <style>
+        table {width: 100%;}
+        table thead tr th {text-align: left;}
+        .task.open h3 {color: #919191}
+        .task.progress h3 {color: #029AE8;}
+        .task.done h3 {color: #47A417}
+    </style>
+</head>
+<body>
+    <header class="pico">
+        <nav>
+            <ul>
+                <li><strong>Acme Corp</strong></li>
+            </ul>
+            <ul>
+                <li><a href="#" class="contrast">About</a></li>
+                <li><a href="#" class="contrast">Services</a></li>
+                <li><a href="#" class="contrast">Products</a></li>
+            </ul>
+        </nav>
+    </header>
+
+
+    <main class="pico container">
+        <?php foreach($this->messages() as $msg): ?>
+            <div class="alert alert-<?= $msg['type'] ?>"><?= $msg['message'] ?></div>
+        <?php endforeach; ?>
+        <hr>
+        <?php echo $this->yield('content'); ?>
+    </main>
+    <!-- 
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <nav class="main-nav" id="mainNav">
+                <?php if (!empty($navigation)): ?>
+                    <ul>
+                        <?php foreach ($navigation as $item): ?>
+                            <li class="<?= $item['active'] ?? false ? 'active' : '' ?>">
+                                <a href="<?= $item['url'] ?>"><?= $item['label'] ?></a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <div class="loading">Loading menu...</div>
+                <?php endif; ?>
+            </nav>
+        </div>
+    </aside> -->
+    <script src="<?= $url->get('js/app.js') ?>"></script>
+</body>
+</html>

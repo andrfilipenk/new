@@ -7,7 +7,13 @@ return [
         'version'           => '1.0.0',
         'base'              => '/new/',
         'debug'             => true,
-        'hash_algo'         => PASSWORD_BCRYPT
+        'hash_algo'         => PASSWORD_BCRYPT,
+        'module' => [
+            'Base',
+            'Admin',
+            'Intern',
+            'Crm'
+        ],
     ],
 
     'data' => [
@@ -82,90 +88,19 @@ return [
         ]
     ],
 
-    'module' => [
-        'Base',
-        'Intranet',
-        'Crm'
-    ],
+    
     
     'modules' => [
         'base' => [
             'routes' => [
-                '/' => [
-                    'module'     => 'base',
-                    'controller' => 'dashboard',
-                    'action'     => 'index',
-                    'method'     => 'GET'
-                ],
-                '/login' => [
-                    'module'     => 'base',
-                    'controller' => 'auth',
-                    'action'     => 'login',
-                    'method'     => ['GET', 'POST']
-                ],
-                '/kuhnle-{id}' => [
-                    'module'     => 'base',
-                    'controller' => 'auth',
-                    'action'     => 'kuhnle',
-                    'method'     => 'GET'
-                ],
-                '/tasks' => [
-                    'module'     => 'base',
-                    'controller' => 'task',
-                    'action'     => 'index',
-                    'method'     => 'GET'
-                ],
+                
             ],
             'services' => [
                 #'baseService' => 'Module\Base\Service\BaseService'
             ]
         ],
         'admin' => [
-            'routes' => [
-                // user management routes
-                '/admin/users' => [
-                    'module'     => 'admin',
-                    'controller' => 'user',
-                    'action' => 'index'
-                ],
-                '/admin/user-create' => [
-                    'module'     => 'admin',
-                    'controller' => 'user',
-                    'action'     => 'create'
-                ],
-                '/admin/user-edit/{id}' => [
-                    'module'     => 'admin',
-                    'controller' => 'user',
-                    'action'     => 'edit'
-                ],
-                '/admin/user-delete/{id}' => [
-                    'module'     => 'admin',
-                    'controller' => 'user',
-                    'action'     => 'delete'
-                ],
-
-                // task routes
-                '/admin/tasks' => [
-                    'module'     => 'admin',
-                    'controller' => 'task',
-                    'action'     => 'index'
-                ],
-                '/admin/task-create' => [
-                    'module'     => 'admin',
-                    'controller' => 'task',
-                    'action'     => 'create'
-                ],
-                '/admin/task-edit/{id}' => [
-                    'module'     => 'admin',
-                    'controller' => 'task',
-                    'action'     => 'edit'
-                ],
-                '/admin/task-delete/{id}' => [
-                    'module'     => 'admin',
-                    'controller' => 'task',
-                    'action'     => 'delete'
-                ],
-            ],
+            
             'services' => [
                 #'myappService' => 'Module\Myapp\Service\MyappService'
             ]

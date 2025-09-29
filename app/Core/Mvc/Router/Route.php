@@ -1,14 +1,20 @@
 <?php
-namespace App\Core\Mvc\Router;
+namespace Core\Mvc\Router;
 
 use stdClass;
 
 class Route extends stdClass {
+    
+    protected $_matched = false;
+
+    protected $_keys = [
+        'module', 'controller', 'action', 'params'
+    ];
+    
 
     static public function fromArray(array $data)
     {
         $route = new self();
-        $route->matched = false;
         foreach ($data as $key => $value) {
             $route->$key = $value;
         }
@@ -17,12 +23,48 @@ class Route extends stdClass {
 
     public function setMatched()
     {
-        $this->matched = true;
+        $this->_matched = true;
         return $this;
     }
 
     public function isMatched()
     {
-        return $this->matched;
+        return $this->_matched;
+    }
+
+    
+    public function setData($key, $value = null)
+    {
+        if (is_array($key)) {
+            foreach ($key as $k => $v) {
+                $this->setData($k, $v);
+            }
+        }
+        if (is_string($key)) {
+            $this->$key = $value;
+        }
+        return $this;
+    }
+
+    /**
+     * Returns result or false
+     *
+     * @return array|bool
+     */
+    public function getResult()
+    {
+        $result = [];
+        foreach ($this->_keys as $key) {
+            if (!isset($this->$key)) {
+                return false;
+            }
+            $result[$key] = $this->$key;
+        }
+        return $result;
+    }
+
+    public function isMethod($method)
+    {
+        return in_array($method, $this->method);
     }
 }

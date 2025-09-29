@@ -1,9 +1,9 @@
 <?php
-// app/Module/Base/Model/TaskComment.php
-namespace Module\Base\Model;
+// app/Intern/Model/TaskComment.php
+namespace Intern\Model;
 
 use Core\Database\Model;
-use Module\Admin\Models\User;
+use Admin\Model\User;
 
 class TaskComment extends Model
 {

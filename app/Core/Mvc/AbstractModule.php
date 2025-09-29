@@ -1,31 +1,44 @@
 <?php
-namespace App\Core\Mvc;
+// app/Core/Mvc/AbstractModule.php
+namespace Core\Mvc;
 
-use Core\Di\Interface\Container as ContainerInterface;
+use Core\Di\Injectable;
 
 abstract class AbstractModule implements ModuleInterface
 {
-    protected $ns;
-    protected $config = [];
+    use Injectable;
 
-    public function setConfig($config)
+    protected $_name;
+
+    protected $_config = [];
+
+    public function setup($name, $config = [])
     {
-        $this->config = $config;
+        $this->_name   = $name;
+        $this->_config = $config;
         return $this;
     }
 
-    public function getConfig()
+    public function getConfig($key = null, $default = null)
     {
-        return $this->config;
+        if ($key === null) {
+            return $this->_config;
+        }
+        return $this->_config[$key] ?? $default;
     }
 
-    public function setNs($ns)
+    public function getName()
     {
-        $this->ns = $ns;
-        return $this;
+        return $this->_name;
     }
 
-    public function initialize()
-    { 
+    public function initialize() {
+        $di = $this->getDI();
+        if ($providers = $this->getConfig('provider')) {
+
+            foreach ($providers as $provider) {
+                $di->register($provider);
+            }
+        }
     }
 }

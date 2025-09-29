@@ -1,6 +1,6 @@
 <?php 
 /** @var \Core\Mvc\View $this */
-
+$url = $this->getDI()->get('url');
 
 /** @var \Module\Base\Model\Task[] $tasks */
 function getFiltered($tasks, $status) {
@@ -16,19 +16,19 @@ function getFiltered($tasks, $status) {
 
 ?>
 <h1>Task List</h1>
-<a href="<?= $this->url('admin/task-create') ?>" class="btn btn-primary mb-2">Add New Task</a>
+<a href="<?= $url->get('admin/task-create') ?>" class="btn btn-primary mb-2">Add New Task</a>
 <div class="grid">
   <div class="task open">
     <h3>open</h3>
-    <?php echo $this->items(getFiltered($tasks, 1), 'base/task/card-item'); ?>
+    <?php echo $this->items(getFiltered($tasks, 1), 'task/card-item'); ?>
   </div>
   <div class="task progress">
     <h3>progress</h3>
-    <?php echo $this->items(getFiltered($tasks, 2), 'base/task/card-item'); ?>
+    <?php echo $this->items(getFiltered($tasks, 2), 'task/card-item'); ?>
   </div>
   <div class="task done">
     <h3>done</h3>
-    <?php echo $this->items(getFiltered($tasks, 3), 'base/task/card-item'); ?>
+    <?php echo $this->items(getFiltered($tasks, 3), 'task/card-item'); ?>
   </div>
 </div>
 
@@ -60,8 +60,8 @@ function getFiltered($tasks, $status) {
                     End: <?= htmlspecialchars($task->end_date) ?>
                 </td>
                 <td>
-                    <a href="<?= $this->url('admin/task-edit/' . $task->id) ?>">E</a>
-                    <a href="<?= $this->url('admin/task-delete/' . $task->id) ?>" onclick="return confirm('Delete this task?')">X</a>
+                    <a href="<?= $url->get('admin/task-edit/' . $task->id) ?>">E</a>
+                    <a href="<?= $url->get('admin/task-delete/' . $task->id) ?>" onclick="return confirm('Delete this task?')">X</a>
                 </td>
             </tr>
         <?php endforeach; ?>

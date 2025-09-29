@@ -10,26 +10,28 @@ class View implements ViewInterface
 {
     use Injectable, EventAware;
 
-    protected string $templatePath;
-    protected string $layout = 'default';
+    protected $templatePath = null;
+    protected $layout = null;
     protected array $vars = [];
     protected array $sections = [];
     protected bool $layoutEnabled = true;
-    protected ?string $activeSection = null;
+    protected $activeSection = null;
     protected array $helpers = []; // New: array of helper functions
-
-    public function __construct($config = [])
-    {
-        $templatePath = $config['path'] ?? 'views/';
-        $layout = $config['layout'] ?? 'default';
-        $this->setLayout($layout);
-        $this->templatePath = rtrim($templatePath, '/\\') . DIRECTORY_SEPARATOR;
-    }
 
     public function setTemplatePath($path)
     {
         $this->templatePath = $path;
         return $this;
+    }
+
+    public function getTemplatePath()
+    {
+        if ($this->templatePath === null) {
+            $config = $this->getDI()->get('config');
+            $templatePath = $config['view']['path'] ?? 'views/';
+            $this->templatePath = rtrim($templatePath, '/\\') . DIRECTORY_SEPARATOR;
+        }
+        return $this->templatePath;
     }
 
     public function render(string $template, array $data = []): string
@@ -38,9 +40,10 @@ class View implements ViewInterface
         $this->vars = array_merge($this->vars, $data);
         $templateFile = $this->findTemplate($template);
         $content = $this->capture($templateFile, $this->vars);
-        if ($this->layoutEnabled && $this->layout) {
+        if ($this->layoutEnabled) {
+            $layout = $this->getLayout();
             $this->sections['content'] = $content;
-            $layoutFile = $this->findTemplate('layouts' . DIRECTORY_SEPARATOR . $this->layout);
+            $layoutFile = $this->findTemplate('layout' . DIRECTORY_SEPARATOR . $layout);
             $content = $this->capture($layoutFile, $this->vars);
         }
         $this->fireEvent('view:afterRender', [$this, [ 'output' => $content ] ]);
@@ -73,7 +76,8 @@ class View implements ViewInterface
 
     protected function findTemplate(string $template): string
     {
-        $file = $this->templatePath . str_replace('/', DIRECTORY_SEPARATOR, $template) . '.phtml';
+        $template = str_replace('/', DIRECTORY_SEPARATOR, $template) . '.phtml';
+        $file = $this->getTemplatePath() . $template;
         if (!file_exists($file)) {
             throw new Exception("Template '{$template}' not found at: {$file}");
         }
@@ -98,6 +102,15 @@ class View implements ViewInterface
     public function yield(string $name, string $default = ''): string
     {
         return $this->sections[$name] ?? $default;
+    }
+
+    public function getLayout() {
+        if ($this->layout !== null) {
+            $config = $this->getDI()->get('config');
+            $layout = $config['view']['layout'] ?? 'default';
+            $this->setLayout($layout);
+        }
+        return $this->layout;
     }
 
     public function setLayout(string $layout): void

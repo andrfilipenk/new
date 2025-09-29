@@ -1,8 +1,8 @@
 <?php
-namespace Module\Base\Form;
+namespace Intern\Form;
 
 use Core\Forms\Builder;
-use Module\Admin\Models\User;
+use Admin\Model\User;
 
 class TaskForm
 {

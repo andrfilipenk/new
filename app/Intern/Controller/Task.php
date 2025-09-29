@@ -1,9 +1,9 @@
 <?php
-namespace Module\Base\Controller;
+namespace Intern\Controller;
 
 use Core\Mvc\Controller;
-use Module\Base\Model\Task as TaskModel;
-use Module\Base\Form\TaskForm;
+use Intern\Model\Task as TaskModel;
+use Intern\Form\TaskForm;
 
 class Task extends Controller
 {

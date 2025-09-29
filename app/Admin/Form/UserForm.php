@@ -1,5 +1,5 @@
 <?php
-namespace Module\Admin\Forms;
+namespace Admin\Form;
 
 use Core\Forms\Builder;
 
