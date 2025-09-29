@@ -59,9 +59,9 @@ class Application
     {
         $di = $this->getDI();
         $this->initModules();
-        /** @var \Core\Http\Request $request */
+        /** @var Request $request */
         $request    = $di->get('request');
-        /** @var \Core\Http\Response $response */
+        /** @var Response $response */
         $response   = $di->get('response');
         
         /** @var \Core\Mvc\Router $router */
@@ -89,7 +89,7 @@ class Application
             $response->setContent($result);
         }
         if (is_object($result)) {
-            if ($result instanceof \Core\Http\Response) {
+            if ($result instanceof Response) {
                 $response = $result;
             }
         }

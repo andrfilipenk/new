@@ -33,7 +33,7 @@ class Dispatcher
     }
 
     /**
-     * Forwarding route
+     * Forward route
      *
      * @param array $route
      * @return $this

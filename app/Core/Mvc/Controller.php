@@ -128,7 +128,9 @@ class Controller
      */
     protected function forward($route = []) 
     {
-        return $this->getDispatcher()->forward($route);
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->forward($route);
+        return $dispatcher;
     }
 
     /**

@@ -51,7 +51,7 @@ class Router
      *
      * @param string $uri
      * @param string $method
-     * @return void
+     * @return array|false
      */
     public function match(string $uri, string $method)
     {
