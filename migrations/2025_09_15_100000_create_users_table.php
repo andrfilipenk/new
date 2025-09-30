@@ -16,19 +16,26 @@ class CreateUsersTable extends Migration
             $table->timestamps();
         });
 
+        $this->createTable('user', function($table) {
+            /** @var Blueprint $table */
+            $table->id();
+            $table->string('name', 32);
+            $table->string('email', 64);
+            $table->integer('custom_id');
+            $table->string('password', 255)->nullable();
+            $table->timestamps();
+        });
+
+
+
+
         $users  = $this->getTestUserList();
         $config = $this->getDI()->get('config');
         $algo   = $config['app']['hash_algo'];
-
         foreach ($users as $i => $row) {
             $users[$i][3] = password_hash($row[3], $algo);
         }
-
-        $this->insertDataArray(
-            'user', 
-            ['id', 'name', 'email', 'password', 'custom_id'], 
-            $users
-        );
+        $this->insertDataArray('user', ['id', 'name', 'email', 'password', 'custom_id'], $users);
     }
 
     public function down()

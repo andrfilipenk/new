@@ -8,7 +8,13 @@ use DateTimeZone;
 
 class Dates
 {
-    public static function createFromFormat(string $format, string $datetime, ?string $timezone = null): ?DateTimeImmutable
+    public static function today(string $timezone = null)
+    {
+        $tz = $timezone ? new DateTimeZone($timezone) : null;
+        return new DateTimeImmutable('now', $tz);
+    }
+
+    public static function createFromFormat(string $format, string $datetime, string $timezone = null)
     {
         try {
             $tz = $timezone ? new DateTimeZone($timezone) : null;
@@ -19,7 +25,14 @@ class Dates
         }
     }
 
-    public static function createFromString(string $datetime, ?string $timezone = null): ?DateTimeImmutable
+    /**
+     * Undocumented function
+     *
+     * @param string $datetime
+     * @param string|null $timezone
+     * @return DateTimeImmutable
+     */
+    public static function createFromString(string $datetime, string $timezone = null)
     {
         try {
             $tz = $timezone ? new DateTimeZone($timezone) : null;
@@ -29,7 +42,7 @@ class Dates
         }
     }
 
-    public static function formatForInput(DateTimeInterface $datetime, string $type = 'datetime'): string
+    public static function formatForInput(DateTimeInterface $datetime, string $type = 'datetime')
     {
         return match ($type) {
             'date' => $datetime->format('Y-m-d'),
@@ -38,7 +51,7 @@ class Dates
         };
     }
 
-    public static function humanReadable(DateTimeInterface $datetime): string
+    public static function humanReadable(DateTimeInterface $datetime)
     {
         $diff = (new DateTimeImmutable())->diff($datetime);
         $periods = [
@@ -57,7 +70,7 @@ class Dates
         return 'Just now';
     }
 
-    public static function timezoneSelect(string $name, ?string $selected = null, array $attributes = []): string
+    public static function timezoneSelect(string $name, string $selected = null, array $attributes = [])
     {
         $options = [];
         foreach (DateTimeZone::listIdentifiers() as $tz) {
@@ -69,7 +82,7 @@ class Dates
         return Tag::select($options, array_merge($attributes, ['name' => $name]));
     }
 
-    public static function isValidFormat(string $datetime, string $format): bool
+    public static function isValidFormat(string $datetime, string $format)
     {
         $d = self::createFromFormat($format, $datetime);
         return $d && $d->format($format) === $datetime;

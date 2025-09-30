@@ -3,10 +3,10 @@
 namespace Intern\Controller;
 
 use Core\Mvc\Controller;
+use Intern\Decorator\TaskItem;
 use Intern\Model\Task as TaskModel;
 use Intern\Model\TaskStatus;
 use Intern\Model\TaskPriority;
-use Intern\Form\TaskForm;
 
 class Task extends Controller
 {
@@ -26,12 +26,17 @@ class Task extends Controller
                 if ($priority = $request->get('priority', null)) {
                     $query->where('priority_id', $priority);
                 }
-            });
+                // assigned to 
+            })->get();
+        $taskRows = [];
+        foreach ($tasks as $task) {
+            $taskRows[] = new TaskItem($task);
+        }
             
         return [
             'statuses' => $this->getOptions(TaskStatus::class, 'status'),
             'priorities' => $this->getOptions(TaskPriority::class, 'priority'),
-            'tasks' => $tasks->get()
+            'tasks' => $taskRows
         ];
     }
 

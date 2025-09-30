@@ -66,10 +66,10 @@ class CreateTasksTable extends Migration
             'task_status',
             ['title', 'code', 'color'],
             [
-                ['Neu', 'new', '#e6e6e6'],
-                ['In arbeit', 'progress', '#1f8dd6'],
-                ['Fertig', 'completed', '#5eb95e'],
-                ['On Hold', 'hold', '#333333']
+                ['Neu', 'new', 'light'],
+                ['In arbeit', 'progress', 'primary'],
+                ['Fertig', 'completed', 'success'],
+                ['On Hold', 'hold', 'secondary']
             ]
         );
 
@@ -77,10 +77,10 @@ class CreateTasksTable extends Migration
             'task_priority',
             ['title', 'code', 'color'],
             [
-                ['Niedrig', 'low', '#e6e6e6'],
-                ['Mittel', 'medium', '#fad232'],
-                ['Hoch', 'high', '#fad232'],
-                ['Extrem', 'extrem', '#dd514c'],
+                ['Niedrig', 'low', 'light'],
+                ['Mittel', 'medium', 'secondary'],
+                ['Hoch', 'high', 'warning'],
+                ['Extrem', 'extrem', 'danger'],
             ]
         );
 
@@ -113,24 +113,24 @@ class CreateTasksTable extends Migration
             [3, 5, 'Website Redesign', '2025-09-08', '2025-09-25', 2, 1],
             [5, 6, 'Database Optimization', '2025-09-06', '2025-09-20', 3, 1],
             [7, 5, 'API Documentation', '2025-09-12', '2025-09-28', 1, 1],
-            [12, 5, 'Client Presentation', '2025-09-05', '2025-09-19', 3, 1],
+            [12, 5, 'Client Presentation', '2025-09-05', '2025-09-19', 3, 4],
             [18, 2, 'Bug Fixing', '2025-09-15', '2025-09-26', 2, 1],
-            [9, 2, 'Security Audit', '2025-09-10', '2025-09-30', 1, 1],
+            [9, 2, 'Security Audit', '2025-09-10', '2025-09-30', 1, 4],
             [14, 2, 'Content Migration', '2025-09-14', '2025-09-27', 2, 1],
             [20, 2, 'Training Materials', '2025-09-16', '2025-10-02', 1, 2],
             [5, 4, 'Mobile App Development', '2025-09-09', '2025-10-05', 2, 2],
             [5, 7, 'Server Maintenance', '2025-09-07', '2025-09-18', 3, 2],
-            [5, 12, 'SEO Optimization', '2025-09-13', '2025-10-03', 1, 2],
+            [5, 12, 'SEO Optimization', '2025-09-13', '2025-10-03', 1, 4],
             [5, 3, 'Payment Integration', '2025-09-08', '2025-09-24', 2, 2],
-            [5, 15, 'User Testing', '2025-09-17', '2025-10-01', 1, 2],
+            [5, 15, 'User Testing', '2025-09-17', '2025-10-01', 1, 4],
             [5, 8, 'Email Campaign', '2025-09-11', '2025-09-26', 2, 3],
             [5, 19, 'Data Backup', '2025-09-06', '2025-09-17', 3, 3],
             [5, 6, 'Dashboard Design', '2025-09-18', '2025-10-06', 1, 3],
-            [5, 11, 'Performance Testing', '2025-09-19', '2025-10-08', 2, 3],
-            [5, 2, 'Documentation Update', '2025-09-05', '2025-09-22', 3, 3],
+            [5, 11, 'Performance Testing', '2025-09-19', '2025-10-08', 2, 4],
+            [5, 2, 'Documentation Update', '2025-09-05', '2025-09-22', 3, 4],
             [5, 17, 'Social Media Strategy', '2025-09-20', '2025-10-09', 1, 3],
             [5, 10, 'Customer Support', '2025-09-21', '2025-10-04', 2, 3],
-            [5, 13, 'Bug Reports Analysis', '2025-09-22', '2025-10-07', 1, 3],
+            [5, 13, 'Bug Reports Analysis', '2025-09-22', '2025-10-07', 1, 4],
             [5, 16, 'Feature Planning', '2025-09-23', '2025-10-10', 2, 3]
         ];
     }

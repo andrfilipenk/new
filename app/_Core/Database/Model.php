@@ -254,10 +254,14 @@ abstract class Model
         return $this;
     }
 
-    public function setData(string $key, mixed $value): self
+    public function __get(string $key): mixed
     {
-        $this->attributes[$key] = $value;
-        return $this;
+        return $this->getData($key);
+    }
+
+    public function __set(string $key, mixed $value): void
+    {
+        $this->setData($key, $value);
     }
 
     public function getData($key = null): mixed
@@ -272,6 +276,12 @@ abstract class Model
             return $this->relations[$key] = $this->$key()->getResults();
         }
         return $this->relations[$key] ?? null;
+    }
+
+    public function setData(string $key, mixed $value): self
+    {
+        $this->attributes[$key] = $value;
+        return $this;
     }
 
     public function getKey(): mixed
@@ -319,16 +329,6 @@ abstract class Model
     {
         $class = is_object($class) ? get_class($class) : $class;
         return basename(str_replace('\\', '/', $class));
-    }
-    
-    public function __get(string $key): mixed
-    {
-        return $this->getData($key);
-    }
-
-    public function __set(string $key, mixed $value): void
-    {
-        $this->setData($key, $value);
     }
 
     public static function __callStatic(string $method, array $parameters): mixed

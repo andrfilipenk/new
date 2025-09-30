@@ -4,82 +4,76 @@ $url = $this->getDI()->get('url');
 $session = $this->getDI()->get('session');
 $navigation = [];
 ?><!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
-    <link rel="stylesheet" href="<?= $url->get('css/pico.min.css', [], true) ?>">
-    <style>
-        table {
-            width: 100%;
-        }
-
-        table thead tr th {
-            text-align: left;
-        }
-
-        span.status,
-        span.priority {
-            padding: 5px 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="<?= $url->get('css/bootstrap.min.css', [], true) ?>">
+    <link rel="stylesheet" href="<?= $url->get('css/bootstrap-icons.min.css', [], true) ?>">
+    <link rel="stylesheet" href="<?= $url->get('css/app.css', [], true) ?>">
 </head>
 
 <body>
-    <header class="pico">
-        <nav>
-            <ul>
-                <li><a class="secondary" aria-label="Menu" data-discover="true" href="/docs/nav">
-                    <svg aria-activedescendant=""xmlns="http://www.w3.org/2000/svg" width="100%" height="1rem" viewBox="0 0 24 24"
-                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
-                            stroke-linejoin="round" class="icon-menu">
-                            <path d="M4 6l16 0"></path>
-                            <path d="M4 12l16 0"></path>
-                            <path d="M4 18l16 0"></path>
-                        </svg>
-                    </a>
-                </li>
-            </ul>
-            <ul>
-                <li><strong>Acme Corp</strong></li>
-            </ul>
-            <ul>
-                <li><a href="#" class="contrast">About</a></li>
-                <li><a href="#" class="contrast">Services</a></li>
-                <li><a href="#" class="contrast">Products</a></li>
-            </ul>
-        </nav>
-    </header>
-
-
-    <main class="pico container">
-        <?php foreach ($this->messages() as $msg): ?>
-            <div class="alert alert-<?= $msg['type'] ?>"><?= $msg['message'] ?></div>
-        <?php endforeach; ?>
-        <hr>
-        <?php echo $this->yield('content'); ?>
-    </main>
-    <!-- 
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-content">
-            <nav class="main-nav" id="mainNav">
-                <?php if (!empty($navigation)): ?>
-                    <ul>
-                        <?php foreach ($navigation as $item): ?>
-                            <li class="<?= $item['active'] ?? false ? 'active' : '' ?>">
-                                <a href="<?= $item['url'] ?>"><?= $item['label'] ?></a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else: ?>
-                    <div class="loading">Loading menu...</div>
-                <?php endif; ?>
-            </nav>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Dropdown
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Action</a></li>
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
         </div>
-    </aside> -->
+    </nav>
+
+    <?php if(($messages = $this->messages()) && count($messages) > 0): ?>
+        <div aria-live="polite" aria-atomic="true" class="position-relative">
+            <div class="toast-container top-0 end-0 p-3">
+                <?php foreach ($messages as $msg): ?>
+                    <div class="toast text-bg-<?=$msg['type'] ?>" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body"><?= $msg['message'] ?></div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
+
+
+
+    <div class="container">
+        <?php echo $this->yield('content'); ?>
+    </div>
+    <script src="<?= $url->get('js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= $url->get('js/app.js') ?>"></script>
 </body>
-
 </html>
