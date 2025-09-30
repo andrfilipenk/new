@@ -18,13 +18,16 @@ class Task extends Controller
         $request = $this->getRequest();
         $relations = ['creator', 'assigned', 'status', 'priority'];
         $tasks = TaskModel::with($relations)
-            ->orderBy('id','desc');
-            if ($status = $request->get('status', null)) {
-                $tasks->where('status_id', $status);
-            }
-            if ($priority = $request->get('priority', null)) {
-                $tasks->where('priority_id', $priority);
-            }
+            ->orderBy('id','desc')
+            ->withFilters(function($query) use ($request) {
+                if ($status = $request->get('status', null)) {
+                    $query->where('status_id', $status);
+                }
+                if ($priority = $request->get('priority', null)) {
+                    $query->where('priority_id', $priority);
+                }
+            });
+            
         return [
             'statuses' => $this->getOptions(TaskStatus::class, 'status'),
             'priorities' => $this->getOptions(TaskPriority::class, 'priority'),

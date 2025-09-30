@@ -25,7 +25,16 @@ $url = $this->getDI()->get('url');
                 </ul>
                 </details>
             </th>
-            <th>Prio</th>
+            <th>
+                <details class="dropdown">
+                <summary>Priority</summary>
+                <ul>
+                    <?php foreach ($priorities as $priority): ?>
+                        <li style="background: <?=$priority->color?>;"><a href="<?=$priority->url?>"><?=$priority->title?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+                </details>
+            </th>
             <th>Dates</th>
             <th>Actions</th>
         </tr>

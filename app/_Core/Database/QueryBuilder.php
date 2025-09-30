@@ -7,6 +7,7 @@ class QueryBuilder
     private string $model;
     private array $relations;
     private Database $query;
+    private array $relationFilters = [];
 
     public function __construct(string $model, array $relations = [])
     {
@@ -80,6 +81,18 @@ class QueryBuilder
         return $this;
     }
 
+    public function andWhere($column, mixed $operator = null, mixed $value = null): self
+    {
+        $this->query->where($column, $operator, $value);
+        return $this;
+    }
+
+    public function orWhere($column, mixed $operator = null, mixed $value = null): self
+    {
+        $this->query->orWhere($column, $operator, $value);
+        return $this;
+    }
+
     public function groupBy(string $column): self
     {
         $this->query->groupBy($column);
@@ -107,6 +120,30 @@ class QueryBuilder
     public function select(array $columns = ['*']): self
     {
         $this->query->select($columns);
+        return $this;
+    }
+
+    /**
+     * Apply filters to the main query before loading relations
+     * This allows custom filtering on the base model before eager loading
+     */
+    public function withFilters(callable $callback): self
+    {
+        $callback($this->query);
+        return $this;
+    }
+
+    /**
+     * Add custom where conditions with relation context
+     * Useful for filtering before eager loading with joins
+     */
+    public function whereWithRelation(string $relation, callable $callback): self
+    {
+        // Store the relation filter for later application
+        if (!isset($this->relationFilters)) {
+            $this->relationFilters = [];
+        }
+        $this->relationFilters[$relation] = $callback;
         return $this;
     }
 
@@ -168,6 +205,12 @@ class QueryBuilder
             $relationInstance = $relationInstances[0];
             // Apply eager constraints
             $relationInstance->addEagerConstraints($models);
+            
+            // Apply custom relation filters if any
+            if (isset($this->relationFilters[$name])) {
+                $this->relationFilters[$name]($relationInstance->getQuery());
+            }
+            
             if ($constraint && is_callable($constraint)) {
                 $constraint($relationInstance->getQuery());
             }

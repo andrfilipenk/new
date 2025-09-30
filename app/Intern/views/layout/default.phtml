@@ -1,25 +1,47 @@
-<?php 
+<?php
 /** @var \Core\Utils\Url $url */
-$url        = $this->getDI()->get('url'); 
-$session    = $this->getDI()->get('session');
+$url = $this->getDI()->get('url');
+$session = $this->getDI()->get('session');
 $navigation = [];
 ?><!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
     <link rel="stylesheet" href="<?= $url->get('css/pico.min.css', [], true) ?>">
     <style>
-        table {width: 100%;}
-        table thead tr th {text-align: left;}
+        table {
+            width: 100%;
+        }
+
+        table thead tr th {
+            text-align: left;
+        }
+
         span.status,
-        span.priority {padding: 5px 10px;}
+        span.priority {
+            padding: 5px 10px;
+        }
     </style>
 </head>
+
 <body>
     <header class="pico">
         <nav>
+            <ul>
+                <li><a class="secondary" aria-label="Menu" data-discover="true" href="/docs/nav">
+                    <svg aria-activedescendant=""xmlns="http://www.w3.org/2000/svg" width="100%" height="1rem" viewBox="0 0 24 24"
+                            stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round"
+                            stroke-linejoin="round" class="icon-menu">
+                            <path d="M4 6l16 0"></path>
+                            <path d="M4 12l16 0"></path>
+                            <path d="M4 18l16 0"></path>
+                        </svg>
+                    </a>
+                </li>
+            </ul>
             <ul>
                 <li><strong>Acme Corp</strong></li>
             </ul>
@@ -33,7 +55,7 @@ $navigation = [];
 
 
     <main class="pico container">
-        <?php foreach($this->messages() as $msg): ?>
+        <?php foreach ($this->messages() as $msg): ?>
             <div class="alert alert-<?= $msg['type'] ?>"><?= $msg['message'] ?></div>
         <?php endforeach; ?>
         <hr>
@@ -59,4 +81,5 @@ $navigation = [];
     </aside> -->
     <script src="<?= $url->get('js/app.js') ?>"></script>
 </body>
+
 </html>

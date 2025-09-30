@@ -277,8 +277,9 @@ class Database
         $conditions = [];
         foreach ($this->query['where'] as $i => [$column, $operator, $value, $boolean]) {
             $prefix = $i > 0 ? " {$boolean} " : '';
-            if ($operator === 'RAW') {
-                $conditions[] = "{$prefix}{$column}";
+            if ($column === 'RAW') {
+                // For RAW queries, $operator contains the SQL and $value contains bindings
+                $conditions[] = "{$prefix}{$operator}";
             } elseif ($operator === 'IN' || $operator === 'NOT IN') {
                 if (is_array($value) && !empty($value)) {
                     $placeholders = str_repeat('?,', count($value) - 1) . '?';

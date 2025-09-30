@@ -3,7 +3,8 @@
 namespace Admin\Model;
 
 use Core\Database\Model;
-use Base\Model\Task;
+use Intern\Model\Task;
+use Intern\Model\TaskComment;
 
 class User extends \Core\Acl\User
 {
