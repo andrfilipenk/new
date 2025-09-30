@@ -3,46 +3,60 @@
 return [
     'routes' => [
         
-        '/admin/users' => [
+        '/admin/user' => [
             'module'     => 'Admin',
             'controller' => 'User',
             'action'     => 'index'
         ],
-        '/admin/user-create' => [
+        '/admin/user/view/{id}' => [
             'module'     => 'Admin',
             'controller' => 'User',
-            'action'     => 'create'
+            'action'     => 'view'
         ],
-        '/admin/user-edit/{id}' => [
+        '/admin/user/groups/{id}' => [
             'module'     => 'Admin',
             'controller' => 'User',
-            'action'     => 'edit'
+            'action'     => 'groups',
+            'method'     => ['GET', 'POST']
         ],
-        '/admin/user-delete/{id}' => [
+        '/admin/user/create' => [
+            'module'     => 'Admin',
+            'controller' => 'User',
+            'action'     => 'create',
+            'method'     => ['GET', 'POST']
+        ],
+        '/admin/user/edit/{id}' => [
+            'module'     => 'Admin',
+            'controller' => 'User',
+            'action'     => 'edit',
+            'method'     => ['GET', 'POST']
+        ],
+        '/admin/user/delete/{id}' => [
             'module'     => 'Admin',
             'controller' => 'User',
             'action'     => 'delete'
         ],
 
-        '/admin/tasks' => [
+
+        '/admin/groups' => [
             'module'     => 'Admin',
-            'controller' => 'Task',
+            'controller' => 'Group',
             'action'     => 'index'
         ],
-        '/admin/task-create' => [
+        '/admin/groups/create' => [
             'module'     => 'Admin',
-            'controller' => 'Task',
-            'action'     => 'create'
+            'controller' => 'Group',
+            'action'     => 'create',
+            'method'     => ['GET', 'POST']
         ],
-        '/admin/task-edit/{id}' => [
+        '/admin/groups/delete/{id}' => [
             'module'     => 'Admin',
-            'controller' => 'Task',
-            'action'     => 'edit'
-        ],
-        '/admin/task-delete/{id}' => [
-            'module'     => 'Admin',
-            'controller' => 'Task',
+            'controller' => 'Group',
             'action'     => 'delete'
         ],
+
+
+
+        
     ],
 ];

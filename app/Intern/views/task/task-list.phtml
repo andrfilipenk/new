@@ -31,7 +31,6 @@ $url = $this->getDI()->get('url');
                 <?php $class = $status->active ? $status->color : 'outline-' . $status->color ?>
                 <a href="<?=$status->url?>" class="btn btn-<?=$class?>"><?=$status->title?></a>
             <?php endforeach; ?>
-
             <hr>
 
             <h4>Priority</h4>

@@ -16,16 +16,22 @@ class CreateUsersTable extends Migration
             $table->timestamps();
         });
 
-        $this->createTable('user', function($table) {
+        $this->createTable('groups', function($table) {
             /** @var Blueprint $table */
             $table->id();
             $table->string('name', 32);
-            $table->string('email', 64);
-            $table->integer('custom_id');
-            $table->string('password', 255)->nullable();
-            $table->timestamps();
+            $table->string('code', 64);
         });
 
+        $this->createTable('user_group', function(Blueprint $table) {
+            $table->id();
+            $table->integer('user_id')->unsigned();
+            $table->integer('group_id')->unsigned();
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('user');
+            $table->foreign('group_id')->references('id')->on('groups');
+        });
 
 
 
@@ -40,7 +46,9 @@ class CreateUsersTable extends Migration
 
     public function down()
     {
-        $this->dropTable('user');;
+        $this->dropTable('user_group');
+        $this->dropTable('groups');
+        $this->dropTable('user');
     }
 
     protected function getTestUserList() {
@@ -65,7 +73,7 @@ class CreateUsersTable extends Migration
             [17, 'Brian Robinson', 'brian.r@email.com', 'brian123', 9851],
             [18, 'Stephanie Clark', 'stephanie.c@email.com', 'steph', 7324],
             [19, 'Timothy Rodriguez', 'timothy.r@email.com', 'timpass', 5489],
-            [20, 'Rebecca Lewis', 'rebecca.l@email.com', 'rebecca', 3167]
+            [20, 'Rebecca Lewis', 'rebecca.l@email.com', 'rebecca', 3167],
         ];
     }
 }

@@ -41,7 +41,7 @@ class User extends Model
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'acl_user_permission', 'user_id', 'permission_id')
-            ->getQuery()->where('granted', 1);
+            ->withPivot('granted');
     }
     
     public function hasRole(string $role): bool

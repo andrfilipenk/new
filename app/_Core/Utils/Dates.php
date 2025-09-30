@@ -30,7 +30,7 @@ class Dates
      *
      * @param string $datetime
      * @param string|null $timezone
-     * @return DateTimeImmutable
+     * @return DateTimeImmutable|null
      */
     public static function createFromString(string $datetime, string $timezone = null)
     {

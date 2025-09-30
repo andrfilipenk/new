@@ -1,6 +1,9 @@
 <?php
-
-class ProductController extends Controller
+use Core\Pagination\Paginator;
+use Core\Pagination\ArrayPaginator;
+use Core\Pagination\DatabasePaginator;
+use Core\Pagination\PaginatorView;
+class ProductController extends \Core\Mvc\Controller
 {
     public function indexAction()
     {
@@ -28,8 +31,6 @@ class ProductController extends Controller
 
 
 // via view rendering
-use Core\Pagination\PaginatorView;
-
 // Default pagination
 $view = PaginatorView::make($paginator);
 echo $view->render();
@@ -58,7 +59,6 @@ $paginator = $arrayPaginator
     ->paginate(10, 1, '/users', ['status' => 'active']);
 
 
-use Core\Pagination\ArrayPaginator;
 
 $data = range(1, 100);
 $paginator = ArrayPaginator::make($data, 10, 2); // 10 per page, page 2

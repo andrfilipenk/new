@@ -1,0 +1,77 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<h1>User Details: <?= htmlspecialchars($user->name) ?></h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>User Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>ID:</strong> <?= htmlspecialchars($user->id) ?></p>
+                <p><strong>Name:</strong> <?= htmlspecialchars($user->name) ?></p>
+                <p><strong>Email:</strong> <?= htmlspecialchars($user->email) ?></p>
+                
+                <div class="mt-3">
+                    <a href="<?= $url->get('admin/user/edit/' . $user->id) ?>" class="btn btn-warning">Edit User</a>
+                    <a href="<?= $url->get('admin/user') ?>" class="btn btn-secondary">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Group Management</h5>
+            </div>
+            <div class="card-body">
+                <h6>Current Groups:</h6>
+                <?php if (!empty($userGroups)): ?>
+                    <ul class="list-group mb-3">
+                        <?php foreach ($userGroups as $group): ?>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <?= htmlspecialchars($group->name) ?>
+                                <span class="badge badge-secondary"><?= htmlspecialchars($group->code) ?></span>
+                                <form method="post" action="<?= $url->get('admin/user/groups/' . $user->id) ?>" style="display: inline;">
+                                    <input type="hidden" name="action" value="remove">
+                                    <input type="hidden" name="group_id" value="<?= $group->id ?>">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                            onclick="return confirm('Remove user from this group?')">Remove</button>
+                                </form>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <p class="text-muted">User is not in any groups.</p>
+                <?php endif; ?>
+                
+                <h6>Add to Group:</h6>
+                <form method="post" action="<?= $url->get('admin/user/groups/' . $user->id) ?>" class="form-inline">
+                    <input type="hidden" name="action" value="add">
+                    <select name="group_id" class="form-control mr-2" required>
+                        <option value="">Select a group...</option>
+                        <?php foreach ($allGroups as $group): ?>
+                            <?php 
+                            $isInGroup = false;
+                            foreach ($userGroups as $userGroup) {
+                                if ($userGroup->id == $group->id) {
+                                    $isInGroup = true;
+                                    break;
+                                }
+                            }
+                            ?>
+                            <?php if (!$isInGroup): ?>
+                                <option value="<?= $group->id ?>"><?= htmlspecialchars($group->name) ?> (<?= htmlspecialchars($group->code) ?>)</option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="submit" class="btn btn-success">Add to Group</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
