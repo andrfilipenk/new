@@ -1,4 +1,5 @@
 <?php
+// app/Admin/Module.php
 namespace Admin;
 
 use Core\Mvc\AbstractModule;

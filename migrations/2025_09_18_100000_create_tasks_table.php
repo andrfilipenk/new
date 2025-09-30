@@ -6,6 +6,22 @@ class CreateTasksTable extends Migration
 {
     public function up()
     {
+        $this->createTable('task_status', function($table) {
+            /** @var Blueprint $table */
+            $table->id();
+            $table->string('title', 32);
+            $table->string('code', 32);
+            $table->string('color', 16);
+        });
+
+        $this->createTable('task_priority', function($table) {
+            /** @var Blueprint $table */
+            $table->id();
+            $table->string('title', 32);
+            $table->string('code', 32);
+            $table->string('color', 16);
+        });
+
         $this->createTable('task', function($table) {
             /** @var Blueprint $table */
             $table->id();
@@ -14,12 +30,14 @@ class CreateTasksTable extends Migration
             $table->string('title', 255);
             $table->date('begin_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->integer('status')->default(1);
-            $table->integer('priority')->default(1);
+            $table->integer('status_id')->unsigned()->default(1);
+            $table->integer('priority_id')->unsigned()->default(1);
             $table->timestamps();
 
             $table->foreign('created_by')->references('id')->on('user');
             $table->foreign('assigned_to')->references('id')->on('user');
+            $table->foreign('status_id')->references('id')->on('task_status');
+            $table->foreign('priority_id')->references('id')->on('task_priority');
         });
 
         $this->createTable('task_log', function($table) {
@@ -44,10 +62,31 @@ class CreateTasksTable extends Migration
             $table->foreign(column: 'task_id')->references('id')->on('task');
         });
 
+        $this->insertDataArray(
+            'task_status',
+            ['title', 'code', 'color'],
+            [
+                ['Neu', 'new', '#e6e6e6'],
+                ['In arbeit', 'progress', '#1f8dd6'],
+                ['Fertig', 'completed', '#5eb95e'],
+                ['On Hold', 'hold', '#333333']
+            ]
+        );
+
+        $this->insertDataArray(
+            'task_priority',
+            ['title', 'code', 'color'],
+            [
+                ['Niedrig', 'low', '#e6e6e6'],
+                ['Mittel', 'medium', '#fad232'],
+                ['Hoch', 'high', '#fad232'],
+                ['Extrem', 'extrem', '#dd514c'],
+            ]
+        );
 
         $this->insertDataArray(
             'task', 
-            ['created_by', 'assigned_to', 'title', 'begin_date', 'end_date', 'status', 'priority'], 
+            ['created_by', 'assigned_to', 'title', 'begin_date', 'end_date', 'status_id', 'priority_id'], 
             $this->getTestTaskList()
         );
 
@@ -63,12 +102,14 @@ class CreateTasksTable extends Migration
         $this->dropTable('task_comment');
         $this->dropTable('task_log');
         $this->dropTable('task');
+        $this->dropTable('task_status');
+        $this->dropTable(tableName: 'task_priority');
     }
 
     protected function getTestTaskList()
     {
         return [
-            // [created_by, assigned_to, title, begin_date, end_date, status, priority]
+            // [created_by, assigned_to, title, begin_date, end_date, status_id, priority_id]
             [3, 5, 'Website Redesign', '2025-09-08', '2025-09-25', 2, 1],
             [5, 6, 'Database Optimization', '2025-09-06', '2025-09-20', 3, 1],
             [7, 5, 'API Documentation', '2025-09-12', '2025-09-28', 1, 1],

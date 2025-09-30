@@ -1,9 +1,9 @@
 <?php
-// app/Module/Base/Controller/Auth.php
-namespace Module\Base\Controller;
+// app/Base/Controller/Auth.php
+namespace Base\Controller;
 
 use Core\Mvc\Controller;
-use Module\Admin\Models\User;
+use Admin\Model\User;
 
 class Auth extends Controller
 {

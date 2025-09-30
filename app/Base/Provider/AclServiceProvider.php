@@ -1,5 +1,6 @@
 <?php
-namespace Module\Base\Provider;
+// app/Base/Provider/AclServiceProvider.php
+namespace Base\Provider;
 
 use Core\Acl\Access;
 use Core\Di\Interface\Container as ContainerInterface;

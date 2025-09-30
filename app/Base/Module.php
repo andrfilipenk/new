@@ -1,4 +1,5 @@
 <?php
+// app/Base/Module.php
 namespace Base;
 
 use Core\Mvc\AbstractModule;

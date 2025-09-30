@@ -1,6 +1,6 @@
 <?php
-// app/Module/Base/Controller/Error.php
-namespace Module\Base\Controller;
+// app/Base/Controller/Error.php
+namespace Base\Controller;
 
 use Core\Mvc\Controller;
 

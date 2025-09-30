@@ -2,7 +2,7 @@
 
 // Basic Event Usage:
 // Create event manager
-$events = new Core\Events\Manager();
+$events = new \Core\Events\Manager();
 
 // Attach a listener
 $events->attach('user.created', function($event) {
@@ -69,7 +69,7 @@ $user = $userService->createUser([
 
 // Stopping Event Propagation:
 // Attach a listener that stops propagation
-$events->attach('request.before', function($event) {
+$events->attach('request.before', listener: function($event) {
     $request = $event->getData();
     // Check if request is from a banned IP
     if ($request->getClientAddress() === '192.168.1.100') {
@@ -78,7 +78,7 @@ $events->attach('request.before', function($event) {
         return false;
     }
     return $request;
-}, 100); // High priority to run first
+}, ); // High priority to run first
 
 // This won't be called if propagation is stopped
 $events->attach('request.before', function($event) {

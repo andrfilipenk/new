@@ -1,6 +1,6 @@
 <?php
-// app/Module/Provider/RouterServiceProvider.php
-namespace Module\Base\Provider;
+// app/Base/Provider/RouterServiceProvider.php
+namespace Base\Provider;
 
 use Core\Di\Interface\ServiceProvider;
 use Core\Di\Interface\Container as ContainerInterface;

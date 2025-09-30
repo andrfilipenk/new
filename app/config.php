@@ -1,6 +1,5 @@
 <?php
 // app/config.php
-
 return [
     'app' => [
         'name'              => 'My Application',

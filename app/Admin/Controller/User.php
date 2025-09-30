@@ -1,4 +1,5 @@
 <?php
+// app/Admin/Controller/User.php
 namespace Admin\Controller;
 
 use Core\Mvc\Controller;

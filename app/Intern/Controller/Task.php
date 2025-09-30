@@ -1,82 +1,62 @@
 <?php
+// app/Intern/Controller/Task.php
 namespace Intern\Controller;
 
 use Core\Mvc\Controller;
 use Intern\Model\Task as TaskModel;
+use Intern\Model\TaskStatus;
+use Intern\Model\TaskPriority;
 use Intern\Form\TaskForm;
 
 class Task extends Controller
 {
-    protected $_statusLabels = [
-        TaskModel::STATUS_OPEN      => 'Open',
-        TaskModel::STATUS_PROGRESS  => 'Progress',
-        TaskModel::STATUS_DONE      => 'Done'
-    ];
+    /**
+     * @return []
+     */
+    public function getData()
+    {
+        $request = $this->getRequest();
+        $relations = ['creator', 'assigned', 'status', 'priority'];
+        $tasks = TaskModel::with($relations)
+            ->orderBy('id','desc');
+            if ($status = $request->get('status', null)) {
+                $tasks->where('status_id', $status);
+            }
+            if ($priority = $request->get('priority', null)) {
+                $tasks->where('priority_id', $priority);
+            }
+        return [
+            'statuses' => $this->getOptions(TaskStatus::class, 'status'),
+            'priorities' => $this->getOptions(TaskPriority::class, 'priority'),
+            'tasks' => $tasks->get()
+        ];
+    }
 
+    public function getOptions($model, $key)
+    {
+        /** @var \Core\Utils\Url $helper */
+        $helper = $this->getDI()->get('url');
+        $id = (int)$this->getRequest()->get($key);
+        $rows = [];
+        foreach ($model::all() as $row) {
+            $url = $helper->get(url: 'tasklist', params: [$key => $row->id]);
+            if ($row->id === $id) {
+                $url = $helper->get('tasklist', [$key => null]);
+                $row->active = true;
+            }
+            $row->url = $url;
+            $rows[] = $row;
+        }
+        return $rows;
+    }
     
-    public function indexAction()
+    public function listAction()
     {
-        $tasks = TaskModel::with(['creator', 'assigned'])->get();
-        return $this->render('task/tasklist', ['tasks' => $tasks]);
+        return $this->render('task/task-list', $this->getData());   
     }
 
-    public function createAction()
+    public function boardAction()
     {
-        $form = TaskForm::build();
-
-        if ($this->isPost()) {
-            $data = $this->getRequest()->all();
-            $task = new TaskModel($data);
-            if ($task->save()) {
-                $this->flashSuccess('Task created.');
-                return $this->redirect('admin/tasks');
-            } else {
-                $this->flashError('Failed to create task.');
-            }
-            $form->setValues($data);
-        }
-
-        return $this->render('task/form', [
-            'form' => $form->render()
-        ]);
-    }
-
-    public function editAction()
-    {
-        $id = $this->getDI()->get('dispatcher')->getParam('id');
-        $task = TaskModel::find($id);
-        if ($task === null) {
-            $this->flashError('Task not found');
-            return $this->redirect('admin/tasks');
-        }
-        $form = TaskForm::build($task->getData());
-        if ($this->isPost()) {
-            $data = $this->getRequest()->all();
-            $task->fill($data);
-            if ($task->save()) {
-                $this->flashSuccess('Task updated.');
-                return $this->redirect('admin/tasks');
-            } else {
-                $this->flashError('Failed to update task.');
-            }
-            $form->setValues($data);
-        }
-
-        return $this->render('task/form', [
-            'form' => $form->render(),
-            'task' => $task
-        ]);
-    }
-
-    public function deleteAction()
-    {
-        $id = $this->getDI()->get('dispatcher')->getParam('id');
-        $task = TaskModel::find($id);
-        if ($task) { // && $task->delete()
-            $this->flashSuccess('Task deleted.');
-        } else {
-            $this->flashError('Failed to delete task.');
-        }
-        return $this->redirect('admin/tasks');
+        return $this->render('task/task-board', $this->getData());
     }
 }

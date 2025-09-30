@@ -1,11 +1,18 @@
 <?php
+// app/Initern/config.php
 return [
     'routes' => [
         
-        '/tasks' => [
+        '/tasklist' => [
             'module'     => 'Intern',
             'controller' => 'Task',
-            'action'     => 'index',
+            'action'     => 'list',
+            'method'     => 'GET'
+        ],
+        '/taskboard' => [
+            'module'     => 'Intern',
+            'controller' => 'Task',
+            'action'     => 'board',
             'method'     => 'GET'
         ],
     ]

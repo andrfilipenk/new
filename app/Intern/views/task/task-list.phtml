@@ -1,0 +1,63 @@
+<?php 
+
+use Core\Utils\Tag;
+/** @var \Core\Mvc\View $this */
+$url = $this->getDI()->get('url');
+
+/** @var \Intern\Model\Task[] $tasks */
+?>
+<h1>Task List</h1>
+<a href="<?= $url->get('admin/task-create') ?>" class="btn btn-primary mb-2">Add New Task</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Bezeichnung</th>
+            <th>Zugewiesen an</th>
+            <th>
+                <details class="dropdown">
+                <summary>Status</summary>
+                <ul>
+                    <?php foreach ($statuses as $status): ?>
+                        <li style="background: <?=$status->color?>;"><a href="<?=$status->url?>"><?=$status->title?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+                </details>
+            </th>
+            <th>Prio</th>
+            <th>Dates</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($tasks as $task): ?>
+            <tr>
+                <td><?= $task->id ?></td>
+                <td><b><?= $task->title ?></b></td>
+                <td><?= $task->assigned->name ?></td>
+                <td>
+                    <?php 
+                    $attr = ['class' => 'status ' . $task->status->code, 'style' => 'background:' . $task->status->color];
+                    echo Tag::span($task->status->title, $attr) 
+                    ?> 
+                </td>
+                <td>
+                    <?php 
+                    $attr = ['class' => 'priority ' . $task->priority->code, 'style' => 'background:' . $task->priority->color];
+                    echo Tag::span($task->priority->title, $attr) 
+                    ?> 
+                </td>
+                <td>
+                    Created: <?= $task->created_at ?><br>
+                    Begin: <?= $task->begin_date ?><br>
+                    End: <?= $task->end_date ?>
+                </td>
+                <td>
+                    <a href="<?= $url->get('admin/task-edit/' . $task->id) ?>">E</a>
+                    <a href="<?= $url->get('admin/task-delete/' . $task->id) ?>" onclick="return confirm('Delete this task?')">X</a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

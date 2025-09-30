@@ -1,5 +1,6 @@
 <?php
-namespace Module\Base\Controller;
+// app/Intern/Controller/TaskList.php
+namespace Intern\Controller;
 
 class TaskList extends Task {
 

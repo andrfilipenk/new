@@ -6,11 +6,14 @@ define('APP_DIR', dirname($_SERVER['SCRIPT_NAME'],2));
 // Register autoloader
 spl_autoload_register(function ($class) {
     $class = str_replace('\\', DIRECTORY_SEPARATOR, $class);
-    $file = APP_PATH . $class . '.php';
-    if (file_exists($file)) {
-        require_once $file;
-        return true;
+    foreach (['_', ''] as $sep) {
+        $file = APP_PATH . $sep . $class . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+            return true;
+        }
     }
+    
     return false;
 });
 

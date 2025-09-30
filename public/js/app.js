@@ -8,7 +8,7 @@ class App {
 
     init() {
         // Load navigation
-        // this.loadNavigation();
+        this.loadNavigation();
         
         // Setup event listeners
         this.setupEventListeners();
@@ -43,9 +43,12 @@ class App {
 
     async loadNavigation() {
         try {
-            const response = await fetch('/api/navigation');
-            const navigation = await response.json();
-            this.renderNavigation(navigation);
+            //const response = await fetch('/new/tasks');
+            //const navigation = await response.json();
+            //console.log(navigation);
+            //this.renderNavigation(navigation);
+            const response = this.apiRequest('/new/tasks');
+            console.log(response);
         } catch (error) {
             console.error('Failed to load navigation:', error);
             this.mainNav.innerHTML = '<div class="error">Failed to load menu</div>';
@@ -78,7 +81,9 @@ class App {
 
     handleResponsive() {
         if (window.innerWidth >= 768) {
-            this.sidebar.classList.remove('open');
+            if (this.sidebar && 'open' in this.sidebar.classList) {
+                this.sidebar.classList.remove('open');
+            }
         }
     }
 
