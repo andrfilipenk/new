@@ -1,9 +1,20 @@
 <?php
+
 /** @var \Core\Utils\Url $url */
 $url = $this->getDI()->get('url');
 $session = $this->getDI()->get('session');
-$navigation = [];
-?><!DOCTYPE html>
+$navigation = [
+    'Home' => 'house',
+    'Calendar' => 'calendar3',
+    'Tasks' => 'list-task',
+    'Flow Builder' => 'diagram-3',
+    'User Management' => 'people-fill',
+    'Access Control' => 'ui-checks',
+    'Settings' => 'gear-fill',
+
+];
+?>
+<!DOCTYPE html>
 <html lang="de">
 
 <head>
@@ -16,48 +27,70 @@ $navigation = [];
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Dropdown
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-auto bg-dark sticky-top">
+            <div class="d-flex flex-sm-column flex-row flex-nowrap bg-dark align-items-center sticky-top">
+                <a href="/" class="d-block p-3 link-light text-decoration-none" title="">
+                    <i class="bi-bootstrap fs-1"></i>
+                </a>
+                <ul class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap mb-auto mx-auto text-center justify-content-between w-100 px-3 align-items-center">
+                    <?php foreach($navigation as $label => $icon): ?>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link py-3 px-3" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="<?=$label?>">
+                                <i class="bi bi-<?=$icon?> fs-1"></i>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                
+                
+                
+                    <li>
+                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Dashboard">
+                            <i class="bi-speedometer2 fs-1"></i>
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                    <li>
+                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Orders">
+                            <i class="bi-table fs-1"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Products">
+                            <i class="bi-heart fs-1"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Customers">
+                            <i class="bi-people fs-1"></i>
+                        </a>
                     </li>
                 </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none dropdown-toggle" id="dropdownUser3" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi-person-circle h2"></i>
+                    </a>
+                    <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
+                        <li><a class="dropdown-item" href="#">New project...</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </nav>
+        <div class="col-sm p-3 min-vh-100">
+            <div class="content">
+                <?php echo $this->yield('content'); ?>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <?php if(($messages = $this->messages()) && count($messages) > 0): ?>
+    <?php if (($messages = $this->messages()) && count($messages) > 0) : ?>
         <div aria-live="polite" aria-atomic="true" class="position-relative">
             <div class="toast-container top-0 end-0 p-3">
-                <?php foreach ($messages as $msg): ?>
-                    <div class="toast text-bg-<?=$msg['type'] ?>" role="alert" aria-live="assertive" aria-atomic="true">
+                <?php foreach ($messages as $msg) : ?>
+                    <div class="toast text-bg-<?= $msg['type'] ?>" role="alert" aria-live="assertive" aria-atomic="true">
                         <div class="d-flex">
                             <div class="toast-body"><?= $msg['message'] ?></div>
                             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
@@ -70,10 +103,9 @@ $navigation = [];
 
 
 
-    <div class="container">
-        <?php echo $this->yield('content'); ?>
-    </div>
+   
     <script src="<?= $url->get('js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= $url->get('js/app.js') ?>"></script>
 </body>
+
 </html>

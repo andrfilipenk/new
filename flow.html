@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlowForge - Production Flow Designer</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f8fafc;
+            --accent: #059669;
+            --danger: #dc2626;
+            --text: #1e293b;
+            --text-light: #475569;
+            --border: #cbd5e1;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: var(--text);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        .modal-message {
+            margin-bottom: 20px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .modal-btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .modal-btn-secondary {
+            background: var(--secondary);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .modal-btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 340px;
+            background: white;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Step Creation Form */
+        .create-step-form {
+            margin-bottom: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .color-options {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: scale(1.05);
+        }
+
+        .color-option.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        .color-option.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .add-step-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.875rem;
+        }
+
+        .add-step-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Step Library */
+        .step-library {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .library-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 12px;
+            background: var(--secondary);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .step-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .step-item {
+            padding: 14px;
+            background: white;
+            cursor: move;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .step-item:hover {
+            border-color: var(--primary);
+            background: #f8fafc;
+        }
+
+        .step-color {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .step-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .step-delete {
+            width: 20px;
+            height: 20px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .step-item:hover .step-delete {
+            opacity: 1;
+        }
+
+        .step-delete:hover {
+            background: #b91c1c;
+        }
+
+        /* Workspace Styles */
+        .workspace {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .workspace-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .workspace-area {
+            position: relative;
+            flex: 1;
+            background: 
+                linear-gradient(90deg, var(--border) 1px, transparent 1px),
+                linear-gradient(var(--border) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: auto;
+            background-color: #f8fafc;
+        }
+
+        /* Flow Step Styles */
+        .flow-step {
+            position: absolute;
+            width: 140px;
+            min-height: 70px;
+            background: white;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            cursor: move;
+            user-select: none;
+            z-index: 10;
+            transition: none;
+            border: 2px solid transparent;
+        }
+
+        .flow-step.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .step-header {
+            padding: 16px 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+        }
+
+        .step-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .connection-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--primary);
+            cursor: crosshair;
+            transition: all 0.2s;
+            pointer-events: all;
+        }
+
+        .connection-point:hover {
+            background: var(--primary-dark);
+            transform: scale(1.2);
+        }
+
+        .connection-point.input {
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .connection-point.output {
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: var(--danger);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+            z-index: 20;
+            box-shadow: var(--shadow);
+        }
+
+        .flow-step:hover .delete-btn,
+        .connection:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Connection Styles */
+        .connection {
+            position: absolute;
+            z-index: 5;
+            cursor: pointer;
+        }
+
+        .connection-line {
+            stroke: var(--text-light);
+            stroke-width: 2;
+            fill: none;
+            marker-end: url(#arrowhead);
+            pointer-events: stroke;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .connection-line:hover {
+            stroke: var(--primary);
+            stroke-width: 3;
+        }
+
+        .connection.selected .connection-line {
+            stroke: var(--primary);
+            stroke-width: 4;
+            filter: drop-shadow(0 0 3px rgba(37, 99, 235, 0.3));
+        }
+
+        .connection-controls {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 25;
+        }
+
+        .connection:hover .connection-controls {
+            opacity: 1;
+        }
+
+        .connection-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .connection-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .connection-delete:hover {
+            background: #b91c1c;
+        }
+
+        .connection-hit-area {
+            stroke: transparent;
+            stroke-width: 15;
+            fill: none;
+            pointer-events: all;
+            cursor: pointer;
+        }
+
+        .pulse-effect {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                filter: drop-shadow(0 0 0 rgba(37, 99, 235, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.7));
+            }
+            100% {
+                filter: drop-shadow(0 0 0 rgba(37, 99, 235, 0.5));
+            }
+        }
+
+        /* Instructions */
+        .instructions {
+            margin-top: 28px;
+            padding: 20px;
+            background: #eff6ff;
+            font-size: 0.875rem;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        .instructions h3 {
+            margin-bottom: 12px;
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Load Data Modal -->
+    <div class="modal" id="loadModal">
+        <div class="modal-content">
+            <div class="modal-title">Load Saved Data</div>
+            <div class="modal-message">
+                We found previously saved workflow data. Would you like to load it?
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-secondary" id="loadCancel">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="loadConfirm">Load Data</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="logo">
+                <div class="logo-icon">FF</div>
+                <div class="logo-text">FlowForge</div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Create New Step</div>
+                <div class="create-step-form">
+                    <div class="form-group">
+                        <input type="text" id="stepTitle" class="form-control" placeholder="Enter step name">
+                    </div>
+                    <div class="form-group">
+                        <div class="color-options">
+                            <div class="color-option selected" style="background-color: #3b82f6;" data-color="#3b82f6"></div>
+                            <div class="color-option" style="background-color: #ef4444;" data-color="#ef4444"></div>
+                            <div class="color-option" style="background-color: #10b981;" data-color="#10b981"></div>
+                            <div class="color-option" style="background-color: #f59e0b;" data-color="#f59e0b"></div>
+                            <div class="color-option" style="background-color: #8b5cf6;" data-color="#8b5cf6"></div>
+                            <div class="color-option" style="background-color: #ec4899;" data-color="#ec4899"></div>
+                            <div class="color-option" style="background-color: #06b6d4;" data-color="#06b6d4"></div>
+                            <div class="color-option" style="background-color: #84cc16;" data-color="#84cc16"></div>
+                        </div>
+                    </div>
+                    <button class="add-step-btn" id="addStepBtn">
+                        <span>+</span> Create Step
+                    </button>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">Step Library</div>
+                <div class="library-tabs">
+                    <button class="tab-btn active" data-tab="custom">My Steps</button>
+                    <button class="tab-btn" data-tab="predefined">Templates</button>
+                </div>
+                <div class="step-library">
+                    <div class="step-items" id="customSteps">
+                        <div class="empty-state">
+                            <h3>No steps yet</h3>
+                            <p>Create your first step above</p>
+                        </div>
+                    </div>
+                    <div class="step-items" id="predefinedSteps" style="display: none;">
+                        <div class="step-item" data-type="create-itemlist" draggable="true">
+                            <div class="step-color" style="background-color: #3b82f6;"></div>
+                            <div class="step-name">Create Item List</div>
+                        </div>
+                        <div class="step-item" data-type="material-request" draggable="true">
+                            <div class="step-color" style="background-color: #ef4444;"></div>
+                            <div class="step-name">Material Request</div>
+                        </div>
+                        <div class="step-item" data-type="cutting-plates" draggable="true">
+                            <div class="step-color" style="background-color: #10b981;"></div>
+                            <div class="step-name">Cutting Plates</div>
+                        </div>
+                        <div class="step-item" data-type="applying-borders" draggable="true">
+                            <div class="step-color" style="background-color: #f59e0b;"></div>
+                            <div class="step-name">Applying Borders</div>
+                        </div>
+                        <div class="step-item" data-type="spraying" draggable="true">
+                            <div class="step-color" style="background-color: #8b5cf6;"></div>
+                            <div class="step-name">Spraying</div>
+                        </div>
+                        <div class="step-item" data-type="assembling" draggable="true">
+                            <div class="step-color" style="background-color: #ec4899;"></div>
+                            <div class="step-name">Assembling</div>
+                        </div>
+                        <div class="step-item" data-type="quality-check" draggable="true">
+                            <div class="step-color" style="background-color: #06b6d4;"></div>
+                            <div class="step-name">Quality Check</div>
+                        </div>
+                        <div class="step-item" data-type="delivery" draggable="true">
+                            <div class="step-color" style="background-color: #84cc16;"></div>
+                            <div class="step-name">Delivery</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>How to Use</h3>
+                <ul>
+                    <li>Create steps using the form above</li>
+                    <li>Drag steps from library to workspace</li>
+                    <li>Connect steps using the side connection points</li>
+                    <li>Select items to edit or delete them</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="workspace">
+            <div class="workspace-controls">
+                <button class="btn btn-primary" id="saveBtn">
+                    <span>💾</span> Save
+                </button>
+                <button class="btn btn-danger" id="clearBtn">
+                    <span>🗑️</span> Clear
+                </button>
+            </div>
+            <div class="workspace-area" id="workspaceArea">
+                <div class="empty-state">
+                    <h3>Your workspace is empty</h3>
+                    <p>Drag steps from the library to get started</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const workspaceArea = document.getElementById('workspaceArea');
+            const saveBtn = document.getElementById('saveBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const addStepBtn = document.getElementById('addStepBtn');
+            const stepTitleInput = document.getElementById('stepTitle');
+            const colorOptions = document.querySelectorAll('.color-option');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const customStepsContainer = document.getElementById('customSteps');
+            const predefinedStepsContainer = document.getElementById('predefinedSteps');
+            const loadModal = document.getElementById('loadModal');
+            const loadCancel = document.getElementById('loadCancel');
+            const loadConfirm = document.getElementById('loadConfirm');
+            
+            let steps = [];
+            let connections = [];
+            let selectedElement = null;
+            let isConnecting = false;
+            let connectionStart = null;
+            const gridSize = 20;
+            let selectedColor = '#3b82f6';
+            
+            // Check for saved data on page load
+            checkForSavedData();
+            
+            // Initialize color selection
+            colorOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    colorOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedColor = this.getAttribute('data-color');
+                });
+            });
+            
+            // Tab switching
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const tab = this.getAttribute('data-tab');
+                    if (tab === 'custom') {
+                        customStepsContainer.style.display = 'flex';
+                        predefinedStepsContainer.style.display = 'none';
+                    } else {
+                        customStepsContainer.style.display = 'none';
+                        predefinedStepsContainer.style.display = 'flex';
+                    }
+                });
+            });
+            
+            // Modal event listeners
+            loadCancel.addEventListener('click', function() {
+                loadModal.style.display = 'none';
+            });
+            
+            loadConfirm.addEventListener('click', function() {
+                loadModal.style.display = 'none';
+                loadDataFromCookie();
+            });
+            
+            // Add event listeners for step items in the library
+            document.querySelectorAll('.step-item').forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+            });
+            
+            // Workspace event listeners
+            workspaceArea.addEventListener('dragover', handleDragOver);
+            workspaceArea.addEventListener('drop', handleDrop);
+            workspaceArea.addEventListener('click', handleWorkspaceClick);
+            
+            // Button event listeners
+            saveBtn.addEventListener('click', saveTemplate);
+            clearBtn.addEventListener('click', clearWorkspace);
+            addStepBtn.addEventListener('click', createCustomStep);
+            
+            // Keyboard events
+            document.addEventListener('keydown', handleKeyDown);
+            
+            // Step counter for unique IDs
+            let stepCounter = 1;
+            let connectionCounter = 1;
+            
+            // Cookie functions
+            function setCookie(name, value, days) {
+                const expires = new Date();
+                expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+                document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+            }
+            
+            function getCookie(name) {
+                const nameEQ = name + "=";
+                const ca = document.cookie.split(';');
+                for(let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                    if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+                }
+                return null;
+            }
+            
+            function deleteCookie(name) {
+                document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+            }
+            
+            function checkForSavedData() {
+                const savedData = getCookie('flowforge_data');
+                if (savedData) {
+                    loadModal.style.display = 'flex';
+                }
+            }
+            
+            function saveTemplate() {
+                const template = {
+                    steps: steps,
+                    connections: connections,
+                    customSteps: getCustomStepsFromLibrary(),
+                    timestamp: new Date().toISOString()
+                };
+                
+                const jsonData = JSON.stringify(template);
+                setCookie('flowforge_data', jsonData, 30); // Save for 30 days
+                
+                console.log('Template saved:', template);
+                alert('Template saved successfully! Data will be available on your next visit.');
+            }
+            
+            function getCustomStepsFromLibrary() {
+                const customSteps = [];
+                customStepsContainer.querySelectorAll('.step-item').forEach(item => {
+                    if (item.getAttribute('data-type') === 'custom') {
+                        customSteps.push({
+                            title: item.querySelector('.step-name').textContent,
+                            color: item.querySelector('.step-color').style.backgroundColor
+                        });
+                    }
+                });
+                return customSteps;
+            }
+            
+            function loadDataFromCookie() {
+                const savedData = getCookie('flowforge_data');
+                if (!savedData) return;
+                
+                try {
+                    const template = JSON.parse(savedData);
+                    
+                    // Clear current workspace
+                    clearWorkspace(true);
+                    
+                    // Restore custom steps to library
+                    if (template.customSteps) {
+                        template.customSteps.forEach(step => {
+                            addToCustomStepsLibrary(step.title, step.color);
+                        });
+                    }
+                    
+                    // Restore steps to workspace
+                    if (template.steps) {
+                        template.steps.forEach(step => {
+                            createStep(step.type, step.x, step.y, step.title, step.color);
+                        });
+                    }
+                    
+                    // Restore connections
+                    if (template.connections) {
+                        // We need to wait a bit for steps to be created before connecting them
+                        setTimeout(() => {
+                            template.connections.forEach(conn => {
+                                createConnection(conn.source, conn.target);
+                            });
+                        }, 100);
+                    }
+                    
+                    console.log('Template loaded:', template);
+                } catch (error) {
+                    console.error('Error loading saved data:', error);
+                    alert('Error loading saved data. The data might be corrupted.');
+                }
+            }
+            
+            function handleDragStart(e) {
+                const stepType = e.target.getAttribute('data-type') || 'custom';
+                e.dataTransfer.setData('text/plain', JSON.stringify({
+                    type: stepType,
+                    title: e.target.querySelector('.step-name').textContent,
+                    color: e.target.querySelector('.step-color').style.backgroundColor
+                }));
+            }
+            
+            function handleDragOver(e) {
+                e.preventDefault();
+            }
+            
+            function handleDrop(e) {
+                e.preventDefault();
+                const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                
+                // Calculate position with grid snapping
+                const rect = workspaceArea.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                let y = e.clientY - rect.top;
+                
+                // Snap to grid
+                x = Math.round(x / gridSize) * gridSize;
+                y = Math.round(y / gridSize) * gridSize;
+                
+                createStep(data.type, x, y, data.title, data.color);
+                
+                // Remove empty state if it exists
+                const emptyState = workspaceArea.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.remove();
+                }
+            }
+            
+            function createCustomStep() {
+                const title = stepTitleInput.value.trim();
+                
+                if (!title) {
+                    alert('Please enter a step name');
+                    return;
+                }
+                
+                // Add to custom steps library
+                addToCustomStepsLibrary(title, selectedColor);
+                
+                // Reset form
+                stepTitleInput.value = '';
+                stepTitleInput.focus();
+            }
+            
+            function addToCustomStepsLibrary(title, color) {
+                const stepItem = document.createElement('div');
+                stepItem.className = 'step-item';
+                stepItem.setAttribute('draggable', 'true');
+                stepItem.setAttribute('data-type', 'custom');
+                
+                stepItem.innerHTML = `
+                    <div class="step-color" style="background-color: ${color};"></div>
+                    <div class="step-name">${title}</div>
+                    <button class="step-delete" title="Remove from library">×</button>
+                `;
+                
+                stepItem.addEventListener('dragstart', handleDragStart);
+                
+                // Add delete functionality for library items
+                stepItem.querySelector('.step-delete').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    stepItem.remove();
+                    
+                    // Show empty state if no custom steps left
+                    if (customStepsContainer.querySelectorAll('.step-item').length === 0) {
+                        customStepsContainer.innerHTML = '<div class="empty-state"><h3>No steps yet</h3><p>Create your first step above</p></div>';
+                    }
+                });
+                
+                // Remove empty state if it exists
+                const emptyState = customStepsContainer.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.remove();
+                }
+                
+                customStepsContainer.appendChild(stepItem);
+            }
+            
+            function createStep(type, x, y, title, color) {
+                const step = document.createElement('div');
+                step.className = 'flow-step';
+                step.id = `step-${stepCounter}`;
+                step.style.left = `${x}px`;
+                step.style.top = `${y}px`;
+                
+                step.innerHTML = `
+                    <div class="step-header" style="background-color: ${color};">${title}</div>
+                    <div class="step-connections">
+                        <div class="connection-point input"></div>
+                        <div class="connection-point output"></div>
+                    </div>
+                    <div class="delete-btn">×</div>
+                `;
+                
+                // Add event listeners for connection points
+                step.querySelectorAll('.connection-point').forEach(point => {
+                    point.addEventListener('mousedown', startConnection);
+                });
+                
+                // Add delete button event
+                step.querySelector('.delete-btn').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    deleteStep(step.id);
+                });
+                
+                // Add event listeners for dragging
+                step.addEventListener('mousedown', startStepDrag);
+                
+                workspaceArea.appendChild(step);
+                
+                // Store step data
+                steps.push({
+                    id: step.id,
+                    type: type,
+                    x: x,
+                    y: y,
+                    title: title,
+                    color: color
+                });
+                
+                stepCounter++;
+            }
+            
+            function startStepDrag(e) {
+                if (e.target.classList.contains('connection-point') || 
+                    e.target.classList.contains('delete-btn')) {
+                    return;
+                }
+                
+                const step = e.currentTarget;
+                selectElement(step);
+                
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startLeft = parseInt(step.style.left);
+                const startTop = parseInt(step.style.top);
+                
+                function handleMouseMove(e) {
+                    let newX = startLeft + (e.clientX - startX);
+                    let newY = startTop + (e.clientY - startY);
+                    
+                    // Snap to grid
+                    newX = Math.round(newX / gridSize) * gridSize;
+                    newY = Math.round(newY / gridSize) * gridSize;
+                    
+                    step.style.left = `${newX}px`;
+                    step.style.top = `${newY}px`;
+                    
+                    // Update connections
+                    updateConnectionsForStep(step.id);
+                }
+                
+                function handleMouseUp() {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                    
+                    // Update step position in data
+                    const stepIndex = steps.findIndex(s => s.id === step.id);
+                    if (stepIndex !== -1) {
+                        steps[stepIndex].x = parseInt(step.style.left);
+                        steps[stepIndex].y = parseInt(step.style.top);
+                    }
+                }
+                
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            }
+            
+            function startConnection(e) {
+                e.stopPropagation();
+                
+                const point = e.currentTarget;
+                const step = point.closest('.flow-step');
+                const isOutput = point.classList.contains('output');
+                
+                isConnecting = true;
+                
+                // Calculate connection start point based on side
+                let startX, startY;
+                const stepX = parseInt(step.style.left);
+                const stepY = parseInt(step.style.top);
+                const stepWidth = 140;
+                const stepHeight = 70;
+                
+                if (isOutput) {
+                    startX = stepX + stepWidth;
+                    startY = stepY + stepHeight / 2;
+                } else {
+                    startX = stepX;
+                    startY = stepY + stepHeight / 2;
+                }
+                
+                connectionStart = {
+                    stepId: step.id,
+                    isOutput: isOutput,
+                    x: startX,
+                    y: startY
+                };
+                
+                function handleMouseMove(e) {
+                    if (!isConnecting) return;
+                    
+                    // Draw temporary connection line
+                    drawTemporaryConnection(
+                        connectionStart.x, 
+                        connectionStart.y, 
+                        e.clientX - workspaceArea.getBoundingClientRect().left, 
+                        e.clientY - workspaceArea.getBoundingClientRect().top
+                    );
+                }
+                
+                function handleMouseUp(e) {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                    
+                    if (!isConnecting) return;
+                    
+                    const targetPoint = document.elementFromPoint(e.clientX, e.clientY);
+                    if (targetPoint && targetPoint.classList.contains('connection-point')) {
+                        const targetStep = targetPoint.closest('.flow-step');
+                        const targetIsInput = targetPoint.classList.contains('input');
+                        
+                        // Check if connection is valid (output to input, not same step)
+                        if (connectionStart.stepId !== targetStep.id && 
+                            connectionStart.isOutput && targetIsInput) {
+                            createConnection(connectionStart.stepId, targetStep.id);
+                        }
+                    }
+                    
+                    isConnecting = false;
+                    connectionStart = null;
+                    clearTemporaryConnection();
+                }
+                
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            }
+            
+            function drawTemporaryConnection(startX, startY, endX, endY) {
+                clearTemporaryConnection();
+                
+                const svg = createConnectionSVG();
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', generateOrthogonalPath(startX, startY, endX, endY));
+                path.setAttribute('stroke', '#3b82f6');
+                path.setAttribute('stroke-width', '2');
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke-dasharray', '5,5');
+                path.setAttribute('marker-end', 'url(#arrowhead)');
+                path.id = 'temp-connection';
+                
+                svg.appendChild(path);
+            }
+            
+            function clearTemporaryConnection() {
+                const tempConnection = document.getElementById('temp-connection');
+                if (tempConnection) {
+                    tempConnection.parentNode.removeChild(tempConnection);
+                }
+            }
+            
+            function createConnection(sourceStepId, targetStepId) {
+                // Check if connection already exists
+                if (connections.some(c => c.source === sourceStepId && c.target === targetStepId)) {
+                    return;
+                }
+                
+                const connectionId = `conn-${connectionCounter}`;
+                
+                // Create connection element with single delete button
+                const connectionElement = document.createElement('div');
+                connectionElement.className = 'connection';
+                connectionElement.id = `connection-${connectionId}`;
+                
+                connectionElement.innerHTML = `
+                    <div class="connection-controls">
+                        <button class="connection-btn connection-delete" title="Delete Connection">×</button>
+                    </div>
+                `;
+                
+                // Add delete button event
+                connectionElement.querySelector('.connection-delete').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    deleteConnection(connectionId);
+                });
+                
+                connectionElement.addEventListener('click', function(e) {
+                    if (!e.target.classList.contains('connection-btn')) {
+                        e.stopPropagation();
+                        selectElement(connectionElement);
+                    }
+                });
+                
+                workspaceArea.appendChild(connectionElement);
+                
+                // Store connection data
+                connections.push({
+                    id: connectionId,
+                    source: sourceStepId,
+                    target: targetStepId
+                });
+                
+                // Update connection path
+                updateConnection(connectionId);
+                
+                selectElement(connectionElement);
+                connectionCounter++;
+            }
+            
+            function updateConnection(connectionId) {
+                const connection = connections.find(c => c.id === connectionId);
+                if (!connection) return;
+                
+                const sourceStep = document.getElementById(connection.source);
+                const targetStep = document.getElementById(connection.target);
+                
+                if (!sourceStep || !targetStep) return;
+                
+                // Calculate connection points from sides
+                const sourceX = parseInt(sourceStep.style.left);
+                const sourceY = parseInt(sourceStep.style.top);
+                const sourceWidth = 140;
+                const sourceHeight = 70;
+                
+                const targetX = parseInt(targetStep.style.left);
+                const targetY = parseInt(targetStep.style.top);
+                const targetWidth = 140;
+                const targetHeight = 70;
+                
+                const startX = sourceX + sourceWidth;
+                const startY = sourceY + sourceHeight / 2;
+                const endX = targetX;
+                const endY = targetY + targetHeight / 2;
+                
+                // Create or update SVG path
+                let path = document.getElementById(connectionId);
+                let hitArea = document.getElementById(`${connectionId}-hit`);
+                
+                if (!path) {
+                    const svg = createConnectionSVG();
+                    
+                    // Create hit area for easy selection
+                    hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    hitArea.setAttribute('id', `${connectionId}-hit`);
+                    hitArea.setAttribute('class', 'connection-hit-area');
+                    hitArea.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const connectionElement = document.getElementById(`connection-${connectionId}`);
+                        if (connectionElement) {
+                            selectElement(connectionElement);
+                        }
+                    });
+                    svg.appendChild(hitArea);
+                    
+                    // Create visible path
+                    path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('id', connectionId);
+                    path.setAttribute('class', 'connection-line');
+                    path.setAttribute('marker-end', 'url(#arrowhead)');
+                    svg.appendChild(path);
+                }
+                
+                const pathData = generateOrthogonalPath(startX, startY, endX, endY);
+                path.setAttribute('d', pathData);
+                hitArea.setAttribute('d', pathData);
+                
+                // Position connection element at midpoint
+                const connectionElement = document.getElementById(`connection-${connectionId}`);
+                const midX = (startX + endX) / 2;
+                const midY = (startY + endY) / 2;
+                connectionElement.style.left = `${midX}px`;
+                connectionElement.style.top = `${midY}px`;
+            }
+            
+            function createConnectionSVG() {
+                let svg = document.getElementById('connection-layer');
+                if (!svg) {
+                    svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('id', 'connection-layer');
+                    svg.setAttribute('style', 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;');
+                    
+                    // Define arrow marker
+                    const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                    marker.setAttribute('id', 'arrowhead');
+                    marker.setAttribute('markerWidth', '10');
+                    marker.setAttribute('markerHeight', '7');
+                    marker.setAttribute('refX', '9');
+                    marker.setAttribute('refY', '3.5');
+                    marker.setAttribute('orient', 'auto');
+                    
+                    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
+                    polygon.setAttribute('fill', '#475569');
+                    
+                    marker.appendChild(polygon);
+                    defs.appendChild(marker);
+                    svg.appendChild(defs);
+                    
+                    workspaceArea.appendChild(svg);
+                }
+                return svg;
+            }
+            
+            function generateOrthogonalPath(startX, startY, endX, endY) {
+                // Create orthogonal path with right angles
+                const midX = (startX + endX) / 2;
+                
+                return `M ${startX} ${startY} L ${midX} ${startY} L ${midX} ${endY} L ${endX} ${endY}`;
+            }
+            
+            function updateConnectionsForStep(stepId) {
+                connections
+                    .filter(c => c.source === stepId || c.target === stepId)
+                    .forEach(c => updateConnection(c.id));
+            }
+            
+            function deleteStep(stepId) {
+                // Remove step from DOM
+                const stepElement = document.getElementById(stepId);
+                if (stepElement) {
+                    workspaceArea.removeChild(stepElement);
+                }
+                
+                // Remove step from data
+                steps = steps.filter(s => s.id !== stepId);
+                
+                // Remove connections associated with this step
+                const connectionsToRemove = connections.filter(c => 
+                    c.source === stepId || c.target === stepId);
+                
+                connectionsToRemove.forEach(c => {
+                    deleteConnection(c.id);
+                });
+                
+                // Deselect if this was the selected element
+                if (selectedElement && selectedElement.id === stepId) {
+                    selectedElement = null;
+                }
+                
+                // Show empty state if no steps left
+                if (workspaceArea.querySelectorAll('.flow-step').length === 0) {
+                    workspaceArea.innerHTML = '<div class="empty-state"><h3>Your workspace is empty</h3><p>Drag steps from the library to get started</p></div>';
+                }
+            }
+            
+            function deleteConnection(connectionId) {
+                // Remove connection from DOM
+                const path = document.getElementById(connectionId);
+                if (path) {
+                    path.parentNode.removeChild(path);
+                }
+                
+                const hitArea = document.getElementById(`${connectionId}-hit`);
+                if (hitArea) {
+                    hitArea.parentNode.removeChild(hitArea);
+                }
+                
+                const connectionElement = document.getElementById(`connection-${connectionId}`);
+                if (connectionElement) {
+                    workspaceArea.removeChild(connectionElement);
+                }
+                
+                // Remove connection from data
+                connections = connections.filter(c => c.id !== connectionId);
+                
+                // Deselect if this was the selected element
+                if (selectedElement && selectedElement.id === `connection-${connectionId}`) {
+                    selectedElement = null;
+                }
+            }
+            
+            function handleWorkspaceClick(e) {
+                // Deselect if clicking on empty space
+                if (e.target === workspaceArea) {
+                    clearSelection();
+                }
+            }
+            
+            function selectElement(element) {
+                clearSelection();
+                
+                selectedElement = element;
+                element.classList.add('selected');
+                
+                // Add visual effect for connections
+                if (element.classList.contains('connection')) {
+                    const connectionId = element.id.replace('connection-', '');
+                    const path = document.getElementById(connectionId);
+                    if (path) {
+                        path.classList.add('pulse-effect');
+                        setTimeout(() => {
+                            path.classList.remove('pulse-effect');
+                        }, 500);
+                    }
+                }
+            }
+            
+            function clearSelection() {
+                if (selectedElement) {
+                    selectedElement.classList.remove('selected');
+                    selectedElement = null;
+                }
+            }
+            
+            function handleKeyDown(e) {
+                // Delete selected element with Delete key
+                if (e.key === 'Delete' && selectedElement) {
+                    if (selectedElement.classList.contains('flow-step')) {
+                        deleteStep(selectedElement.id);
+                    } else if (selectedElement.classList.contains('connection')) {
+                        const connectionId = selectedElement.id.replace('connection-', '');
+                        deleteConnection(connectionId);
+                    }
+                }
+            }
+            
+            function clearWorkspace(silent = false) {
+                if (!silent && !confirm('Are you sure you want to clear the workspace?')) {
+                    return;
+                }
+                
+                // Remove all steps
+                document.querySelectorAll('.flow-step').forEach(step => {
+                    workspaceArea.removeChild(step);
+                });
+                
+                // Remove all connections
+                document.querySelectorAll('.connection').forEach(conn => {
+                    workspaceArea.removeChild(conn);
+                });
+                
+                // Remove connection SVG
+                const svg = document.getElementById('connection-layer');
+                if (svg) {
+                    workspaceArea.removeChild(svg);
+                }
+                
+                // Clear data
+                steps = [];
+                connections = [];
+                selectedElement = null;
+                stepCounter = 1;
+                connectionCounter = 1;
+                
+                // Show empty state
+                workspaceArea.innerHTML = '<div class="empty-state"><h3>Your workspace is empty</h3><p>Drag steps from the library to get started</p></div>';
+            }
+        });
+    </script>
+</body>
+</html>

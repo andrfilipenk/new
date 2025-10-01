@@ -100,7 +100,7 @@ class PermissionSeeder extends Seeder
         ];
         
         foreach ($rolePermissions as $roleName => $permissions) {
-            $role = Role::where('name', $roleName)->first();
+            $role = Role::find('name', $roleName)->first();
             if (!$role) continue;
             
             foreach ($permissions as $permissionPattern) {

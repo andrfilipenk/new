@@ -134,4 +134,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return new bootstrap.Toast(toastEl)
     })
     toastList.forEach(toast => toast.show())
+
+
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function(tooltipEl) {
+        return new bootstrap.Tooltip(tooltipEl)
+    })
 });
