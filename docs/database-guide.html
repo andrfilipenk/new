@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database & ORM Guide - Framework Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        .container { max-width: 1200px; }
+        .page-header { border-bottom: 2px solid #667eea; padding-bottom: 1rem; margin-bottom: 2rem; }
+        .page-title { color: #667eea; font-weight: 700; margin: 0; }
+        .code-example { background: #2d3748; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; position: relative; }
+        .code-example::before { content: attr(data-title); position: absolute; top: 0; left: 0; background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 8px 0 8px 0; font-size: 0.75rem; font-weight: 600; }
+        .toc { background: #f8f9fa; border-left: 4px solid #667eea; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .alert-info { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 1px solid #2196f3; color: #0d47a1; }
+        .alert-warning { background: linear-gradient(135deg, #fff3e0, #ffcc02); border: 1px solid #ff9800; color: #e65100; }
+        .alert-success { background: linear-gradient(135deg, #e8f5e8, #c8e6c9); border: 1px solid #4caf50; color: #1b5e20; }
+        .nav-pills .nav-link { margin: 0.25rem; }
+        .nav-pills .nav-link.active { background-color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Navigation -->
+        <nav class="mb-4">
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link" href="index.html">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" href="installation-guide.html">Installation</a></li>
+                <li class="nav-item"><a class="nav-link" href="mvc-guide.html">MVC</a></li>
+                <li class="nav-item"><a class="nav-link active" href="database-guide.html">Database</a></li>
+                <li class="nav-item"><a class="nav-link" href="acl-guide.html">ACL</a></li>
+                <li class="nav-item"><a class="nav-link" href="validation-guide.html">Validation</a></li>
+                <li class="nav-item"><a class="nav-link" href="forms-guide.html">Forms</a></li>
+                <li class="nav-item"><a class="nav-link" href="api-guide.html">API</a></li>
+                <li class="nav-item"><a class="nav-link" href="testing-guide.html">Testing</a></li>
+                <li class="nav-item"><a class="nav-link" href="best-practices-guide.html">Best Practices</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="bg-white rounded p-4 shadow-sm">
+            <div class="page-header">
+                <h1 class="page-title">Database & ORM</h1>
+                <p class="page-subtitle text-muted">Comprehensive guide to database operations and Object-Relational Mapping</p>
+            </div>
+
+            <div class="toc">
+                <h6>Table of Contents</h6>
+                <ul>
+                    <li><a href="#database-config">Database Configuration</a></li>
+                    <li><a href="#query-builder">Query Builder</a></li>
+                    <li><a href="#orm-basics">ORM Basics</a></li>
+                    <li><a href="#relationships">Relationships</a></li>
+                    <li><a href="#advanced-queries">Advanced Queries</a></li>
+                    <li><a href="#migrations">Migrations</a></li>
+                </ul>
+            </div>
+
+            <h2 id="database-config">Database Configuration</h2>
+            <p>The framework supports multiple database connections and provides a fluent query builder interface.</p>
+
+            <h3>Basic Configuration</h3>
+            <div class="code-example" data-title="config/database.php">
+                <pre><code class="language-php"><?php
+return [
+    'default' => [
+        'driver'    => 'mysql',
+        'host'      => 'localhost',
+        'port'      => 3306,
+        'database'  => 'your_database',
+        'username'  => 'your_username',
+        'password'  => 'your_password',
+        'charset'   => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'options'   => [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]
+    ]
+];</code></pre>
+            </div>
+
+            <h2 id="query-builder">Query Builder</h2>
+            <p>The query builder provides a fluent interface for building database queries.</p>
+
+            <h3>Basic Queries</h3>
+            <div class="code-example" data-title="Select Queries">
+                <pre><code class="language-php"><?php
+$db = Container::getDefault()->get('db');
+
+// Simple select
+$users = $db->table('user')->get();
+
+// Select with conditions
+$activeUsers = $db->table('user')
+    ->where('status', 'active')
+    ->get();
+
+// Select specific columns
+$userEmails = $db->table('user')
+    ->select(['id', 'name', 'email'])
+    ->where('department', 'IT')
+    ->get();
+
+// Single record
+$user = $db->table('user')
+    ->where('id', 1)
+    ->first();</code></pre>
+            </div>
+
+            <h3>Insert, Update, Delete</h3>
+            <div class="code-example" data-title="Data Modification">
+                <pre><code class="language-php"><?php
+// Insert single record
+$userId = $db->table('user')->insert([
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+    'created_at' => date('Y-m-d H:i:s')
+]);
+
+// Update records
+$affected = $db->table('user')
+    ->where('id', 1)
+    ->update([
+        'name' => 'Jane Doe',
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
+
+// Delete records
+$deleted = $db->table('user')
+    ->where('status', 'inactive')
+    ->delete();</code></pre>
+            </div>
+
+            <h2 id="orm-basics">ORM Basics</h2>
+            <p>The framework includes a simple but powerful ORM for working with database records as objects.</p>
+
+            <h3>Model Definition</h3>
+            <div class="code-example" data-title="app/Models/User.php">
+                <pre><code class="language-php"><?php
+namespace App\Models;
+
+class User extends Model
+{
+    protected static $table = 'user';
+    protected static $primaryKey = 'id';
+    
+    protected $fillable = [
+        'name', 'email', 'password', 'status'
+    ];
+    
+    protected $hidden = [
+        'password'
+    ];
+    
+    // Hash password before saving
+    public function setPassword($password)
+    {
+        $this->password = password_hash($password, PASSWORD_DEFAULT);
+    }
+    
+    // Verify password
+    public function verifyPassword($password)
+    {
+        return password_verify($password, $this->password);
+    }
+}</code></pre>
+            </div>
+
+            <h2 id="relationships">Relationships</h2>
+            <p>Define relationships between models for easy data access.</p>
+
+            <h3>One-to-Many Relationship</h3>
+            <div class="code-example" data-title="User and Posts">
+                <pre><code class="language-php"><?php
+class User extends Model
+{
+    // User has many posts
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'user_id');
+    }
+}
+
+class Post extends Model
+{
+    // Post belongs to user
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+}
+
+// Usage
+$user = User::find(1);
+$posts = $user->posts(); // Get all posts by user
+
+$post = Post::find(1);
+$author = $post->user(); // Get post author</code></pre>
+            </div>
+
+            <h2 id="migrations">Migrations</h2>
+            <p>Database migrations allow you to version your database schema.</p>
+
+            <div class="code-example" data-title="Migration Example">
+                <pre><code class="language-php"><?php
+// migrations/001_create_users_table.php
+class CreateUsersTable
+{
+    public function up()
+    {
+        $sql = "
+            CREATE TABLE user (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                status ENUM('active', 'inactive') DEFAULT 'active',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )
+        ";
+        
+        Database::execute($sql);
+    }
+    
+    public function down()
+    {
+        Database::execute("DROP TABLE IF EXISTS user");
+    }
+}</code></pre>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Pro Tip:</strong> Always use migrations for database changes to keep your schema versioned and deployable.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

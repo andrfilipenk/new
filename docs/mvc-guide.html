@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVC Architecture - Framework Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        .container { max-width: 1200px; }
+        .page-header { border-bottom: 2px solid #667eea; padding-bottom: 1rem; margin-bottom: 2rem; }
+        .page-title { color: #667eea; font-weight: 700; margin: 0; }
+        .code-example { background: #2d3748; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; position: relative; }
+        .code-example::before { content: attr(data-title); position: absolute; top: 0; left: 0; background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 8px 0 8px 0; font-size: 0.75rem; font-weight: 600; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+        .feature-card { background: white; border: 1px solid #e9ecef; border-radius: 12px; padding: 1.5rem; }
+        .feature-icon { width: 48px; height: 48px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; margin-bottom: 1rem; }
+        .nav-pills .nav-link { margin: 0.25rem; }
+        .nav-pills .nav-link.active { background-color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Navigation -->
+        <nav class="mb-4">
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link" href="index.html">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" href="installation-guide.html">Installation</a></li>
+                <li class="nav-item"><a class="nav-link active" href="mvc-guide.html">MVC</a></li>
+                <li class="nav-item"><a class="nav-link" href="database-guide.html">Database</a></li>
+                <li class="nav-item"><a class="nav-link" href="acl-guide.html">ACL</a></li>
+                <li class="nav-item"><a class="nav-link" href="validation-guide.html">Validation</a></li>
+                <li class="nav-item"><a class="nav-link" href="forms-guide.html">Forms</a></li>
+                <li class="nav-item"><a class="nav-link" href="api-guide.html">API</a></li>
+                <li class="nav-item"><a class="nav-link" href="testing-guide.html">Testing</a></li>
+                <li class="nav-item"><a class="nav-link" href="best-practices-guide.html">Best Practices</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="bg-white rounded p-4 shadow-sm">
+            <div class="page-header">
+                <h1 class="page-title">MVC Architecture</h1>
+                <p class="page-subtitle text-muted">Understanding the Model-View-Controller pattern</p>
+            </div>
+
+            <h2>MVC Overview</h2>
+            <p>The framework follows the Model-View-Controller (MVC) architectural pattern, which separates application logic into three interconnected components:</p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h5>Model</h5>
+                    <p>Manages data and business logic. Handles database operations, validation, and data relationships.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h5>View</h5>
+                    <p>Handles the presentation layer. Renders HTML templates and manages user interface components.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h5>Controller</h5>
+                    <p>Coordinates between Model and View. Handles user input, processes requests, and manages application flow.</p>
+                </div>
+            </div>
+
+            <h2>Basic Model Example</h2>
+            <div class="code-example" data-title="app/Admin/Model/User.php">
+                <pre><code class="language-php"><?php
+namespace Admin\Model;
+
+use Core\Database\Model;
+
+class User extends Model
+{
+    protected $table = 'user';
+    protected $primaryKey = 'id';
+    
+    protected array $fillable = [
+        'name', 'email', 'password', 'custom_id'
+    ];
+    
+    protected array $hidden = ['password'];
+    
+    public function save(): bool
+    {
+        if (isset($this->attributes['password']) && $this->isDirty('password')) {
+            $this->attributes['password'] = password_hash(
+                $this->attributes['password'], 
+                PASSWORD_ARGON2I
+            );
+        }
+        return parent::save();
+    }
+    
+    public function verifyPassword(string $password): bool
+    {
+        return password_verify($password, $this->attributes['password']);
+    }
+    
+    // Relationships
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'acl_user_role', 'user_id', 'role_id');
+    }
+    
+    public function groups()
+    {
+        return $this->belongsToMany(Groups::class, 'user_group', 'user_id', 'group_id');
+    }
+}</code></pre>
+            </div>
+
+            <h2>Basic Controller Example</h2>
+            <div class="code-example" data-title="app/Admin/Controller/User.php">
+                <pre><code class="language-php"><?php
+namespace Admin\Controller;
+
+use Core\Mvc\Controller;
+use Admin\Model\User as UserModel;
+
+class User extends Controller
+{
+    public function indexAction()
+    {
+        $users = UserModel::with(['groups'])->get();
+        
+        return $this->render('user/index', [
+            'users' => $users,
+            'title' => 'User Management'
+        ]);
+    }
+    
+    public function createAction()
+    {
+        if ($this->isPost()) {
+            $data = $this->getRequest()->all();
+            
+            $user = new UserModel();
+            $user->fill($data);
+            
+            if ($user->save()) {
+                $this->flashSuccess('User created successfully.');
+                return $this->redirect('admin/user');
+            } else {
+                $this->flashError('Failed to create user.');
+            }
+        }
+        
+        return $this->render('user/form');
+    }
+}</code></pre>
+            </div>
+
+            <h2>View Template Example</h2>
+            <div class="code-example" data-title="app/Admin/views/user/index.phtml">
+                <pre><code class="language-php"><?php $this->setLayout('default'); ?>
+
+<div class="container-fluid">
+    <h1>User Management</h1>
+    
+    <?php if (!empty($users)): ?>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($users as $user): ?>
+                    <tr>
+                        <td><?= $this->escape($user->id) ?></td>
+                        <td><?= $this->escape($user->name) ?></td>
+                        <td><?= $this->escape($user->email) ?></td>
+                        <td>
+                            <a href="<?= $this->url('admin/user/edit/' . $user->id) ?>" 
+                               class="btn btn-sm btn-warning">Edit</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+        <p>No users found.</p>
+    <?php endif; ?>
+</div></code></pre>
+            </div>
+
+            <h2>URL Structure</h2>
+            <div class="code-example" data-title="Route Pattern">
+                <pre><code class="language-text"># Basic route pattern:
+/{module}/{controller}/{action}/{params}
+
+# Examples:
+/admin/user/view/123        # Admin module, User controller, view action, ID 123
+/base/auth/login            # Base module, Auth controller, login action
+/api/user                   # Api module, User controller, index action (default)</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

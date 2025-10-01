@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Control (ACL) Guide - Framework Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        .container { max-width: 1200px; }
+        .page-header { border-bottom: 2px solid #667eea; padding-bottom: 1rem; margin-bottom: 2rem; }
+        .page-title { color: #667eea; font-weight: 700; margin: 0; }
+        .code-example { background: #2d3748; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; position: relative; }
+        .code-example::before { content: attr(data-title); position: absolute; top: 0; left: 0; background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 8px 0 8px 0; font-size: 0.75rem; font-weight: 600; }
+        .toc { background: #f8f9fa; border-left: 4px solid #667eea; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .alert-info { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 1px solid #2196f3; color: #0d47a1; }
+        .alert-warning { background: linear-gradient(135deg, #fff3e0, #ffcc02); border: 1px solid #ff9800; color: #e65100; }
+        .alert-success { background: linear-gradient(135deg, #e8f5e8, #c8e6c9); border: 1px solid #4caf50; color: #1b5e20; }
+        .nav-pills .nav-link { margin: 0.25rem; }
+        .nav-pills .nav-link.active { background-color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Navigation -->
+        <nav class="mb-4">
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link" href="index.html">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" href="installation-guide.html">Installation</a></li>
+                <li class="nav-item"><a class="nav-link" href="mvc-guide.html">MVC</a></li>
+                <li class="nav-item"><a class="nav-link" href="database-guide.html">Database</a></li>
+                <li class="nav-item"><a class="nav-link active" href="acl-guide.html">ACL</a></li>
+                <li class="nav-item"><a class="nav-link" href="validation-guide.html">Validation</a></li>
+                <li class="nav-item"><a class="nav-link" href="forms-guide.html">Forms</a></li>
+                <li class="nav-item"><a class="nav-link" href="api-guide.html">API</a></li>
+                <li class="nav-item"><a class="nav-link" href="testing-guide.html">Testing</a></li>
+                <li class="nav-item"><a class="nav-link" href="best-practices-guide.html">Best Practices</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="bg-white rounded p-4 shadow-sm">
+            <div class="page-header">
+                <h1 class="page-title">Access Control Lists (ACL)</h1>
+                <p class="page-subtitle text-muted">Users, roles, permissions, and security management</p>
+            </div>
+
+            <div class="toc">
+                <h6>Table of Contents</h6>
+                <ul>
+                    <li><a href="#acl-overview">ACL Overview</a></li>
+                    <li><a href="#users-roles">Users and Roles</a></li>
+                    <li><a href="#permissions">Permissions</a></li>
+                    <li><a href="#middleware">ACL Middleware</a></li>
+                    <li><a href="#usage-examples">Usage Examples</a></li>
+                    <li><a href="#best-practices">Security Best Practices</a></li>
+                </ul>
+            </div>
+
+            <h2 id="acl-overview">ACL Overview</h2>
+            <p>The Access Control List (ACL) system provides fine-grained permission control for your application resources.</p>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Concept:</strong> ACL system consists of Users, Roles, Permissions, and Resources that work together to control access.
+            </div>
+
+            <h3>ACL Components</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-user text-primary me-2"></i>Users</h5>
+                    <p>Individual users who can have roles and direct permissions</p>
+                </div>
+                <div class="col-md-6">
+                    <h5><i class="fas fa-users text-success me-2"></i>Roles</h5>
+                    <p>Groups of permissions that can be assigned to users</p>
+                </div>
+                <div class="col-md-6">
+                    <h5><i class="fas fa-key text-warning me-2"></i>Permissions</h5>
+                    <p>Specific actions that can be performed on resources</p>
+                </div>
+                <div class="col-md-6">
+                    <h5><i class="fas fa-folder text-info me-2"></i>Resources</h5>
+                    <p>Objects or areas that need access control</p>
+                </div>
+            </div>
+
+            <h2 id="users-roles">Users and Roles</h2>
+
+            <h3>User Model with ACL</h3>
+            <div class="code-example" data-title="app/Models/User.php">
+                <pre><code class="language-php"><?php
+namespace App\Models;
+
+class User extends Model
+{
+    protected static $table = 'user';
+    
+    protected $fillable = [
+        'name', 'email', 'password', 'status'
+    ];
+    
+    // Get user roles
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_role', 'user_id', 'role_id');
+    }
+    
+    // Check if user has role
+    public function hasRole($roleName)
+    {
+        return $this->roles()->where('name', $roleName)->exists();
+    }
+    
+    // Check if user has permission
+    public function hasPermission($permission, $resource = null)
+    {
+        // Check direct user permissions
+        $directPermission = $this->permissions()
+            ->where('name', $permission)
+            ->where('resource', $resource)
+            ->exists();
+            
+        if ($directPermission) {
+            return true;
+        }
+        
+        // Check role permissions
+        foreach ($this->roles() as $role) {
+            if ($role->hasPermission($permission, $resource)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    // Get user permissions
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'user_permission', 'user_id', 'permission_id');
+    }
+}</code></pre>
+            </div>
+
+            <h3>Role Model</h3>
+            <div class="code-example" data-title="app/Models/Role.php">
+                <pre><code class="language-php"><?php
+namespace App\Models;
+
+class Role extends Model
+{
+    protected static $table = 'role';
+    
+    protected $fillable = [
+        'name', 'description', 'status'
+    ];
+    
+    // Get role permissions
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'role_permission', 'role_id', 'permission_id');
+    }
+    
+    // Check if role has permission
+    public function hasPermission($permission, $resource = null)
+    {
+        return $this->permissions()
+            ->where('name', $permission)
+            ->where('resource', $resource)
+            ->exists();
+    }
+    
+    // Assign permission to role
+    public function givePermission($permission, $resource = null)
+    {
+        $perm = Permission::firstOrCreate([
+            'name' => $permission,
+            'resource' => $resource
+        ]);
+        
+        $this->permissions()->attach($perm->id);
+    }
+}</code></pre>
+            </div>
+
+            <h2 id="permissions">Permissions</h2>
+
+            <h3>Permission Model</h3>
+            <div class="code-example" data-title="app/Models/Permission.php">
+                <pre><code class="language-php"><?php
+namespace App\Models;
+
+class Permission extends Model
+{
+    protected static $table = 'permission';
+    
+    protected $fillable = [
+        'name', 'resource', 'description'
+    ];
+    
+    // Get roles that have this permission
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_permission', 'permission_id', 'role_id');
+    }
+    
+    // Get users that have this permission directly
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_permission', 'permission_id', 'user_id');
+    }
+}</code></pre>
+            </div>
+
+            <h3>ACL Service</h3>
+            <div class="code-example" data-title="app/Services/ACLService.php">
+                <pre><code class="language-php"><?php
+namespace App\Services;
+
+class ACLService
+{
+    public static function check($user, $permission, $resource = null)
+    {
+        if (!$user instanceof User) {
+            return false;
+        }
+        
+        return $user->hasPermission($permission, $resource);
+    }
+    
+    public static function authorize($user, $permission, $resource = null)
+    {
+        if (!self::check($user, $permission, $resource)) {
+            throw new UnauthorizedException('Access denied');
+        }
+        
+        return true;
+    }
+    
+    public static function createRole($name, $permissions = [])
+    {
+        $role = Role::create(['name' => $name]);
+        
+        foreach ($permissions as $permission => $resource) {
+            $role->givePermission($permission, $resource);
+        }
+        
+        return $role;
+    }
+}</code></pre>
+            </div>
+
+            <h2 id="middleware">ACL Middleware</h2>
+
+            <div class="code-example" data-title="app/Middleware/ACLMiddleware.php">
+                <pre><code class="language-php"><?php
+namespace App\Middleware;
+
+class ACLMiddleware
+{
+    public function handle($request, $next, $permission, $resource = null)
+    {
+        $user = $request->getUser();
+        
+        if (!$user) {
+            return redirect('/login');
+        }
+        
+        if (!ACLService::check($user, $permission, $resource)) {
+            return response()->json([
+                'error' => 'Access denied'
+            ], 403);
+        }
+        
+        return $next($request);
+    }
+}
+
+// Usage in routes
+$router->group(['middleware' => 'acl:edit,user'], function() {
+    $router->get('/admin/users/{id}/edit', 'AdminController@editUser');
+    $router->post('/admin/users/{id}', 'AdminController@updateUser');
+});</code></pre>
+            </div>
+
+            <h2 id="usage-examples">Usage Examples</h2>
+
+            <h3>Controller Usage</h3>
+            <div class="code-example" data-title="Controller ACL Check">
+                <pre><code class="language-php"><?php
+namespace App\Controllers;
+
+class AdminController extends Controller
+{
+    public function editUser($id)
+    {
+        $user = $this->getUser();
+        
+        // Check permission
+        ACLService::authorize($user, 'edit', 'user');
+        
+        $targetUser = User::find($id);
+        
+        return view('admin/edit-user', ['user' => $targetUser]);
+    }
+    
+    public function deleteUser($id)
+    {
+        $user = $this->getUser();
+        
+        // Check if user can delete users
+        if (!$user->hasPermission('delete', 'user')) {
+            return response()->json(['error' => 'Access denied'], 403);
+        }
+        
+        User::find($id)->delete();
+        
+        return response()->json(['success' => true]);
+    }
+}</code></pre>
+            </div>
+
+            <h3>View Usage</h3>
+            <div class="code-example" data-title="Conditional UI Elements">
+                <pre><code class="language-php">&lt;?php if ($user->hasPermission('create', 'post')): ?&gt;
+    &lt;a href="/posts/create" class="btn btn-primary"&gt;Create Post&lt;/a&gt;
+&lt;?php endif; ?&gt;
+
+&lt;?php if ($user->hasRole('admin')): ?&gt;
+    &lt;div class="admin-panel"&gt;
+        &lt;h3&gt;Admin Controls&lt;/h3&gt;
+        &lt;!-- Admin only content --&gt;
+    &lt;/div&gt;
+&lt;?php endif; ?&gt;</code></pre>
+            </div>
+
+            <h2 id="best-practices">Security Best Practices</h2>
+
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Security Notice:</strong> Always check permissions on both client and server side. Client-side checks are for UX, server-side checks are for security.
+            </div>
+
+            <h3>Security Guidelines</h3>
+            <ul>
+                <li><strong>Principle of Least Privilege:</strong> Give users only the minimum permissions needed</li>
+                <li><strong>Regular Audits:</strong> Review and audit user permissions regularly</li>
+                <li><strong>Session Security:</strong> Implement proper session management and timeout</li>
+                <li><strong>Permission Caching:</strong> Cache permissions for performance but invalidate on changes</li>
+                <li><strong>Logging:</strong> Log all permission checks and changes for audit trails</li>
+            </ul>
+
+            <div class="code-example" data-title="Permission Seeder">
+                <pre><code class="language-php"><?php
+// Setup default roles and permissions
+class ACLSeeder
+{
+    public function run()
+    {
+        // Create roles
+        $admin = Role::create(['name' => 'admin']);
+        $editor = Role::create(['name' => 'editor']);
+        $user = Role::create(['name' => 'user']);
+        
+        // Admin permissions
+        $admin->givePermission('*', '*'); // All permissions
+        
+        // Editor permissions
+        $editor->givePermission('create', 'post');
+        $editor->givePermission('edit', 'post');
+        $editor->givePermission('delete', 'post');
+        $editor->givePermission('view', 'post');
+        
+        // User permissions
+        $user->givePermission('view', 'post');
+        $user->givePermission('comment', 'post');
+    }
+}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>

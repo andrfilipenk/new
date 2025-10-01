@@ -6,476 +6,178 @@
     <title>Framework Documentation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
     <style>
-        :root {
-            --sidebar-width: 280px;
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --accent-color: #f093fb;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            overflow-y: auto;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-        }
-
-        .sidebar-header h3 {
-            color: white;
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .sidebar-nav {
-            padding: 1rem 0;
-        }
-
-        .nav-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .nav-section-title {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 0 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 0.75rem 1.5rem;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: none;
-            background: none;
-        }
-
-        .nav-link:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
-            transform: translateX(5px);
-        }
-
-        .nav-link.active {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-right: 3px solid var(--accent-color);
-        }
-
-        .nav-link i {
-            width: 20px;
-            margin-right: 0.75rem;
-        }
-
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 2rem;
-            min-height: 100vh;
-        }
-
-        .content-section {
-            display: none;
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            margin-bottom: 2rem;
-        }
-
-        .content-section.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .page-header {
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .page-title {
-            color: var(--primary-color);
-            font-weight: 700;
-            margin: 0;
-        }
-
-        .page-subtitle {
-            color: #6c757d;
-            margin: 0.5rem 0 0 0;
-        }
-
-        .code-example {
-            background: #2d3748;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-            position: relative;
-        }
-
-        .code-example::before {
-            content: attr(data-title);
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: var(--primary-color);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 8px 0 8px 0;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .feature-card {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .toc {
-            background: #f8f9fa;
-            border-left: 4px solid var(--primary-color);
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .toc h6 {
-            color: var(--primary-color);
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .toc ul {
-            margin: 0;
-            padding-left: 1rem;
-        }
-
-        .toc li {
-            margin: 0.25rem 0;
-        }
-
-        .toc a {
-            color: #495057;
-            text-decoration: none;
-        }
-
-        .toc a:hover {
-            color: var(--primary-color);
-        }
-
-        .alert-info {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            border: 1px solid #2196f3;
-            color: #0d47a1;
-        }
-
-        .alert-warning {
-            background: linear-gradient(135deg, #fff3e0, #ffcc02);
-            border: 1px solid #ff9800;
-            color: #e65100;
-        }
-
-        .alert-success {
-            background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-            border: 1px solid #4caf50;
-            color: #1b5e20;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.show {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .mobile-toggle {
-                display: block !important;
-            }
-        }
-
-        .mobile-toggle {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1001;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem;
-            font-size: 1.25rem;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        .hero-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 4rem 0; }
+        .feature-card { background: white; border-radius: 12px; padding: 2rem; text-align: center; height: 100%; transition: transform 0.3s ease; }
+        .feature-card:hover { transform: translateY(-5px); }
+        .feature-icon { width: 64px; height: 64px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; margin: 0 auto 1rem; }
+        .doc-link { text-decoration: none; color: inherit; }
+        .doc-link:hover { color: inherit; }
     </style>
 </head>
 <body>
-    <!-- Mobile Toggle Button -->
-    <button class="mobile-toggle btn" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <h3><i class="fas fa-code"></i> Framework Docs</h3>
-            <p class="text-white-50 mb-0">Complete Developer Guide</p>
-        </div>
-
-        <div class="sidebar-nav">
-            <!-- Getting Started -->
-            <div class="nav-section">
-                <div class="nav-section-title">Getting Started</div>
-                <a href="#overview" class="nav-link active" onclick="showSection('overview')">
-                    <i class="fas fa-home"></i> Overview
-                </a>
-                <a href="#installation" class="nav-link" onclick="showSection('installation')">
-                    <i class="fas fa-download"></i> Installation
-                </a>
-                <a href="#configuration" class="nav-link" onclick="showSection('configuration')">
-                    <i class="fas fa-cog"></i> Configuration
-                </a>
-            </div>
-
-            <!-- Core Components -->
-            <div class="nav-section">
-                <div class="nav-section-title">Core Components</div>
-                <a href="#mvc" class="nav-link" onclick="showSection('mvc')">
-                    <i class="fas fa-layer-group"></i> MVC Architecture
-                </a>
-                <a href="#routing" class="nav-link" onclick="showSection('routing')">
-                    <i class="fas fa-route"></i> Routing System
-                </a>
-                <a href="#database" class="nav-link" onclick="showSection('database')">
-                    <i class="fas fa-database"></i> Database & ORM
-                </a>
-                <a href="#authentication" class="nav-link" onclick="showSection('authentication')">
-                    <i class="fas fa-shield-alt"></i> Authentication
-                </a>
-            </div>
-
-            <!-- Advanced Features -->
-            <div class="nav-section">
-                <div class="nav-section-title">Advanced Features</div>
-                <a href="#acl" class="nav-link" onclick="showSection('acl')">
-                    <i class="fas fa-users-cog"></i> Access Control (ACL)
-                </a>
-                <a href="#validation" class="nav-link" onclick="showSection('validation')">
-                    <i class="fas fa-check-circle"></i> Validation
-                </a>
-                <a href="#forms" class="nav-link" onclick="showSection('forms')">
-                    <i class="fas fa-edit"></i> Forms & Input
-                </a>
-                <a href="#api" class="nav-link" onclick="showSection('api')">
-                    <i class="fas fa-plug"></i> API Development
-                </a>
-            </div>
-
-            <!-- Development -->
-            <div class="nav-section">
-                <div class="nav-section-title">Development</div>
-                <a href="#migrations" class="nav-link" onclick="showSection('migrations')">
-                    <i class="fas fa-code-branch"></i> Migrations
-                </a>
-                <a href="#testing" class="nav-link" onclick="showSection('testing')">
-                    <i class="fas fa-vial"></i> Testing
-                </a>
-                <a href="#deployment" class="nav-link" onclick="showSection('deployment')">
-                    <i class="fas fa-rocket"></i> Deployment
-                </a>
-            </div>
-
-            <!-- Examples -->
-            <div class="nav-section">
-                <div class="nav-section-title">Examples</div>
-                <a href="#examples-basic" class="nav-link" onclick="showSection('examples-basic')">
-                    <i class="fas fa-play"></i> Basic Examples
-                </a>
-                <a href="#examples-advanced" class="nav-link" onclick="showSection('examples-advanced')">
-                    <i class="fas fa-magic"></i> Advanced Examples
-                </a>
-                <a href="#best-practices" class="nav-link" onclick="showSection('best-practices')">
-                    <i class="fas fa-star"></i> Best Practices
-                </a>
-            </div>
-
-            <!-- Reference -->
-            <div class="nav-section">
-                <div class="nav-section-title">Reference</div>
-                <a href="#api-reference" class="nav-link" onclick="showSection('api-reference')">
-                    <i class="fas fa-book"></i> API Reference
-                </a>
-                <a href="#troubleshooting" class="nav-link" onclick="showSection('troubleshooting')">
-                    <i class="fas fa-tools"></i> Troubleshooting
-                </a>
-                <a href="#changelog" class="nav-link" onclick="showSection('changelog')">
-                    <i class="fas fa-history"></i> Changelog
-                </a>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-3">Framework Documentation</h1>
+                    <p class="lead mb-4">A comprehensive guide to building modern PHP applications with our MVC framework</p>
+                    <a href="installation-guide.html" class="btn btn-light btn-lg">
+                        <i class="fas fa-rocket me-2"></i>Get Started
+                    </a>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <i class="fas fa-code" style="font-size: 8rem; opacity: 0.3;"></i>
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Overview Section -->
-        <section id="overview" class="content-section active">
-            <div class="page-header">
-                <h1 class="page-title">Framework Overview</h1>
-                <p class="page-subtitle">A modern PHP MVC framework with advanced features</p>
+    <!-- Documentation Grid -->
+    <div class="container my-5">
+        <h2 class="text-center mb-5">Documentation Sections</h2>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <a href="installation-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <h5>Installation Guide</h5>
+                        <p class="text-muted">Complete setup instructions, server configuration, and getting started</p>
+                    </div>
+                </a>
             </div>
-
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong>Welcome!</strong> This documentation covers all aspects of the framework from basic usage to advanced features.
+            
+            <div class="col-md-6 col-lg-4">
+                <a href="mvc-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h5>MVC Architecture</h5>
+                        <p class="text-muted">Models, Views, Controllers, and application structure</p>
+                    </div>
+                </a>
             </div>
-
-            <h2>What is this Framework?</h2>
-            <p>This is a custom PHP MVC framework designed for enterprise applications with a focus on:</p>
-
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-tachometer-alt"></i>
+            
+            <div class="col-md-6 col-lg-4">
+                <a href="database-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h5>Database & ORM</h5>
+                        <p class="text-muted">Query builder, relationships, migrations, and database operations</p>
                     </div>
-                    <h5>Performance</h5>
-                    <p>Optimized database queries, efficient ORM, and built-in caching mechanisms for high performance applications.</p>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <a href="acl-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h5>Access Control (ACL)</h5>
+                        <p class="text-muted">Users, roles, permissions, and security management</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <a href="validation-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h5>Validation System</h5>
+                        <p class="text-muted">Input validation, custom rules, and form security</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <a href="forms-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <h5>Forms & Input</h5>
+                        <p class="text-muted">Form builders, file uploads, and input handling</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <a href="api-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-plug"></i>
+                        </div>
+                        <h5>API Development</h5>
+                        <p class="text-muted">RESTful APIs, JSON responses, and authentication</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <a href="testing-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                        <h5>Testing</h5>
+                        <p class="text-muted">Unit testing, API testing, and test strategies</p>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <a href="best-practices-guide.html" class="doc-link">
+                    <div class="feature-card shadow-sm">
+                        <div class="feature-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h5>Best Practices</h5>
+                        <p class="text-muted">Security guidelines, code organization, and performance tips</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="bg-light py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5><i class="fas fa-rocket me-2 text-primary"></i>Quick Start</h5>
+                    <p>Get up and running in minutes with our installation guide and examples.</p>
+                    <a href="installation-guide.html" class="btn btn-outline-primary btn-sm">Install Now</a>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h5>Security</h5>
-                    <p>Built-in authentication, authorization (ACL), input validation, and protection against common security threats.</p>
+                <div class="col-md-4">
+                    <h5><i class="fas fa-code me-2 text-success"></i>Examples</h5>
+                    <p>Practical code examples for every feature and component.</p>
+                    <a href="mvc-guide.html" class="btn btn-outline-success btn-sm">View Examples</a>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-puzzle-piece"></i>
-                    </div>
-                    <h5>Modularity</h5>
-                    <p>Clean modular architecture allowing easy extension and maintenance of large applications.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h5>Database</h5>
-                    <p>Advanced ORM with relationships, migrations, and query builder for efficient database operations.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h5>User Management</h5>
-                    <p>Complete user management system with roles, permissions, groups, and profile management.</p>
-                </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h5>Modern UI</h5>
-                    <p>Responsive design with Bootstrap 5, AJAX support, and modern JavaScript integration.</p>
+                <div class="col-md-4">
+                    <h5><i class="fas fa-question-circle me-2 text-info"></i>Need Help?</h5>
+                    <p>Check our troubleshooting guide and best practices.</p>
+                    <a href="best-practices-guide.html" class="btn btn-outline-info btn-sm">Get Help</a>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <h2>Architecture Overview</h2>
-            <p>The framework follows the Model-View-Controller (MVC) pattern with additional architectural components:</p>
-
-            <div class="toc">
-                <h6>Framework Structure</h6>
-                <ul>
-                    <li><strong>app/</strong> - Application modules (Admin, Base, etc.)</li>
-                    <li><strong>app/_Core/</strong> - Core framework components</li>
-                    <li><strong>public/</strong> - Web-accessible files</li>
-                    <li><strong>migrations/</strong> - Database migrations</li>
-                    <li><strong>config/</strong> - Configuration files</li>
-                    <li><strong>docs/</strong> - Documentation</li>
-                </ul>
-            </div>
-
-            <h2>Quick Start</h2>
-            <p>Get started with the framework in just a few steps:</p>
-
-            <ol>
-                <li><strong>Setup Environment:</strong> Configure web server and database</li>
-                <li><strong>Run Migrations:</strong> Set up database tables</li>
-                <li><strong>Configure Services:</strong> Set up authentication and other services</li>
-                <li><strong>Create Your First Module:</strong> Build your application logic</li>
-                <li><strong>Deploy:</strong> Go live with your application</li>
-            </ol>
-
-            <div class="alert alert-success">
-                <i class="fas fa-lightbulb me-2"></i>
-                <strong>Tip:</strong> Start with the Installation guide and then explore the Core Components to understand how everything works together.
-            </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>            </div>
+            <p>Security practices, code organization, and performance optimization tips.</p>
         </section>
-
-        <!-- Other sections will be loaded here -->
-        <div id="content-placeholder"></div>
     </main>
 
     <!-- Scripts -->
@@ -484,7 +186,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
     <script>
-        // Documentation functionality
+        // Simple static navigation
         function showSection(sectionId) {
             // Hide all sections
             document.querySelectorAll('.content-section').forEach(section => {
@@ -500,16 +202,12 @@
             const section = document.getElementById(sectionId);
             if (section) {
                 section.classList.add('active');
-            } else {
-                // Load section content dynamically
-                loadSectionContent(sectionId);
+                // Add active class to clicked nav link
+                const activeLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
             }
-
-            // Add active class to clicked nav link
-            document.querySelector(`[onclick="showSection('${sectionId}')"]`).classList.add('active');
-
-            // Update URL hash
-            window.location.hash = sectionId;
 
             // Close sidebar on mobile
             if (window.innerWidth <= 768) {
@@ -517,79 +215,15 @@
             }
         }
 
-        function loadSectionContent(sectionId) {
-            const placeholder = document.getElementById('content-placeholder');
-            placeholder.innerHTML = `
-                <section id="${sectionId}" class="content-section active">
-                    <div class="page-header">
-                        <h1 class="page-title">Loading...</h1>
-                        <p class="page-subtitle">Please wait while we load the content</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </section>
-            `;
-
-            // Simulate loading external content
-            setTimeout(() => {
-                fetch(`${sectionId}.html`)
-                    .then(response => response.text())
-                    .then(content => {
-                        placeholder.innerHTML = content;
-                        // Re-initialize Prism for syntax highlighting
-                        if (window.Prism) {
-                            Prism.highlightAll();
-                        }
-                    })
-                    .catch(() => {
-                        placeholder.innerHTML = `
-                            <section id="${sectionId}" class="content-section active">
-                                <div class="page-header">
-                                    <h1 class="page-title">${sectionId.charAt(0).toUpperCase() + sectionId.slice(1).replace('-', ' ')}</h1>
-                                    <p class="page-subtitle">Content coming soon</p>
-                                </div>
-                                <div class="alert alert-warning">
-                                    <i class="fas fa-construction me-2"></i>
-                                    This section is under construction. Content will be available soon.
-                                </div>
-                            </section>
-                        `;
-                    });
-            }, 500);
-        }
-
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('show');
         }
 
-        // Handle browser back/forward
-        window.addEventListener('hashchange', () => {
-            const hash = window.location.hash.slice(1);
-            if (hash) {
-                showSection(hash);
-            }
-        });
-
         // Load initial section based on URL hash
         document.addEventListener('DOMContentLoaded', () => {
             const hash = window.location.hash.slice(1);
-            if (hash) {
+            if (hash && document.getElementById(hash)) {
                 showSection(hash);
-            }
-        });
-
-        // Smooth scrolling for internal links
-        document.addEventListener('click', (e) => {
-            if (e.target.tagName === 'A' && e.target.getAttribute('href').startsWith('#')) {
-                e.preventDefault();
-                const targetId = e.target.getAttribute('href').slice(1);
-                const targetElement = document.getElementById(targetId);
-                if (targetElement) {
-                    targetElement.scrollIntoView({ behavior: 'smooth' });
-                }
             }
         });
     </script>

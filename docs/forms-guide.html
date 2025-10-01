@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms & Input Guide - Framework Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
+        .container { max-width: 1200px; }
+        .page-header { border-bottom: 2px solid #667eea; padding-bottom: 1rem; margin-bottom: 2rem; }
+        .page-title { color: #667eea; font-weight: 700; margin: 0; }
+        .code-example { background: #2d3748; border-radius: 8px; padding: 1.5rem; margin: 1rem 0; position: relative; }
+        .code-example::before { content: attr(data-title); position: absolute; top: 0; left: 0; background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 8px 0 8px 0; font-size: 0.75rem; font-weight: 600; }
+        .toc { background: #f8f9fa; border-left: 4px solid #667eea; padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; }
+        .alert-info { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 1px solid #2196f3; color: #0d47a1; }
+        .alert-warning { background: linear-gradient(135deg, #fff3e0, #ffcc02); border: 1px solid #ff9800; color: #e65100; }
+        .alert-success { background: linear-gradient(135deg, #e8f5e8, #c8e6c9); border: 1px solid #4caf50; color: #1b5e20; }
+        .nav-pills .nav-link { margin: 0.25rem; }
+        .nav-pills .nav-link.active { background-color: #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Navigation -->
+        <nav class="mb-4">
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link" href="index.html">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" href="installation-guide.html">Installation</a></li>
+                <li class="nav-item"><a class="nav-link" href="mvc-guide.html">MVC</a></li>
+                <li class="nav-item"><a class="nav-link" href="database-guide.html">Database</a></li>
+                <li class="nav-item"><a class="nav-link" href="acl-guide.html">ACL</a></li>
+                <li class="nav-item"><a class="nav-link" href="validation-guide.html">Validation</a></li>
+                <li class="nav-item"><a class="nav-link active" href="forms-guide.html">Forms</a></li>
+                <li class="nav-item"><a class="nav-link" href="api-guide.html">API</a></li>
+                <li class="nav-item"><a class="nav-link" href="testing-guide.html">Testing</a></li>
+                <li class="nav-item"><a class="nav-link" href="best-practices-guide.html">Best Practices</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="bg-white rounded p-4 shadow-sm">
+            <div class="page-header">
+                <h1 class="page-title">Forms & Input Handling</h1>
+                <p class="page-subtitle text-muted">Form builders, file uploads, and input processing</p>
+            </div>
+
+            <div class="toc">
+                <h6>Table of Contents</h6>
+                <ul>
+                    <li><a href="#form-builder">Form Builder</a></li>
+                    <li><a href="#input-handling">Input Handling</a></li>
+                    <li><a href="#file-uploads">File Uploads</a></li>
+                    <li><a href="#csrf-protection">CSRF Protection</a></li>
+                    <li><a href="#form-examples">Complete Examples</a></li>
+                    <li><a href="#security-best-practices">Security Best Practices</a></li>
+                </ul>
+            </div>
+
+            <h2 id="form-builder">Form Builder</h2>
+            <p>The framework provides a fluent form builder for generating HTML forms with validation and security features.</p>
+
+            <h3>Form Builder Class</h3>
+            <div class="code-example" data-title="app/Core/FormBuilder.php">
+                <pre><code class="language-php"><?php
+namespace App\Core;
+
+class FormBuilder
+{
+    protected $fields = [];
+    protected $method = 'POST';
+    protected $action = '';
+    protected $attributes = [];
+    
+    public function open($action = '', $method = 'POST', $attributes = [])
+    {
+        $this->action = $action;
+        $this->method = strtoupper($method);
+        $this->attributes = $attributes;
+        
+        $html = '<form action="' . htmlspecialchars($action) . '" method="' . ($method === 'GET' ? 'GET' : 'POST') . '"';
+        
+        foreach ($attributes as $key => $value) {
+            $html .= ' ' . $key . '="' . htmlspecialchars($value) . '"';
+        }
+        
+        $html .= '>';
+        
+        // Add CSRF token for POST requests
+        if ($method !== 'GET') {
+            $html .= $this->csrf();
+        }
+        
+        // Add method spoofing for PUT/DELETE
+        if (in_array($method, ['PUT', 'DELETE', 'PATCH'])) {
+            $html .= '<input type="hidden" name="_method" value="' . $method . '">';
+        }
+        
+        return $html;
+    }
+    
+    public function close()
+    {
+        return '</form>';
+    }
+    
+    public function text($name, $value = '', $attributes = [])
+    {
+        return $this->input('text', $name, $value, $attributes);
+    }
+    
+    public function email($name, $value = '', $attributes = [])
+    {
+        return $this->input('email', $name, $value, $attributes);
+    }
+    
+    public function password($name, $attributes = [])
+    {
+        return $this->input('password', $name, '', $attributes);
+    }
+    
+    public function textarea($name, $value = '', $attributes = [])
+    {
+        $attributes = array_merge(['rows' => 3], $attributes);
+        
+        $html = '<textarea name="' . $name . '" id="' . $name . '"';
+        
+        foreach ($attributes as $key => $val) {
+            $html .= ' ' . $key . '="' . htmlspecialchars($val) . '"';
+        }
+        
+        $html .= '>' . htmlspecialchars($value) . '</textarea>';
+        
+        return $html;
+    }
+    
+    public function select($name, $options = [], $selected = null, $attributes = [])
+    {
+        $html = '<select name="' . $name . '" id="' . $name . '"';
+        
+        foreach ($attributes as $key => $value) {
+            $html .= ' ' . $key . '="' . htmlspecialchars($value) . '"';
+        }
+        
+        $html .= '>';
+        
+        foreach ($options as $value => $text) {
+            $isSelected = ($value == $selected) ? ' selected' : '';
+            $html .= '<option value="' . htmlspecialchars($value) . '"' . $isSelected . '>';
+            $html .= htmlspecialchars($text) . '</option>';
+        }
+        
+        $html .= '</select>';
+        
+        return $html;
+    }
+    
+    protected function input($type, $name, $value = '', $attributes = [])
+    {
+        $html = '<input type="' . $type . '" name="' . $name . '" id="' . $name . '"';
+        
+        if ($value !== '') {
+            $html .= ' value="' . htmlspecialchars($value) . '"';
+        }
+        
+        foreach ($attributes as $key => $val) {
+            $html .= ' ' . $key . '="' . htmlspecialchars($val) . '"';
+        }
+        
+        $html .= '>';
+        
+        return $html;
+    }
+    
+    protected function csrf()
+    {
+        $token = Session::getCSRFToken();
+        return '<input type="hidden" name="_token" value="' . $token . '">';
+    }
+}</code></pre>
+            </div>
+
+            <h3>Using Form Builder</h3>
+            <div class="code-example" data-title="View with Form Builder">
+                <pre><code class="language-php"><?php $form = new FormBuilder(); ?>
+
+&lt;div class="container"&gt;
+    &lt;h2&gt;Create User&lt;/h2&gt;
+    
+    &lt;?= $form->open('/users', 'POST', ['class' => 'needs-validation', 'novalidate' => true]) ?&gt;
+    
+    &lt;div class="mb-3"&gt;
+        &lt;label for="name" class="form-label"&gt;Name&lt;/label&gt;
+        &lt;?= $form->text('name', old('name'), [
+            'class' => 'form-control',
+            'required' => true
+        ]) ?&gt;
+        &lt;div class="invalid-feedback"&gt;Please provide a valid name.&lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="mb-3"&gt;
+        &lt;label for="email" class="form-label"&gt;Email&lt;/label&gt;
+        &lt;?= $form->email('email', old('email'), [
+            'class' => 'form-control',
+            'required' => true
+        ]) ?&gt;
+        &lt;div class="invalid-feedback"&gt;Please provide a valid email.&lt;/div&gt;
+    &lt;/div&gt;
+    
+    &lt;div class="mb-3"&gt;
+        &lt;label for="role" class="form-label"&gt;Role&lt;/label&gt;
+        &lt;?= $form->select('role', [
+            'user' => 'Regular User',
+            'admin' => 'Administrator',
+            'editor' => 'Editor'
+        ], old('role'), ['class' => 'form-select']) ?&gt;
+    &lt;/div&gt;
+    
+    &lt;button type="submit" class="btn btn-primary"&gt;Create User&lt;/button&gt;
+    
+    &lt;?= $form->close() ?&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+
+            <h2 id="input-handling">Input Handling</h2>
+
+            <h3>Request Input Class</h3>
+            <div class="code-example" data-title="app/Core/Request.php">
+                <pre><code class="language-php"><?php
+namespace App\Core;
+
+class Request
+{
+    protected $data = [];
+    protected $files = [];
+    
+    public function __construct()
+    {
+        $this->data = array_merge($_GET, $_POST);
+        $this->files = $_FILES;
+    }
+    
+    public function get($key, $default = null)
+    {
+        return $this->data[$key] ?? $default;
+    }
+    
+    public function all()
+    {
+        return $this->data;
+    }
+    
+    public function only($keys)
+    {
+        $result = [];
+        foreach ($keys as $key) {
+            if (isset($this->data[$key])) {
+                $result[$key] = $this->data[$key];
+            }
+        }
+        return $result;
+    }
+    
+    public function except($keys)
+    {
+        $result = $this->data;
+        foreach ($keys as $key) {
+            unset($result[$key]);
+        }
+        return $result;
+    }
+    
+    public function has($key)
+    {
+        return isset($this->data[$key]);
+    }
+    
+    public function filled($key)
+    {
+        return isset($this->data[$key]) && !empty($this->data[$key]);
+    }
+    
+    public function file($key)
+    {
+        return isset($this->files[$key]) ? new UploadedFile($this->files[$key]) : null;
+    }
+    
+    public function hasFile($key)
+    {
+        return isset($this->files[$key]) && $this->files[$key]['error'] === UPLOAD_ERR_OK;
+    }
+}</code></pre>
+            </div>
+
+            <h3>Controller Input Handling</h3>
+            <div class="code-example" data-title="Controller Input Processing">
+                <pre><code class="language-php"><?php
+class UserController extends Controller
+{
+    public function store(Request $request)
+    {
+        // Get specific fields
+        $name = $request->get('name');
+        $email = $request->get('email');
+        
+        // Get all input
+        $allData = $request->all();
+        
+        // Get only specific fields
+        $userData = $request->only(['name', 'email', 'role']);
+        
+        // Get all except specific fields
+        $safeData = $request->except(['password', '_token']);
+        
+        // Check if field exists and has value
+        if ($request->filled('bio')) {
+            $bio = $request->get('bio');
+        }
+        
+        // Sanitize input
+        $sanitized = $this->sanitizeInput($userData);
+        
+        // Create user
+        User::create($sanitized);
+        
+        return redirect('/users');
+    }
+    
+    protected function sanitizeInput($data)
+    {
+        $sanitized = [];
+        
+        foreach ($data as $key => $value) {
+            if (is_string($value)) {
+                // Trim whitespace
+                $value = trim($value);
+                
+                // Remove HTML tags for most fields
+                if (!in_array($key, ['bio', 'description'])) {
+                    $value = strip_tags($value);
+                }
+                
+                // Escape HTML entities
+                $value = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+            }
+            
+            $sanitized[$key] = $value;
+        }
+        
+        return $sanitized;
+    }
+}</code></pre>
+            </div>
+
+            <h2 id="file-uploads">File Uploads</h2>
+
+            <h3>File Upload Handling</h3>
+            <div class="code-example" data-title="app/Core/UploadedFile.php">
+                <pre><code class="language-php"><?php
+namespace App\Core;
+
+class UploadedFile
+{
+    protected $file;
+    
+    public function __construct($file)
+    {
+        $this->file = $file;
+    }
+    
+    public function getOriginalName()
+    {
+        return $this->file['name'];
+    }
+    
+    public function getSize()
+    {
+        return $this->file['size'];
+    }
+    
+    public function getMimeType()
+    {
+        return $this->file['type'];
+    }
+    
+    public function getExtension()
+    {
+        return pathinfo($this->file['name'], PATHINFO_EXTENSION);
+    }
+    
+    public function isValid()
+    {
+        return $this->file['error'] === UPLOAD_ERR_OK;
+    }
+    
+    public function move($destination, $name = null)
+    {
+        if (!$this->isValid()) {
+            throw new Exception('File upload error: ' . $this->getErrorMessage());
+        }
+        
+        $fileName = $name ?: $this->generateSafeName();
+        $fullPath = rtrim($destination, '/') . '/' . $fileName;
+        
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
+        
+        if (move_uploaded_file($this->file['tmp_name'], $fullPath)) {
+            return $fileName;
+        }
+        
+        throw new Exception('Failed to move uploaded file');
+    }
+    
+    protected function generateSafeName()
+    {
+        $extension = $this->getExtension();
+        return uniqid() . '_' . time() . '.' . $extension;
+    }
+    
+    protected function getErrorMessage()
+    {
+        $errors = [
+            UPLOAD_ERR_INI_SIZE => 'File exceeds upload_max_filesize',
+            UPLOAD_ERR_FORM_SIZE => 'File exceeds MAX_FILE_SIZE',
+            UPLOAD_ERR_PARTIAL => 'File was only partially uploaded',
+            UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+            UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
+            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+            UPLOAD_ERR_EXTENSION => 'File upload stopped by extension'
+        ];
+        
+        return $errors[$this->file['error']] ?? 'Unknown upload error';
+    }
+}</code></pre>
+            </div>
+
+            <h3>File Upload Controller</h3>
+            <div class="code-example" data-title="File Upload Implementation">
+                <pre><code class="language-php"><?php
+class FileController extends Controller
+{
+    public function uploadAvatar(Request $request)
+    {
+        // Validate file upload
+        $validator = new Validator();
+        $validation = $validator->validate($request->all(), [
+            'avatar' => 'required|file|mimes:jpg,jpeg,png|max:2048'
+        ]);
+        
+        if ($validation->fails()) {
+            return redirect()->back()->withErrors($validation->errors());
+        }
+        
+        $file = $request->file('avatar');
+        
+        if ($file && $file->isValid()) {
+            // Generate unique filename
+            $filename = $this->generateFileName($file);
+            
+            // Move to uploads directory
+            $file->move('uploads/avatars', $filename);
+            
+            // Update user avatar
+            $user = $this->getUser();
+            $user->avatar = 'uploads/avatars/' . $filename;
+            $user->save();
+            
+            return redirect()->back()->with('success', 'Avatar updated successfully');
+        }
+        
+        return redirect()->back()->with('error', 'File upload failed');
+    }
+    
+    protected function generateFileName($file)
+    {
+        $user = $this->getUser();
+        $extension = $file->getExtension();
+        
+        return 'avatar_' . $user->id . '_' . time() . '.' . $extension;
+    }
+    
+    public function uploadMultiple(Request $request)
+    {
+        $uploadedFiles = [];
+        
+        foreach ($_FILES['documents']['tmp_name'] as $key => $tmpName) {
+            if ($_FILES['documents']['error'][$key] === UPLOAD_ERR_OK) {
+                $file = [
+                    'name' => $_FILES['documents']['name'][$key],
+                    'tmp_name' => $tmpName,
+                    'size' => $_FILES['documents']['size'][$key],
+                    'type' => $_FILES['documents']['type'][$key],
+                    'error' => $_FILES['documents']['error'][$key]
+                ];
+                
+                $uploadedFile = new UploadedFile($file);
+                $filename = $uploadedFile->move('uploads/documents');
+                
+                $uploadedFiles[] = [
+                    'original_name' => $uploadedFile->getOriginalName(),
+                    'filename' => $filename,
+                    'size' => $uploadedFile->getSize()
+                ];
+            }
+        }
+        
+        return response()->json([
+            'success' => true,
+            'files' => $uploadedFiles
+        ]);
+    }
+}</code></pre>
+            </div>
+
+            <h2 id="csrf-protection">CSRF Protection</h2>
+
+            <div class="alert alert-warning">
+                <i class="fas fa-shield-alt me-2"></i>
+                <strong>Security:</strong> CSRF protection is essential for all forms that modify data.
+            </div>
+
+            <h3>CSRF Token Generation</h3>
+            <div class="code-example" data-title="app/Core/Session.php">
+                <pre><code class="language-php"><?php
+namespace App\Core;
+
+class Session
+{
+    public static function getCSRFToken()
+    {
+        if (!isset($_SESSION['_token'])) {
+            $_SESSION['_token'] = bin2hex(random_bytes(32));
+        }
+        
+        return $_SESSION['_token'];
+    }
+    
+    public static function validateCSRFToken($token)
+    {
+        return isset($_SESSION['_token']) && hash_equals($_SESSION['_token'], $token);
+    }
+    
+    public static function regenerateCSRFToken()
+    {
+        $_SESSION['_token'] = bin2hex(random_bytes(32));
+    }
+}</code></pre>
+            </div>
+
+            <h3>CSRF Middleware</h3>
+            <div class="code-example" data-title="app/Middleware/CSRFMiddleware.php">
+                <pre><code class="language-php"><?php
+namespace App\Middleware;
+
+class CSRFMiddleware
+{
+    public function handle($request, $next)
+    {
+        if ($this->shouldValidate($request)) {
+            $token = $request->get('_token');
+            
+            if (!$token || !Session::validateCSRFToken($token)) {
+                return response()->json([
+                    'error' => 'CSRF token mismatch'
+                ], 419);
+            }
+        }
+        
+        return $next($request);
+    }
+    
+    protected function shouldValidate($request)
+    {
+        return in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT', 'DELETE', 'PATCH']);
+    }
+}</code></pre>
+            </div>
+
+            <h2 id="form-examples">Complete Form Examples</h2>
+
+            <div class="code-example" data-title="User Registration Form">
+                <pre><code class="language-php">&lt;?php $form = new FormBuilder(); ?&gt;
+
+&lt;div class="card"&gt;
+    &lt;div class="card-header"&gt;
+        &lt;h4&gt;User Registration&lt;/h4&gt;
+    &lt;/div&gt;
+    &lt;div class="card-body"&gt;
+        &lt;?= $form->open('/register', 'POST', ['class' => 'needs-validation']) ?&gt;
+        
+        &lt;div class="row"&gt;
+            &lt;div class="col-md-6 mb-3"&gt;
+                &lt;label for="first_name" class="form-label"&gt;First Name&lt;/label&gt;
+                &lt;?= $form->text('first_name', old('first_name'), [
+                    'class' => 'form-control',
+                    'required' => true
+                ]) ?&gt;
+                &lt;?php if (hasError('first_name')): ?&gt;
+                    &lt;div class="text-danger"&gt;&lt;?= getError('first_name') ?&gt;&lt;/div&gt;
+                &lt;?php endif; ?&gt;
+            &lt;/div&gt;
+            
+            &lt;div class="col-md-6 mb-3"&gt;
+                &lt;label for="last_name" class="form-label"&gt;Last Name&lt;/label&gt;
+                &lt;?= $form->text('last_name', old('last_name'), [
+                    'class' => 'form-control',
+                    'required' => true
+                ]) ?&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        
+        &lt;div class="mb-3"&gt;
+            &lt;label for="email" class="form-label"&gt;Email&lt;/label&gt;
+            &lt;?= $form->email('email', old('email'), [
+                'class' => 'form-control',
+                'required' => true
+            ]) ?&gt;
+        &lt;/div&gt;
+        
+        &lt;div class="mb-3"&gt;
+            &lt;label for="password" class="form-label"&gt;Password&lt;/label&gt;
+            &lt;?= $form->password('password', [
+                'class' => 'form-control',
+                'required' => true,
+                'minlength' => 8
+            ]) ?&gt;
+        &lt;/div&gt;
+        
+        &lt;div class="mb-3 form-check"&gt;
+            &lt;input type="checkbox" class="form-check-input" name="terms" required&gt;
+            &lt;label class="form-check-label" for="terms"&gt;
+                I agree to the &lt;a href="/terms"&gt;Terms and Conditions&lt;/a&gt;
+            &lt;/label&gt;
+        &lt;/div&gt;
+        
+        &lt;button type="submit" class="btn btn-primary"&gt;Register&lt;/button&gt;
+        
+        &lt;?= $form->close() ?&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+
+            <h2 id="security-best-practices">Security Best Practices</h2>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Remember:</strong> Security should be implemented at multiple layers - client-side for UX, server-side for protection.
+            </div>
+
+            <ul>
+                <li><strong>Always validate on server-side</strong> - Client validation can be bypassed</li>
+                <li><strong>Use CSRF protection</strong> - Prevent cross-site request forgery</li>
+                <li><strong>Sanitize all input</strong> - Clean data before processing</li>
+                <li><strong>Validate file uploads</strong> - Check file types, sizes, and content</li>
+                <li><strong>Use parameterized queries</strong> - Prevent SQL injection</li>
+                <li><strong>Escape output</strong> - Prevent XSS attacks</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
