@@ -1,0 +1,87 @@
+<section id="best-practices" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Best Practices</h1>
+        <p class="page-subtitle">Guidelines for building maintainable applications</p>
+    </div>
+
+    <h2>Security Best Practices</h2>
+    <div class="alert alert-warning">
+        <i class="fas fa-shield-alt me-2"></i>
+        <strong>Security Checklist:</strong>
+    </div>
+    
+    <ul>
+        <li><strong>Input Validation:</strong> Always validate and sanitize user input</li>
+        <li><strong>SQL Injection:</strong> Use parameterized queries and ORM</li>
+        <li><strong>XSS Protection:</strong> Escape output in templates</li>
+        <li><strong>Authentication:</strong> Implement proper session management</li>
+        <li><strong>Authorization:</strong> Use ACL for permission checking</li>
+        <li><strong>HTTPS:</strong> Always use SSL in production</li>
+    </ul>
+
+    <h2>Code Organization</h2>
+    <div class="code-example" data-title="Directory Structure">
+        <pre><code class="language-text">app/
+├── Admin/              # Admin module
+│   ├── Controller/     # Controllers
+│   ├── Model/          # Models  
+│   ├── views/          # View templates
+│   └── Form/           # Form classes
+├── _Core/              # Framework core
+│   ├── Database/       # ORM and query builder
+│   ├── Mvc/            # MVC components
+│   ├── Auth/           # Authentication
+│   └── Validation/     # Validation system
+└── Base/               # Public area module</code></pre>
+    </div>
+
+    <h2>Performance Tips</h2>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <h5>Database</h5>
+            <ul>
+                <li>Use eager loading for relationships</li>
+                <li>Add indexes on frequently queried columns</li>
+                <li>Avoid N+1 query problems</li>
+            </ul>
+        </div>
+        <div class="feature-card">
+            <h5>Caching</h5>
+            <ul>
+                <li>Cache frequently accessed data</li>
+                <li>Use query result caching</li>
+                <li>Implement page caching where appropriate</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Error Handling</h2>
+    <div class="code-example" data-title="Proper Error Handling">
+        <pre><code class="language-php"><?php
+public function createAction()
+{
+    try {
+        $data = $this->getRequest()->all();
+        $validation = $this->validateUser($data);
+        
+        if (!$validation['valid']) {
+            $this->flashError('Validation failed');
+            return $this->render('user/form', ['errors' => $validation['errors']]);
+        }
+        
+        $user = User::create($data);
+        $this->flashSuccess('User created successfully');
+        return $this->redirect('admin/user');
+        
+    } catch (DatabaseException $e) {
+        $this->logger->error('Database error: ' . $e->getMessage());
+        $this->flashError('Database error occurred');
+    } catch (Exception $e) {
+        $this->logger->error('Unexpected error: ' . $e->getMessage());
+        $this->flashError('An unexpected error occurred');
+    }
+    
+    return $this->render('user/form');
+}</code></pre>
+    </div>
+</section>

@@ -1,0 +1,401 @@
+<section id="installation" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Installation Guide</h1>
+        <p class="page-subtitle">Complete setup instructions for the framework</p>
+    </div>
+
+    <div class="toc">
+        <h6>Table of Contents</h6>
+        <ul>
+            <li><a href="#system-requirements">System Requirements</a></li>
+            <li><a href="#server-setup">Server Setup</a></li>
+            <li><a href="#database-setup">Database Setup</a></li>
+            <li><a href="#framework-installation">Framework Installation</a></li>
+            <li><a href="#first-run">First Run</a></li>
+        </ul>
+    </div>
+
+    <h2 id="system-requirements">System Requirements</h2>
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Minimum Requirements:</strong> Make sure your system meets these requirements before installation.
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Server Requirements</h4>
+            <ul>
+                <li><strong>PHP:</strong> 8.0 or higher</li>
+                <li><strong>Web Server:</strong> Apache 2.4+ or Nginx 1.15+</li>
+                <li><strong>Database:</strong> MySQL 5.7+ or MariaDB 10.3+</li>
+                <li><strong>Memory:</strong> 512MB minimum, 1GB recommended</li>
+                <li><strong>Disk Space:</strong> 100MB minimum</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h4>PHP Extensions</h4>
+            <ul>
+                <li><strong>PDO:</strong> PHP Data Objects</li>
+                <li><strong>mbstring:</strong> Multibyte String</li>
+                <li><strong>openssl:</strong> OpenSSL</li>
+                <li><strong>json:</strong> JSON support</li>
+                <li><strong>curl:</strong> cURL support</li>
+                <li><strong>gd:</strong> GD Library (for image processing)</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2 id="server-setup">Server Setup</h2>
+
+    <h3>Apache Configuration</h3>
+    <div class="code-example" data-title=".htaccess">
+        <pre><code class="language-apache"># .htaccess in root directory
+RewriteEngine On
+
+# Redirect everything to public directory
+RewriteRule ^(.*)$ public/$1 [L]
+
+# Security headers
+Header always set X-Content-Type-Options nosniff
+Header always set X-Frame-Options DENY
+Header always set X-XSS-Protection "1; mode=block"</code></pre>
+    </div>
+
+    <div class="code-example" data-title="public/.htaccess">
+        <pre><code class="language-apache"># public/.htaccess
+RewriteEngine On
+
+# Handle Angular/React routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Security
+Options -Indexes
+Options -ExecCGI
+
+# Cache static files
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+</IfModule></code></pre>
+    </div>
+
+    <h3>Nginx Configuration</h3>
+    <div class="code-example" data-title="nginx.conf">
+        <pre><code class="language-nginx">server {
+    listen 80;
+    server_name your-domain.com;
+    root /path/to/your/project/public;
+    index index.php index.html;
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.0-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    # Deny access to sensitive files
+    location ~ /\. {
+        deny all;
+    }
+
+    location ~ /(config|migrations|app) {
+        deny all;
+    }
+
+    # Cache static files
+    location ~* \.(css|js|jpg|jpeg|png|gif|ico|svg)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}</code></pre>
+    </div>
+
+    <h2 id="database-setup">Database Setup</h2>
+
+    <h3>MySQL/MariaDB Setup</h3>
+    <div class="code-example" data-title="Create Database">
+        <pre><code class="language-sql">-- Connect to MySQL as root
+mysql -u root -p
+
+-- Create database
+CREATE DATABASE your_app_name CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Create user
+CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'secure_password';
+
+-- Grant permissions
+GRANT ALL PRIVILEGES ON your_app_name.* TO 'app_user'@'localhost';
+
+-- Flush privileges
+FLUSH PRIVILEGES;</code></pre>
+    </div>
+
+    <h3>Database Configuration</h3>
+    <div class="code-example" data-title="config/database.php">
+        <pre><code class="language-php"><?php
+// config/database.php
+return [
+    'default' => [
+        'driver'    => 'mysql',
+        'host'      => 'localhost',
+        'port'      => 3306,
+        'database'  => 'your_app_name',
+        'username'  => 'app_user',
+        'password'  => 'secure_password',
+        'charset'   => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'options'   => [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]
+    ]
+];</code></pre>
+    </div>
+
+    <h2 id="framework-installation">Framework Installation</h2>
+
+    <h3>Step 1: Download/Clone Framework</h3>
+    <div class="code-example" data-title="Git Clone">
+        <pre><code class="language-bash"># Clone the repository
+git clone https://github.com/your-repo/framework.git your-project
+cd your-project
+
+# Or download ZIP and extract</code></pre>
+    </div>
+
+    <h3>Step 2: Set Permissions</h3>
+    <div class="code-example" data-title="File Permissions">
+        <pre><code class="language-bash"># Make directories writable
+chmod -R 755 storage/
+chmod -R 755 public/uploads/
+chmod -R 755 storage/logs/
+chmod -R 755 storage/cache/
+
+# Set proper ownership (Linux/Ubuntu)
+chown -R www-data:www-data storage/
+chown -R www-data:www-data public/uploads/</code></pre>
+    </div>
+
+    <h3>Step 3: Environment Configuration</h3>
+    <div class="code-example" data-title=".env">
+        <pre><code class="language-ini"># Copy example environment file
+cp .env.example .env
+
+# Edit environment variables
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=your_app_name
+DB_USERNAME=app_user
+DB_PASSWORD=secure_password
+
+# Mail Configuration
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_ENCRYPTION=tls
+
+# Cache
+CACHE_DRIVER=file
+CACHE_PREFIX=app_
+
+# Session
+SESSION_DRIVER=file
+SESSION_LIFETIME=120</code></pre>
+    </div>
+
+    <h3>Step 4: Application Configuration</h3>
+    <div class="code-example" data-title="config/app.php">
+        <pre><code class="language-php"><?php
+// config/app.php
+return [
+    'name' => 'Your Application Name',
+    'url' => $_ENV['APP_URL'] ?? 'http://localhost',
+    'debug' => $_ENV['APP_DEBUG'] ?? false,
+    'timezone' => 'UTC',
+    
+    // Security
+    'hash_algo' => PASSWORD_ARGON2I,
+    'encryption_key' => 'your-32-character-secret-key-here',
+    
+    // Modules
+    'modules' => [
+        'Base' => [
+            'path' => APP_PATH . 'Base/',
+            'namespace' => 'Base\\'
+        ],
+        'Admin' => [
+            'path' => APP_PATH . 'Admin/',
+            'namespace' => 'Admin\\'
+        ],
+        'Api' => [
+            'path' => APP_PATH . 'Api/',
+            'namespace' => 'Api\\'
+        ]
+    ],
+    
+    // Services
+    'services' => [
+        'Core\\Provider\\DatabaseServiceProvider',
+        'Core\\Provider\\ViewServiceProvider',
+        'Core\\Provider\\SessionServiceProvider',
+        'Core\\Provider\\AuthServiceProvider',
+        'Core\\Provider\\ValidationServiceProvider'
+    ]
+];</code></pre>
+    </div>
+
+    <h2 id="first-run">First Run</h2>
+
+    <h3>Step 1: Run Migrations</h3>
+    <div class="code-example" data-title="Database Migration">
+        <pre><code class="language-php"><?php
+// Run this script to set up database tables
+require_once 'app/bootstrap.php';
+
+$migrator = $container->get('migrator');
+$migrations = $migrator->run();
+
+if (empty($migrations)) {
+    echo "No migrations to run.\n";
+} else {
+    echo "Migrations completed:\n";
+    foreach ($migrations as $migration) {
+        echo "- $migration\n";
+    }
+}</code></pre>
+    </div>
+
+    <h3>Step 2: Create Admin User</h3>
+    <div class="code-example" data-title="Create Admin User">
+        <pre><code class="language-php"><?php
+// create-admin.php
+require_once 'app/bootstrap.php';
+
+use Admin\Model\User;
+use Core\Acl\Role;
+
+// Create admin user
+$admin = new User();
+$admin->name = 'Administrator';
+$admin->email = 'admin@example.com';
+$admin->custom_id = 1000;
+$admin->password = 'admin123'; // Will be hashed automatically
+$admin->status = 'active';
+
+if ($admin->save()) {
+    // Assign admin role
+    $adminRole = Role::where('name', 'admin')->first();
+    if ($adminRole) {
+        $admin->assignRole('admin');
+        echo "Admin user created successfully!\n";
+        echo "Email: admin@example.com\n";
+        echo "Password: admin123\n";
+    }
+} else {
+    echo "Failed to create admin user.\n";
+}</code></pre>
+    </div>
+
+    <h3>Step 3: Verify Installation</h3>
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle me-2"></i>
+        <strong>Success!</strong> Your framework is now installed and ready to use.
+    </div>
+
+    <p>Visit your application URL to verify the installation:</p>
+    <ul>
+        <li><strong>Homepage:</strong> <code>http://your-domain.com/</code></li>
+        <li><strong>Admin Panel:</strong> <code>http://your-domain.com/admin</code></li>
+        <li><strong>Login:</strong> <code>http://your-domain.com/login</code></li>
+    </ul>
+
+    <h3>Troubleshooting</h3>
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Common Issues:</strong>
+    </div>
+
+    <div class="accordion" id="troubleshootingAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+                    500 Internal Server Error
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul>
+                        <li>Check file permissions (755 for directories, 644 for files)</li>
+                        <li>Verify .htaccess configuration</li>
+                        <li>Check PHP error logs</li>
+                        <li>Ensure database connection is working</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+                    Database Connection Failed
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul>
+                        <li>Verify database credentials in config/database.php</li>
+                        <li>Check if database server is running</li>
+                        <li>Ensure database and user exist</li>
+                        <li>Test connection with mysql command line</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+                    Blank Page or White Screen
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#troubleshootingAccordion">
+                <div class="accordion-body">
+                    <ul>
+                        <li>Enable error reporting in php.ini</li>
+                        <li>Check error logs in storage/logs/</li>
+                        <li>Verify autoload.php exists and is readable</li>
+                        <li>Check PHP version compatibility</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-lightbulb me-2"></i>
+        <strong>Next Steps:</strong> Now that installation is complete, check out the <a href="#configuration">Configuration Guide</a> to customize your application.
+    </div>
+</section>

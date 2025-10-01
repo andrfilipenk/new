@@ -1,0 +1,726 @@
+<section id="database" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Database & ORM</h1>
+        <p class="page-subtitle">Comprehensive guide to database operations and Object-Relational Mapping</p>
+    </div>
+
+    <div class="toc">
+        <h6>Table of Contents</h6>
+        <ul>
+            <li><a href="#database-config">Database Configuration</a></li>
+            <li><a href="#query-builder">Query Builder</a></li>
+            <li><a href="#orm-basics">ORM Basics</a></li>
+            <li><a href="#relationships">Relationships</a></li>
+            <li><a href="#advanced-queries">Advanced Queries</a></li>
+            <li><a href="#migrations">Migrations</a></li>
+        </ul>
+    </div>
+
+    <h2 id="database-config">Database Configuration</h2>
+    <p>The framework supports multiple database connections and provides a fluent query builder interface.</p>
+
+    <h3>Basic Configuration</h3>
+    <div class="code-example" data-title="config/database.php">
+        <pre><code class="language-php"><?php
+return [
+    'default' => [
+        'driver'    => 'mysql',
+        'host'      => 'localhost',
+        'port'      => 3306,
+        'database'  => 'your_database',
+        'username'  => 'your_username',
+        'password'  => 'your_password',
+        'charset'   => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'options'   => [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]
+    ],
+    
+    // Additional connections
+    'reporting' => [
+        'driver'   => 'mysql',
+        'host'     => 'reporting-server.com',
+        'database' => 'reports_db',
+        // ... other settings
+    ]
+];</code></pre>
+    </div>
+
+    <h3>Database Service Usage</h3>
+    <div class="code-example" data-title="Getting Database Instance">
+        <pre><code class="language-php"><?php
+// Get default database connection
+$db = Container::getDefault()->get('db');
+
+// Get specific connection
+$reportingDb = Container::getDefault()->get('db.reporting');
+
+// Use in models
+class User extends Model
+{
+    public static function db(): Database
+    {
+        return Container::getDefault()->get('db');
+    }
+}</code></pre>
+    </div>
+
+    <h2 id="query-builder">Query Builder</h2>
+    <p>The query builder provides a fluent interface for building database queries.</p>
+
+    <h3>Basic Queries</h3>
+    <div class="code-example" data-title="Select Queries">
+        <pre><code class="language-php"><?php
+$db = Container::getDefault()->get('db');
+
+// Simple select
+$users = $db->table('user')->get();
+
+// Select with conditions
+$activeUsers = $db->table('user')
+    ->where('status', 'active')
+    ->get();
+
+// Select specific columns
+$userEmails = $db->table('user')
+    ->select(['id', 'name', 'email'])
+    ->where('department', 'IT')
+    ->get();
+
+// Single record
+$user = $db->table('user')
+    ->where('id', 1)
+    ->first();
+
+// Count records
+$userCount = $db->table('user')
+    ->where('status', 'active')
+    ->count();
+
+// Check existence
+$exists = $db->table('user')
+    ->where('email', 'admin@example.com')
+    ->exists();</code></pre>
+    </div>
+
+    <h3>Advanced Where Conditions</h3>
+    <div class="code-example" data-title="Complex Where Clauses">
+        <pre><code class="language-php"><?php
+// Multiple where conditions
+$users = $db->table('user')
+    ->where('department', 'IT')
+    ->where('status', 'active')
+    ->where('salary', '>', 50000)
+    ->get();
+
+// Or conditions
+$users = $db->table('user')
+    ->where('department', 'IT')
+    ->orWhere('department', 'Marketing')
+    ->get();
+
+// Where In
+$users = $db->table('user')
+    ->whereIn('id', [1, 2, 3, 4, 5])
+    ->get();
+
+// Where Between
+$users = $db->table('user')
+    ->whereBetween('salary', [40000, 80000])
+    ->get();
+
+// Where Null
+$usersWithoutPhone = $db->table('user')
+    ->whereNull('phone')
+    ->get();
+
+// Where Like
+$searchUsers = $db->table('user')
+    ->where('name', 'LIKE', '%john%')
+    ->get();
+
+// Where Date
+$recentUsers = $db->table('user')
+    ->whereDate('created_at', '>=', '2024-01-01')
+    ->get();
+
+// Grouped conditions
+$users = $db->table('user')
+    ->where('status', 'active')
+    ->where(function($query) {
+        $query->where('department', 'IT')
+              ->orWhere('department', 'Marketing');
+    })
+    ->get();</code></pre>
+    </div>
+
+    <h3>Joins</h3>
+    <div class="code-example" data-title="Table Joins">
+        <pre><code class="language-php"><?php
+// Inner Join
+$usersWithGroups = $db->table('user')
+    ->select(['user.*', 'groups.name as group_name'])
+    ->join('user_group', 'user.id', '=', 'user_group.user_id')
+    ->join('groups', 'user_group.group_id', '=', 'groups.id')
+    ->get();
+
+// Left Join
+$allUsersWithGroups = $db->table('user')
+    ->select(['user.*', 'groups.name as group_name'])
+    ->leftJoin('user_group', 'user.id', '=', 'user_group.user_id')
+    ->leftJoin('groups', 'user_group.group_id', '=', 'groups.id')
+    ->get();
+
+// Complex joins
+$userTasks = $db->table('user')
+    ->select([
+        'user.name',
+        'task.title',
+        'task_status.title as status'
+    ])
+    ->join('task', 'user.id', '=', 'task.assigned_to')
+    ->join('task_status', 'task.status_id', '=', 'task_status.id')
+    ->where('task.status_id', '!=', 3) // Not completed
+    ->orderBy('task.end_date')
+    ->get();</code></pre>
+    </div>
+
+    <h3>Insert, Update, Delete</h3>
+    <div class="code-example" data-title="Data Modification">
+        <pre><code class="language-php"><?php
+// Insert single record
+$userId = $db->table('user')->insert([
+    'name' => 'John Doe',
+    'email' => 'john@example.com',
+    'created_at' => date('Y-m-d H:i:s')
+]);
+
+// Insert multiple records
+$db->table('user')->insert([
+    [
+        'name' => 'Jane Smith',
+        'email' => 'jane@example.com',
+        'created_at' => date('Y-m-d H:i:s')
+    ],
+    [
+        'name' => 'Bob Wilson',
+        'email' => 'bob@example.com',
+        'created_at' => date('Y-m-d H:i:s')
+    ]
+]);
+
+// Update records
+$affectedRows = $db->table('user')
+    ->where('department', 'IT')
+    ->update([
+        'salary' => 'salary * 1.1', // 10% increase
+        'updated_at' => date('Y-m-d H:i:s')
+    ]);
+
+// Update single record
+$db->table('user')
+    ->where('id', 1)
+    ->update(['status' => 'inactive']);
+
+// Delete records
+$db->table('user')
+    ->where('status', 'inactive')
+    ->where('last_login', '<', '2023-01-01')
+    ->delete();
+
+// Truncate table
+$db->table('temp_data')->truncate();</code></pre>
+    </div>
+
+    <h2 id="orm-basics">ORM Basics</h2>
+    <p>The Object-Relational Mapping (ORM) system provides an elegant ActiveRecord implementation.</p>
+
+    <h3>Model Definition</h3>
+    <div class="code-example" data-title="Basic Model">
+        <pre><code class="language-php"><?php
+namespace Admin\Model;
+
+use Core\Database\Model;
+
+class User extends Model
+{
+    // Table name (auto-detected if not specified)
+    protected $table = 'user';
+    
+    // Primary key (default: 'id')
+    protected $primaryKey = 'id';
+    
+    // Mass-assignable attributes
+    protected array $fillable = [
+        'name', 'email', 'password', 'custom_id',
+        'first_name', 'last_name', 'phone', 'department'
+    ];
+    
+    // Hidden attributes (excluded from arrays/JSON)
+    protected array $hidden = ['password'];
+    
+    // Attributes to cast to specific types
+    protected array $casts = [
+        'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'metadata' => 'json'
+    ];
+    
+    // Enable automatic timestamps
+    protected $timestamps = true;
+    
+    // Custom timestamp column names
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+}</code></pre>
+    </div>
+
+    <h3>Basic CRUD Operations</h3>
+    <div class="code-example" data-title="Model CRUD">
+        <pre><code class="language-php"><?php
+// CREATE
+$user = new User();
+$user->name = 'John Doe';
+$user->email = 'john@example.com';
+$user->save();
+
+// Or using mass assignment
+$user = User::create([
+    'name' => 'Jane Smith',
+    'email' => 'jane@example.com',
+    'department' => 'Marketing'
+]);
+
+// READ
+$user = User::find(1);                    // Find by primary key
+$user = User::find('john@example.com', 'email'); // Find by custom field
+
+// Multiple records
+$users = User::all();                     // Get all users
+$activeUsers = User::where('status', 'active')->get();
+
+// UPDATE
+$user = User::find(1);
+$user->name = 'John Updated';
+$user->save();
+
+// Mass update
+User::where('department', 'IT')
+    ->update(['salary' => 'salary * 1.1']);
+
+// DELETE
+$user = User::find(1);
+$user->delete();
+
+// Mass delete
+User::where('status', 'inactive')->delete();</code></pre>
+    </div>
+
+    <h3>Query Scopes</h3>
+    <div class="code-example" data-title="Model Scopes">
+        <pre><code class="language-php"><?php
+class User extends Model
+{
+    /**
+     * Scope for active users
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+    
+    /**
+     * Scope for users in specific department
+     */
+    public function scopeInDepartment($query, $department)
+    {
+        return $query->where('department', $department);
+    }
+    
+    /**
+     * Scope for recent users
+     */
+    public function scopeRecent($query, $days = 30)
+    {
+        return $query->where('created_at', '>=', date('Y-m-d', strtotime("-{$days} days")));
+    }
+}
+
+// Usage
+$activeUsers = User::active()->get();
+$itUsers = User::active()->inDepartment('IT')->get();
+$recentActiveUsers = User::active()->recent(7)->get();</code></pre>
+    </div>
+
+    <h3>Accessors and Mutators</h3>
+    <div class="code-example" data-title="Data Transformation">
+        <pre><code class="language-php"><?php
+class User extends Model
+{
+    /**
+     * Accessor: Get full name
+     */
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+    
+    /**
+     * Accessor: Format phone number
+     */
+    public function getFormattedPhoneAttribute()
+    {
+        $phone = preg_replace('/[^0-9]/', '', $this->phone);
+        return preg_replace('/(\d{3})(\d{3})(\d{4})/', '($1) $2-$3', $phone);
+    }
+    
+    /**
+     * Mutator: Hash password before saving
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = password_hash($value, PASSWORD_ARGON2I);
+    }
+    
+    /**
+     * Mutator: Normalize email
+     */
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = strtolower(trim($value));
+    }
+}
+
+// Usage
+$user = User::find(1);
+echo $user->full_name;        // Accessor
+echo $user->formatted_phone;  // Accessor
+
+$user->password = 'newpassword'; // Mutator will hash it
+$user->email = 'JOHN@EXAMPLE.COM'; // Mutator will normalize it
+$user->save();</code></pre>
+    </div>
+
+    <h2 id="relationships">Relationships</h2>
+    <p>The ORM supports various types of relationships between models.</p>
+
+    <h3>One-to-One Relationships</h3>
+    <div class="code-example" data-title="One-to-One">
+        <pre><code class="language-php"><?php
+class User extends Model
+{
+    /**
+     * User has one profile
+     */
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class, 'user_id', 'id');
+    }
+}
+
+class UserProfile extends Model
+{
+    /**
+     * Profile belongs to user
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+}
+
+// Usage
+$user = User::find(1);
+$profile = $user->profile; // Get related profile
+
+$profile = UserProfile::find(1);
+$user = $profile->user; // Get related user</code></pre>
+    </div>
+
+    <h3>One-to-Many Relationships</h3>
+    <div class="code-example" data-title="One-to-Many">
+        <pre><code class="language-php"><?php
+class User extends Model
+{
+    /**
+     * User has many tasks
+     */
+    public function createdTasks()
+    {
+        return $this->hasMany(Task::class, 'created_by', 'id');
+    }
+    
+    /**
+     * User has many assigned tasks
+     */
+    public function assignedTasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to', 'id');
+    }
+}
+
+class Task extends Model
+{
+    /**
+     * Task belongs to creator
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+    
+    /**
+     * Task belongs to assignee
+     */
+    public function assignee()
+    {
+        return $this->belongsTo(User::class, 'assigned_to', 'id');
+    }
+}
+
+// Usage
+$user = User::find(1);
+$tasks = $user->createdTasks; // Get all tasks created by user
+
+$task = Task::find(1);
+$creator = $task->creator; // Get task creator</code></pre>
+    </div>
+
+    <h3>Many-to-Many Relationships</h3>
+    <div class="code-example" data-title="Many-to-Many">
+        <pre><code class="language-php"><?php
+class User extends Model
+{
+    /**
+     * User belongs to many groups
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(
+            Groups::class,      // Related model
+            'user_group',       // Pivot table
+            'user_id',          // Foreign key
+            'group_id'          // Related key
+        );
+    }
+    
+    /**
+     * User has many roles (ACL)
+     */
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'acl_user_role', 'user_id', 'role_id');
+    }
+    
+    /**
+     * User has many permissions with pivot data
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'acl_user_permission', 'user_id', 'permission_id')
+                    ->withPivot('granted'); // Include pivot column
+    }
+}
+
+// Usage
+$user = User::find(1);
+
+// Get related models
+$groups = $user->groups;
+$roles = $user->roles;
+
+// Attach relationships
+$user->groups()->attach([1, 2, 3]); // Attach to multiple groups
+$user->roles()->attach(2);          // Attach single role
+
+// Detach relationships
+$user->groups()->detach([1, 2]);    // Detach specific groups
+$user->roles()->detach();           // Detach all roles
+
+// Sync relationships (attach new, detach missing)
+$user->groups()->sync([1, 3, 5]);
+
+// Check relationship existence
+if ($user->groups()->exists()) {
+    echo "User belongs to groups";
+}
+
+// Count related models
+$groupCount = $user->groups()->count();</code></pre>
+    </div>
+
+    <h3>Eager Loading</h3>
+    <div class="code-example" data-title="Preventing N+1 Queries">
+        <pre><code class="language-php"><?php
+// Without eager loading (N+1 problem)
+$users = User::all();
+foreach ($users as $user) {
+    echo $user->groups; // This executes a query for each user
+}
+
+// With eager loading (2 queries total)
+$users = User::with(['groups'])->get();
+foreach ($users as $user) {
+    echo $user->groups; // No additional queries
+}
+
+// Multiple relationships
+$users = User::with(['groups', 'roles', 'createdTasks'])->get();
+
+// Nested relationships
+$users = User::with(['createdTasks.assignee', 'createdTasks.status'])->get();
+
+// Conditional eager loading
+$users = User::with(['groups' => function($query) {
+    $query->where('active', true)->orderBy('name');
+}])->get();
+
+// Eager loading with constraints
+$users = User::with(['createdTasks' => function($query) {
+    $query->where('status_id', 1)->orderBy('priority_id', 'desc');
+}])->get();</code></pre>
+    </div>
+
+    <h2 id="advanced-queries">Advanced Queries</h2>
+
+    <h3>Raw Queries</h3>
+    <div class="code-example" data-title="Raw SQL">
+        <pre><code class="language-php"><?php
+// Raw select
+$users = $db->query("
+    SELECT u.*, COUNT(t.id) as task_count 
+    FROM user u 
+    LEFT JOIN task t ON u.id = t.assigned_to 
+    GROUP BY u.id
+");
+
+// Raw with parameters
+$users = $db->query("
+    SELECT * FROM user 
+    WHERE department = ? AND salary > ?
+", ['IT', 50000]);
+
+// Raw expressions in query builder
+$users = $db->table('user')
+    ->select([
+        'name',
+        'email',
+        $db->raw('YEAR(created_at) as join_year')
+    ])
+    ->where($db->raw('YEAR(created_at)'), '2024')
+    ->get();
+
+// Complex aggregations
+$stats = $db->table('task')
+    ->select([
+        'status_id',
+        $db->raw('COUNT(*) as total'),
+        $db->raw('AVG(DATEDIFF(end_date, begin_date)) as avg_duration')
+    ])
+    ->groupBy('status_id')
+    ->get();</code></pre>
+    </div>
+
+    <h3>Subqueries</h3>
+    <div class="code-example" data-title="Subqueries">
+        <pre><code class="language-php"><?php
+// Users with latest task
+$users = $db->table('user')
+    ->select(['user.*'])
+    ->whereIn('id', function($query) {
+        $query->select('assigned_to')
+              ->from('task')
+              ->where('status_id', 1); // Active tasks
+    })
+    ->get();
+
+// Count relationships
+$users = User::withCount(['createdTasks', 'assignedTasks'])->get();
+
+// Complex conditions with subqueries
+$productiveUsers = $db->table('user')
+    ->where('id', 'IN', function($query) {
+        $query->select('assigned_to')
+              ->from('task')
+              ->where('status_id', 3) // Completed
+              ->groupBy('assigned_to')
+              ->having($db->raw('COUNT(*)'), '>', 10);
+    })
+    ->get();</code></pre>
+    </div>
+
+    <h2 id="migrations">Migrations</h2>
+    <p>Migrations provide version control for your database schema.</p>
+
+    <h3>Creating Migrations</h3>
+    <div class="code-example" data-title="Migration File">
+        <pre><code class="language-php"><?php
+// migrations/2024_01_15_100000_create_user_profiles_table.php
+use Core\Database\Migration;
+use Core\Database\Blueprint;
+
+class CreateUserProfilesTable extends Migration
+{
+    public function up(): void
+    {
+        $this->createTable('user_profiles', function(Blueprint $table) {
+            $table->id();
+            $table->integer('user_id')->unsigned();
+            $table->string('bio', 500)->nullable();
+            $table->string('avatar', 255)->nullable();
+            $table->json('preferences')->nullable();
+            $table->timestamps();
+            
+            $table->foreign('user_id')->references('id')->on('user');
+            $table->unique('user_id');
+        });
+    }
+    
+    public function down(): void
+    {
+        $this->dropTable('user_profiles');
+    }
+}</code></pre>
+    </div>
+
+    <h3>Column Types</h3>
+    <div class="code-example" data-title="Available Column Types">
+        <pre><code class="language-php"><?php
+$table->id();                           // Auto-incrementing primary key
+$table->string('name', 100);            // VARCHAR(100)
+$table->text('description');            // TEXT
+$table->integer('count');               // INTEGER
+$table->bigInteger('big_count');        // BIGINT
+$table->decimal('price', 8, 2);         // DECIMAL(8,2)
+$table->boolean('is_active');           // BOOLEAN
+$table->date('birth_date');             // DATE
+$table->datetime('created_at');         // DATETIME
+$table->timestamp('updated_at');        // TIMESTAMP
+$table->json('metadata');               // JSON
+$table->enum('status', ['active', 'inactive']); // ENUM
+
+// Column modifiers
+$table->string('email')->unique();      // Add unique constraint
+$table->string('name')->nullable();     // Allow NULL values
+$table->integer('sort_order')->default(0); // Default value
+$table->integer('user_id')->unsigned(); // Unsigned integer
+
+// Indexes
+$table->index('email');                 // Regular index
+$table->unique(['email', 'company_id']); // Composite unique
+$table->foreign('user_id')->references('id')->on('user'); // Foreign key</code></pre>
+    </div>
+
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle me-2"></i>
+        <strong>Best Practice:</strong> Always use migrations for database changes. Never modify the database directly in production.
+    </div>
+
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Performance Tip:</strong> Use eager loading to prevent N+1 query problems, especially when displaying lists with relationships.
+    </div>
+</section>

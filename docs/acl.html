@@ -1,0 +1,202 @@
+<section id="acl" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Access Control Lists (ACL)</h1>
+        <p class="page-subtitle">Role-based permission system for secure applications</p>
+    </div>
+
+    <div class="toc">
+        <h6>Table of Contents</h6>
+        <ul>
+            <li><a href="#acl-overview">ACL Overview</a></li>
+            <li><a href="#roles-permissions">Roles & Permissions</a></li>
+            <li><a href="#user-assignment">User Assignment</a></li>
+            <li><a href="#checking-permissions">Checking Permissions</a></li>
+            <li><a href="#acl-examples">Practical Examples</a></li>
+        </ul>
+    </div>
+
+    <h2 id="acl-overview">ACL Overview</h2>
+    <p>The ACL system provides role-based access control with Users, Roles, and Permissions.</p>
+
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-users"></i></div>
+            <h5>Users</h5>
+            <p>Individual system users who can be assigned roles and direct permissions.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-user-tag"></i></div>
+            <h5>Roles</h5>
+            <p>Named groups of permissions (admin, manager, employee, etc.).</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-key"></i></div>
+            <h5>Permissions</h5>
+            <p>Specific actions that can be performed (user.create, task.edit, etc.).</p>
+        </div>
+    </div>
+
+    <h2 id="roles-permissions">Roles & Permissions</h2>
+
+    <h3>Creating Roles</h3>
+    <div class="code-example" data-title="Role Management">
+        <pre><code class="language-php"><?php
+use Core\Acl\Role;
+
+// Create role
+$adminRole = new Role();
+$adminRole->name = 'admin';
+$adminRole->display_name = 'Administrator';
+$adminRole->description = 'Full system access';
+$adminRole->save();
+
+// Find role
+$role = Role::where('name', 'admin')->first();</code></pre>
+    </div>
+
+    <h3>Creating Permissions</h3>
+    <div class="code-example" data-title="Permission Management">
+        <pre><code class="language-php"><?php
+use Core\Acl\Permission;
+
+// Create permission
+$permission = Permission::createForResource('user', 'create', 'Create User');
+
+// Manual creation
+$permission = new Permission();
+$permission->name = 'user.edit';
+$permission->display_name = 'Edit User';
+$permission->resource = 'user';
+$permission->action = 'edit';
+$permission->save();</code></pre>
+    </div>
+
+    <h3>Assigning Permissions to Roles</h3>
+    <div class="code-example" data-title="Role-Permission Assignment">
+        <pre><code class="language-php"><?php
+$adminRole = Role::where('name', 'admin')->first();
+
+// Give permission to role
+$adminRole->givePermission('user.create');
+$adminRole->givePermission('user.edit');
+$adminRole->givePermission('user.delete');
+
+// Check if role has permission
+if ($adminRole->hasPermission('user.create')) {
+    echo "Admin can create users";
+}</code></pre>
+    </div>
+
+    <h2 id="user-assignment">User Assignment</h2>
+
+    <h3>Assigning Roles to Users</h3>
+    <div class="code-example" data-title="User-Role Assignment">
+        <pre><code class="language-php"><?php
+use Admin\Model\User;
+
+$user = User::find(1);
+
+// Assign role
+$user->assignRole('admin');
+
+// Check user roles
+if ($user->hasRole('admin')) {
+    echo "User is an admin";
+}
+
+// Check multiple roles
+if ($user->hasAnyRole(['admin', 'manager'])) {
+    echo "User has elevated privileges";
+}</code></pre>
+    </div>
+
+    <h3>Direct Permission Assignment</h3>
+    <div class="code-example" data-title="Direct Permissions">
+        <pre><code class="language-php"><?php
+// Via controller (Admin/Controller/Access.php)
+$this->assignUserPermission($userId, $permissionId, 1); // Grant
+$this->assignUserPermission($userId, $permissionId, 0); // Deny
+
+// Check user permissions
+$permissions = $user->getAllPermissions();
+if ($user->hasPermission('user.create')) {
+    echo "User can create users";
+}</code></pre>
+    </div>
+
+    <h2 id="checking-permissions">Checking Permissions</h2>
+
+    <h3>In Controllers</h3>
+    <div class="code-example" data-title="Controller Permission Checks">
+        <pre><code class="language-php"><?php
+class UserController extends Controller
+{
+    public function createAction()
+    {
+        // Check permission
+        $user = $this->getSession()->get('user');
+        if (!in_array('user.create', $user['permissions'] ?? [])) {
+            $this->flashError('Access denied');
+            return $this->redirect('admin');
+        }
+        
+        // Proceed with user creation
+    }
+}</code></pre>
+    </div>
+
+    <h3>In Views</h3>
+    <div class="code-example" data-title="View Permission Checks">
+        <pre><code class="language-php"><?php // In view templates ?>
+<?php $user = $this->getSession()->get('user'); ?>
+<?php if (in_array('user.create', $user['permissions'] ?? [])): ?>
+    <a href="<?= $this->url('admin/user/create') ?>" class="btn btn-primary">
+        Add User
+    </a>
+<?php endif; ?></code></pre>
+    </div>
+
+    <h2 id="acl-examples">Practical Examples</h2>
+
+    <h3>Complete ACL Setup</h3>
+    <div class="code-example" data-title="Full ACL Implementation">
+        <pre><code class="language-php"><?php
+// 1. Create roles
+$roles = [
+    ['name' => 'user', 'display_name' => 'User'],
+    ['name' => 'worker', 'display_name' => 'Worker'], 
+    ['name' => 'leader', 'display_name' => 'Leader'],
+    ['name' => 'admin', 'display_name' => 'Administrator']
+];
+
+foreach ($roles as $roleData) {
+    Role::create($roleData);
+}
+
+// 2. Create permissions
+$permissions = [
+    'user.list', 'user.view', 'user.create', 'user.edit', 'user.delete',
+    'task.list', 'task.view', 'task.create', 'task.edit', 'task.assign'
+];
+
+foreach ($permissions as $permission) {
+    [$resource, $action] = explode('.', $permission);
+    Permission::createForResource($resource, $action);
+}
+
+// 3. Assign permissions to roles
+$adminRole = Role::where('name', 'admin')->first();
+foreach ($permissions as $permission) {
+    $adminRole->givePermission($permission);
+}
+
+// 4. Assign role to user
+$user = User::find(1);
+$user->assignRole('admin');</code></pre>
+    </div>
+
+    <div class="alert alert-success">
+        <i class="fas fa-shield-alt me-2"></i>
+        <strong>Security Best Practice:</strong> Always check permissions in controllers before performing sensitive operations.
+    </div>
+</section>

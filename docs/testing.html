@@ -1,0 +1,114 @@
+<section id="testing" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Testing</h1>
+        <p class="page-subtitle">Unit testing and application testing strategies</p>
+    </div>
+
+    <h2>Basic Unit Testing</h2>
+    <div class="code-example" data-title="Model Testing">
+        <pre><code class="language-php"><?php
+// tests/Unit/UserTest.php
+use PHPUnit\Framework\TestCase;
+use Admin\Model\User;
+
+class UserTest extends TestCase
+{
+    public function testUserCreation()
+    {
+        $user = new User();
+        $user->name = 'Test User';
+        $user->email = 'test@example.com';
+        $user->password = 'password123';
+        
+        $this->assertTrue($user->save());
+        $this->assertNotNull($user->id);
+    }
+    
+    public function testPasswordHashing()
+    {
+        $user = new User();
+        $user->password = 'plaintext';
+        $user->save();
+        
+        $this->assertNotEquals('plaintext', $user->password);
+        $this->assertTrue($user->verifyPassword('plaintext'));
+    }
+    
+    public function testUserRoles()
+    {
+        $user = User::find(1);
+        $user->assignRole('admin');
+        
+        $this->assertTrue($user->hasRole('admin'));
+        $this->assertContains('admin', $user->roles->pluck('name')->toArray());
+    }
+}</code></pre>
+    </div>
+
+    <h2>Controller Testing</h2>
+    <div class="code-example" data-title="API Testing">
+        <pre><code class="language-php"><?php
+// tests/Feature/UserApiTest.php
+class UserApiTest extends TestCase
+{
+    public function testUserIndex()
+    {
+        $response = $this->get('/api/user');
+        
+        $response->assertStatus(200)
+                 ->assertJson(['success' => true])
+                 ->assertJsonStructure([
+                     'success',
+                     'data' => [
+                         '*' => ['id', 'name', 'email']
+                     ]
+                 ]);
+    }
+    
+    public function testUserCreation()
+    {
+        $userData = [
+            'name' => 'New User',
+            'email' => 'new@example.com',
+            'password' => 'password123'
+        ];
+        
+        $response = $this->post('/api/user', $userData);
+        
+        $response->assertStatus(201)
+                 ->assertJson(['success' => true]);
+        
+        $this->assertDatabaseHas('user', [
+            'email' => 'new@example.com'
+        ]);
+    }
+}</code></pre>
+    </div>
+
+    <h2>Database Testing</h2>
+    <div class="code-example" data-title="Database Assertions">
+        <pre><code class="language-php"><?php
+class DatabaseTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->refreshDatabase();
+    }
+    
+    public function testUserCreation()
+    {
+        User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com'
+        ]);
+        
+        $this->assertDatabaseHas('user', [
+            'email' => 'test@example.com'
+        ]);
+        
+        $this->assertDatabaseCount('user', 1);
+    }
+}</code></pre>
+    </div>
+</section>

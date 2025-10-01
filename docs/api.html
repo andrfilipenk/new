@@ -1,0 +1,130 @@
+<section id="api" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">API Development</h1>
+        <p class="page-subtitle">Building RESTful APIs and handling JSON responses</p>
+    </div>
+
+    <h2>API Controller Structure</h2>
+    <div class="code-example" data-title="Basic API Controller">
+        <pre><code class="language-php"><?php
+namespace Api\Controller;
+
+use Core\Mvc\Controller;
+use Admin\Model\User;
+
+class UserController extends Controller
+{
+    public function indexAction()
+    {
+        $users = User::with(['roles'])->get();
+        return $this->jsonResponse([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
+    
+    public function showAction()
+    {
+        $id = $this->getDispatcher()->getParam('id');
+        $user = User::find($id);
+        
+        if (!$user) {
+            return $this->jsonError('User not found', 404);
+        }
+        
+        return $this->jsonResponse(['success' => true, 'data' => $user]);
+    }
+    
+    public function storeAction()
+    {
+        if (!$this->isPost()) {
+            return $this->jsonError('Method not allowed', 405);
+        }
+        
+        $data = $this->getRequest()->all();
+        $validation = $this->validateUser($data);
+        
+        if (!$validation['valid']) {
+            return $this->jsonError('Validation failed', 422, $validation['errors']);
+        }
+        
+        $user = User::create($data);
+        return $this->jsonResponse(['success' => true, 'data' => $user], 201);
+    }
+    
+    protected function jsonResponse(array $data, int $status = 200)
+    {
+        return $this->getResponse()->json($data, $status);
+    }
+    
+    protected function jsonError(string $message, int $status = 400, array $errors = [])
+    {
+        $response = ['success' => false, 'message' => $message];
+        if (!empty($errors)) $response['errors'] = $errors;
+        return $this->jsonResponse($response, $status);
+    }
+}</code></pre>
+    </div>
+
+    <h2>API Authentication</h2>
+    <div class="code-example" data-title="API Token Authentication">
+        <pre><code class="language-php"><?php
+class ApiAuthMiddleware
+{
+    public function handle($request, $response, $next)
+    {
+        $token = $request->getHeader('Authorization');
+        
+        if (!$token || !$this->validateToken($token)) {
+            return $response->json(['error' => 'Unauthorized'], 401);
+        }
+        
+        return $next();
+    }
+    
+    protected function validateToken($token): bool
+    {
+        // Remove 'Bearer ' prefix
+        $token = str_replace('Bearer ', '', $token);
+        
+        // Validate token against database or JWT
+        return $this->isValidApiToken($token);
+    }
+}</code></pre>
+    </div>
+
+    <h2>JSON Response Examples</h2>
+    <div class="code-example" data-title="API Response Formats">
+        <pre><code class="language-json">// Success Response
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@example.com"
+    }
+}
+
+// Error Response
+{
+    "success": false,
+    "message": "Validation failed",
+    "errors": {
+        "email": ["Email is required"],
+        "name": ["Name must be at least 2 characters"]
+    }
+}
+
+// Paginated Response
+{
+    "success": true,
+    "data": [...],
+    "pagination": {
+        "current_page": 1,
+        "per_page": 10,
+        "total": 25,
+        "last_page": 3
+    }
+}</code></pre>
+    </div>
+</section>
