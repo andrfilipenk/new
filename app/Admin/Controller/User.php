@@ -9,6 +9,12 @@ use Admin\Form\UserForm;
 
 class User extends Controller
 {
+    protected function getUser()
+    {
+        $id = $this->getDispatcher()->getParam('id');
+        return UserModel::find($id);
+    }
+
     // List all users with their groups
     public function indexAction()
     {
@@ -19,8 +25,7 @@ class User extends Controller
     // Show user details with groups
     public function viewAction()
     {
-        $id = $this->getDispatcher()->getParam('id');
-        $user = UserModel::find($id);
+        $user = $this->getUser();
         if (!$user) {
             $this->flashError('User not found.');
             return $this->redirect('admin/user');
@@ -37,8 +42,7 @@ class User extends Controller
     // Manage user groups (add/remove)
     public function groupsAction()
     {
-        $id = $this->getDispatcher()->getParam('id');
-        $user = UserModel::find($id);
+        $user = $this->getUser();
         if (!$user) {
             $this->flashError('User not found.');
             return $this->redirect('admin/user');
@@ -56,9 +60,9 @@ class User extends Controller
                     $this->flashSuccess('User removed from group.');
                 }
             }
-            return $this->redirect('admin/user/view/' . $id);
+            return $this->redirect('admin/user/view/' . $user->id);
         }
-        return $this->redirect('admin/user/view/' . $id);
+        return $this->redirect('admin/user/view/' . $user->id);
     }
 
     // Show create form and handle creation
@@ -84,8 +88,7 @@ class User extends Controller
     // Show edit form and handle update
     public function editAction()
     {
-        $id = $this->getDispatcher()->getParam('id');
-        $user = UserModel::find($id);
+        $user = $this->getUser();
         if (!$user) {
             return $this->redirect('admin/user');
         }
@@ -110,8 +113,7 @@ class User extends Controller
     // Delete user
     public function deleteAction()
     {
-        $id = $this->getDispatcher()->getParam('id');
-        $user = UserModel::find($id);
+        $user = $this->getUser();
         if ($user) {
             // Remove from all groups first
             $user->groups()->detach();

@@ -1,0 +1,51 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<h1>Manage Permissions</h1>
+
+<div class="mb-3">
+    <a href="<?= $url->get('admin/access/create-permission') ?>" class="btn btn-primary">Create New Permission</a>
+    <a href="<?= $url->get('admin/access') ?>" class="btn btn-secondary">Back to Overview</a>
+</div>
+
+<?php if (!empty($permissions)): ?>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Display Name</th>
+                <th>Module</th>
+                <th>Controller</th>
+                <th>Action</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($permissions as $permission): ?>
+                <tr>
+                    <td><?= htmlspecialchars($permission->id) ?></td>
+                    <td><code><?= htmlspecialchars($permission->name) ?></code></td>
+                    <td><?= htmlspecialchars($permission->display_name ?? '') ?></td>
+                    <td><?= htmlspecialchars($permission->module ?? '-') ?></td>
+                    <td><?= htmlspecialchars($permission->controller ?? '-') ?></td>
+                    <td><?= htmlspecialchars($permission->action ?? '-') ?></td>
+                    <td><?= htmlspecialchars($permission->description ?? 'No description') ?></td>
+                    <td>
+                        <a href="<?= $url->get('admin/access/edit-permission/' . $permission->id) ?>" 
+                           class="btn btn-sm btn-warning">Edit</a>
+                        <a href="<?= $url->get('admin/access/delete-permission/' . $permission->id) ?>" 
+                           class="btn btn-sm btn-danger" 
+                           onclick="return confirm('Delete this permission? This will remove all assignments.')">Delete</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <div class="alert alert-info">
+        <p>No permissions found. <a href="<?= $url->get('admin/access/create-permission') ?>">Create your first permission</a>.</p>
+    </div>
+<?php endif; ?>

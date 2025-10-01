@@ -1,0 +1,47 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<h1>My Holiday Requests</h1>
+
+<div class="mb-3">
+    <a href="<?= $url->get('admin/holidays/create') ?>" class="btn btn-primary">Create New Request</a>
+    <a href="<?= $url->get('admin/holidays') ?>" class="btn btn-secondary">All Requests</a>
+</div>
+
+<?php if (!empty($requests)): ?>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Begin Date</th>
+                <th>End Date</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($requests as $request): ?>
+                <tr>
+                    <td><?= htmlspecialchars($request->id) ?></td>
+                    <td><?= htmlspecialchars($request->begin_date) ?></td>
+                    <td><?= htmlspecialchars($request->end_date) ?></td>
+                    <td><?= $request->getDurationDays() ?> days</td>
+                    <td>
+                        <?php if ($request->isGranted()): ?>
+                            <span class="badge badge-success">Granted</span>
+                        <?php else: ?>
+                            <span class="badge badge-warning">Pending</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?= htmlspecialchars($request->created_at ?? 'N/A') ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <div class="alert alert-info">
+        <p>You have no holiday requests yet. <a href="<?= $url->get('admin/holidays/create') ?>">Create your first request</a>.</p>
+    </div>
+<?php endif; ?>

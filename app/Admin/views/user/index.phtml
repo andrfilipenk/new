@@ -27,7 +27,7 @@ $url = $this->getDI()->get('url');
                     <td><?= htmlspecialchars($user->name) ?></td>
                     <td><?= htmlspecialchars($user->email) ?></td>
                     <td>
-                        <?php if (!empty($user->groups)): ?>
+                        <?php if (is_array($user->groups) && count($user->groups) > 0): ?>
                             <?php 
                             $groupNames = [];
                             foreach ($user->groups as $group) {

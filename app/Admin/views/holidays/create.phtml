@@ -1,0 +1,60 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<h1>Create Holiday Request</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Request Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="<?= $url->get('admin/holidays/create') ?>">
+                    <div class="form-group">
+                        <label for="user_id">User:</label>
+                        <select id="user_id" name="user_id" class="form-control" required>
+                            <option value="">Select a user...</option>
+                            <?php foreach ($users as $user): ?>
+                                <option value="<?= $user->id ?>"><?= htmlspecialchars($user->name) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="begin_date">Begin Date:</label>
+                        <input type="date" id="begin_date" name="begin_date" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="end_date">End Date:</label>
+                        <input type="date" id="end_date" name="end_date" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Create Request</button>
+                        <a href="<?= $url->get('admin/holidays') ?>" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Select the user requesting holiday time</li>
+                    <li>Choose valid begin and end dates</li>
+                    <li>End date must be after or equal to begin date</li>
+                    <li>Request will be created with "Pending" status</li>
+                    <li>Managers can grant or deny the request later</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

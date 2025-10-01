@@ -1,0 +1,71 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<h1>Access Control Management</h1>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Roles</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="text-primary"><?= $rolesCount ?></h2>
+                <p>Total Roles</p>
+                <a href="<?= $url->get('admin/access/roles') ?>" class="btn btn-primary">Manage Roles</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>Permissions</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="text-success"><?= $permissionsCount ?></h2>
+                <p>Total Permissions</p>
+                <a href="<?= $url->get('admin/access/permissions') ?>" class="btn btn-success">Manage Permissions</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>User Roles</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="text-info">👥</h2>
+                <p>Role Assignments</p>
+                <a href="<?= $url->get('admin/access/user-roles') ?>" class="btn btn-info">Manage User Roles</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-header">
+                <h5>User Permissions</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="text-warning">🔑</h2>
+                <p>Direct Permissions</p>
+                <a href="<?= $url->get('admin/access/user-permissions') ?>" class="btn btn-warning">Manage User Permissions</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h5>Quick Actions</h5>
+        </div>
+        <div class="card-body">
+            <a href="<?= $url->get('admin/access/create-role') ?>" class="btn btn-outline-primary mr-2">Create New Role</a>
+            <a href="<?= $url->get('admin/access/create-permission') ?>" class="btn btn-outline-success">Create New Permission</a>
+        </div>
+    </div>
+</div>

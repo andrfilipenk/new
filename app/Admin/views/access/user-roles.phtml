@@ -1,0 +1,54 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<h1>User Role Assignments</h1>
+
+<div class="mb-3">
+    <a href="<?= $url->get('admin/access') ?>" class="btn btn-secondary">Back to Overview</a>
+    <a href="<?= $url->get('admin/access/roles') ?>" class="btn btn-primary">Manage Roles</a>
+</div>
+
+<?php if (!empty($users)): ?>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Assigned Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $user): ?>
+                <tr>
+                    <td><?= htmlspecialchars($user->id) ?></td>
+                    <td><?= htmlspecialchars($user->name) ?></td>
+                    <td><?= htmlspecialchars($user->email) ?></td>
+                    <td>
+                        <?php if (is_array($user->roles) && count($user->roles) > 0): ?>
+                            <?php 
+                            $roleNames = [];
+                            foreach ($user->roles as $role) {
+                                $roleNames[] = '<span class="badge badge-primary">' . htmlspecialchars($role->name) . '</span>';
+                            }
+                            echo implode(' ', $roleNames);
+                            ?>
+                        <?php else: ?>
+                            <em class="text-muted">No roles assigned</em>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <a href="<?= $url->get('admin/access/manage-user-roles/' . $user->id) ?>" 
+                           class="btn btn-sm btn-info">Manage Roles</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <div class="alert alert-info">
+        <p>No users found.</p>
+    </div>
+<?php endif; ?>

@@ -20,7 +20,7 @@ $url = $this->getDI()->get('url');
                     </div>
                     <div class="card-body">
                         <h6>Members (<?= count($group->users) ?>):</h6>
-                        <?php if (!empty($group->users)): ?>
+                        <?php if (count($group->users) > 0): ?>
                             <ul class="list-unstyled">
                                 <?php foreach ($group->users as $user): ?>
                                     <li>

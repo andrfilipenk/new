@@ -83,16 +83,23 @@ class BelongsToMany extends Relation
     {
         $dictionary = [];
         foreach ($results as $result) {
-            // Extract pivot data if available
-            if (isset($result->pivot)) {
-                $pivotData     = $result->pivot;
-                $pivotKey      = $pivotData->{$this->foreignPivotKey};
-                $result->pivot = (object) $pivotData;
+            // Extract pivot data - check for pivot columns with prefix
+            $pivotKey = null;
+            if (isset($result->{'pivot_' . $this->foreignPivotKey})) {
+                $pivotKey = $result->{'pivot_' . $this->foreignPivotKey};
+            } elseif (isset($result->{$this->foreignPivotKey})) {
+                $pivotKey = $result->{$this->foreignPivotKey};
             } else {
-                $pivotKey      = $result->getData($this->foreignPivotKey);
+                // Try to get from raw data
+                $data = $result->getData();
+                $pivotKey = $data['pivot_' . $this->foreignPivotKey] ?? $data[$this->foreignPivotKey] ?? null;
             }
-            $dictionary[$pivotKey][] = $result;
+            
+            if ($pivotKey !== null) {
+                $dictionary[$pivotKey][] = $result;
+            }
         }
+        
         foreach ($models as $model) {
             $key = $model->getKey();
             if (isset($dictionary[$key])) {
@@ -272,6 +279,12 @@ class BelongsToMany extends Relation
                 return empty($this->items);
             }
         };
+    }
+
+    public function getQuery()
+    {
+        $this->addJoin();
+        return $this->query;
     }
 
     /**

@@ -1,5 +1,5 @@
 <?php
-// app/Initern/config.php
+// app/Intern/config.php
 return [
     'routes' => [
         
@@ -15,5 +15,5 @@ return [
             'action'     => 'board',
             'method'     => 'GET'
         ],
-    ]
+    ],
 ];

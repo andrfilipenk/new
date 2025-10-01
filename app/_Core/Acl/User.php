@@ -79,7 +79,7 @@ class User extends Model
     public function removeRole(string|Role $role): bool
     {
         if (is_string($role)) {
-            $roleObj = Role::where('name', $role)->first();
+            $roleObj = Role::find($role, 'name')->first();
             if (!$roleObj) {
                 return false;
             }

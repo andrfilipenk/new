@@ -65,6 +65,40 @@ class User extends \Core\Acl\User
             ->count() > 0;
     }
 
+    /**
+     * Assign ACL role to user by ID
+     */
+    public function assignRoleById($roleId)
+    {
+        // Check if role assignment already exists
+        $existing = $this->db()->table('acl_user_role')
+            ->where('user_id', $this->getKey())
+            ->where('role_id', $roleId)
+            ->first();
+            
+        if (!$existing) {
+            $this->db()->table('acl_user_role')->insert([
+                'user_id' => $this->getKey(),
+                'role_id' => $roleId,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+        return $this;
+    }
+
+    /**
+     * Remove ACL role from user by ID
+     */
+    public function removeRoleById($roleId)
+    {
+        $this->db()->table('acl_user_role')
+            ->where('user_id', $this->getKey())
+            ->where('role_id', $roleId)
+            ->delete();
+        return $this;
+    }
+
     public function createdTasks()
     {
         return $this->hasMany(Task::class, 'created_by', 'id');
