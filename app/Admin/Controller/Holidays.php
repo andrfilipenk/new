@@ -39,11 +39,20 @@ class Holidays extends Controller
         return $this->render('holidays/create', ['users' => $users]);
     }
 
+    /**
+     * Summary of loadHolidayRequest
+     * @return HolidayRequest
+     */
+    protected function loadHolidayRequest()
+    {
+        $id = $this->getDispatcher()->getParam('id');
+        return HolidayRequest::find($id);
+    }
+
     // Grant or deny request
     public function manageAction()
     {
-        $id = $this->getDispatcher()->getParam('id');
-        $request = HolidayRequest::find($id);
+        $request = $this->loadHolidayRequest();
         if (!$request) {
             $this->flashError('Holiday request not found.');
             return $this->redirect('admin/holidays');
@@ -66,8 +75,7 @@ class Holidays extends Controller
     // Delete request
     public function deleteAction()
     {
-        $id = $this->getDispatcher()->getParam('id');
-        $request = HolidayRequest::find($id);
+        $request = $this->loadHolidayRequest();
         if ($request) {
             if ($request->delete()) {
                 $this->flashSuccess('Holiday request deleted.');
