@@ -1,5 +1,4 @@
 <?php
-
 /** @var \Core\Utils\Url $url */
 $url = $this->getDI()->get('url');
 $session = $this->getDI()->get('session');
@@ -11,8 +10,102 @@ $navigation = [
     'User Management' => 'people-fill',
     'Access Control' => 'ui-checks',
     'Settings' => 'gear-fill',
-
 ];
+
+$menu = [
+    [
+        'label' => '',
+        'icon'  => '',
+        'path'  => ['', '', ''],
+    ]
+]; 
+
+class Menu
+{
+    public $items = [];
+
+    public function add($label, $icon, $module, $controller, $action = 'index', $url = null)
+    {
+        $navItem = new NavItem($label, $icon, $module, $controller, $action, $url);
+    }
+}
+
+class NavItem 
+{
+
+    public $label;
+    public $icon;
+    public $module;
+    public $controller;
+    public $action;
+    public $url;
+    public $active = false;
+    public $children = [];
+    public $root = true;
+
+    public function __construct($label, $icon, $module, $controller, $action = 'index', $url = null)
+    {
+        $this->label        = $label;
+        $this->icon         = $icon;
+        $this->module       = $module;
+        $this->controller   = $controller;
+        $this->action       = $action;
+        $this->url          = $url;
+    }
+
+    public function addChild(NavItem $navItem)
+    {
+        $navItem->root      = false;
+        $this->children[]   = $navItem;
+        return $this;
+    }
+
+    public function getChildren()
+    {
+        if (count($this->children) > 0) {
+            return $this->children;
+        }
+        return null;
+    }
+
+    public function setActive($module, $controller, $action)
+    {
+        if ($this->root) {
+            if ($module === $this->module && $controller === $this->controller) {
+                $this->active = true;
+            }
+            if ($this->getChildren()) {
+                foreach ($this->getChildren() as $navItem) {
+                    $navItem->setActive($module, $controller, $action);
+                }
+            }
+        } else {
+            if ($module === $this->module 
+            && $controller === $this->controller 
+            && $action === $this->action) {
+                $this->active = true;
+            }
+        }
+        return $this;
+    }
+
+    public function isActive()
+    {
+        if ($this->active) {
+            return true;
+        }
+        if ($this->getChildren()) {
+            foreach ($this->getChildren() as $navItem) {
+                if ($navItem->isActive()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -42,33 +135,10 @@ $navigation = [
                             </a>
                         </li>
                     <?php endforeach; ?>
-                
-                
-                
-                    <li>
-                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Dashboard">
-                            <i class="bi-speedometer2 fs-1"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Orders">
-                            <i class="bi-table fs-1"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Products">
-                            <i class="bi-heart fs-1"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="nav-link py-3 px-2" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Customers">
-                            <i class="bi-people fs-1"></i>
-                        </a>
-                    </li>
                 </ul>
                 <div class="dropdown">
                     <a href="#" class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none dropdown-toggle" id="dropdownUser3" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi-person-circle h2"></i>
+                        <i class="bi bi-person-circle h2"></i>
                     </a>
                     <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
                         <li><a class="dropdown-item" href="#">New project...</a></li>

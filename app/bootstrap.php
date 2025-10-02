@@ -23,9 +23,11 @@ $di = new \Core\Di\Container();
 
 $di->set('config', fn() => $config);
 $di->set('eventsManager', fn() => new \Core\Events\Manager);
+$di->set('validator', '\Core\Validation\Validator');
 $di->set('db', fn() => new \Core\Database\Database);
 $di->set('url', '\Core\Utils\Url');
 $di->set('view', '\Core\Mvc\View');
+
 $di->set('request', fn() => \Core\Http\Request::capture());
 $di->set('response', fn() => \Core\Http\Response::create());
 

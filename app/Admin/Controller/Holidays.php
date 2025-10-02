@@ -92,13 +92,14 @@ class Holidays extends Controller
     // User's own requests
     public function myrequestsAction()
     {
-        // For demo purposes, we'll use user ID 1
-        // In real implementation, get from session/authentication
-        $userId = 1;
+        $user_id = $this->getSession()->get('user')['id'] ?? null;
+        if ($user_id) {
+            $this->flashError('Please log in.');
+            return $this->redirect('login');
+        }
         $requests = HolidayRequest::query()
-            ->where('user_id', $userId)
+            ->where('user_id', $user_id)
             ->get();
-        
         $userRequests = array_map([HolidayRequest::class, 'newFromBuilder'], $requests);
         return $this->render('holidays/my-requests', ['requests' => $userRequests]);
     }

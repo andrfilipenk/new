@@ -17,6 +17,20 @@ class Controller
 
     public function beforeExecute() {}
     public function afterExecute() {}
+
+    /**
+     * Check csrf token
+     *
+     * @return bool
+     */
+    protected function validateCsrfToken()
+    {
+        if ($this->isPost()) {
+            $token = $this->getRequest()->post('_token');
+            return ($this->getSession()->get('csrf_token') === $token);
+        }
+        return true;
+    }
     
     /**
      * Returns view instance
@@ -26,6 +40,16 @@ class Controller
     public function getView()
     {
         return $this->getDI()->get('\Core\Mvc\View');
+    }
+
+    /**
+     * Returns validator instance
+     *
+     * @return \Core\Validation\Validator
+     */
+    public function getValidator()
+    {
+        return $this->getDI()->get('\Core\Validation\Validator');
     }
 
     /**

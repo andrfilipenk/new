@@ -1,0 +1,90 @@
+<!-- app/Admin/views/performance/index.phtml -->
+<?php
+/** @var \Core\Mvc\View $this */
+$sortBy = $this->get('sort_by', 'created_at');
+$sortOrder = $this->get('sort_order', 'desc');
+$startDate = $this->get('start_date', '');
+$endDate = $this->get('end_date', '');
+$nextOrder = $sortOrder === 'asc' ? 'desc' : 'asc';
+?>
+<h1>Performance Metrics</h1>
+<form method="get" action="<?php echo $this->url()->get('admin/performance'); ?>">
+    <label>
+        Start Date:
+        <input type="date" name="start_date" value="<?php echo htmlspecialchars($startDate); ?>">
+    </label>
+    <label>
+        End Date:
+        <input type="date" name="end_date" value="<?php echo htmlspecialchars($endDate); ?>">
+    </label>
+    <button type="submit">Filter</button>
+    <button type="submit" formaction="<?php echo $this->url()->get('admin/performance/export', [
+        'sort_by' => $sortBy,
+        'sort_order' => $sortOrder,
+        'start_date' => $startDate,
+        'end_date' => $endDate
+    ]); ?>">Export CSV</button>
+    <button type="submit" formaction="<?php echo $this->url()->get('admin/performance/pdf', [
+        'sort_by' => $sortBy,
+        'sort_order' => $sortOrder,
+        'start_date' => $startDate,
+        'end_date' => $endDate
+    ]); ?>">Export PDF</button>
+</form>
+<table>
+    <thead>
+        <tr>
+            <th>
+                <a href="<?php echo $this->url()->get('admin/performance', [
+                    'sort_by' => 'user_name',
+                    'sort_order' => $sortBy === 'user_name' ? $nextOrder : 'asc',
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]); ?>">User <?php echo $sortBy === 'user_name' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+            </th>
+            <th>
+                <a href="<?php echo $this->url()->get('admin/performance', [
+                    'sort_by' => 'action',
+                    'sort_order' => $sortBy === 'action' ? $nextOrder : 'asc',
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]); ?>">Action <?php echo $sortBy === 'action' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+            </th>
+            <th>
+                <a href="<?php echo $this->url()->get('admin/performance', [
+                    'sort_by' => 'execution_time',
+                    'sort_order' => $sortBy === 'execution_time' ? $nextOrder : 'asc',
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]); ?>">Execution Time (s) <?php echo $sortBy === 'execution_time' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+            </th>
+            <th>
+                <a href="<?php echo $this->url()->get('admin/performance', [
+                    'sort_by' => 'memory_usage',
+                    'sort_order' => $sortBy === 'memory_usage' ? $nextOrder : 'asc',
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]); ?>">Memory Usage (MB) <?php echo $sortBy === 'memory_usage' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+            </th>
+            <th>
+                <a href="<?php echo $this->url()->get('admin/performance', [
+                    'sort_by' => 'created_at',
+                    'sort_order' => $sortBy === 'created_at' ? $nextOrder : 'asc',
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]); ?>">Timestamp <?php echo $sortBy === 'created_at' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($metrics as $metric): ?>
+            <tr>
+                <td><?php echo $metric->user_name ? htmlspecialchars($metric->user_name) : 'System'; ?></td>
+                <td><?php echo htmlspecialchars($metric->action); ?></td>
+                <td><?php echo number_format($metric->execution_time, 4); ?></td>
+                <td><?php echo number_format($metric->memory_usage / 1024 / 1024, 2); ?></td>
+                <td><?php echo $metric->created_at; ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

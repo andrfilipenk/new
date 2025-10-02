@@ -22,12 +22,12 @@ class User extends Model
         return parent::save();
     }
 
-    public function verifyPassword(string $password): bool
+    public function verifyPassword(string $password)
     {
         return password_verify($password, $this->attributes['password']);
     }
 
-    protected function isDirty(string $attribute): bool
+    protected function isDirty(string $attribute)
     {
         return !isset($this->original[$attribute]) || 
                $this->attributes[$attribute] !== $this->original[$attribute];
@@ -63,7 +63,7 @@ class User extends Model
     public function assignRole(string|Role $role): bool
     {
         if (is_string($role)) {
-            $roleObj = Role::find($role, 'name')->first();
+            $roleObj = Role::find($role, 'name');
             if (!$roleObj) {
                 return false;
             }
@@ -79,7 +79,7 @@ class User extends Model
     public function removeRole(string|Role $role): bool
     {
         if (is_string($role)) {
-            $roleObj = Role::find($role, 'name')->first();
+            $roleObj = Role::find($role, 'name');
             if (!$roleObj) {
                 return false;
             }

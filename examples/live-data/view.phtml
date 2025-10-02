@@ -1,0 +1,235 @@
+<!-- app/Admin/views/performance/index.phtml -->
+<?php
+/** @var \Core\Mvc\View $this */
+$sortBy = $this->get('sort_by', 'created_at');
+$sortOrder = $this->get('sort_order', 'desc');
+$startDate = $this->get('start_date', '');
+$endDate = $this->get('end_date', '');
+$nextOrder = $sortOrder === 'asc' ? 'desc' : 'asc';
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Performance Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .dashboard { max-width: 1200px; margin: 0 auto; }
+        .filters { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .filters label { display: flex; align-items: center; gap: 5px; }
+        .filters input, .filters button { padding: 5px; }
+        .charts { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; }
+        .chart-container { flex: 1; min-width: 300px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th a { text-decoration: none; color: #333; }
+        th a:hover { text-decoration: underline; }
+        .new-row { background-color: #e0ffe0; transition: background-color 2s; }
+        @media (max-width: 600px) {
+            table, th, td { font-size: 14px; }
+            .filters { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <h1>Performance Dashboard</h1>
+        <form method="get" action="<?php echo $this->url()->get('admin/performance'); ?>" id="filter-form">
+            <div class="filters">
+                <label>
+                    Start Date:
+                    <input type="date" name="start_date" value="<?php echo htmlspecialchars($startDate); ?>">
+                </label>
+                <label>
+                    End Date:
+                    <input type="date" name="end_date" value="<?php echo htmlspecialchars($endDate); ?>">
+                </label>
+                <button type="submit">Filter</button>
+                <button type="submit" formaction="<?php echo $this->url()->get('admin/performance/export', [
+                    'sort_by' => $sortBy,
+                    'sort_order' => $sortOrder,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]); ?>">Export CSV</button>
+                <button type="submit" formaction="<?php echo $this->url()->get('admin/performance/pdf', [
+                    'sort_by' => $sortBy,
+                    'sort_order' => $sortOrder,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate
+                ]); ?>">Export PDF</button>
+            </div>
+        </form>
+        <div class="charts">
+            <div class="chart-container">
+                <h3>Average Execution Time per Action</h3>
+                <canvas id="execution-time-chart" width="400" height="200"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Average Memory Usage per Action</h3>
+                <canvas id="memory-usage-chart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <table id="metrics-table">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="<?php echo $this->url()->get('admin/performance', [
+                            'sort_by' => 'user_name',
+                            'sort_order' => $sortBy === 'user_name' ? $nextOrder : 'asc',
+                            'start_date' => $startDate,
+                            'end_date' => $endDate
+                        ]); ?>">User <?php echo $sortBy === 'user_name' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+                    </th>
+                    <th>
+                        <a href="<?php echo $this->url()->get('admin/performance', [
+                            'sort_by' => 'action',
+                            'sort_order' => $sortBy === 'action' ? $nextOrder : 'asc',
+                            'start_date' => $startDate,
+                            'end_date' => $endDate
+                        ]); ?>">Action <?php echo $sortBy === 'action' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+                    </th>
+                    <th>
+                        <a href="<?php echo $this->url()->get('admin/performance', [
+                            'sort_by' => 'execution_time',
+                            'sort_order' => $sortBy === 'execution_time' ? $nextOrder : 'asc',
+                            'start_date' => $startDate,
+                            'end_date' => $endDate
+                        ]); ?>">Execution Time (s) <?php echo $sortBy === 'execution_time' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+                    </th>
+                    <th>
+                        <a href="<?php echo $this->url()->get('admin/performance', [
+                            'sort_by' => 'memory_usage',
+                            'sort_order' => $sortBy === 'memory_usage' ? $nextOrder : 'asc',
+                            'start_date' => $startDate,
+                            'end_date' => $endDate
+                        ]); ?>">Memory Usage (MB) <?php echo $sortBy === 'memory_usage' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+                    </th>
+                    <th>
+                        <a href="<?php echo $this->url()->get('admin/performance', [
+                            'sort_by' => 'created_at',
+                            'sort_order' => $sortBy === 'created_at' ? $nextOrder : 'asc',
+                            'start_date' => $startDate,
+                            'end_date' => $endDate
+                        ]); ?>">Timestamp <?php echo $sortBy === 'created_at' ? ($sortOrder === 'asc' ? '↑' : '↓') : ''; ?></a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="metrics-body">
+                <?php foreach ($metrics as $metric): ?>
+                    <tr>
+                        <td><?php echo $metric->user_name ? htmlspecialchars($metric->user_name) : 'System'; ?></td>
+                        <td><?php echo htmlspecialchars($metric->action); ?></td>
+                        <td><?php echo number_format($metric->execution_time, 4); ?></td>
+                        <td><?php echo number_format($metric->memory_usage / 1024 / 1024, 2); ?></td>
+                        <td><?php echo $metric->created_at; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        function drawBarChart(canvasId, data, xLabel, yLabel) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const chartWidth = canvas.width - 60;
+            const chartHeight = canvas.height - 60;
+            const barWidth = chartWidth / (data.length * 2);
+            const maxValue = Math.max(...data.map(item => parseFloat(item.value))) || 1;
+
+            // Draw axes
+            ctx.beginPath();
+            ctx.moveTo(40, 20);
+            ctx.lineTo(40, chartHeight + 20);
+            ctx.lineTo(chartWidth + 40, chartHeight + 20);
+            ctx.stroke();
+            ctx.font = '12px Arial';
+            ctx.fillText(yLabel, 10, 20);
+            ctx.fillText(xLabel, chartWidth, chartHeight + 40);
+
+            // Draw bars
+            data.forEach((item, i) => {
+                const barHeight = (item.value / maxValue) * chartHeight;
+                ctx.fillStyle = '#666';
+                ctx.fillRect(40 + i * barWidth * 2, chartHeight + 20 - barHeight, barWidth, barHeight);
+                ctx.fillStyle = '#000';
+                ctx.fillText(item.label.substring(0, 10), 40 + i * barWidth * 2, chartHeight + 35);
+            });
+        }
+
+        function fetchChartData() {
+            const form = document.getElementById('filter-form');
+            const startDate = form.querySelector('input[name="start_date"]').value;
+            const endDate = form.querySelector('input[name="end_date"]').value;
+            fetch('<?php echo $this->url()->get('admin/performance/chart-data'); ?>?start_date=' + encodeURIComponent(startDate) + '&end_date=' + encodeURIComponent(endDate))
+                .then(response => response.json())
+                .then(data => {
+                    drawBarChart('execution-time-chart', data.execution_time, 'Action', 'Time (s)');
+                    drawBarChart('memory-usage-chart', data.memory_usage, 'Action', 'Memory (MB)');
+                });
+        }
+
+        // WebSocket for real-time metrics
+        let lastTimestamp = '<?php echo end($metrics)->created_at ?? date('Y-m-d H:i:s'); ?>';
+        let ws = new WebSocket('ws://localhost:8080');
+        ws.onopen = function() {
+            ws.send(JSON.stringify({ last_timestamp: lastTimestamp }));
+        };
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            lastTimestamp = data.last_timestamp;
+            const tbody = document.getElementById('metrics-body');
+
+            // Append new metrics
+            data.metrics.forEach(metric => {
+                const form = document.getElementById('filter-form');
+                const startDate = form.querySelector('input[name="start_date"]').value;
+                const endDate = form.querySelector('input[name="end_date"]').value;
+
+                // Apply date filter client-side
+                if ((startDate && metric.created_at < startDate + ' 00:00:00') ||
+                    (endDate && metric.created_at > endDate + ' 23:59:59')) {
+                    return;
+                }
+
+                const row = document.createElement('tr');
+                row.className = 'new-row';
+                row.innerHTML = `
+                    <td>${metric.user_name}</td>
+                    <td>${metric.action}</td>
+                    <td>${metric.execution_time}</td>
+                    <td>${metric.memory_usage}</td>
+                    <td>${metric.created_at}</td>
+                `;
+                tbody.insertBefore(row, tbody.firstChild); // Add at top
+                setTimeout(() => row.className = '', 2000); // Remove highlight after 2s
+            });
+
+            // Update charts
+            fetchChartData();
+        };
+        ws.onclose = function() {
+            setTimeout(() => {
+                ws = new WebSocket('ws://localhost:8080');
+                ws.onopen = function() {
+                    ws.send(JSON.stringify({ last_timestamp: lastTimestamp }));
+                };
+                ws.onmessage = ws.onmessage;
+            }, 1000);
+        };
+
+        // Update charts and table on filter change
+        document.getElementById('filter-form').addEventListener('submit', (e) => {
+            if (e.submitter.formAction.includes('export') || e.submitter.formAction.includes('pdf')) return;
+            e.preventDefault();
+            fetchChartData();
+            window.location.href = e.target.action + '?' + new URLSearchParams(new FormData(e.target)).toString();
+            ws.close();
+        });
+
+        // Initial chart load
+        fetchChartData();
+    </script>
+</body>
+</html>
