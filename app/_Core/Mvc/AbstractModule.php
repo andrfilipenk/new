@@ -43,4 +43,16 @@ abstract class AbstractModule implements ModuleInterface
         $this->fireEvent('module.afterInitialize', $this);
         return $this;
     }
+    
+    /**
+     * Called after module is bootstrapped
+     * Override in child classes to register events, services, etc.
+     * 
+     * @param \Core\Di\Interface\Container $di
+     * @return void
+     */
+    public function afterBootstrap($di)
+    {
+        // Override in child classes
+    }
 }

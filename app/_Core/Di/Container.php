@@ -70,7 +70,7 @@ class Container implements ContainerInterface
 
     public function has(string $id): bool
     {
-        return isset($this->definitions[$id]) || isset($this->instances[$id]) || $this->isResolvable($id);
+        return isset($this->definitions[$id]) || isset($this->factories[$id]) || isset($this->instances[$id]) || $this->isResolvable($id);
     }
 
     protected function isResolvable($abstract): bool

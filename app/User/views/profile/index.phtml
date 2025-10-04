@@ -1,0 +1,67 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">My Profile</h4>
+                    <div>
+                        <a href="<?= $url->get('user/profile/edit') ?>" class="btn btn-primary btn-sm">Edit Profile</a>
+                        <a href="<?= $url->get('user/profile/password') ?>" class="btn btn-warning btn-sm">Change Password</a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Name:</strong></div>
+                        <div class="col-sm-9"><?= htmlspecialchars($user->name) ?></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Email:</strong></div>
+                        <div class="col-sm-9"><?= htmlspecialchars($user->email) ?></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>User ID:</strong></div>
+                        <div class="col-sm-9"><?= htmlspecialchars($user->custom_id) ?></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Account Created:</strong></div>
+                        <div class="col-sm-9"><?= isset($user->created_at) ? date('F j, Y', strtotime($user->created_at)) : 'N/A' ?></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">My Groups</h5>
+                </div>
+                <div class="card-body">
+                    <?php if (is_array($userGroups) && count($userGroups) > 0): ?>
+                        <?php foreach ($userGroups as $group): ?>
+                            <span class="badge badge-primary mr-1 mb-1"><?= htmlspecialchars($group->name) ?></span>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted">You are not assigned to any groups.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="<?= $url->get('user/profile/edit') ?>" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                        <a href="<?= $url->get('user/profile/password') ?>" class="btn btn-outline-warning btn-sm">Change Password</a>
+                        <a href="<?= $url->get('logout') ?>" class="btn btn-outline-danger btn-sm">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

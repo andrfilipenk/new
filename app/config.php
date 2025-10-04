@@ -9,6 +9,7 @@ return [
         'hash_algo'         => PASSWORD_BCRYPT,
         'module' => [
             'Base',
+            'User',
             'Admin',
             'Intern',
             'Crm'
@@ -86,23 +87,4 @@ return [
             'action'     => 'denied',
         ]
     ],
-
-    
-    
-    'modules' => [
-        'base' => [
-            'routes' => [
-                
-            ],
-            'services' => [
-                #'baseService' => 'Module\Base\Service\BaseService'
-            ]
-        ],
-        'admin' => [
-            
-            'services' => [
-                #'myappService' => 'Module\Myapp\Service\MyappService'
-            ]
-        ]
-    ]
 ];

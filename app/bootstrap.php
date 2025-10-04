@@ -13,16 +13,14 @@ spl_autoload_register(function ($class) {
             return true;
         }
     }
-    
     return false;
 });
 
 // Load configuration
 $config = require APP_PATH . 'config.php';
 $di = new \Core\Di\Container();
-
 $di->set('config', fn() => $config);
-$di->set('eventsManager', fn() => new \Core\Events\Manager);
+$di->set('eventsManager', '\Core\Events\Manager');
 $di->set('validator', '\Core\Validation\Validator');
 $di->set('db', fn() => new \Core\Database\Database);
 $di->set('url', '\Core\Utils\Url');
@@ -33,8 +31,8 @@ $di->set('response', fn() => \Core\Http\Response::create());
 
 #$di->register(new \Module\Base\Provider\CookieServiceProvider);
 #$di->register(new \Module\Base\Provider\RouterServiceProvider);
-#$di->register(new \Module\Base\Provider\NavigationServiceProvider);
+#$di->register(new \Base\Provider\NavigationServiceProvider);
 #$di->register(new \Module\Base\Provider\AclServiceProvider);
 
 $di->set('migrationRepository', fn() => new \Core\Database\MigrationRepository);
-$di->set('migrator', concrete: fn() => new \Core\Database\Migrator);
+$di->set('migrator', fn() => new \Core\Database\Migrator);

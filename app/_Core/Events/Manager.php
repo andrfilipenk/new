@@ -2,10 +2,13 @@
 // app/_Core/Events/Manager.php
 namespace Core\Events;
 
+use Core\Di\Injectable;
 use InvalidArgumentException;
 
 class Manager
 {
+    use Injectable;
+    
     protected $listeners = [];
     protected $sorted = [];
 

@@ -9,11 +9,5 @@ return [
             'action'     => 'list',
             'method'     => 'GET'
         ],
-        '/taskboard' => [
-            'module'     => 'Intern',
-            'controller' => 'Task',
-            'action'     => 'board',
-            'method'     => 'GET'
-        ],
     ],
 ];

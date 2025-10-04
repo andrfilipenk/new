@@ -1,0 +1,57 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<h1>User Management</h1>
+
+<div class="mb-3">
+    <a href="<?= $url->get('user/create') ?>" class="btn btn-primary">Add User</a>
+    <a href="<?= $url->get('user/groups') ?>" class="btn btn-secondary">Manage Groups</a>
+</div>
+
+<?php if (!empty($users)): ?>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Groups</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($users as $user): ?>
+                <tr>
+                    <td><?= htmlspecialchars($user->id) ?></td>
+                    <td><?= htmlspecialchars($user->name) ?></td>
+                    <td><?= htmlspecialchars($user->email) ?></td>
+                    <td>
+                        <?php if (is_array($user->groups) && count($user->groups) > 0): ?>
+                            <?php 
+                            $groupNames = [];
+                            foreach ($user->groups as $group) {
+                                $groupNames[] = htmlspecialchars($group->name);
+                            }
+                            echo implode(', ', $groupNames);
+                            ?>
+                        <?php else: ?>
+                            <em>No groups</em>
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <a href="<?= $url->get('user/view/' . $user->id) ?>" class="btn btn-sm btn-info">View</a>
+                        <a href="<?= $url->get('user/edit/' . $user->id) ?>" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="<?= $url->get('user/delete/' . $user->id) ?>" 
+                           class="btn btn-sm btn-danger" 
+                           onclick="return confirm('Delete user and remove from all groups?')">Delete</a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <div class="alert alert-info">
+        <p>No users found.</p>
+    </div>
+<?php endif; ?>

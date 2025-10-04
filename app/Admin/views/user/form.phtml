@@ -1,9 +1,0 @@
-<?php 
-/** @var \Core\Utils\Url $url */
-$url = $this->getDI()->get('url'); 
-?>
-<h1><?= isset($user) ? 'Edit User' : 'Create User' ?></h1>
-<?php if (isset($form)): ?>
-    <?= $form ?>
-<?php endif; ?>
-<a href="<?= $url->get('admin/user') ?>">Back to User List</a>
