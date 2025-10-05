@@ -8,7 +8,7 @@
 - [StoppableEventInterface.php](file://app/Core/Events/StoppableEventInterface.php)
 - [EventInterface.php](file://app/Core/Events/EventInterface.php)
 - [events-usage.php](file://examples/events-usage.php)
-- [Application.php](file://app/Core/Mvc/Application.php)
+- [.php](file://app/Core/Mvc/.php)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php)
 </cite>
 
@@ -218,11 +218,11 @@ L --> M[Error Response]
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 
 ### Practical Implementation Examples

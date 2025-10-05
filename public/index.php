@@ -1,8 +1,8 @@
 <?php
 date_default_timezone_set('Europe/Berlin');
 /** 
- * @var \Core\Mvc\Application $app 
+ * @var \Core\Mvc\App $app 
 */
 require '../app/bootstrap.php';
-$app        = $di->get('\Core\Mvc\Application');
+$app        = $di->get('\Core\Mvc\App');
 $app->run();

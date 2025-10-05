@@ -75,7 +75,7 @@ class Router
     {
         $uri = trim($uri, '/');
         foreach ($this->routes as $route) {
-            $this->fireEvent('router.matchRoute', $route);
+            $this->fireEvent('router.checkRoute', $route);
             if (!$route->isMethod($method)) {
                 continue;
             }

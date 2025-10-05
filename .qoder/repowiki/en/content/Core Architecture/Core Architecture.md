@@ -3,7 +3,7 @@
 <cite>
 **Referenced Files in This Document**   
 - [bootstrap.php](file://app/bootstrap.php)
-- [Application.php](file://app/Core/Mvc/Application.php)
+- [.php](file://app/Core/Mvc/.php)
 - [Router.php](file://app/Core/Mvc/Router.php)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php)
 - [View.php](file://app/Core/Mvc/View.php)
@@ -26,11 +26,11 @@
 8. [Conclusion](#conclusion)
 
 ## Introduction
-This document provides a comprehensive architectural overview of the core components of the framework. It details the Model-View-Controller (MVC) pattern, the Dependency Injection (DI) container, and the Event system. The framework is designed to be lightweight, modular, and extensible, with a focus on performance and developer experience. The central coordinator, Application, orchestrates the request lifecycle through Router, Dispatcher, and View components, all managed via the DI container. The Event system enables extensibility through lifecycle hooks such as 'application:beforeHandle' and 'core:beforeDispatch'.
+This document provides a comprehensive architectural overview of the core components of the framework. It details the Model-View-Controller (MVC) pattern, the Dependency Injection (DI) container, and the Event system. The framework is designed to be lightweight, modular, and extensible, with a focus on performance and developer experience. The central coordinator, , orchestrates the request lifecycle through Router, Dispatcher, and View components, all managed via the DI container. The Event system enables extensibility through lifecycle hooks such as 'application:beforeHandle' and 'core:beforeDispatch'.
 
 ## MVC Architecture
 
-The framework implements a clean separation of concerns using the MVC pattern. The **Application** class acts as the central coordinator, receiving HTTP requests and delegating processing to the **Router**, **Dispatcher**, and **View** components.
+The framework implements a clean separation of concerns using the MVC pattern. The **** class acts as the central coordinator, receiving HTTP requests and delegating processing to the **Router**, **Dispatcher**, and **View** components.
 
 - **Router**: Matches incoming requests to route configurations based on URI and HTTP method.
 - **Dispatcher**: Instantiates controllers and invokes the appropriate action method.
@@ -40,7 +40,7 @@ These components are loosely coupled and communicate through the DI container, e
 
 ```mermaid
 classDiagram
-class Application {
+class  {
 +handle(Request) Response
 -di : ContainerInterface
 }
@@ -62,22 +62,22 @@ class View {
 -layout : string
 -vars : array
 }
-Application --> Router : "uses"
-Application --> Dispatcher : "uses"
-Application --> View : "via DI"
+ --> Router : "uses"
+ --> Dispatcher : "uses"
+ --> View : "via DI"
 Dispatcher --> View : "controller may use"
-Router --> Application : "returns match"
-Dispatcher --> Application : "returns response"
+Router -->  : "returns match"
+Dispatcher -->  : "returns response"
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L1-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 - [View.php](file://app/Core/Mvc/View.php#L1-L144)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L1-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 - [View.php](file://app/Core/Mvc/View.php#L1-L144)
@@ -183,7 +183,7 @@ class EventAware {
 }
 Manager --> Event : "creates and dispatches"
 EventAware --> Manager : "delegates fireEvent"
-Application --> EventAware : "uses trait"
+ --> EventAware : "uses trait"
 Dispatcher --> EventAware : "uses trait"
 View --> EventAware : "uses trait"
 ```
@@ -192,7 +192,7 @@ View --> EventAware : "uses trait"
 - [Manager.php](file://app/Core/Events/Manager.php#L1-L102)
 - [Event.php](file://app/Core/Events/Event.php)
 - [EventAware.php](file://app/Core/Events/EventAware.php)
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 - [View.php](file://app/Core/Mvc/View.php#L1-L144)
 
@@ -205,7 +205,7 @@ View --> EventAware : "uses trait"
 The **bootstrap.php** file serves as the entry point for the application, configuring the DI container with all core and module-specific services. It defines constants, registers the autoloader, loads configuration, and sets up the container.
 
 Key service registrations:
-- **config**: Application configuration array.
+- **config**:  configuration array.
 - **request**: HTTP request object.
 - **router**: Configured with routes from the configuration.
 - **dispatcher**: Handles controller instantiation.
@@ -220,24 +220,24 @@ Service providers (e.g., `SessionServiceProvider`) encapsulate the registration 
 
 ## Request Handling Sequence
 
-The request handling process follows a well-defined sequence, coordinated by the Application and enhanced by events and DI.
+The request handling process follows a well-defined sequence, coordinated by the  and enhanced by events and DI.
 
 ```mermaid
 sequenceDiagram
 participant Client
-participant Application
+participant 
 participant EventsManager
 participant Router
 participant Dispatcher
 participant Controller
 participant View
 participant Response
-Client->>Application : HTTP Request
-Application->>EventsManager : trigger('application : beforeHandle')
-Application->>Router : match(uri, method)
+Client->> : HTTP Request
+->>EventsManager : trigger('application : beforeHandle')
+->>Router : match(uri, method)
 alt Route Found
-Router-->>Application : route config
-Application->>Dispatcher : dispatch(route, request)
+Router-->> : route config
+->>Dispatcher : dispatch(route, request)
 Dispatcher->>EventsManager : trigger('core : beforeDispatch')
 Dispatcher->>Dispatcher : getDI()->get(controllerClass)
 Dispatcher->>Controller : initialize()
@@ -251,29 +251,29 @@ else returns string
 Dispatcher->>Response : new Response(content)
 end
 Dispatcher->>Controller : afterExecute()
-Dispatcher-->>Application : Response
-Application->>EventsManager : trigger('application : afterHandle')
+Dispatcher-->> : Response
+->>EventsManager : trigger('application : afterHandle')
 else Route Not Found
-Application->>EventsManager : trigger('application : beforeNotFound')
-Application->>Response : error('Not Found')
+->>EventsManager : trigger('application : beforeNotFound')
+->>Response : error('Not Found')
 end
 alt Exception Thrown
-Application->>EventsManager : trigger('application : onException')
-Application->>Response : error('Internal Server Error')
+->>EventsManager : trigger('application : onException')
+->>Response : error('Internal Server Error')
 end
-Application->>Response : modify content (URL replacement)
+->>Response : modify content (URL replacement)
 Response-->>Client : HTTP Response
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L1-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 - [View.php](file://app/Core/Mvc/View.php#L1-L144)
 - [Response.php](file://app/Core/Http/Response.php#L1-L137)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 
 ## Architectural Trade-offs and Scalability
@@ -288,7 +288,7 @@ The framework makes several architectural trade-offs to achieve its lightweight 
 The modular design via service providers and event listeners allows for incremental complexity, making it suitable for both small applications and larger systems with proper architectural discipline.
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Container.php](file://app/Core/Di/Container.php#L1-L144)
 - [Manager.php](file://app/Core/Events/Manager.php#L1-L102)
 

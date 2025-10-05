@@ -6,7 +6,7 @@
 - [Response.php](file://app/Core/Http/Response.php)
 - [UploadedFile.php](file://app/Core/Http/UploadedFile.php)
 - [http-req-res.php](file://examples/http-req-res.php)
-- [Application.php](file://app/Core/Mvc/Application.php)
+- [.php](file://app/Core/Mvc/.php)
 - [Controller.php](file://app/Core/Mvc/Controller.php)
 </cite>
 
@@ -118,7 +118,7 @@ The `Request::file($key)` method returns an `UploadedFile` instance or null if n
 - `getSize()` - returns file size in bytes
 
 ### Validation and Storage Patterns
-Applications should always validate file properties before moving them to permanent storage. The `moveTo()` method throws a `RuntimeException` if the upload was not successful, enforcing error checking.
+s should always validate file properties before moving them to permanent storage. The `moveTo()` method throws a `RuntimeException` if the upload was not successful, enforcing error checking.
 
 ```mermaid
 sequenceDiagram
@@ -152,8 +152,8 @@ end
 
 The Request and Response objects are tightly integrated into the MVC architecture through dependency injection and the application lifecycle.
 
-### Application-Level Handling
-The `Application::handle()` method receives a `Request` object and returns a `Response`. It orchestrates routing, dispatching, and exception handling, ensuring all responses pass through a consistent pipeline.
+### -Level Handling
+The `::handle()` method receives a `Request` object and returns a `Response`. It orchestrates routing, dispatching, and exception handling, ensuring all responses pass through a consistent pipeline.
 
 ### Controller Access
 Controllers inherit helper methods from the base `Controller` class:
@@ -168,30 +168,30 @@ These methods abstract the DI container lookup, providing convenient access to H
 ```mermaid
 sequenceDiagram
 participant Client
-participant Application
+participant 
 participant Router
 participant Dispatcher
 participant Controller
 participant Response
-Client->>Application : HTTP Request
-Application->>Router : Match route
-Router-->>Application : Route
-Application->>Dispatcher : Dispatch
+Client->> : HTTP Request
+->>Router : Match route
+Router-->> : Route
+->>Dispatcher : Dispatch
 Dispatcher->>Controller : Execute action
 Controller->>Request : Get input
 Controller->>Response : Build response
 Response-->>Dispatcher : Return
-Dispatcher-->>Application : Return
-Application->>Response : Send
+Dispatcher-->> : Return
+->>Response : Send
 Response-->>Client : HTTP Response
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Controller.php](file://app/Core/Mvc/Controller.php#L1-L124)
 
 ## Security Considerations
@@ -228,7 +228,7 @@ The `withCookie()` method supports secure cookie attributes:
 PHP's `upload_max_filesize` and `post_max_size` limits must be configured appropriately. The `UploadedFile::isValid()` method will return false for files exceeding these limits (error code `UPLOAD_ERR_INI_SIZE` or `UPLOAD_ERR_FORM_SIZE`).
 
 ### JSON Parsing Errors
-When `Content-Type` is `application/json`, the framework attempts to parse the body. Malformed JSON results in an empty array. Applications should validate the presence and structure of expected data.
+When `Content-Type` is `application/json`, the framework attempts to parse the body. Malformed JSON results in an empty array. s should validate the presence and structure of expected data.
 
 ### Response Buffering Problems
 The `send()` method uses `echo` to output content. If PHP output buffering is enabled, responses may be delayed. Ensure `output_buffering` is configured correctly in `php.ini`.

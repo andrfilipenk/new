@@ -1,9 +1,9 @@
-# Application Initialization Example
+#  Initialization Example
 
 <cite>
 **Referenced Files in This Document**   
 - [usign-app.php](file://examples/usign-app.php)
-- [Application.php](file://app/Core/Mvc/Application.php)
+- [.php](file://app/Core/Mvc/.php)
 - [bootstrap.php](file://app/bootstrap.php)
 - [index.php](file://public/index.php)
 - [Router.php](file://app/Core/Mvc/Router.php)
@@ -14,16 +14,16 @@
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Project Structure Overview](#project-structure-overview)
-3. [Manual Application Bootstrapping](#manual-application-bootstrapping)
+3. [Manual  Bootstrapping](#manual-application-bootstrapping)
 4. [Routing Configuration and Dispatching](#routing-configuration-and-dispatching)
 5. [Custom Entry Points and CLI Integration](#custom-entry-points-and-cli-integration)
-6. [Advanced Use Cases: Microservices and Embedded Applications](#advanced-use-cases-microservices-and-embedded-applications)
+6. [Advanced Use Cases: Microservices and Embedded s](#advanced-use-cases-microservices-and-embedded-applications)
 7. [Common Configuration Mistakes](#common-configuration-mistakes)
 8. [Lifecycle Management and Event Hooks](#lifecycle-management-and-event-hooks)
 9. [Conclusion](#conclusion)
 
 ## Introduction
-This document provides a comprehensive guide to initializing and using the application framework through manual bootstrapping. It focuses on the `Application` class, routing setup, and request handling outside the standard `public/index.php` entry point. The example in `usign-app.php` demonstrates how to instantiate the application programmatically, configure modules, and dispatch requests directly. This approach enables advanced use cases such as CLI tools, microservices, and embedded applications.
+This document provides a comprehensive guide to initializing and using the application framework through manual bootstrapping. It focuses on the `` class, routing setup, and request handling outside the standard `public/index.php` entry point. The example in `usign-app.php` demonstrates how to instantiate the application programmatically, configure modules, and dispatch requests directly. This approach enables advanced use cases such as CLI tools, microservices, and embedded applications.
 
 **Section sources**
 - [usign-app.php](file://examples/usign-app.php#L0-L144)
@@ -34,7 +34,7 @@ The project follows a modular architecture with clear separation of concerns. Th
 ```mermaid
 graph TB
 subgraph "Core Framework"
-A[Application]
+A[]
 B[Router]
 C[Dispatcher]
 D[Container]
@@ -58,21 +58,21 @@ H --> A
 
 **Diagram sources**
 - [bootstrap.php](file://app/bootstrap.php#L0-L56)
-- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [.php](file://app/Core/Mvc/.php#L0-L70)
 - [usign-app.php](file://examples/usign-app.php#L0-L144)
 
-## Manual Application Bootstrapping
-The `usign-app.php` example demonstrates how to manually instantiate the `Application` class and configure it without relying on the default bootstrap process. This involves creating a dependency injection container, registering core services, loading configuration, and setting up the application instance directly.
+## Manual  Bootstrapping
+The `usign-app.php` example demonstrates how to manually instantiate the `` class and configure it without relying on the default bootstrap process. This involves creating a dependency injection container, registering core services, loading configuration, and setting up the application instance directly.
 
-The `Application` constructor accepts a `ContainerInterface` instance, which is used to manage all framework services. During initialization, the application registers itself in the DI container under the 'application' key, enabling access throughout the system.
+The `` constructor accepts a `ContainerInterface` instance, which is used to manage all framework services. During initialization, the application registers itself in the DI container under the 'application' key, enabling access throughout the system.
 
 ```mermaid
 sequenceDiagram
 participant User as "Developer"
-participant App as "Application"
+participant App as ""
 participant DI as "DI Container"
 participant Config as "config.php"
-User->>App : new Application($di)
+User->>App : new ($di)
 App->>DI : set('application', $this)
 User->>Config : require APP_PATH . 'config.php'
 Config-->>User : return config array
@@ -80,19 +80,19 @@ User->>App : registerModules($config['modules'])
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L9-L20)
+- [.php](file://app/Core/Mvc/.php#L9-L20)
 - [bootstrap.php](file://app/bootstrap.php#L25-L30)
 - [usign-app.php](file://examples/usign-app.php#L50-L55)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L9-L20)
+- [.php](file://app/Core/Mvc/.php#L9-L20)
 - [bootstrap.php](file://app/bootstrap.php#L25-L30)
 - [usign-app.php](file://examples/usign-app.php#L50-L55)
 
 ## Routing Configuration and Dispatching
 The framework's routing system is configured through the DI container in `bootstrap.php`, where the `router` service is defined with route patterns from the configuration. The `Router` class converts URL patterns into regular expressions and matches incoming requests based on URI and HTTP method.
 
-When handling a request, the `Application::handle()` method triggers the `application:beforeHandle` event, matches the route using the `Router`, and dispatches to the appropriate controller via the `Dispatcher`. If no route matches, the `application:beforeNotFound` event is triggered.
+When handling a request, the `::handle()` method triggers the `application:beforeHandle` event, matches the route using the `Router`, and dispatches to the appropriate controller via the `Dispatcher`. If no route matches, the `application:beforeNotFound` event is triggered.
 
 ```mermaid
 flowchart TD
@@ -120,12 +120,12 @@ OnException --> ErrorResponse
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L25-L70)
+- [.php](file://app/Core/Mvc/.php#L25-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L25-L70)
+- [.php](file://app/Core/Mvc/.php#L25-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 
@@ -139,7 +139,7 @@ graph LR
 A[CLI Script] --> B[require bootstrap.php]
 B --> C[Create Request Object]
 C --> D[Set URI and Method]
-D --> E[Call Application->handle()]
+D --> E[Call ->handle()]
 E --> F[Process Response]
 F --> G[Output Result]
 H[Web Request] --> I[public/index.php]
@@ -156,7 +156,7 @@ I --> B
 - [index.php](file://public/index.php#L0-L6)
 - [usign-app.php](file://examples/usign-app.php#L0-L144)
 
-## Advanced Use Cases: Microservices and Embedded Applications
+## Advanced Use Cases: Microservices and Embedded s
 The manual application initialization pattern is particularly valuable for microservices and embedded applications. By controlling the bootstrap process, developers can create lightweight service instances that expose only specific functionality.
 
 For microservices, this approach allows creating dedicated entry points that load only the necessary modules and services, reducing memory footprint and improving performance. Embedded applications can use this pattern to integrate the framework into larger systems, where the application instance is created and managed by a host system.
@@ -166,18 +166,18 @@ The dependency injection container enables flexible service composition, allowin
 ```mermaid
 graph TB
 subgraph "Microservice A"
-A1[Application]
+A1[]
 A2[Router with limited routes]
 A3[Dispatcher]
 A4[Database Service]
 end
 subgraph "Microservice B"
-B1[Application]
+B1[]
 B2[Router with different routes]
 B3[Dispatcher]
 B4[Cache Service]
 end
-subgraph "Embedded Application"
+subgraph "Embedded "
 C1[Host System]
 C2[Framework Instance]
 C3[Custom Router]
@@ -196,12 +196,12 @@ C2 --> C4
 
 **Diagram sources**
 - [bootstrap.php](file://app/bootstrap.php#L35-L44)
-- [Application.php](file://app/Core/Mvc/Application.php#L9-L20)
+- [.php](file://app/Core/Mvc/.php#L9-L20)
 - [Container.php](file://app/Core/Di/Container.php#L0-L144)
 
 **Section sources**
 - [bootstrap.php](file://app/bootstrap.php#L35-L44)
-- [Application.php](file://app/Core/Mvc/Application.php#L9-L20)
+- [.php](file://app/Core/Mvc/.php#L9-L20)
 - [Container.php](file://app/Core/Di/Container.php#L0-L144)
 
 ## Common Configuration Mistakes
@@ -221,7 +221,7 @@ The `Container` class provides autowiring capabilities through reflection, but c
 - [usign-app.php](file://examples/usign-app.php#L0-L144)
 
 ## Lifecycle Management and Event Hooks
-The framework provides a comprehensive event system that allows interception of key lifecycle moments. The `Application::handle()` method triggers several events:
+The framework provides a comprehensive event system that allows interception of key lifecycle moments. The `::handle()` method triggers several events:
 
 - `application:beforeHandle`: Before request processing begins
 - `application:beforeNotFound`: When no route matches the request
@@ -255,12 +255,12 @@ end
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L25-L70)
+- [.php](file://app/Core/Mvc/.php#L25-L70)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 - [usign-app.php](file://examples/usign-app.php#L105-L144)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L25-L70)
+- [.php](file://app/Core/Mvc/.php#L25-L70)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 - [usign-app.php](file://examples/usign-app.php#L105-L144)
 

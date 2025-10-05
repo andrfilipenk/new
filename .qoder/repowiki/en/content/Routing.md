@@ -5,7 +5,7 @@
 - [Router.php](file://app/Core/Mvc/Router.php)
 - [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php)
-- [Application.php](file://app/Core/Mvc/Application.php)
+- [.php](file://app/Core/Mvc/.php)
 - [UserResourceController.php](file://app/Module/Admin/Controller/UserResourceController.php)
 - [Task.php](file://app/Module/Admin/Controller/Task.php)
 </cite>
@@ -25,28 +25,28 @@
 This document provides a comprehensive analysis of the routing system in the PHP application framework. The routing mechanism serves as the entry point for HTTP requests, mapping URLs to appropriate controller actions. The system combines a flexible pattern-based router with a resource-oriented router that automatically generates CRUD routes, following RESTful conventions and enabling rapid development of web applications and APIs.
 
 ## Core Routing Components
-The routing system consists of three main components working together: the Router, the ResourceRouter, and the Dispatcher. These components are orchestrated by the Application class to handle incoming requests and route them to the appropriate controller actions.
+The routing system consists of three main components working together: the Router, the ResourceRouter, and the Dispatcher. These components are orchestrated by the  class to handle incoming requests and route them to the appropriate controller actions.
 
 ```mermaid
 graph TB
-Request --> Application
-Application --> Router
+Request --> 
+ --> Router
 Router --> |Matched Route| Dispatcher
 Dispatcher --> Controller
 Controller --> Response
 ResourceRouter --> |Generates Routes| Router
 classDef component fill:#f9f,stroke:#333;
-class Application,Router,Dispatcher,ResourceRouter component;
+class ,Router,Dispatcher,ResourceRouter component;
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [.php](file://app/Core/Mvc/.php#L0-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 - [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php#L0-L188)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [.php](file://app/Core/Mvc/.php#L0-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 
@@ -105,12 +105,12 @@ style Complete fill:#4CAF50,stroke:#388E3C
 - [ResourceRouter.php](file://app/Core/Mvc/ResourceRouter.php#L0-L188)
 
 ## Routing Flow and Dispatch Process
-The complete routing and dispatch process involves multiple components working in sequence to handle an HTTP request. The Application receives the request, uses the Router to find a matching route, and then delegates to the Dispatcher to execute the appropriate controller action.
+The complete routing and dispatch process involves multiple components working in sequence to handle an HTTP request. The  receives the request, uses the Router to find a matching route, and then delegates to the Dispatcher to execute the appropriate controller action.
 
 ```mermaid
 sequenceDiagram
 participant Client as "Client"
-participant App as "Application"
+participant App as ""
 participant Router as "Router"
 participant Dispatcher as "Dispatcher"
 participant Controller as "Controller"
@@ -131,12 +131,12 @@ end
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [.php](file://app/Core/Mvc/.php#L0-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L0-L70)
+- [.php](file://app/Core/Mvc/.php#L0-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L0-L91)
 - [Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L0-L83)
 

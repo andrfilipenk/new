@@ -188,7 +188,7 @@ Additionally, the system validates table names through model definitions and res
 
 ```mermaid
 sequenceDiagram
-participant App as Application
+participant App as 
 participant QB as QueryBuilder
 participant DB as Database
 participant PDO as PDO Driver

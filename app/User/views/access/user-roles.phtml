@@ -31,7 +31,7 @@ $url = $this->getDI()->get('url');
                             <?php 
                             $roleNames = [];
                             foreach ($user->roles as $role) {
-                                $roleNames[] = '<span class="badge badge-primary">' . htmlspecialchars($role->name) . '</span>';
+                                $roleNames[] = '<span class="badge bg-primary">' . htmlspecialchars($role->name) . '</span>';
                             }
                             echo implode(' ', $roleNames);
                             ?>

@@ -41,7 +41,7 @@ The framework implements a flexible response generation system that allows contr
 - **Array responses** for JSON data
 - **Response objects** for complete control over HTTP response
 
-The Application class handles response normalization, ensuring that all controller outputs are properly converted to Response objects before being sent to the client. This allows for consistent response handling regardless of the return type from controller actions. With the introduction of `CrudController`, actions can now return either a string (for HTML views) or a Response object (for JSON APIs or redirects), indicated by the return type `string|Response`.
+The  class handles response normalization, ensuring that all controller outputs are properly converted to Response objects before being sent to the client. This allows for consistent response handling regardless of the return type from controller actions. With the introduction of `CrudController`, actions can now return either a string (for HTML views) or a Response object (for JSON APIs or redirects), indicated by the return type `string|Response`.
 
 ```mermaid
 flowchart TD
@@ -58,7 +58,7 @@ F --> G[Send Response]
 **Diagram sources**
 - [Controller.php](file://app\Core\Mvc\Controller.php#L61-L101)
 - [Response.php](file://app\Core\Http\Response.php#L0-L41)
-- [Application.php](file://app\Core\Mvc\Application.php#L40-L70)
+- [.php](file://app\Core\Mvc\.php#L40-L70)
 
 **Section sources**
 - [Controller.php](file://app\Core\Mvc\Controller.php#L9-L124)

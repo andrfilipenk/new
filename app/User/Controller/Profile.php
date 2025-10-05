@@ -10,15 +10,13 @@ class Profile extends Controller
     /**
      * Summary of getCurrentUser
      * 
-     * 
-     * @return \Core\Acl\User|\Core\Http\Response
+     * @return \Core\Acl\User|false
      */
     protected function getCurrentUser()
     {
         $sessionUser = $this->getSession()->get('user');
         if (!$sessionUser) {
-            $this->flashError('Please log in to access your profile.');
-            return $this->redirect('user/login');
+            return false;
         }
         return UserModel::find($sessionUser['id']);
     }
@@ -30,6 +28,7 @@ class Profile extends Controller
     {
         $user = $this->getCurrentUser();
         if (!$user) {
+            $this->flashError('Please log in to access your profile.');
             return $this->redirect('user/login');
         }
         return $this->render('profile/index', [
@@ -45,6 +44,7 @@ class Profile extends Controller
     {
         $user = $this->getCurrentUser();
         if (!$user) {
+            $this->flashError('Please log in to access your profile.');
             return $this->redirect('user/login');
         }
         if ($this->isPost()) {
@@ -85,6 +85,7 @@ class Profile extends Controller
     {
         $user = $this->getCurrentUser();
         if (!$user) {
+            $this->flashError('Please log in to access your profile.');
             return $this->redirect('user/login');
         }
 
@@ -98,7 +99,7 @@ class Profile extends Controller
             // Validate current password
             if (!$user->verifyPassword($currentPassword)) {
                 $this->flashError('Current password is incorrect.');
-            } elseif (strlen($newPassword) < 6) {
+            } elseif (strlen($newPassword) < 6 || strlen($confirmPassword) < 6) {
                 $this->flashError('New password must be at least 6 characters long.');
             } elseif ($newPassword !== $confirmPassword) {
                 $this->flashError('New password and confirmation do not match.');

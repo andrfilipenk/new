@@ -29,10 +29,5 @@ $di->set('view', '\Core\Mvc\View');
 $di->set('request', fn() => \Core\Http\Request::capture());
 $di->set('response', fn() => \Core\Http\Response::create());
 
-#$di->register(new \Module\Base\Provider\CookieServiceProvider);
-#$di->register(new \Module\Base\Provider\RouterServiceProvider);
-#$di->register(new \Base\Provider\NavigationServiceProvider);
-#$di->register(new \Module\Base\Provider\AclServiceProvider);
-
 $di->set('migrationRepository', fn() => new \Core\Database\MigrationRepository);
 $di->set('migrator', fn() => new \Core\Database\Migrator);

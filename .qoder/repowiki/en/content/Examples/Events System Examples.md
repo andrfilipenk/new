@@ -8,7 +8,7 @@
 - [EventInterface.php](file://app/Core/Events/EventInterface.php)
 - [StoppableEventInterface.php](file://app/Core/Events/StoppableEventInterface.php)
 - [EventAware.php](file://app/Core/Events/EventAware.php)
-- [Application.php](file://app/Core/Mvc/Application.php)
+- [.php](file://app/Core/Mvc/.php)
 </cite>
 
 ## Table of Contents
@@ -215,11 +215,11 @@ H --> I[Send Response]
 ```
 
 **Diagram sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L29)
+- [.php](file://app/Core/Mvc/.php#L29)
 - [events-usage.php](file://examples/events-usage.php#L135-L145)
 
 **Section sources**
-- [Application.php](file://app/Core/Mvc/Application.php#L29)
+- [.php](file://app/Core/Mvc/.php#L29)
 - [events-usage.php](file://examples/events-usage.php#L135-L145)
 
 ## Common Pitfalls and Best Practices

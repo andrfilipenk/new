@@ -234,10 +234,10 @@ The all() method merges all input sources, which could consume significant memor
 While the Request object provides clean access to input data, application-level sanitization is required for security. Never trust raw input from get(), post(), or input() methods.
 
 ### CSRF Protection
-The framework does not implement built-in CSRF protection. Applications should implement token validation for state-changing operations, especially when using method spoofing.
+The framework does not implement built-in CSRF protection. s should implement token validation for state-changing operations, especially when using method spoofing.
 
 ### Header Injection
-The header() method normalizes input to lowercase but does not validate header names. Applications should validate and sanitize header values when used in output.
+The header() method normalizes input to lowercase but does not validate header names. s should validate and sanitize header values when used in output.
 
 **Section sources**
 - [Request.php](file://app/Core/Http/Request.php#L100-L120)

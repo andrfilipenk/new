@@ -30,7 +30,7 @@ The application follows a modular structure with a clear separation of concerns.
 
 ```mermaid
 graph TD
-A[Application Root] --> B[app/Core/Database]
+A[ Root] --> B[app/Core/Database]
 A --> C[examples]
 B --> D[Model.php]
 B --> E[Database.php]
@@ -61,7 +61,7 @@ The database architecture follows a layered pattern where the `Database` service
 
 ```mermaid
 graph TB
-subgraph "Application Layer"
+subgraph " Layer"
 A[UserService]
 end
 subgraph "ORM Layer"

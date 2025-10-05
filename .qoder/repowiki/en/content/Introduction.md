@@ -5,7 +5,7 @@
 - [public/index.php](file://public/index.php)
 - [app/bootstrap.php](file://app/bootstrap.php)
 - [app/config.php](file://app/config.php)
-- [app/Core/Mvc/Application.php](file://app/Core/Mvc/Application.php)
+- [app/Core/Mvc/.php](file://app/Core/Mvc/.php)
 - [app/Core/Mvc/Router.php](file://app/Core/Mvc/Router.php)
 - [app/Core/Mvc/Dispatcher.php](file://app/Core/Mvc/Dispatcher.php)
 - [app/Core/Di/Container.php](file://app/Core/Di/Container.php)
@@ -39,13 +39,13 @@ This framework is ideal for developers seeking a minimal yet powerful foundation
 **Section sources**
 - [app/bootstrap.php](file://app/bootstrap.php#L1-L56)
 - [app/config.php](file://app/config.php#L1-L100)
-- [app/Core/Mvc/Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [app/Core/Mvc/.php](file://app/Core/Mvc/.php#L1-L70)
 
 ## Core Components
 
 The framework is composed of several cohesive components that work together to handle HTTP requests and generate responses.
 
-- **MVC System**: The `Application`, `Router`, `Dispatcher`, and `View` classes form the backbone of the MVC pattern. Requests are routed to controllers, which interact with models and render views.
+- **MVC System**: The ``, `Router`, `Dispatcher`, and `View` classes form the backbone of the MVC pattern. Requests are routed to controllers, which interact with models and render views.
 - **DI Container**: The `Container` class resolves dependencies automatically using reflection, allowing for type-hinted constructor injection and service registration.
 - **Database Abstraction**: The `Database` class provides a fluent interface for building and executing SQL queries, abstracting low-level PDO operations.
 - **Event Manager**: The `Manager` class allows components to emit and listen to events, facilitating loose coupling and cross-cutting concerns.
@@ -54,7 +54,7 @@ The framework is composed of several cohesive components that work together to h
 These components are orchestrated through the DI container, which serves as the central hub for service resolution and lifecycle management.
 
 **Section sources**
-- [app/Core/Mvc/Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [app/Core/Mvc/.php](file://app/Core/Mvc/.php#L1-L70)
 - [app/Core/Di/Container.php](file://app/Core/Di/Container.php#L1-L144)
 - [app/Core/Database/Database.php](file://app/Core/Database/Database.php#L1-L258)
 - [app/Core/Events/Manager.php](file://app/Core/Events/Manager.php#L1-L102)
@@ -66,7 +66,7 @@ The request lifecycle begins at `public/index.php` and proceeds through a series
 
 1. **Entry Point**: `public/index.php` includes `bootstrap.php` and creates the application instance.
 2. **Bootstrap**: `bootstrap.php` sets up autoloading, loads configuration, and registers core services in the DI container.
-3. **Application Handle**: The `Application::handle()` method receives the request and initiates processing.
+3. ** Handle**: The `::handle()` method receives the request and initiates processing.
 4. **Routing**: The `Router` matches the request URI and method to a configured route from `config.php`.
 5. **Dispatching**: The `Dispatcher` instantiates the controller via the DI container and invokes the specified action method.
 6. **Response Generation**: The controller returns content, which is wrapped in a `Response` object.
@@ -77,8 +77,8 @@ This flow ensures a predictable and testable execution path, with clear separati
 ```mermaid
 flowchart TD
 A["public/index.php"] --> B["bootstrap.php"]
-B --> C["Create Application"]
-C --> D["Application::handle(request)"]
+B --> C["Create "]
+C --> D["::handle(request)"]
 D --> E["Router::match(uri, method)"]
 E --> F{"Route Found?"}
 F --> |No| G["Return 404"]
@@ -93,7 +93,7 @@ L --> M["Send Response"]
 **Diagram sources**
 - [public/index.php](file://public/index.php#L1-L7)
 - [app/bootstrap.php](file://app/bootstrap.php#L1-L56)
-- [app/Core/Mvc/Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [app/Core/Mvc/.php](file://app/Core/Mvc/.php#L1-L70)
 - [app/Core/Mvc/Router.php](file://app/Core/Mvc/Router.php#L1-L91)
 - [app/Core/Mvc/Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 
@@ -129,7 +129,7 @@ Config["config.php"]
 Container["Di\Container"]
 end
 subgraph "Core Components"
-Application["Mvc\Application"]
+["Mvc\"]
 Router["Mvc\Router"]
 Dispatcher["Mvc\Dispatcher"]
 View["Mvc\View"]
@@ -143,14 +143,14 @@ end
 Index --> Bootstrap
 Bootstrap --> Config
 Bootstrap --> Container
-Container --> Application
-Application --> Router
-Application --> Dispatcher
-Application --> Events
+Container --> 
+ --> Router
+ --> Dispatcher
+ --> Events
 Dispatcher --> View
 Dispatcher --> Database
 Router --> Config
-Application --> Events
+ --> Events
 Base --> Router
 Admin --> Router
 View --> Container
@@ -161,7 +161,7 @@ Database --> Container
 - [public/index.php](file://public/index.php#L1-L7)
 - [app/bootstrap.php](file://app/bootstrap.php#L1-L56)
 - [app/config.php](file://app/config.php#L1-L100)
-- [app/Core/Mvc/Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [app/Core/Mvc/.php](file://app/Core/Mvc/.php#L1-L70)
 - [app/Core/Mvc/Router.php](file://app/Core/Mvc/Router.php#L1-L91)
 - [app/Core/Mvc/Dispatcher.php](file://app/Core/Mvc/Dispatcher.php#L1-L83)
 - [app/Core/Mvc/View.php](file://app/Core/Mvc/View.php#L1-L144)

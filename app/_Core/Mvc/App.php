@@ -1,5 +1,5 @@
 <?php
-// app/_Core/Mvc/Application.php
+// app/_Core/Mvc/App.php
 namespace Core\Mvc;
 
 use Core\Mvc\AbstractModule;
@@ -11,9 +11,9 @@ use Core\Http\Response;
 use Exception;
 
 /**
- * Optimized Application class with reduced DI lookups and better error handling
+ * Optimized App class with reduced DI lookups and better error handling
  */
-class Application
+class App
 {
     use Injectable, EventAware;
     private $dispatcher;

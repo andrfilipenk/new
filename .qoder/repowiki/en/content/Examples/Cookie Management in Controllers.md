@@ -212,7 +212,7 @@ The cookie system supports compliance with privacy regulations such as GDPR thro
 - **Easy removal**: The `delete` and `clearAll` methods enable user data removal requests
 - **Minimal data**: Cookies store tokens rather than personal data, with sensitive information kept server-side
 
-Applications should extend this foundation with cookie consent banners and preference centers to achieve full regulatory compliance.
+s should extend this foundation with cookie consent banners and preference centers to achieve full regulatory compliance.
 
 **Section sources**
 - [Cookie.php](file://app/Core/Cookie/Cookie.php#L1-L208)

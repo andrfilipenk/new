@@ -21,9 +21,9 @@ class AclServiceProvider implements ServiceProvider
                 /** @var Dispatcher $dispatcher */
                 $dispatcher = $event->getData();
                 $role       = $di->get('session')->get('role', 'guest');
-                $module     = $dispatcher->getModuleName();
-                $controller = $dispatcher->getControllerName();
-                $action     = $dispatcher->getActionName();
+                $module     = $dispatcher->getModule();
+                $controller = $dispatcher->getController();
+                $action     = $dispatcher->getAction();
                 if (!$access->isAllowed($role, $module, $controller, $action)) {
                     $event->stopPropagation();
                     return $dispatcher->forward($config['acl']['denied']);

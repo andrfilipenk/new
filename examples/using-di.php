@@ -10,7 +10,7 @@ class EchoLogger {}
 // Create a simple container
 $di = new Core\Di\Container();
 // Register a simple value
-$di->set('app.name', 'My Application');
+$di->set('app.name', 'My App');
 // Register an object instance
 $di->set('logger', new FileLogger('/path/to/logs'));
 // Register a closure (lazy loading)
@@ -18,7 +18,7 @@ $di->set('database', function($di) {
     return new PDO('mysql:host=localhost;dbname=myapp', 'user', 'password');
 });
 // Retrieve services
-$appName = $di->get('app.name'); // Returns "My Application"
+$appName = $di->get('app.name'); // Returns "My App"
 $logger = $di->get('logger');    // Returns the FileLogger instance
 $db = $di->get('database');      // Creates and returns PDO instance
 

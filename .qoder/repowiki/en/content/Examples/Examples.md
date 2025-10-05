@@ -14,7 +14,7 @@
 - [Request.php](file://app/Core/Http/Request.php)
 - [Response.php](file://app/Core/Http/Response.php)
 - [Migration.php](file://app/Core/Database/Migration.php)
-- [Application.php](file://app/Core/Mvc/Application.php)
+- [.php](file://app/Core/Mvc/.php)
 - [Controller.php](file://app/Core/Mvc/Controller.php)
 - [View.php](file://app/Core/Mvc/View.php)
 </cite>
@@ -24,7 +24,7 @@
 2. [Dependency Injection Usage Examples](#dependency-injection-usage-examples)
 3. [HTTP Request and Response Handling](#http-request-and-response-handling)
 4. [Database Migrations](#database-migrations)
-5. [Complete Small Application Example](#complete-small-application-example)
+5. [Complete Small  Example](#complete-small-application-example)
 6. [Setup Requirements and Expected Outputs](#setup-requirements-and-expected-outputs)
 7. [Common Adaptation Issues](#common-adaptation-issues)
 
@@ -91,7 +91,7 @@ class Injectable {
 }
 Container --> ContainerInterface : implements
 UserService --> Container : uses
-Application --> Container : depends on
+ --> Container : depends on
 Controller --> Injectable : uses
 ```
 
@@ -180,7 +180,7 @@ G --> H
 - [migrations.php](file://examples/migrations.php#L1-L79)
 - [Migration.php](file://app/Core/Database/Migration.php#L1-L62)
 
-## Complete Small Application Example
+## Complete Small  Example
 
 This section demonstrates a complete small application integrating routing, controller, model, view, and form handling components. The example shows how these pieces work together in a real application context.
 
@@ -227,7 +227,7 @@ style bootstrap fill:#bbf,stroke:#333
 - [usign-app.php](file://examples/usign-app.php#L1-L145)
 - [bootstrap.php](file://app/bootstrap.php#L1-L57)
 - [index.php](file://public/index.php#L1-L7)
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L71)
+- [.php](file://app/Core/Mvc/.php#L1-L71)
 - [Controller.php](file://app/Core/Mvc/Controller.php#L1-L125)
 - [View.php](file://app/Core/Mvc/View.php#L1-L145)
 
@@ -283,5 +283,5 @@ When applying these example patterns to production code, several common issues m
 **Section sources**
 - [Container.php](file://app/Core/Di/Container.php#L1-L145)
 - [Model.php](file://app/Core/Database/Model.php#L1-L465)
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L71)
+- [.php](file://app/Core/Mvc/.php#L1-L71)
 - [config.php](file://app/config.php#L1-L100)

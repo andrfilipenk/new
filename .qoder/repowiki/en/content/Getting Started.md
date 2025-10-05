@@ -5,7 +5,7 @@
 - [config.php](file://app/config.php)
 - [index.php](file://public/index.php)
 - [bootstrap.php](file://app/bootstrap.php)
-- [Application.php](file://app/Core/Mvc/Application.php)
+- [.php](file://app/Core/Mvc/.php)
 - [Container.php](file://app/Core/Di/Container.php)
 - [Router.php](file://app/Core/Mvc/Router.php)
 - [Controller.php](file://app/Core/Mvc/Controller.php)
@@ -86,7 +86,7 @@ Understanding the directory layout is crucial for effective development.
 ### app/
 The `app/` directory contains the core application logic:
 - `Core/`: Framework components (DI container, MVC classes, HTTP utilities)
-- `Module/`: Application modules (Base and Admin with controllers, models, forms)
+- `Module/`:  modules (Base and Admin with controllers, models, forms)
 - `views/`: Template files organized by module and controller
 - `bootstrap.php`: Initializes the application and DI container
 - `config.php`: Configuration array loaded at runtime
@@ -121,7 +121,7 @@ participant Client as "Client Browser"
 participant WebServer as "Web Server"
 participant IndexPHP as "public/index.php"
 participant Bootstrap as "app/bootstrap.php"
-participant Application as "Application"
+participant  as ""
 participant Router as "Router"
 participant Dispatcher as "Dispatcher"
 participant Controller as "Controller"
@@ -131,28 +131,28 @@ IndexPHP->>Bootstrap : require '../app/bootstrap.php'
 Bootstrap->>Bootstrap : Define constants and register autoloader
 Bootstrap->>Bootstrap : Load config.php and create DI container
 Bootstrap->>Bootstrap : Register service providers
-Bootstrap->>Application : new Application($di)
-IndexPHP->>Application : $app->handle($request)
-Application->>Router : Match URI and method
-Router-->>Application : Return route configuration
-Application->>Dispatcher : Dispatch route
+Bootstrap->> : new ($di)
+IndexPHP->> : $app->handle($request)
+->>Router : Match URI and method
+Router-->> : Return route configuration
+->>Dispatcher : Dispatch route
 Dispatcher->>Controller : Instantiate controller and call action
 Controller-->>Dispatcher : Return response or content
-Dispatcher-->>Application : Return Response object
-Application->>IndexPHP : Return Response
+Dispatcher-->> : Return Response object
+->>IndexPHP : Return Response
 IndexPHP->>Client : $response->send()
 ```
 
 **Diagram sources**
 - [index.php](file://public/index.php#L1-L6)
 - [bootstrap.php](file://app/bootstrap.php#L1-L56)
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 - [Router.php](file://app/Core/Mvc/Router.php#L1-L91)
 
 **Section sources**
 - [index.php](file://public/index.php#L1-L6)
 - [bootstrap.php](file://app/bootstrap.php#L1-L56)
-- [Application.php](file://app/Core/Mvc/Application.php#L1-L70)
+- [.php](file://app/Core/Mvc/.php#L1-L70)
 
 ## Creating a Hello World Example
 
