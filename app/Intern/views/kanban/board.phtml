@@ -1,0 +1,356 @@
+<?php
+/** @var \Core\Mvc\View $this */
+$url = $this->getDI()->get('url');
+
+use Core\Utils\Tag;
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Board - Task Management</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Steroids.dev Kanban CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/@steroids/ui-kit@latest/dist/steroids-kanban.css" rel="stylesheet">
+    
+    <!-- Custom Kanban Styles -->
+    <style>
+        .kanban-board {
+            min-height: calc(100vh - 120px);
+            background: #f8f9fa;
+            padding: 20px;
+            overflow-x: auto;
+        }
+        
+        .kanban-column {
+            min-width: 300px;
+            max-width: 350px;
+            margin-right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .kanban-column-header {
+            padding: 15px;
+            border-bottom: 2px solid #e9ecef;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .kanban-column-body {
+            padding: 15px;
+            min-height: 400px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .kanban-task {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 12px;
+            cursor: move;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .kanban-task:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .kanban-task.dragging {
+            opacity: 0.5;
+            transform: rotate(3deg);
+        }
+        
+        .kanban-task-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .kanban-task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .kanban-task-assignee {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        .kanban-task-assignee img {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .kanban-task-priority {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+        
+        .kanban-task-due-date {
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+        
+        .drop-zone {
+            border: 2px dashed #007bff;
+            background: rgba(0, 123, 255, 0.1);
+            border-radius: 6px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #007bff;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        
+        .status-light { background-color: #6c757d; }
+        .status-primary { background-color: #007bff; }
+        .status-success { background-color: #28a745; }
+        .status-secondary { background-color: #6c757d; }
+        
+        .priority-light { background-color: #f8f9fa; color: #495057; }
+        .priority-secondary { background-color: #6c757d; color: white; }
+        .priority-warning { background-color: #ffc107; color: #212529; }
+        .priority-danger { background-color: #dc3545; color: white; }
+        
+        .kanban-filters {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row">
+            <div class="col-12">
+                <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" href="<?= $url->get('/') ?>">Task Management</a>
+                        <div class="navbar-nav ms-auto">
+                            <a class="nav-link" href="<?= $url->get('/tasklist') ?>">List View</a>
+                            <a class="nav-link active" href="<?= $url->get('/kanban') ?>">Kanban Board</a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="row">
+            <div class="col-12">
+                <div class="kanban-filters">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="filterAssignee" class="form-label">Assigned To</label>
+                            <select id="filterAssignee" class="form-select form-select-sm">
+                                <option value="">All Users</option>
+                                <?php foreach ($users as $user): ?>
+                                    <option value="<?= $user->id ?>"><?= $user->name ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filterPriority" class="form-label">Priority</label>
+                            <select id="filterPriority" class="form-select form-select-sm">
+                                <option value="">All Priorities</option>
+                                <?php foreach ($priorities as $priority): ?>
+                                    <option value="<?= $priority->id ?>"><?= $priority->title ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="applyFilters" class="btn btn-primary btn-sm mt-4">Apply Filters</button>
+                            <button id="clearFilters" class="btn btn-outline-secondary btn-sm mt-4">Clear</button>
+                        </div>
+                        <div class="col-md-3">
+                            <button id="addNewTask" class="btn btn-success btn-sm mt-4">
+                                <i class="fas fa-plus"></i> Add New Task
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="row">
+            <div class="col-12">
+                <div id="kanbanBoard" class="kanban-board d-flex">
+                    <!-- Columns will be dynamically populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Detail Modal -->
+    <div class="modal fade" id="taskDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Task Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="taskDetailContent">
+                        <!-- Task details will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="editTaskBtn">Edit Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Create/Edit Modal -->
+    <div class="modal fade" id="taskFormModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="taskFormTitle">Add New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="taskForm">
+                        <div class="mb-3">
+                            <label for="taskTitle" class="form-label">Title *</label>
+                            <input type="text" class="form-control" id="taskTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="taskDescription" rows="3"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="taskStatus" class="form-label">Status *</label>
+                                    <select class="form-select" id="taskStatus" required>
+                                        <?php foreach ($statuses as $status): ?>
+                                            <option value="<?= $status->id ?>"><?= $status->title ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="taskPriority" class="form-label">Priority *</label>
+                                    <select class="form-select" id="taskPriority" required>
+                                        <?php foreach ($priorities as $priority): ?>
+                                            <option value="<?= $priority->id ?>"><?= $priority->title ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskAssignee" class="form-label">Assigned To *</label>
+                            <select class="form-select" id="taskAssignee" required>
+                                <?php foreach ($users as $user): ?>
+                                    <option value="<?= $user->id ?>"><?= $user->name ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="taskBeginDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="taskBeginDate">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="taskEndDate" class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="taskEndDate">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveTaskBtn">Save Task</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="mt-2">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Font Awesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <!-- Custom Kanban JavaScript -->
+    <script src="<?= $url->get('/public/js/kanban.js') ?>"></script>
+    
+    <script>
+        // Initialize Kanban Board
+        document.addEventListener('DOMContentLoaded', function() {
+            const kanban = new KanbanBoard({
+                container: '#kanbanBoard',
+                apiBaseUrl: '<?= $url->get('/kanban') ?>',
+                csrfToken: '<?= $this->getSession()->get('csrf_token') ?>'
+            });
+            
+            kanban.init();
+        });
+    </script>
+</body>
+</html>
