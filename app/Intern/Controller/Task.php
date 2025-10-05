@@ -3,7 +3,6 @@
 namespace Intern\Controller;
 
 use Core\Mvc\Controller;
-use Intern\Decorator\TaskItem;
 use Intern\Model\Task as TaskModel;
 use Intern\Model\TaskStatus;
 use Intern\Model\TaskPriority;
@@ -28,15 +27,10 @@ class Task extends Controller
                 }
                 // assigned to 
             })->get();
-        $taskRows = [];
-        foreach ($tasks as $task) {
-            $taskRows[] = new TaskItem($task);
-        }
-            
         return [
             'statuses' => $this->getOptions(TaskStatus::class, 'status'),
             'priorities' => $this->getOptions(TaskPriority::class, 'priority'),
-            'tasks' => $taskRows
+            'tasks' => $tasks
         ];
     }
 

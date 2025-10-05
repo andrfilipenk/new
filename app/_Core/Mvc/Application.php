@@ -51,7 +51,7 @@ class Application
         $di = $this->getDI();
         $this->fireEvent('app.beforeInitModule', $this);
         $modules = $this->initModules();
-        /** @var Request $request */
+        /** @var Request $requ est */
         $request    = $di->get('request');
         /** @var Response $response */
         $response   = $di->get('response');

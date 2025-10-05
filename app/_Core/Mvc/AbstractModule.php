@@ -35,7 +35,7 @@ abstract class AbstractModule implements ModuleInterface
         $this->_name   = $name;
         $this->_config = $config;
         $this->fireEvent('module.onInitialize', $this);
-        if ($providers = $this->getConfig('provider')) {
+        if ($providers = $this->getConfig(key: 'provider')) {
             foreach ($providers as $provider) {
                 $this->getDI()->register($provider);
             }
@@ -43,7 +43,7 @@ abstract class AbstractModule implements ModuleInterface
         $this->fireEvent('module.afterInitialize', $this);
         return $this;
     }
-    
+
     /**
      * Called after module is bootstrapped
      * Override in child classes to register events, services, etc.

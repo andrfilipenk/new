@@ -29,7 +29,7 @@ class SimplePdfGenerator
     private function addHeader(): void
     {
         $this->content .= "BT /F1 10 Tf {$this->margin} 800 Td (Performance Metrics Report - Page {$this->page}) Tj ET\n";
-        $this->content .= "0.5 w {$this->margin} 790 m {$this->pageWidth - $this->margin} 790 l S\n"; // Horizontal line
+        $this->content .= "0.5 w {$this->margin} 790 m {($this->pageWidth - $this->margin)} 790 l S\n"; // Horizontal line
     }
 
     private function addFooter(): void
@@ -54,7 +54,7 @@ class SimplePdfGenerator
             $x += $this->colWidths[$i];
         }
         $this->y -= $rowHeight;
-        $this->content .= "{$this->margin} {$this->y} m {$this->pageWidth - $this->margin} {$this->y} l S\n"; // Horizontal line below headers
+        $this->content .= "{$this->margin} {$this->y} m {($this->pageWidth - $this->margin)} {$this->y} l S\n"; // Horizontal line below headers
 
         // Draw rows
         foreach ($rows as $row) {
@@ -66,7 +66,7 @@ class SimplePdfGenerator
                     $x += $this->colWidths[$i];
                 }
                 $this->y -= $rowHeight;
-                $this->content .= "{$this->margin} {$this->y} m {$this->pageWidth - $this->margin} {$this->y} l S\n";
+                $this->content .= "{$this->margin} {$this->y} m {($this->pageWidth - $this->margin)} {$this->y} l S\n";
             }
             $x = $this->margin;
             foreach ($row as $i => $cell) {
@@ -118,10 +118,10 @@ class SimplePdfGenerator
     private function drawCell(float $x, float $y, float $width, float $height, string $text): void
     {
         // Draw cell border
-        $this->content .= "{$x} {$y} m {$x + $width} {$y} l {$x + $width} " . ($y - $height) . " l {$x} " . ($y - $height) . " l {$x} {$y} l S\n";
+        $this->content .= "{$x} {$y} m {($x + $width)} {$y} l {($x + $width)} " . ($y - $height) . " l {$x} " . ($y - $height) . " l {$x} {$y} l S\n";
         // Draw text (clipped to fit width)
         $text = substr($text, 0, floor($width / 5)); // Rough estimate: 5 points per character
-        $this->content .= "{$x + 2} " . ($y - $height + 3) . " Td (" . addslashes($text) . ") Tj\n";
+        $this->content .= "{($x + 2)} " . ($y - $height + 3) . " Td (" . addslashes($text) . ") Tj\n";
     }
 
     private function calculateColumnWidths(array $headers, array $rows): array

@@ -8,7 +8,10 @@ use User\Model\User as UserModel;
 class Profile extends Controller
 {
     /**
-     * Get current logged-in user
+     * Summary of getCurrentUser
+     * 
+     * 
+     * @return \Core\Acl\User|\Core\Http\Response
      */
     protected function getCurrentUser()
     {
@@ -44,7 +47,6 @@ class Profile extends Controller
         if (!$user) {
             return $this->redirect('user/login');
         }
-
         if ($this->isPost()) {
             $data = $this->getRequest()->all();
             

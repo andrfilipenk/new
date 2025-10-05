@@ -9,6 +9,10 @@ use User\Form\UserForm;
 
 class User extends Controller
 {
+    /**
+     * 
+     * @return UserModel|null
+     */
     protected function getUser()
     {
         $id = $this->getDispatcher()->getParam('id');
