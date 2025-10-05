@@ -46,12 +46,15 @@ class App
         return $modules;
     }
 
+    /**
+     * Run the application
+     */
     public function run()
     {
         $di = $this->getDI();
         $this->fireEvent('app.beforeInitModule', $this);
         $modules = $this->initModules();
-        /** @var Request $requ est */
+        /** @var Request $request */
         $request    = $di->get('request');
         /** @var Response $response */
         $response   = $di->get('response');

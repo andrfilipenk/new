@@ -50,12 +50,25 @@ class Router
         return $this;
     }
 
+    /**
+     * Summary of resetRoutes
+     * 
+     * @return static
+     */
     public function resetRoutes()
     {
         $this->routes = [];
         return $this;
     }
 
+    /**
+     * Summary of group match
+     * 
+     * @param string $uri
+     * @param string $method
+     * @param array $routes
+     * @return array|false
+     */
     public function matchRouteGroup(string $uri, string $method, array $routes)
     {
         return $this

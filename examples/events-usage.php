@@ -5,7 +5,7 @@
 $events = new \Core\Events\Manager();
 
 // Attach a listener
-$events->attach('user.created', function($event) {
+$events->attach('user.created', listener: function($event) {
     $user = $event->getData();
     echo "User created: " . $user['name'] . "\n";
 });

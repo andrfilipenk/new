@@ -13,6 +13,13 @@ abstract class AbstractModule implements ModuleInterface
 
     protected $_config = [];
 
+    /**
+     * Summary of getConfig
+     * 
+     * @param mixed $key
+     * @param mixed $default
+     * @return mixed
+     */
     public function getConfig($key = null, $default = null)
     {
         if ($key === null) {
@@ -21,16 +28,33 @@ abstract class AbstractModule implements ModuleInterface
         return $this->_config[$key] ?? $default;
     }
 
+    /**
+     * Summary of getRoutes
+     * 
+     * @return mixed
+     */
     public function getRoutes()
     {
         return $this->getConfig('routes', []);
     }
 
+    /**
+     * Summary of getName
+     * 
+     * @return mixed
+     */
     public function getName()
     {
         return $this->_name;
     }
 
+    /**
+     * Summary of initialize
+     * 
+     * @param mixed $name
+     * @param mixed $config
+     * @return static
+     */
     public function initialize($name, $config) {
         $this->_name   = $name;
         $this->_config = $config;

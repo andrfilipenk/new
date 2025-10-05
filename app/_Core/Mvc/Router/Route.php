@@ -6,13 +6,31 @@ use stdClass;
 
 class Route extends stdClass {
     
+    /**
+     * Summary of _matched
+     * 
+     * @var bool
+     */
     protected $_matched = false;
 
+    /**
+     * Summary of _keys
+     * 
+     * @var array
+     */
     protected $_keys = [
-        'module', 'controller', 'action', 'params'
+        'module', 
+        'controller', 
+        'action', 
+        'params'
     ];
-    
 
+    /**
+     * Summary of fromArray
+     * 
+     * @param array $data
+     * @return Route
+     */
     static public function fromArray(array $data)
     {
         $route = new self();
@@ -22,18 +40,34 @@ class Route extends stdClass {
         return $route;
     }
 
+    /**
+     * Summary of setMatched
+     * 
+     * @return static
+     */
     public function setMatched()
     {
         $this->_matched = true;
         return $this;
     }
 
+    /**
+     * Summary of isMatched
+     * 
+     * @return bool
+     */
     public function isMatched()
     {
         return $this->_matched;
     }
-
     
+    /**
+     * Summary of setData
+     * 
+     * @param mixed $key
+     * @param mixed $value
+     * @return static
+     */
     public function setData($key, $value = null)
     {
         if (is_array($key)) {
@@ -64,6 +98,11 @@ class Route extends stdClass {
         return $result;
     }
 
+    /**
+     * 
+     * @param string $method
+     * @return bool
+     */
     public function isMethod($method)
     {
         return in_array($method, $this->method);
