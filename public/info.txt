@@ -1,2 +1,189 @@
+<?php
 
-https://frappe.io/erpnext/open-source-project-management-software
+// app/_Core/Middleware/ErrorHandlerMiddleware.php
+namespace Core\Middleware;
+
+use Core\Http\Request;
+use Core\Http\Response;
+use Core\Exception\BaseException;
+
+class ErrorHandlerMiddleware
+{
+    use Injectable;
+    
+    public function handle(Request $request, Response $response, callable $next)
+    {
+        try {
+            return $next();
+        } catch (BaseException $e) {
+            return $this->handleFrameworkException($e, $request, $response);
+        } catch (\Throwable $e) {
+            return $this->handleGenericException($e, $request, $response);
+        }
+    }
+    
+    private function handleFrameworkException(BaseException $e, Request $request, Response $response)
+    {
+        $this->logException($e);
+        
+        if ($request->isAjax() || $request->wantsJson()) {
+            return $response->json([
+                'success' => false,
+                'message' => $e->getUserMessage(),
+                'errors' => $e instanceof ValidationException ? $e->getErrors() : null,
+                'debug' => $this->isDebugMode() ? $this->getDebugInfo($e) : null
+            ], $e->getHttpStatusCode());
+        }
+        
+        return $response->error($e->getUserMessage(), $e->getHttpStatusCode());
+    }
+}
+
+
+
+// app/_Core/Logger/Logger.php
+namespace Core\Logger;
+
+class Logger
+{
+    use Injectable;
+    
+    public function logException(\Throwable $exception, array $context = []): void
+    {
+        $logData = [
+            'timestamp' => date('c'),
+            'type' => get_class($exception),
+            'message' => $exception->getMessage(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+            'trace' => $this->formatTrace($exception->getTrace()),
+            'context' => $context,
+            'request' => $this->getRequestContext(),
+            'environment' => $this->getEnvironmentContext()
+        ];
+        
+        $this->writeLog('error', $logData);
+        
+        // Send to external monitoring if configured
+        if ($this->config->get('monitoring.enabled')) {
+            $this->sendToMonitoring($logData);
+        }
+    }
+    
+    private function getRequestContext(): array
+    {
+        $request = $this->getDI()->get('request');
+        return [
+            'method' => $request->getMethod(),
+            'uri' => $request->getURI(),
+            'user_agent' => $request->getUserAgent(),
+            'ip' => $request->getClientAddress(),
+            'user_id' => $this->session->get('user.id')
+        ];
+    }
+}
+
+
+
+// Extend existing Response class
+namespace Core\Http;
+
+class Response
+{
+    // ... existing code ...
+    
+    public function error(string $message, int $statusCode = 500, array $data = []): Response
+    {
+        $this->setStatusCode($statusCode);
+        
+        if ($this->request->wantsJson()) {
+            return $this->json([
+                'success' => false,
+                'message' => $message,
+                'data' => $data,
+                'timestamp' => date('c')
+            ]);
+        }
+        
+        // Render error page
+        return $this->setContent($this->renderErrorPage($statusCode, $message));
+    }
+    
+    public function validationError(array $errors, string $message = 'Validation failed'): Response
+    {
+        return $this->json([
+            'success' => false,
+            'message' => $message,
+            'errors' => $errors
+        ], 422);
+    }
+}
+
+
+
+// Enhance existing QueryBuilder/Model classes
+namespace Core\Database;
+
+class QueryBuilder
+{
+    // ... existing code ...
+    
+    protected function executeQuery(string $sql, array $bindings = [])
+    {
+        try {
+            return parent::executeQuery($sql, $bindings);
+        } catch (\PDOException $e) {
+            throw new QueryException(
+                $e->getMessage(),
+                $sql,
+                $bindings
+            );
+        }
+    }
+}
+
+
+
+
+// app/_Core/Validation/ValidatorService.php
+namespace Core\Validation;
+
+class ValidatorService
+{
+    public function validate(array $data, array $rules): bool
+    {
+        $errors = [];
+        
+        foreach ($rules as $field => $fieldRules) {
+            $value = $data[$field] ?? null;
+            
+            foreach ($fieldRules as $rule) {
+                if (!$this->validateRule($value, $rule)) {
+                    $errors[$field][] = $this->getErrorMessage($field, $rule);
+                }
+            }
+        }
+        
+        if (!empty($errors)) {
+            throw new ValidationException($errors);
+        }
+        
+        return true;
+    }
+}
+
+
+// app/config.php - Add error handling config
+return [
+    // ... existing config ...
+    'error' => [
+        'debug' => $_ENV['APP_DEBUG'] ?? false,
+        'log_level' => 'error',
+        'log_path' => __DIR__ . '/../logs/error.log',
+        'monitoring' => [
+            'enabled' => false,
+            'service' => 'sentry', // or 'bugsnag', 'rollbar'
+            'dsn' => $_ENV['SENTRY_DSN'] ?? null
+        ]
+    ]
+];
