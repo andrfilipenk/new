@@ -1,0 +1,67 @@
+<div class="week-grid">
+    <!-- Day Headers -->
+    <div class="grid-header">
+        <?php foreach ($calendarData['days'] as $day): ?>
+            <div class="day-header <?= $day['isToday'] ? 'today' : '' ?>">
+                <div><?= $day['dayShort'] ?></div>
+                <div><?= $day['day'] ?></div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    
+    <!-- Grid Background -->
+    <div class="grid-body">
+        <?php for ($h = 8; $h < 18; $h++): ?>
+            <div class="time-row">
+                <?php foreach ($calendarData['days'] as $day): ?>
+                    <div class="time-cell <?= $day['isToday'] ? 'today-cell' : '' ?>"></div>
+                <?php endforeach; ?>
+            </div>
+        <?php endfor; ?>
+        
+        <!-- Task Overlay -->
+        <div class="task-overlay">
+            <?php foreach ($demoTasks as $i => $task): 
+                $taskStart = new DateTime($task['start']);
+                $taskEnd = new DateTime($task['end']);
+                $weekStart = $calendarData['days'][0]['date'];
+                $weekEnd = $calendarData['days'][6]['date'];
+                
+                // Only show tasks that overlap with current week
+                if ($taskEnd >= $weekStart && $taskStart <= $weekEnd):
+                    // Find start and end positions
+                    $startIdx = 0;
+                    $endIdx = 6;
+                    
+                    // Find start position
+                    for ($idx = 0; $idx < 7; $idx++) {
+                        $dayDate = $calendarData['days'][$idx]['date'];
+                        if ($taskStart->format('Y-m-d') <= $dayDate->format('Y-m-d')) {
+                            $startIdx = $idx;
+                            break;
+                        }
+                    }
+                    
+                    // Find end position  
+                    for ($idx = 6; $idx >= 0; $idx--) {
+                        $dayDate = $calendarData['days'][$idx]['date'];
+                        if ($taskEnd->format('Y-m-d') >= $dayDate->format('Y-m-d')) {
+                            $endIdx = $idx;
+                            break;
+                        }
+                    }
+                    
+                    $span = $endIdx - $startIdx + 1;
+                    $dayWidth = 100 / 7;
+                    $left = $startIdx * $dayWidth;
+                    $width = $span * $dayWidth;
+            ?>
+                <div class="task-bar" 
+                     style="left: <?= $left ?>%; width: <?= $width ?>%; background: <?= $task['color'] ?>; top: <?= 30 + $i * 30 ?>px;" 
+                     title="<?= htmlspecialchars($task['title']) ?>">
+                    <?= htmlspecialchars($task['title']) ?>
+                </div>
+            <?php endif; endforeach; ?>
+        </div>
+    </div>
+</div>

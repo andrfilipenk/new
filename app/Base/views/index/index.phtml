@@ -1,11 +1,27 @@
-<!-- app/views/module/base/index/index.phtml -->
-<h1>Welcome to our Framework</h1>
-<p>Hello, <?= $name ?? 'Guest' ?>!</p>
+<!-- Compact Calendar with Task Bars -->
+<div class="calendar">
+    <!-- Header & Navigation -->
+    <div class="cal-header">
+        <a href="?view=<?= $display ?>&date=<?= $calendarData['prev'] ?>" class="nav-btn">‹</a>
+        <h2><?= $calendarData['title'] ?></h2>
+        <a href="?view=<?= $display ?>&date=<?= $calendarData['next'] ?>" class="nav-btn">›</a>
+    </div>
+    
+    <div class="view-tabs">
+        <a href="?view=week&date=<?= $currentDate->format('Y-m-d') ?>" class="tab <?= $display === 'week' ? 'active' : '' ?>">Week</a>
+        <a href="?view=month&date=<?= $currentDate->format('Y-m-d') ?>" class="tab <?= $display === 'month' ? 'active' : '' ?>">Month</a>
+        <a href="?view=year&date=<?= $currentDate->format('Y-m-d') ?>" class="tab <?= $display === 'year' ? 'active' : '' ?>">Year</a>
+    </div>
+    
+    <!-- Calendar Content -->
+    <?php if ($display === 'week'): ?>
+        <?php include __DIR__ . '/partials/week-view.phtml'; ?>
+    <?php elseif ($display === 'month'): ?>
+        <?php include __DIR__ . '/partials/month-view.phtml'; ?>
+    <?php else: ?>
+        <?php include __DIR__ . '/partials/year-view.phtml'; ?>
+    <?php endif; ?>
+</div>
 
-<?php if (!empty($users)): ?>
-    <ul>
-        <?php foreach ($users as $user): ?>
-            <li><?= $user['name'] ?></li>
-        <?php endforeach; ?>
-    </ul>
-<?php endif; ?>
+<link rel="stylesheet" href="/new/css/calendar.css">
+<script src="/new/js/calendar.js"></script>

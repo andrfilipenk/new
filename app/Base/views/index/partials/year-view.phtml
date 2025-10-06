@@ -1,0 +1,8 @@
+<div class="year-grid">
+    <?php foreach ($calendarData['months'] as $month): ?>
+        <div class="month-card <?= $month['isCurrentMonth'] ? 'current' : '' ?>" 
+             onclick="location.href='?view=month&date=<?= $month['date']->format('Y-m-d') ?>'">
+            <?= $month['name'] ?>
+        </div>
+    <?php endforeach; ?>
+</div>

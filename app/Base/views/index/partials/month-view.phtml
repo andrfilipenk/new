@@ -1,0 +1,74 @@
+<div class="month-grid">
+    <!-- Headers -->
+    <div class="grid-header">
+        <div class="week-col">Wk</div>
+        <?php foreach (['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] as $day): ?>
+            <div class="day-header"><?= $day ?></div>
+        <?php endforeach; ?>
+    </div>
+    
+    <!-- Weeks -->
+    <?php for ($w = 0; $w < 6; $w++): 
+        $start = $w * 7;
+        if (!isset($calendarData['days'][$start])) break;
+        $weekNum = $calendarData['days'][$start]['date']->format('W');
+    ?>
+        <div class="week-row">
+            <div class="week-num" onclick="location.href='?view=week&date=<?= $calendarData['days'][$start]['date']->format('Y-m-d') ?>'"><?= $weekNum ?></div>
+            
+            <?php for ($d = 0; $d < 7; $d++): 
+                $idx = $start + $d;
+                if (!isset($calendarData['days'][$idx])) break;
+                $day = $calendarData['days'][$idx];
+            ?>
+                <div class="day-cell <?= $day['isToday'] ? 'today-cell' : '' ?> <?= !$day['isCurrentMonth'] ? 'other-month' : '' ?>">
+                    <?= $day['day'] ?>
+                </div>
+            <?php endfor; ?>
+            
+            <!-- Week Tasks -->
+            <div class="week-tasks">
+                <?php foreach ($demoTasks as $i => $task): 
+                    $taskStart = new DateTime($task['start']);
+                    $taskEnd = new DateTime($task['end']);
+                    $weekStart = $calendarData['days'][$start]['date'];
+                    $weekEnd = clone $weekStart; $weekEnd->modify('+6 days');
+                    
+                    // Only show tasks that overlap with current week
+                    if ($taskEnd >= $weekStart && $taskStart <= $weekEnd):
+                        // Calculate which days the task spans in this week
+                        $startIdx = 0;
+                        $endIdx = 6;
+                        
+                        // Find start day index
+                        for ($x = 0; $x < 7; $x++) {
+                            $dayDate = $calendarData['days'][$start + $x]['date'] ?? null;
+                            if (!$dayDate) break;
+                            if ($taskStart <= $dayDate) {
+                                $startIdx = $x;
+                                break;
+                            }
+                        }
+                        
+                        // Find end day index
+                        for ($x = 6; $x >= 0; $x--) {
+                            $dayDate = $calendarData['days'][$start + $x]['date'] ?? null;
+                            if (!$dayDate) continue;
+                            if ($taskEnd >= $dayDate) {
+                                $endIdx = $x;
+                                break;
+                            }
+                        }
+                        
+                        $span = $endIdx - $startIdx + 1;
+                        $left = 12.5 + ($startIdx * 12.5);
+                        $width = $span * 12.5;
+                ?>
+                    <div class="task-bar small" style="left:<?= $left ?>%;width:<?= $width ?>%;background:<?= $task['color'] ?>;top:<?= 10 + ($i % 3) * 18 ?>px" title="<?= $task['title'] ?>">
+                        <?= htmlspecialchars($task['title']) ?>
+                    </div>
+                <?php endif; endforeach; ?>
+            </div>
+        </div>
+    <?php endfor; ?>
+</div>
