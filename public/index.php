@@ -1,4 +1,5 @@
 <?php
+// public/index.php
 date_default_timezone_set('Europe/Berlin');
 /** 
  * @var \Core\Mvc\App $app 
