@@ -3,6 +3,7 @@
 namespace Core\Mvc;
 
 use Core\Di\Injectable;
+use Core\Di\Interface\Container as ContainerInterface;
 use Core\Events\EventAware;
 
 abstract class AbstractModule implements ModuleInterface
@@ -80,8 +81,16 @@ abstract class AbstractModule implements ModuleInterface
         // Override in child classes
     }
 
-    public function boot($di, $module, $controller, $action) 
+    /**
+     * Summary of boot
+     * @param mixed $di
+     * @param mixed $module
+     * @param mixed $controller
+     * @param mixed $action
+     * @return void
+     */
+    public function boot(ContainerInterface $di, $module, $controller, $action) 
     {
-        return $this;
+        // Override in child classes
     }
 }
