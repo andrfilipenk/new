@@ -40,6 +40,7 @@ class Group extends Controller
     public function deleteAction()
     {
         $id = $this->getDispatcher()->getParam('id');
+        /** @var GroupModel $group */
         $group = GroupModel::find($id);
         if ($group) {
             // Remove all user-group associations first

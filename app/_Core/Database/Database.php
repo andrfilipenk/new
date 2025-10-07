@@ -6,6 +6,7 @@ use PDO;
 use PDOException;
 use Core\Di\Injectable;
 use Core\Events\EventAware;
+use Core\Exception\DatabaseException;
 
 class Database
 {
@@ -325,11 +326,14 @@ class Database
         } catch (PDOException $e) {
             $paramCount     = substr_count($sql, '?');
             $providedCount  = count($params);
-            throw new DatabaseException(
-                "Query failed: {$e->getMessage()}\n" .
-                "SQL: {$sql}\n" .
-                "Expected parameters: {$paramCount}, Provided: {$providedCount}\n" .
-                "Parameters: " . json_encode($params)
+            throw new QueryException(
+                $e->getMessage(),
+                $sql,
+                [
+                    'Expected parameters' => $paramCount,
+                    'Provided parameters' => $providedCount,
+                    'Parameters' => json_encode($params)
+                ]
             );
         }
     }

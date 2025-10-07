@@ -48,25 +48,19 @@ class Profile extends Controller
             return $this->redirect('user/login');
         }
         if ($this->isPost()) {
-            $data = $this->getRequest()->all();
-            
-            // Basic validation
-            $name = trim($data['name'] ?? '');
-            $email = trim($data['email'] ?? '');
-            
+            $data   = $this->getRequest()->all();
+            $name   = trim($data['name'] ?? '');
+            $email  = trim($data['email'] ?? '');
             if (!$name || !$email) {
                 $this->flashError('Name and email are required.');
             } else {
-                $user->name = $name;
-                $user->email = $email;
-                
-                if ($user->save()) {
-                    // Update session data
+                $user->name     = $name;
+                $user->email    = $email;
+                if ($user->save()) { // Update session data
                     $sessionUser = $this->getSession()->get('user');
-                    $sessionUser['name'] = $name;
-                    $sessionUser['email'] = $email;
+                    $sessionUser['name']    = $name;
+                    $sessionUser['email']   = $email;
                     $this->getSession()->set('user', $sessionUser);
-                    
                     $this->flashSuccess('Profile updated successfully.');
                     return $this->redirect('user/profile');
                 } else {
@@ -74,7 +68,6 @@ class Profile extends Controller
                 }
             }
         }
-
         return $this->render('profile/edit', ['user' => $user]);
     }
 
@@ -88,14 +81,11 @@ class Profile extends Controller
             $this->flashError('Please log in to access your profile.');
             return $this->redirect('user/login');
         }
-
         if ($this->isPost()) {
             $data = $this->getRequest()->all();
-            
-            $currentPassword = $data['current_password'] ?? '';
-            $newPassword = $data['new_password'] ?? '';
-            $confirmPassword = $data['confirm_password'] ?? '';
-            
+            $currentPassword    = $data['current_password'] ?? '';
+            $newPassword        = $data['new_password']     ?? '';
+            $confirmPassword    = $data['confirm_password'] ?? '';
             // Validate current password
             if (!$user->verifyPassword($currentPassword)) {
                 $this->flashError('Current password is incorrect.');
@@ -107,7 +97,6 @@ class Profile extends Controller
                 $config = $this->getDI()->get('config');
                 $algo = $config['app']['hash_algo'];
                 $user->password = password_hash($newPassword, $algo);
-                
                 if ($user->save()) {
                     $this->flashSuccess('Password changed successfully.');
                     return $this->redirect('user/profile');
@@ -116,7 +105,6 @@ class Profile extends Controller
                 }
             }
         }
-
         return $this->render('profile/password', ['user' => $user]);
     }
 }

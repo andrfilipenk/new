@@ -9,7 +9,8 @@ class Form implements FormInterface
     protected array $fields = [];
     protected array $values = [];
     protected array $renderers;
-    protected string $template = '<form method="post">{fields}</form>';
+    protected $action;
+    protected string $template = '<form method="post" action="{action}">{fields}</form>';
     protected string $fieldTemplate = '<div class="form-group">{label}{field}</div>';
 
     public function __construct()
@@ -48,74 +49,6 @@ class Form implements FormInterface
             $this->attrs($name, $field),
             ['type' => $field['attributes']['type'] ?? 'button']
         ));
-    }
-
-    public function addField(string $name, string $type, array $options = []): static
-    {
-        $this->fields[$name] = [
-            'type'          => $type,
-            'label'         => $options['label'] ?? $this->generateLabel($name),
-            'required'      => $options['attributes']['required'] ?? false,
-            'attributes'    => $options['attributes'] ?? [],
-            'options'       => $options['options'] ?? [],
-            'renderer'      => $options['renderer'] ?? null,
-        ];
-        return $this;
-    }
-
-    public function addFieldRenderer(string $type, callable $renderer): static
-    {
-        $this->renderers[$type] = $renderer;
-        return $this;
-    }
-
-    public function setValues(array $values): static
-    {
-        $this->values = array_merge($this->values, $values);
-        return $this;
-    }
-
-    public function getValues(): array
-    {
-        return $this->values;
-    }
-
-    public function render(): string
-    {
-        $output = $this->template;
-        // Replace individual field placeholders first
-        foreach (array_keys($this->fields) as $name) {
-            $placeholder = '{field_' . $name . '}';
-            if (strpos($output, $placeholder) !== false) {
-                $output = str_replace($placeholder, $this->renderField($name), $output);
-            }
-        }
-        // Then replace the general {fields} placeholder with any remaining fields
-        $remainingFields = '';
-        foreach (array_keys($this->fields) as $name) {
-            $placeholder = '{field_' . $name . '}';
-            if (strpos($output, $placeholder) === false) {
-                $remainingFields .= $this->renderField($name);
-            }
-        }
-        return str_replace('{fields}', $remainingFields, $output);
-    }
-
-    public function renderField(string $name): string
-    {
-        $field = $this->fields[$name] ?? null;
-        if (!$field) return '';
-        $value      = $this->values[$name] ?? null;
-        $renderer   = $field['renderer'] ?? $this->renderers[$field['type']] ?? $this->renderers['text'];
-        $fieldHtml  = $renderer($name, $field, $value);
-        if ($field['type'] === 'button' || $field['type'] === 'hidden') {
-            return $fieldHtml;
-        }
-        return str_replace(
-            ['{label}', '{field}'],
-            [Tag::label($field['label'], ['for' => $name]), $fieldHtml],
-            $this->fieldTemplate
-        );
     }
 
     private function selectRenderer(string $name, array $field, $value): string
@@ -158,6 +91,75 @@ class Form implements FormInterface
         return implode('', $radios);
     }
 
+    public function addField(string $name, string $type, array $options = []): static
+    {
+        $this->fields[$name] = [
+            'type'          => $type,
+            'label'         => $options['label'] ?? $this->generateLabel($name),
+            'required'      => $options['attributes']['required'] ?? false,
+            'attributes'    => $options['attributes'] ?? [],
+            'options'       => $options['options'] ?? [],
+            'renderer'      => $options['renderer'] ?? null,
+        ];
+        return $this;
+    }
+
+    public function addFieldRenderer(string $type, callable $renderer): static
+    {
+        $this->renderers[$type] = $renderer;
+        return $this;
+    }
+
+    public function render(): string
+    {
+        $output = $this->template;
+        // Replace individual field placeholders first
+        foreach (array_keys($this->fields) as $name) {
+            $placeholder = '{field_' . $name . '}';
+            if (strpos($output, $placeholder) !== false) {
+                $output = str_replace($placeholder, $this->renderField($name), $output);
+            }
+        }
+        // Then replace the general {fields} placeholder with any remaining fields
+        $remainingFields = '';
+        foreach (array_keys($this->fields) as $name) {
+            $placeholder = '{field_' . $name . '}';
+            if (strpos($output, $placeholder) === false) {
+                $remainingFields .= $this->renderField($name);
+            }
+        }
+        $output = str_replace('{action}', $this->action, $output);
+        return str_replace('{fields}', $remainingFields, $output);
+    }
+
+    public function renderField(string $name): string
+    {
+        $field = $this->fields[$name] ?? null;
+        if (!$field) return '';
+        $value      = $this->values[$name] ?? null;
+        $renderer   = $field['renderer'] ?? $this->renderers[$field['type']] ?? $this->renderers['text'];
+        $fieldHtml  = $renderer($name, $field, $value);
+        if ($field['type'] === 'button' || $field['type'] === 'hidden') {
+            return $fieldHtml;
+        }
+        return str_replace(
+            ['{label}', '{field}'],
+            [Tag::label($field['label'], ['for' => $name]), $fieldHtml],
+            $this->fieldTemplate
+        );
+    }
+
+    public function setValues(array $values): static
+    {
+        $this->values = array_merge($this->values, $values);
+        return $this;
+    }
+
+    public function getValues(): array
+    {
+        return $this->values;
+    }
+
     private function attrs(string $name, array $field): array
     {
         $attrs = $field['attributes'] ?? [];
@@ -189,6 +191,12 @@ class Form implements FormInterface
     private function generateLabel(string $name): string
     {
         return ucwords(str_replace(['_', '-'], ' ', $name));
+    }
+
+    public function setAction($action): static
+    {
+        $this->action = $action;
+        return $this;
     }
 
     public function setTemplate(string $template): static

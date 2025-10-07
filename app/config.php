@@ -16,6 +16,13 @@ return [
         ],
     ],
 
+    'logging' => [
+        'file'              => APP_PATH . '../public/logs/app.log',
+        'level'             => 'debug', // Options: emergency, alert, critical, error, warning, notice, info, debug
+        'buffer_size'       => 10, // Buffer logs to reduce I/O
+        'rotation_size'     => 5242880 // 5MB in bytes
+    ],
+
     'data' => [
         'accounts' => [
             '1000' => 'user',
@@ -74,17 +81,13 @@ return [
     ],
 
     'acl' => [
-        'allowed' => [
-            'guest.base.auth.login',
-            'guest.base.auth.kuhnle',
-            'guest.base.error.notfound',
-            'guest.base.error.denied',
-            'guest.base.task.index'
-        ],
-        'denied' => [
-            'module'     => 'base',
-            'controller' => 'error',
-            'action'     => 'denied',
+        'public' => [
+            ['base', 'dashboard',   'index'],
+            ['base', 'error',       'denied'],
+            ['base', 'error',       'notfound'],
+            ['base', 'error',       'error'],
+            ['user', 'auth',        'login'],
+            ['user', 'auth',        'kuhnle'],
         ]
     ],
 ];

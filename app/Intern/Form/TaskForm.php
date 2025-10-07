@@ -19,6 +19,7 @@ class TaskForm
         }
 
         $builder
+            ->setAction('')
             ->addSelect('created_by', $userOptions, 'Created By', ['required' => true])
             ->addSelect('assigned_to', $userOptions, 'Assigned To', ['required' => true])
             ->addText('title', 'Task Title', ['required' => true])

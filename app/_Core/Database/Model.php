@@ -8,6 +8,8 @@ use Core\Database\Model\HasMany;
 use Core\Database\Model\BelongsTo;
 use Core\Database\Model\BelongsToMany;
 
+use Core\Exception\DatabaseException;
+
 abstract class Model
 {
     protected $table            = '';
@@ -170,6 +172,14 @@ abstract class Model
         return $result;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $related
+     * @param string|null $foreignKey
+     * @param string|null $localKey
+     * @return HasOne
+     */
     public function hasOne(string $related, ?string $foreignKey = null, ?string $localKey = null): HasOne
     {
         return new HasOne(
@@ -180,6 +190,14 @@ abstract class Model
         );
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $related
+     * @param string|null $foreignKey
+     * @param string|null $localKey
+     * @return HasMany
+     */
     public function hasMany(string $related, ?string $foreignKey = null, ?string $localKey = null): HasMany
     {
         return new HasMany(
@@ -190,6 +208,14 @@ abstract class Model
         );
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $related
+     * @param string|null $foreignKey
+     * @param string|null $ownerKey
+     * @return BelongsTo
+     */
     public function belongsTo(string $related, ?string $foreignKey = null, ?string $ownerKey = null): BelongsTo
     {
         $instance = $this->getRelatedInstance($related);
@@ -201,6 +227,14 @@ abstract class Model
         );
     }
 
+    /**
+     *
+     * @param string $related
+     * @param string|null $table
+     * @param string|null $foreignPivotKey
+     * @param string|null $relatedPivotKey
+     * @return BelongsToMany
+     */
     public function belongsToMany(string $related, ?string $table = null, ?string $foreignPivotKey = null, ?string $relatedPivotKey = null): BelongsToMany
     {
         $instance = $this->getRelatedInstance($related);
@@ -213,22 +247,40 @@ abstract class Model
         );
     }
 
+    /**
+     *
+     * @return static
+     */
     private static function getInstance(): static
     {
         $class = static::class;
         return self::$instances[$class] ??= new static;
     }
 
+    /**
+     *
+     * @param string $class
+     * @return Model
+     */
     private function getRelatedInstance(string $class): Model
     {
         return self::$instances[$class] ??= new $class;
     }
 
+    /**
+     *
+     * @return string
+     */
     private function getTableName(): string
     {
         return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', self::className(static::class))) . 's';
     }
 
+    /**
+     *
+     * @param array $attributes
+     * @return static
+     */
     public static function newFromBuilder(array $attributes): static
     {
         $model = new static;
@@ -238,32 +290,60 @@ abstract class Model
         return $model;
     }
 
+    /**
+     *
+     * @return string
+     */
     public function getTable(): string
     {
         return $this->table;
     }
 
+    /**
+     *
+     * @return string
+     */
     public function getKeyName(): string
     {
         return $this->primaryKey;
     }
 
+    /**
+     *
+     * @param array $attributes
+     * @return self
+     */
     public function fill(array $attributes): self
     {
         $this->attributes = array_merge($this->attributes, $attributes);
         return $this;
     }
 
+    /**
+     *
+     * @param string $key
+     * @return mixed
+     */
     public function __get(string $key): mixed
     {
         return $this->getData($key);
     }
 
-    public function __set(string $key, mixed $value): void
+    /**
+     *
+     * @param string $key
+     * @param mixed $value
+     */
+    public function __set(string $key, mixed $value)
     {
         $this->setData($key, $value);
     }
 
+    /**
+     *
+     * @param string $key
+     * @return mixed
+     */
     public function getData($key = null): mixed
     {
         if ($key === null) {
@@ -278,22 +358,42 @@ abstract class Model
         return $this->relations[$key] ?? null;
     }
 
+    /**
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return self
+     */
     public function setData(string $key, mixed $value): self
     {
         $this->attributes[$key] = $value;
         return $this;
     }
 
+    /**
+     *
+     * @return mixed
+     */
     public function getKey(): mixed
     {
         return $this->attributes[$this->primaryKey] ?? null;
     }
 
+    /**
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
     public function setRelation($key, mixed $value): void
     {
         $this->relations[$key] = $value;
     }
 
+    /**
+     *
+     * @return array
+     */
     protected function getDirty(): array
     {
         $dirty = [];
@@ -305,16 +405,30 @@ abstract class Model
         return $dirty;
     }
 
-    private function syncOriginal(): void
+    /**
+     *
+     * @return self
+     */
+    private function syncOriginal(): self
     {
         $this->original = $this->attributes;
+        return $this;
     }
 
+    /**
+     *
+     * @return string
+     */
     private function getForeignKey(): string
     {
         return strtolower(self::className(static::class)) . '_id';
     }
 
+    /**
+     *
+     * @param Model $related
+     * @return string
+     */
     private function getJoinTableName(Model $related): string
     {
         $models = [
@@ -325,17 +439,32 @@ abstract class Model
         return implode('_', $models);
     }
 
+    /**
+     *
+     * @param object|string $class
+     * @return string
+     */
     public static function className($class): string
     {
         $class = is_object($class) ? get_class($class) : $class;
         return basename(str_replace('\\', '/', $class));
     }
 
+    /**
+     *
+     * @param string $method
+     * @param array $parameters
+     * @return mixed
+     */
     public static function __callStatic(string $method, array $parameters): mixed
     {
         return static::query()->$method(...$parameters);
     }
 
+    /**
+     *
+     * @return boolean
+     */
     protected function usesTimestamps(): bool
     {
         return in_array('created_at', array_keys($this->attributes)) || 
@@ -343,6 +472,10 @@ abstract class Model
                property_exists($this, 'timestamps') && $this->timestamps !== false;
     }
 
+    /**
+     *
+     * @param string $event
+     */
     protected function fireEvent(string $event): void
     {
         $eventManager = Container::getDefault()->get('eventsManager');
@@ -351,6 +484,10 @@ abstract class Model
         }
     }
 
+    /**
+     *
+     * @return Database
+     */
     public static function queryWithScopes(): Database
     {
         $instance = static::getInstance();
@@ -361,18 +498,32 @@ abstract class Model
         return $query;
     }
 
+    /**
+     *
+     * @return Database
+     */
     public static function withTrashed(): Database
     {
         $instance = static::getInstance();
         return self::db()->table($instance->table);
     }
 
+    /**
+     *
+     * @return Database
+     */
     public static function onlyTrashed(): Database
     {
         $instance = static::getInstance();
         return self::db()->table($instance->table)->where($instance->deletedAt, '!=', null);
     }
     
+    /**
+     *
+     * @param string $key
+     * @param int|float|string|boolean|array|\DateTime $value
+     * @return void
+     */
     protected function castAttribute(string $key, $value)
     {
         if (!isset($this->casts[$key])) {
@@ -390,6 +541,11 @@ abstract class Model
         };
     }
 
+    /**
+     *
+     * @param string $key
+     * @return boolean
+     */
     protected function isFillable(string $key): bool
     {
         if (!empty($this->fillable)) {
@@ -401,6 +557,11 @@ abstract class Model
         return true;
     }
 
+    /**
+     *
+     * @param Relation[] $relations
+     * @return self
+     */
     public function withCount($relations)
     {
         if (is_string($relations)) {

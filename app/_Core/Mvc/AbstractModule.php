@@ -79,4 +79,9 @@ abstract class AbstractModule implements ModuleInterface
     {
         // Override in child classes
     }
+
+    public function boot($di, $module, $controller, $action) 
+    {
+        return $this;
+    }
 }

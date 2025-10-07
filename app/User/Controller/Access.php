@@ -23,12 +23,10 @@ class Access extends Controller
             $data = $this->getRequest()->all();
             $name = trim($data['name'] ?? '');
             $description = trim($data['description'] ?? '');
-
             if ($name) {
                 $role = new Role();
                 $role->name = $name;
                 $role->description = $description;
-                
                 if ($role->save()) {
                     $this->flashSuccess('Role created successfully.');
                     return $this->redirect('user/access/roles');
@@ -39,7 +37,6 @@ class Access extends Controller
                 $this->flashError('Role name is required.');
             }
         }
-
         return $this->render('access/create-role');
     }
 
@@ -48,17 +45,14 @@ class Access extends Controller
     {
         $id = $this->getDispatcher()->getParam('id');
         $role = Role::find($id);
-        
         if (!$role) {
             $this->flashError('Role not found.');
             return $this->redirect('user/access/roles');
         }
-
         if ($this->isPost()) {
             $data = $this->getRequest()->all();
             $name = trim($data['name'] ?? '');
             $description = trim($data['description'] ?? '');
-
             if ($name) {
                 $role->name = $name;
                 $role->description = $description;
@@ -73,7 +67,6 @@ class Access extends Controller
                 $this->flashError('Role name is required.');
             }
         }
-
         return $this->render('access/edit-role', ['role' => $role]);
     }
 
@@ -91,7 +84,6 @@ class Access extends Controller
         } else {
             $this->flashError('Role not found.');
         }
-        
         return $this->redirect('user/access/roles');
     }
 
@@ -110,7 +102,6 @@ class Access extends Controller
             $name = trim($data['name'] ?? '');
             $resource = trim($data['resource'] ?? '');
             $action = trim($data['action'] ?? '');
-
             if ($name && $resource && $action) {
                 $permission = new Permission();
                 $permission->name = $name;
@@ -127,7 +118,6 @@ class Access extends Controller
                 $this->flashError('All fields are required.');
             }
         }
-
         return $this->render('access/create-permission');
     }
 
@@ -136,12 +126,10 @@ class Access extends Controller
     {
         $id = $this->getDispatcher()->getParam('id');
         $permission = Permission::find($id);
-        
         if (!$permission) {
             $this->flashError('Permission not found.');
             return $this->redirect('user/access/permissions');
         }
-
         if ($this->isPost()) {
             $data = $this->getRequest()->all();
             $name = trim($data['name'] ?? '');
@@ -152,7 +140,6 @@ class Access extends Controller
                 $permission->name = $name;
                 $permission->resource = $resource;
                 $permission->action = $action;
-                
                 if ($permission->save()) {
                     $this->flashSuccess('Permission updated successfully.');
                     return $this->redirect('user/access/permissions');
@@ -163,7 +150,6 @@ class Access extends Controller
                 $this->flashError('All fields are required.');
             }
         }
-
         return $this->render('access/edit-permission', ['permission' => $permission]);
     }
 
@@ -172,7 +158,6 @@ class Access extends Controller
     {
         $id = $this->getDispatcher()->getParam('id');
         $permission = Permission::find($id);
-        
         if ($permission) {
             if ($permission->delete()) {
                 $this->flashSuccess('Permission deleted successfully.');
@@ -182,7 +167,6 @@ class Access extends Controller
         } else {
             $this->flashError('Permission not found.');
         }
-        
         return $this->redirect('user/access/permissions');
     }
 
@@ -209,18 +193,16 @@ class Access extends Controller
     public function manageUserRolesAction()
     {
         $id = $this->getDispatcher()->getParam('id');
+        /** @var User $user */
         $user = User::find($id);
-        
         if (!$user) {
             $this->flashError('User not found.');
             return $this->redirect('user/access/user-roles');
         }
-
         if ($this->isPost()) {
             $data = $this->getRequest()->all();
             $action = $data['action'] ?? '';
             $roleId = (int)($data['role_id'] ?? 0);
-
             if ($roleId > 0) {
                 if ($action === 'assign') {
                     $user->assignRoleById($roleId);
@@ -230,13 +212,10 @@ class Access extends Controller
                     $this->flashSuccess('Role removed from user.');
                 }
             }
-            
             return $this->redirect('user/access/manage-user-roles/' . $id);
         }
-
         $allRoles = Role::all();
         $userRoles = $user->roles()->getResults();
-        
         return $this->render('access/manage-user-roles', [
             'user' => $user,
             'userRoles' => $userRoles,
@@ -256,18 +235,15 @@ class Access extends Controller
     {
         $id = $this->getDispatcher()->getParam('id');
         $user = User::find($id);
-        
         if (!$user) {
             $this->flashError('User not found.');
             return $this->redirect('user/access/user-permissions');
         }
-
         if ($this->isPost()) {
             $data = $this->getRequest()->all();
             $action = $data['action'] ?? '';
             $permissionId = (int)($data['permission_id'] ?? 0);
             $granted = isset($data['granted']) ? (int)$data['granted'] : 1;
-
             if ($permissionId > 0) {
                 if ($action === 'assign') {
                     $this->assignUserPermission($user->id, $permissionId, $granted);
@@ -277,13 +253,10 @@ class Access extends Controller
                     $this->flashSuccess('Permission removed from user.');
                 }
             }
-            
             return $this->redirect('user/access/manage-user-permissions/' . $id);
         }
-
         $allPermissions = Permission::all();
         $userPermissions = $this->getUserPermissions($user->id);
-        
         return $this->render('access/manage-user-permissions', [
             'user' => $user,
             'userPermissions' => $userPermissions,
@@ -295,22 +268,17 @@ class Access extends Controller
     private function assignUserPermission(int $userId, int $permissionId, int $granted = 1)
     {
         $db = User::db();
-        
-        // Check if permission already exists
-        $existing = $db->table('acl_user_permission')
+        $existing = $db->table('acl_user_permission') // permission already exists
             ->where('user_id', $userId)
             ->where('permission_id', $permissionId)
             ->first();
-            
         if ($existing) {
-            // Update existing permission
-            $db->table('acl_user_permission')
+            $db->table('acl_user_permission') // Update existing permission
                 ->where('user_id', $userId)
                 ->where('permission_id', $permissionId)
                 ->update(['granted' => $granted, 'updated_at' => date('Y-m-d H:i:s')]);
         } else {
-            // Insert new permission
-            $db->table('acl_user_permission')->insert([
+            $db->table('acl_user_permission')->insert([ // Insert new permission
                 'user_id' => $userId,
                 'permission_id' => $permissionId,
                 'granted' => $granted,
@@ -339,7 +307,6 @@ class Access extends Controller
             ->join('acl_permission', 'acl_user_permission.permission_id', '=', 'acl_permission.id')
             ->where('acl_user_permission.user_id', $userId)
             ->get();
-            
         return array_map([Permission::class, 'newFromBuilder'], $results);
     }
 }

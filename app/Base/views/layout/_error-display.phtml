@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><?php echo htmlspecialchars($this->get('title', 'My Application')); ?></title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <?php if ($messages = $this->messages()): ?>
+            <div class="alerts">
+                <?php foreach ($messages as $message): ?>
+                    <div class="alert alert-<?php echo $message['type']; ?>">
+                        <?php echo htmlspecialchars($message['message']); ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <?php echo $this->content; ?>
+    </div>
+    <script src="/assets/js/bootstrap.min.js"></script>
+</body>
+</html>

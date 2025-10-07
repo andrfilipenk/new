@@ -3,6 +3,7 @@
 namespace Core\Validation;
 
 use Core\Di\Injectable;
+use Core\Exception\ValidationException;
 use DateTime;
 
 class Validator
@@ -25,7 +26,10 @@ class Validator
                 $this->applyRule($field, $value, $ruleName, $param, $data);
             }
         }
-        return empty($this->errors);
+        if (!empty($this->errors)) {
+            throw new ValidationException($this->errors);
+        }
+        return true;
     }
 
     /**

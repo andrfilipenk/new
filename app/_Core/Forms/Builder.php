@@ -78,6 +78,12 @@ class Builder
         return $this;
     }
 
+    public function setAction($action): self
+    {
+        $this->form->setAction($action);
+        return $this;
+    }
+
     public function setValues(array $values): self
     {
         $this->form->setValues($values);

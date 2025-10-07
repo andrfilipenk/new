@@ -4,11 +4,10 @@ namespace Core\Mvc;
 
 use Core\Mvc\AbstractModule;
 use Core\Di\Injectable;
-use Core\Di\Interface\Container as ContainerInterface;
 use Core\Events\EventAware;
+use Core\Exception\NotFoundException;
 use Core\Http\Request;
 use Core\Http\Response;
-use Exception;
 
 /**
  * Optimized App class with reduced DI lookups and better error handling
@@ -16,6 +15,7 @@ use Exception;
 class App
 {
     use Injectable, EventAware;
+
     private $dispatcher;
 
     /**
@@ -70,15 +70,15 @@ class App
             $request->method(), 
             $module->getRoutes());
             if ($route) {
+                $module->boot($di, $route['module'], $route['controller'], $route['action']);
                 break;
             }
         }
         if (!$route) {
-            $exception = new Exception('Route not found');
-            $this->fireEvent('app.noRouteFound', $exception);
-            $response = $this->createErrorResponse($exception);
-            $response->send();
-            return;
+            throw new NotFoundException('Route not found', 'Notfound', [
+                'uri' => $request->uri(),
+                'method' => $request->method(),
+            ]);
         }
         $dispatcher->prepare($route);
         $result = $dispatcher->dispatch();
@@ -96,26 +96,5 @@ class App
         $this->fireEvent('app.beforeSendResponse', $this);
         $response->send();
         return;
-    }
-
-    private function createErrorResponse(Exception $e): Response
-    {
-        $isDebug  = $this->config['app']['debug'] ?? false;
-        $response = $this->di->get('response');
-        $response->setStatusCode(500);
-        if ($isDebug) {
-            $message = sprintf(
-                "Error: %s\nFile: %s\nLine: %d\n\nStack Trace:\n%s",
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine(),
-                $e->getTraceAsString()
-            );
-            $response->setContent($message);
-            $response->setHeaders(['Content-Type' => 'text/plain']);
-            return $response;
-        }
-        $response->setContent('An unexpected error occurred.');
-        return $response;
     }
 }

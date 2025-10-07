@@ -9,9 +9,6 @@ class Auth extends Controller
 {
     public function indexAction()
     {
-        if (!$this->getSession()->get('user')) {
-            return $this->redirect('user/login');
-        }
         $handler = $this->getSession()->getHandler();
         $activeSessions = $handler->getActiveSessionsCount();
         return $this->render(null, ['activeSessions' => $activeSessions]);
