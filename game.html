@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<!--
+    PING PONG GAME
+    ==============
+    A modern, interactive ping pong game built with HTML5, CSS3, and vanilla JavaScript.
+    
+    Features:
+    - Single player vs AI with 3 difficulty levels
+    - Local two-player multiplayer
+    - Real-time physics and collision detection
+    - Particle effects and visual animations
+    - Synthetic audio system with sound effects
+    - Responsive design with modern UI
+    - Keyboard and touch controls
+    - Fullscreen support
+    
+    Controls:
+    - Player 1: W/S or Arrow Up/Down
+    - Player 2: I/K keys
+    - Space: Pause/Resume or Start Game
+    - Escape: Return to menu
+    - M: Mute/Unmute audio
+    - R: Restart game
+    - F: Toggle fullscreen
+    - D: Toggle debug info
+    
+    Created as a single-file game for easy deployment and portability.
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        /* Modern Ping Pong Game Styling */
+        :root {
+            --primary-neon: #00ff88;
+            --secondary-neon: #ff0080;
+            --accent-blue: #00ccff;
+            --dark-bg: #1a1a1a;
+            --darker-bg: #0d0d0d;
+            --card-bg: #2d2d2d;
+            --text-light: #ffffff;
+            --text-muted: #cccccc;
+            --border-glow: rgba(0, 255, 136, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--card-bg) 50%, var(--darker-bg) 100%);
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-light);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 136, 0.05) 0%, transparent 70%);
+        }
+        
+        /* Header Styling */
+        header h1 {
+            color: var(--primary-neon);
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.4);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            animation: pulseGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from { text-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.4); }
+            to { text-shadow: 0 0 30px rgba(0, 255, 136, 1), 0 0 60px rgba(0, 255, 136, 0.6); }
+        }
+
+        #scoreDisplay {
+            color: var(--text-light);
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+        
+        /* Game Canvas Styling */
+        .game-area {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        #gameCanvas {
+            border: 3px solid var(--primary-neon);
+            border-radius: 15px;
+            background: var(--darker-bg);
+            box-shadow: 
+                0 0 30px var(--border-glow),
+                inset 0 0 20px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        #gameCanvas:hover {
+            box-shadow: 
+                0 0 50px var(--border-glow),
+                inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--primary-neon);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-neon);
+            animation: fadeInOut 1.5s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        /* Control Panel Styling */
+        .control-panel {
+            background: rgba(45, 45, 45, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Button Styling */
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--primary-neon), #00cc70);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(45deg, #00cc70, var(--primary-neon));
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ffa500, #ff8c00);
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.3);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(45deg, #ff8c00, #ffa500);
+            box-shadow: 0 6px 20px rgba(255, 165, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-light {
+            border: 2px solid var(--text-muted);
+            color: var(--text-light);
+            background: transparent;
+        }
+
+        .btn-outline-light:hover {
+            background: var(--text-light);
+            color: var(--dark-bg);
+            border-color: var(--text-light);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Form Controls */
+        .form-select {
+            background: var(--card-bg);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            background: var(--card-bg);
+            border-color: var(--primary-neon);
+            color: var(--text-light);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .form-select option {
+            background: var(--card-bg);
+            color: var(--text-light);
+        }
+        
+        /* Instructions Card */
+        .card {
+            background: rgba(45, 45, 45, 0.95) !important;
+            border: 1px solid rgba(0, 255, 136, 0.2) !important;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 255, 136, 0.4) !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-title {
+            color: var(--primary-neon);
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+
+            #gameCanvas {
+                width: 100%;
+                max-width: 350px;
+                height: auto;
+            }
+
+            .control-panel .row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .control-panel .col-auto {
+                width: 100%;
+            }
+
+            .btn, .form-select {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            #gameCanvas {
+                max-width: 300px;
+            }
+
+            .control-panel {
+                padding: 15px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-neon);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00cc70;
+        }
+
+        /* Loading Animation */
+        .loading i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Game State Indicators */
+        .game-state-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            z-index: 10;
+        }
+
+        .game-message {
+            text-align: center;
+            color: var(--primary-neon);
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header Section -->
+        <header class="text-center mb-4">
+            <h1 class="display-4 mb-3" style="color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);">
+                <i class="bi bi-circle-fill"></i> PING PONG <i class="bi bi-circle-fill"></i>
+            </h1>
+            <div id="scoreDisplay" class="h4 mb-0">
+                <span id="player1Score">0</span> - <span id="player2Score">0</span>
+            </div>
+        </header>
+
+        <!-- Game Canvas -->
+        <main class="game-area">
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+            <div id="loadingMessage" class="loading">
+                <i class="bi bi-hourglass-split"></i> Loading Game...
+            </div>
+            <!-- Game State Overlay -->
+            <div id="gameStateOverlay" class="game-state-overlay" style="display: none;">
+                <div class="game-message">
+                    <div id="overlayTitle">PAUSED</div>
+                    <div id="overlaySubtitle" class="mt-2" style="font-size: 1rem; opacity: 0.8;">Press SPACE to resume</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Control Panel -->
+        <section class="control-panel mt-4">
+            <div class="row g-3 align-items-center justify-content-center">
+                <div class="col-auto">
+                    <button id="startBtn" class="btn btn-success btn-lg">
+                        <i class="bi bi-play-fill"></i> Start Game
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <button id="pauseBtn" class="btn btn-warning btn-lg" disabled>
+                        <i class="bi bi-pause-fill"></i> Pause
+                    </button>
+                </div>
+                <div class="col-auto">
+                    <select id="gameModeSelect" class="form-select">
+                        <option value="singlePlayer">Single Player</option>
+                        <option value="twoPlayer">Two Player</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select id="difficultySelect" class="form-select">
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button id="muteBtn" class="btn btn-outline-light">
+                        <i class="bi bi-volume-up-fill"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Instructions -->
+        <footer class="mt-4 text-center">
+            <div class="card bg-dark border-secondary">
+                <div class="card-body">
+                    <h6 class="card-title">Controls & Info</h6>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <small>
+                                <strong>Player 1:</strong> W/S or ↑/↓<br>
+                                <strong>Player 2:</strong> I/K keys
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <small>
+                                <strong>Space:</strong> Pause/Resume<br>
+                                <strong>Escape:</strong> Main Menu
+                            </small>
+                        </div>
+                        <div class="col-md-4">
+                            <small>
+                                <strong>R:</strong> Restart Game<br>
+                                <strong>F:</strong> Fullscreen<br>
+                                <strong>M:</strong> Mute/Unmute
+                            </small>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <span id="gameStatus">Ready to play</span> | 
+                            <span id="gameInfo">Select mode and difficulty</span>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // ========================
+        // GAME OBJECT SYSTEM
+        // ========================
+        
+        class GameObject {
+            constructor(x = 0, y = 0, width = 0, height = 0) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.velocityX = 0;
+                this.velocityY = 0;
+                this.color = '#ffffff';
+                this.active = true;
+            }
+            
+            update(deltaTime) {
+                // Override in subclasses
+            }
+            
+            render(ctx) {
+                // Override in subclasses
+            }
+            
+            // Collision detection helpers
+            getBounds() {
+                return {
+                    left: this.x,
+                    right: this.x + this.width,
+                    top: this.y,
+                    bottom: this.y + this.height,
+                    centerX: this.x + this.width / 2,
+                    centerY: this.y + this.height / 2
+                };
+            }
+            
+            intersects(other) {
+                const thisBounds = this.getBounds();
+                const otherBounds = other.getBounds();
+                
+                return !(thisBounds.right < otherBounds.left ||
+                        thisBounds.left > otherBounds.right ||
+                        thisBounds.bottom < otherBounds.top ||
+                        thisBounds.top > otherBounds.bottom);
+            }
+        }
+        
+        class Ball extends GameObject {
+            constructor(x, y, radius = 8) {
+                super(x - radius, y - radius, radius * 2, radius * 2);
+                this.radius = radius;
+                this.speed = 5;
+                this.maxSpeed = 12;
+                this.minSpeed = 3;
+                this.speedIncrement = 0.2;
+                this.color = '#00ff88';
+                this.trail = [];
+                this.trailLength = 10;
+                
+                // Initialize with random direction
+                this.reset();
+            }
+            
+            reset() {
+                // Reset position to center
+                this.x = 400 - this.radius; // Canvas center - radius
+                this.y = 200 - this.radius; // Canvas center - radius
+                
+                // Random initial direction
+                const angle = (Math.random() - 0.5) * Math.PI / 3; // ±30 degrees
+                const direction = Math.random() < 0.5 ? 1 : -1; // Left or right
+                
+                this.velocityX = Math.cos(angle) * this.speed * direction;
+                this.velocityY = Math.sin(angle) * this.speed;
+                
+                // Clear trail
+                this.trail = [];
+                
+                console.log('Ball reset:', { x: this.x, y: this.y, vx: this.velocityX, vy: this.velocityY });
+            }
+            
+            update(deltaTime, canvasWidth = 800, canvasHeight = 400) {
+                if (!this.active) return;
+                
+                // Store previous position for trail
+                this.trail.push({ x: this.x + this.radius, y: this.y + this.radius });
+                if (this.trail.length > this.trailLength) {
+                    this.trail.shift();
+                }
+                
+                // Update position
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                
+                // Wall collision (top and bottom)
+                if (this.y <= 0) {
+                    this.y = 0;
+                    this.velocityY = -this.velocityY;
+                    this.playBounceSound('wall');
+                    // Create wall bounce effect
+                    if (window.game && window.game.particleSystem) {
+                        window.game.particleSystem.createCollisionEffect(
+                            this.getCenterX(), 
+                            this.y, 
+                            '#ff8800', 
+                            6
+                        );
+                    }
+                } else if (this.y >= canvasHeight - this.height) {
+                    this.y = canvasHeight - this.height;
+                    this.velocityY = -this.velocityY;
+                    this.playBounceSound('wall');
+                    // Create wall bounce effect
+                    if (window.game && window.game.particleSystem) {
+                        window.game.particleSystem.createCollisionEffect(
+                            this.getCenterX(), 
+                            this.y + this.height, 
+                            '#ff8800', 
+                            6
+                        );
+                    }
+                }
+                
+                // Check if ball went off screen (scoring)
+                if (this.x < -this.width) {
+                    this.onScore('player2');
+                    return;
+                } else if (this.x > canvasWidth) {
+                    this.onScore('player1');
+                    return;
+                }
+            }
+            
+            render(ctx) {
+                if (!this.active) return;
+                
+                // Draw trail
+                this.drawTrail(ctx);
+                
+                // Draw ball with glow effect
+                const centerX = this.x + this.radius;
+                const centerY = this.y + this.radius;
+                
+                // Outer glow
+                const gradient = ctx.createRadialGradient(
+                    centerX, centerY, 0,
+                    centerX, centerY, this.radius * 2
+                );
+                gradient.addColorStop(0, this.color);
+                gradient.addColorStop(0.7, this.color + '40');
+                gradient.addColorStop(1, 'transparent');
+                
+                ctx.save();
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, this.radius * 2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Main ball
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Inner highlight
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(centerX - this.radius * 0.3, centerY - this.radius * 0.3, this.radius * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            }
+            
+            drawTrail(ctx) {
+                if (this.trail.length < 2) return;
+                
+                ctx.save();
+                ctx.globalCompositeOperation = 'lighter'; // Additive blending for glow effect
+                
+                for (let i = 0; i < this.trail.length; i++) {
+                    const alpha = (i / this.trail.length) * 0.5;
+                    const size = (i / this.trail.length) * this.radius * 0.8;
+                    
+                    ctx.fillStyle = this.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
+                    ctx.beginPath();
+                    ctx.arc(this.trail[i].x, this.trail[i].y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                ctx.globalCompositeOperation = 'source-over'; // Reset blend mode
+                ctx.restore();
+            }
+            
+            // Handle paddle collision
+            handlePaddleCollision(paddle) {
+                const ballBounds = this.getBounds();
+                const paddleBounds = paddle.getBounds();
+                
+                // Calculate collision point relative to paddle center
+                const relativeIntersectY = (ballBounds.centerY) - paddleBounds.centerY;
+                const normalizedIntersectY = relativeIntersectY / (paddle.height / 2);
+                
+                // Calculate bounce angle (max 60 degrees)
+                const bounceAngle = normalizedIntersectY * Math.PI / 3;
+                
+                // Determine direction based on which paddle was hit
+                const direction = paddle.isLeftPaddle ? 1 : -1;
+                
+                // Update velocity with angle
+                const currentSpeed = Math.sqrt(this.velocityX * this.velocityX + this.velocityY * this.velocityY);
+                const newSpeed = Math.min(currentSpeed + this.speedIncrement, this.maxSpeed);
+                
+                this.velocityX = Math.cos(bounceAngle) * newSpeed * direction;
+                this.velocityY = Math.sin(bounceAngle) * newSpeed;
+                
+                // Add some randomness for realism
+                this.velocityY += (Math.random() - 0.5) * 0.5;
+                
+                // Ensure ball moves away from paddle
+                if (paddle.isLeftPaddle && this.velocityX < 0) {
+                    this.velocityX = -this.velocityX;
+                } else if (!paddle.isLeftPaddle && this.velocityX > 0) {
+                    this.velocityX = -this.velocityX;
+                }
+                
+                // Position ball to prevent stick inside paddle
+                if (paddle.isLeftPaddle) {
+                    this.x = paddleBounds.right;
+                } else {
+                    this.x = paddleBounds.left - this.width;
+                }
+                
+                this.playBounceSound('paddle');
+                
+                console.log('Paddle collision:', {
+                    angle: bounceAngle,
+                    speed: newSpeed,
+                    velocity: { x: this.velocityX, y: this.velocityY }
+                });
+            }
+            
+            playBounceSound(type) {
+                // Use the global game's audio manager
+                if (window.game && window.game.audioManager) {
+                    if (type === 'paddle') {
+                        window.game.audioManager.playSound('paddleHit');
+                    } else if (type === 'wall') {
+                        window.game.audioManager.playSound('wallBounce');
+                    }
+                }
+            }
+            
+            onScore(scoringPlayer) {
+                console.log(`${scoringPlayer} scored!`);
+                // This will be handled by the game engine
+                if (window.game) {
+                    window.game.handleScore(scoringPlayer);
+                }
+            }
+            
+            // Get center position
+            getCenterX() {
+                return this.x + this.radius;
+            }
+            
+            getCenterY() {
+                return this.y + this.radius;
+            }
+            
+            // Prediction method for AI
+            predictPosition(frames) {
+                return {
+                    x: this.x + this.velocityX * frames,
+                    y: this.y + this.velocityY * frames
+                };
+            }
+        }
+        
+        class Paddle extends GameObject {
+            constructor(x, y, width = 10, height = 80, isLeftPaddle = true) {
+                super(x, y, width, height);
+                this.isLeftPaddle = isLeftPaddle;
+                this.speed = 6;
+                this.maxSpeed = 8;
+                this.color = '#ffffff';
+                this.score = 0;
+                this.canvasHeight = 400;
+                
+                // Movement state
+                this.movingUp = false;
+                this.movingDown = false;
+                
+                // Visual effects
+                this.glowIntensity = 0;
+            }
+            
+            update(deltaTime, keys) {
+                if (!this.active) return;
+                
+                // Handle movement based on keys
+                this.handleInput(keys);
+                
+                // Update position
+                this.updatePosition();
+                
+                // Keep paddle within bounds
+                this.constrainToBounds();
+                
+                // Update visual effects
+                this.updateVisualEffects();
+            }
+            
+            handleInput(keys) {
+                // This will be overridden by player-specific controls
+            }
+            
+            updatePosition() {
+                let movement = 0;
+                
+                if (this.movingUp) {
+                    movement -= this.speed;
+                }
+                if (this.movingDown) {
+                    movement += this.speed;
+                }
+                
+                this.y += movement;
+            }
+            
+            constrainToBounds() {
+                if (this.y < 0) {
+                    this.y = 0;
+                }
+                if (this.y > this.canvasHeight - this.height) {
+                    this.y = this.canvasHeight - this.height;
+                }
+            }
+            
+            updateVisualEffects() {
+                // Pulse effect when moving
+                if (this.movingUp || this.movingDown) {
+                    this.glowIntensity = Math.min(this.glowIntensity + 0.1, 1);
+                } else {
+                    this.glowIntensity = Math.max(this.glowIntensity - 0.05, 0);
+                }
+            }
+            
+            render(ctx) {
+                if (!this.active) return;
+                
+                ctx.save();
+                
+                // Draw glow effect
+                if (this.glowIntensity > 0) {
+                    const gradient = ctx.createLinearGradient(
+                        this.x - 5, this.y,
+                        this.x + this.width + 5, this.y
+                    );
+                    gradient.addColorStop(0, 'transparent');
+                    gradient.addColorStop(0.5, `rgba(0, 255, 136, ${this.glowIntensity * 0.3})`);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(this.x - 5, this.y - 5, this.width + 10, this.height + 10);
+                }
+                
+                // Draw main paddle
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+                
+                // Draw highlight
+                const highlightGradient = ctx.createLinearGradient(
+                    this.x, this.y,
+                    this.x + this.width, this.y
+                );
+                highlightGradient.addColorStop(0, 'rgba(255, 255, 255, 0.3)');
+                highlightGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+                
+                ctx.fillStyle = highlightGradient;
+                ctx.fillRect(this.x, this.y, this.width * 0.3, this.height);
+                
+                ctx.restore();
+            }
+            
+            // Movement methods
+            moveUp() {
+                this.movingUp = true;
+            }
+            
+            moveDown() {
+                this.movingDown = true;
+            }
+            
+            stopMoving() {
+                this.movingUp = false;
+                this.movingDown = false;
+            }
+            
+            // Get center Y position
+            getCenterY() {
+                return this.y + this.height / 2;
+            }
+        }
+        
+        class PlayerPaddle extends Paddle {
+            constructor(x, y, isLeftPaddle = true, controls = null) {
+                super(x, y, 10, 80, isLeftPaddle);
+                this.controls = controls || {
+                    up: isLeftPaddle ? ['w', 'arrowup'] : ['i'],
+                    down: isLeftPaddle ? ['s', 'arrowdown'] : ['k']
+                };
+            }
+            
+            handleInput(keys) {
+                this.movingUp = false;
+                this.movingDown = false;
+                
+                // Check for up movement
+                for (let key of this.controls.up) {
+                    if (keys[key]) {
+                        this.movingUp = true;
+                        break;
+                    }
+                }
+                
+                // Check for down movement
+                for (let key of this.controls.down) {
+                    if (keys[key]) {
+                        this.movingDown = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        class AIPaddle extends Paddle {
+            constructor(x, y, difficulty = 'medium') {
+                super(x, y, 10, 80, false); // AI is always right paddle
+                this.difficulty = difficulty;
+                this.ball = null;
+                this.targetY = this.y;
+                this.reactionDelay = 0;
+                this.maxReactionDelay = this.getDifficultySettings().reactionDelay;
+                this.errorMargin = this.getDifficultySettings().errorMargin;
+                this.predictionFrames = this.getDifficultySettings().predictionFrames;
+            }
+            
+            getDifficultySettings() {
+                const settings = {
+                    easy: {
+                        reactionDelay: 15,
+                        errorMargin: 30,
+                        predictionFrames: 10,
+                        speed: 4
+                    },
+                    medium: {
+                        reactionDelay: 8,
+                        errorMargin: 15,
+                        predictionFrames: 20,
+                        speed: 6
+                    },
+                    hard: {
+                        reactionDelay: 3,
+                        errorMargin: 5,
+                        predictionFrames: 30,
+                        speed: 8
+                    }
+                };
+                
+                const setting = settings[this.difficulty] || settings.medium;
+                this.speed = setting.speed;
+                return setting;
+            }
+            
+            setBall(ball) {
+                this.ball = ball;
+            }
+            
+            handleInput(keys) {
+                if (!this.ball || !this.ball.active) {
+                    this.stopMoving();
+                    return;
+                }
+                
+                // Only react if ball is moving towards AI paddle
+                if (this.ball.velocityX <= 0) {
+                    this.stopMoving();
+                    return;
+                }
+                
+                // Add reaction delay
+                if (this.reactionDelay > 0) {
+                    this.reactionDelay--;
+                    return;
+                } else {
+                    this.reactionDelay = this.maxReactionDelay;
+                }
+                
+                // Predict ball position
+                const predictedBallY = this.predictBallPosition();
+                
+                // Add some error based on difficulty
+                const error = (Math.random() - 0.5) * this.errorMargin;
+                this.targetY = predictedBallY + error - this.height / 2;
+                
+                // Move towards target
+                const paddleCenterY = this.getCenterY();
+                const difference = this.targetY + this.height / 2 - paddleCenterY;
+                
+                this.movingUp = false;
+                this.movingDown = false;
+                
+                if (Math.abs(difference) > 5) { // Dead zone to prevent jittering
+                    if (difference < 0) {
+                        this.movingUp = true;
+                    } else {
+                        this.movingDown = true;
+                    }
+                }
+            }
+            
+            predictBallPosition() {
+                if (!this.ball) return this.getCenterY();
+                
+                // Calculate when ball will reach paddle X position
+                const distanceToTravel = this.x - this.ball.getCenterX();
+                const timeToReach = distanceToTravel / Math.abs(this.ball.velocityX);
+                
+                // Predict Y position
+                let predictedY = this.ball.getCenterY() + (this.ball.velocityY * timeToReach);
+                
+                // Account for wall bounces
+                while (predictedY < 0 || predictedY > this.canvasHeight) {
+                    if (predictedY < 0) {
+                        predictedY = -predictedY;
+                    } else if (predictedY > this.canvasHeight) {
+                        predictedY = 2 * this.canvasHeight - predictedY;
+                    }
+                }
+                
+                return predictedY;
+            }
+            
+            setDifficulty(difficulty) {
+                this.difficulty = difficulty;
+                const settings = this.getDifficultySettings();
+                this.maxReactionDelay = settings.reactionDelay;
+                this.errorMargin = settings.errorMargin;
+                this.predictionFrames = settings.predictionFrames;
+            }
+        }
+        
+        // ========================
+        // AUDIO SYSTEM
+        // ========================
+        
+        class AudioManager {
+            constructor() {
+                this.sounds = {};
+                this.musicVolume = 0.5;
+                this.sfxVolume = 0.7;
+                this.muted = false;
+                this.audioContext = null;
+                this.masterGain = null;
+                
+                this.initializeAudio();
+            }
+            
+            initializeAudio() {
+                try {
+                    // Create audio context
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.masterGain = this.audioContext.createGain();
+                    this.masterGain.connect(this.audioContext.destination);
+                    
+                    // Generate synthetic sounds
+                    this.createSyntheticSounds();
+                    
+                    console.log('Audio system initialized');
+                } catch (error) {
+                    console.warn('Audio initialization failed:', error);
+                    this.audioContext = null;
+                }
+            }
+            
+            createSyntheticSounds() {
+                if (!this.audioContext) return;
+                
+                // Paddle hit sound
+                this.sounds.paddleHit = this.createPaddleHitSound();
+                
+                // Wall bounce sound
+                this.sounds.wallBounce = this.createWallBounceSound();
+                
+                // Score sound
+                this.sounds.score = this.createScoreSound();
+                
+                // UI sounds
+                this.sounds.uiClick = this.createUIClickSound();
+                this.sounds.gameStart = this.createGameStartSound();
+                this.sounds.gameOver = this.createGameOverSound();
+            }
+            
+            createPaddleHitSound() {
+                return () => {
+                    if (!this.audioContext || this.muted) return;
+                    
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.masterGain);
+                    
+                    oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.1);
+                    
+                    gainNode.gain.setValueAtTime(this.sfxVolume * 0.3, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + 0.1);
+                };
+            }
+            
+            createWallBounceSound() {
+                return () => {
+                    if (!this.audioContext || this.muted) return;
+                    
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.masterGain);
+                    
+                    oscillator.frequency.setValueAtTime(150, this.audioContext.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(75, this.audioContext.currentTime + 0.05);
+                    
+                    gainNode.gain.setValueAtTime(this.sfxVolume * 0.2, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.05);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + 0.05);
+                };
+            }
+            
+            createScoreSound() {
+                return () => {
+                    if (!this.audioContext || this.muted) return;
+                    
+                    // Play a sequence of notes
+                    const notes = [261.63, 329.63, 392.00]; // C, E, G
+                    
+                    notes.forEach((freq, index) => {
+                        const oscillator = this.audioContext.createOscillator();
+                        const gainNode = this.audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(this.masterGain);
+                        
+                        oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime + index * 0.1);
+                        
+                        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime + index * 0.1);
+                        gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.4, this.audioContext.currentTime + index * 0.1 + 0.01);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + index * 0.1 + 0.3);
+                        
+                        oscillator.start(this.audioContext.currentTime + index * 0.1);
+                        oscillator.stop(this.audioContext.currentTime + index * 0.1 + 0.3);
+                    });
+                };
+            }
+            
+            createUIClickSound() {
+                return () => {
+                    if (!this.audioContext || this.muted) return;
+                    
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.masterGain);
+                    
+                    oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                    
+                    gainNode.gain.setValueAtTime(this.sfxVolume * 0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.05);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + 0.05);
+                };
+            }
+            
+            createGameStartSound() {
+                return () => {
+                    if (!this.audioContext || this.muted) return;
+                    
+                    const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                    
+                    notes.forEach((freq, index) => {
+                        const oscillator = this.audioContext.createOscillator();
+                        const gainNode = this.audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(this.masterGain);
+                        
+                        oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime + index * 0.08);
+                        
+                        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime + index * 0.08);
+                        gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.3, this.audioContext.currentTime + index * 0.08 + 0.01);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + index * 0.08 + 0.2);
+                        
+                        oscillator.start(this.audioContext.currentTime + index * 0.08);
+                        oscillator.stop(this.audioContext.currentTime + index * 0.08 + 0.2);
+                    });
+                };
+            }
+            
+            createGameOverSound() {
+                return () => {
+                    if (!this.audioContext || this.muted) return;
+                    
+                    const notes = [392.00, 349.23, 293.66, 261.63]; // G, F, D, C (descending)
+                    
+                    notes.forEach((freq, index) => {
+                        const oscillator = this.audioContext.createOscillator();
+                        const gainNode = this.audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(this.masterGain);
+                        
+                        oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime + index * 0.15);
+                        
+                        gainNode.gain.setValueAtTime(0, this.audioContext.currentTime + index * 0.15);
+                        gainNode.gain.linearRampToValueAtTime(this.sfxVolume * 0.4, this.audioContext.currentTime + index * 0.15 + 0.02);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + index * 0.15 + 0.4);
+                        
+                        oscillator.start(this.audioContext.currentTime + index * 0.15);
+                        oscillator.stop(this.audioContext.currentTime + index * 0.15 + 0.4);
+                    });
+                };
+            }
+            
+            playSound(soundName) {
+                if (this.sounds[soundName]) {
+                    try {
+                        // Resume audio context if it's suspended (browser autoplay policy)
+                        if (this.audioContext && this.audioContext.state === 'suspended') {
+                            this.audioContext.resume();
+                        }
+                        this.sounds[soundName]();
+                    } catch (error) {
+                        console.warn('Failed to play sound:', soundName, error);
+                    }
+                }
+            }
+            
+            setMuted(muted) {
+                this.muted = muted;
+                if (this.masterGain) {
+                    this.masterGain.gain.setValueAtTime(muted ? 0 : 1, this.audioContext.currentTime);
+                }
+            }
+            
+            isMuted() {
+                return this.muted;
+            }
+            
+            setSFXVolume(volume) {
+                this.sfxVolume = Math.max(0, Math.min(1, volume));
+            }
+            
+            setMusicVolume(volume) {
+                this.musicVolume = Math.max(0, Math.min(1, volume));
+            }
+        }
+        
+        // ========================
+        // PARTICLE SYSTEM
+        // ========================
+        
+        class Particle {
+            constructor(x, y, velocityX, velocityY, color = '#00ff88', life = 1) {
+                this.x = x;
+                this.y = y;
+                this.velocityX = velocityX;
+                this.velocityY = velocityY;
+                this.color = color;
+                this.life = life;
+                this.maxLife = life;
+                this.size = Math.random() * 3 + 1;
+                this.gravity = 0.1;
+                this.friction = 0.98;
+            }
+            
+            update(deltaTime) {
+                this.x += this.velocityX;
+                this.y += this.velocityY;
+                this.velocityY += this.gravity;
+                this.velocityX *= this.friction;
+                this.velocityY *= this.friction;
+                
+                this.life -= 0.02;
+                return this.life > 0;
+            }
+            
+            render(ctx) {
+                const alpha = this.life / this.maxLife;
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * alpha, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+        
+        class ParticleSystem {
+            constructor() {
+                this.particles = [];
+                this.maxParticles = 100; // Limit particles for performance
+            }
+            
+            createCollisionEffect(x, y, color = '#00ff88', count = 6) {
+                // Limit particle creation if we have too many
+                if (this.particles.length > this.maxParticles - count) {
+                    this.particles.splice(0, count);
+                }
+                
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+                    const speed = Math.random() * 3 + 2;
+                    const velocityX = Math.cos(angle) * speed;
+                    const velocityY = Math.sin(angle) * speed;
+                    
+                    this.particles.push(new Particle(x, y, velocityX, velocityY, color, 1));
+                }
+            }
+            
+            createScoreEffect(x, y, color = '#ffff00') {
+                // Limit particle creation
+                const count = Math.min(20, this.maxParticles - this.particles.length);
+                
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 5 + 3;
+                    const velocityX = Math.cos(angle) * speed;
+                    const velocityY = Math.sin(angle) * speed - 2; // Upward bias
+                    
+                    this.particles.push(new Particle(x, y, velocityX, velocityY, color, 1.5));
+                }
+            }
+            
+            update(deltaTime) {
+                this.particles = this.particles.filter(particle => particle.update(deltaTime));
+            }
+            
+            render(ctx) {
+                this.particles.forEach(particle => particle.render(ctx));
+            }
+            
+            getParticleCount() {
+                return this.particles.length;
+            }
+        }
+        
+        // ========================
+        // PING PONG GAME ENGINE
+        // ========================
+
+        class GameEngine {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.loadingMessage = document.getElementById('loadingMessage');
+                
+                // Initialize audio system
+                this.audioManager = new AudioManager();
+                
+                // Initialize particle system
+                this.particleSystem = new ParticleSystem();
+                
+                // Game state management
+                this.gameState = 'MENU'; // MENU, PLAYING, PAUSED, GAME_OVER
+                this.gameMode = 'singlePlayer'; // singlePlayer, twoPlayer
+                this.difficulty = 'medium'; // easy, medium, hard
+                
+                // Game objects
+                this.gameObjects = [];
+                this.ball = null;
+                this.player1 = null;
+                this.player2 = null;
+                
+                // Game settings
+                this.settings = {
+                    scoreLimit: 10,
+                    ballSpeed: 5,
+                    paddleSpeed: 6,
+                    canvasWidth: 800,
+                    canvasHeight: 400
+                };
+                
+                // Input handling
+                this.keys = {};
+                this.mousePos = { x: 0, y: 0 };
+                
+                // Game timing
+                this.lastTime = 0;
+                this.deltaTime = 0;
+                this.fps = 0;
+                this.frameCount = 0;
+                
+                // Score tracking
+                this.scores = { player1: 0, player2: 0 };
+                
+                // Animation frame ID for cleanup
+                this.animationId = null;
+                
+                this.init();
+            }
+            
+            init() {
+                console.log('Initializing Ping Pong Game Engine...');
+                
+                // Set up canvas
+                this.setupCanvas();
+                
+                // Initialize input handlers
+                this.setupInputHandlers();
+                
+                // Initialize UI event listeners
+                this.setupUIEventListeners();
+                
+                // Initialize UI elements
+                this.gameStateOverlay = document.getElementById('gameStateOverlay');
+                this.overlayTitle = document.getElementById('overlayTitle');
+                this.overlaySubtitle = document.getElementById('overlaySubtitle');
+                this.gameStatus = document.getElementById('gameStatus');
+                this.gameInfo = document.getElementById('gameInfo');
+                
+                // Hide loading message
+                setTimeout(() => {
+                    if (this.loadingMessage) {
+                        this.loadingMessage.style.display = 'none';
+                    }
+                    this.showMainMenu();
+                    this.updateGameInfo();
+                }, 1000);
+                
+                console.log('Game Engine initialized successfully');
+            }
+            
+            setupCanvas() {
+                // Set canvas size
+                this.canvas.width = this.settings.canvasWidth;
+                this.canvas.height = this.settings.canvasHeight;
+                
+                // Set up rendering context
+                this.ctx.imageSmoothingEnabled = true;
+                this.ctx.textBaseline = 'middle';
+            }
+            
+            setupInputHandlers() {
+                // Keyboard event listeners with improved key mapping
+                document.addEventListener('keydown', (e) => {
+                    const key = this.normalizeKey(e.key);
+                    this.keys[key] = true;
+                    this.handleKeyPress(key);
+                    
+                    // Prevent default for game control keys
+                    if (this.isGameControlKey(key)) {
+                        e.preventDefault();
+                    }
+                });
+                
+                document.addEventListener('keyup', (e) => {
+                    const key = this.normalizeKey(e.key);
+                    this.keys[key] = false;
+                });
+                
+                // Mouse event listeners
+                this.canvas.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.mousePos.x = e.clientX - rect.left;
+                    this.mousePos.y = e.clientY - rect.top;
+                });
+                
+                // Touch support for mobile
+                this.canvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.handleTouch(e);
+                });
+                
+                this.canvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    this.handleTouch(e);
+                });
+                
+                // Prevent context menu on right click
+                this.canvas.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                });
+                
+                // Handle window focus/blur for pause
+                window.addEventListener('blur', () => {
+                    if (this.gameState === 'PLAYING') {
+                        this.togglePause();
+                    }
+                });
+            }
+            
+            setupUIEventListeners() {
+                const startBtn = document.getElementById('startBtn');
+                const pauseBtn = document.getElementById('pauseBtn');
+                const gameModeSelect = document.getElementById('gameModeSelect');
+                const difficultySelect = document.getElementById('difficultySelect');
+                const muteBtn = document.getElementById('muteBtn');
+                
+                startBtn.addEventListener('click', () => {
+                    this.audioManager.playSound('uiClick');
+                    this.startGame();
+                });
+                pauseBtn.addEventListener('click', () => {
+                    this.audioManager.playSound('uiClick');
+                    this.togglePause();
+                });
+                
+                gameModeSelect.addEventListener('change', (e) => {
+                    this.gameMode = e.target.value;
+                    this.updateDifficultyVisibility();
+                    // Restart game if it's currently playing to apply new mode
+                    if (this.gameState === 'PLAYING') {
+                        this.startGame();
+                    }
+                });
+                
+                difficultySelect.addEventListener('change', (e) => {
+                    this.difficulty = e.target.value;
+                    // Update existing AI paddle if in single player mode
+                    if (this.gameMode === 'singlePlayer' && this.player2 instanceof AIPaddle) {
+                        this.player2.setDifficulty(this.difficulty);
+                    }
+                });
+                
+                muteBtn.addEventListener('click', () => this.toggleMute());
+                
+                this.updateDifficultyVisibility();
+            }
+            
+            updateDifficultyVisibility() {
+                const difficultySelect = document.getElementById('difficultySelect');
+                difficultySelect.style.display = this.gameMode === 'singlePlayer' ? 'block' : 'none';
+            }
+            
+            handleKeyPress(key) {
+                switch (key) {
+                    case ' ': // Spacebar
+                    case 'space':
+                        if (this.gameState === 'PLAYING') {
+                            this.togglePause();
+                        } else if (this.gameState === 'MENU' || this.gameState === 'GAME_OVER') {
+                            this.startGame();
+                        }
+                        break;
+                    case 'escape':
+                        if (this.gameState === 'PLAYING' || this.gameState === 'PAUSED') {
+                            this.returnToMenu();
+                        }
+                        break;
+                    case 'm':
+                        this.toggleMute();
+                        break;
+                    case 'r':
+                        if (this.gameState === 'PLAYING' || this.gameState === 'GAME_OVER') {
+                            this.startGame();
+                        }
+                        break;
+                    case 'f':
+                        this.toggleFullscreen();
+                        break;
+                    case 'd':
+                        // Toggle debug info
+                        this.showDebugInfo = !this.showDebugInfo;
+                        break;
+                }
+            }
+            
+            startGame() {
+                console.log('Starting new game...');
+                
+                this.gameState = 'PLAYING';
+                this.scores = { player1: 0, player2: 0 };
+                this.updateScoreDisplay();
+                
+                // Play game start sound
+                this.audioManager.playSound('gameStart');
+                
+                // Create game objects (will be implemented in next tasks)
+                this.initializeGameObjects();
+                
+                // Update UI
+                this.updateUIState();
+                
+                // Start game loop
+                if (!this.animationId) {
+                    this.gameLoop();
+                }
+            }
+            
+            togglePause() {
+                if (this.gameState === 'PLAYING') {
+                    this.gameState = 'PAUSED';
+                    console.log('Game paused');
+                } else if (this.gameState === 'PAUSED') {
+                    this.gameState = 'PLAYING';
+                    console.log('Game resumed');
+                }
+                this.updateUIState();
+            }
+            
+            returnToMenu() {
+                this.gameState = 'MENU';
+                this.scores = { player1: 0, player2: 0 };
+                this.updateScoreDisplay();
+                this.updateUIState();
+                this.showMainMenu();
+            }
+            
+            toggleMute() {
+                const muteBtn = document.getElementById('muteBtn');
+                const icon = muteBtn.querySelector('i');
+                
+                const newMutedState = !this.audioManager.isMuted();
+                this.audioManager.setMuted(newMutedState);
+                
+                if (newMutedState) {
+                    icon.className = 'bi bi-volume-mute-fill';
+                    console.log('Audio muted');
+                } else {
+                    icon.className = 'bi bi-volume-up-fill';
+                    console.log('Audio unmuted');
+                    // Play a test sound to confirm audio is working
+                    this.audioManager.playSound('uiClick');
+                }
+            }
+            
+            initializeGameObjects() {
+                // Clear existing game objects
+                this.gameObjects = [];
+                
+                // Create ball
+                this.ball = new Ball(this.canvas.width / 2, this.canvas.height / 2);
+                this.addGameObject(this.ball);
+                
+                // Create paddles based on game mode
+                const padding = 20;
+                const paddleHeight = 80;
+                const paddleY = (this.canvas.height - paddleHeight) / 2;
+                
+                // Player 1 (left paddle)
+                this.player1 = new PlayerPaddle(padding, paddleY, true);
+                this.addGameObject(this.player1);
+                
+                // Player 2 or AI (right paddle)
+                if (this.gameMode === 'singlePlayer') {
+                    this.player2 = new AIPaddle(this.canvas.width - padding - 10, paddleY, this.difficulty);
+                    this.player2.setBall(this.ball);
+                } else {
+                    this.player2 = new PlayerPaddle(this.canvas.width - padding - 10, paddleY, false);
+                }
+                this.addGameObject(this.player2);
+                
+                console.log('Game objects initialized:', {
+                    objects: this.gameObjects.length,
+                    mode: this.gameMode,
+                    difficulty: this.difficulty
+                });
+            }
+            
+            updateUIState() {
+                const startBtn = document.getElementById('startBtn');
+                const pauseBtn = document.getElementById('pauseBtn');
+                
+                switch (this.gameState) {
+                    case 'MENU':
+                        startBtn.innerHTML = '<i class="bi bi-play-fill"></i> Start Game';
+                        startBtn.disabled = false;
+                        pauseBtn.disabled = true;
+                        this.hideGameStateOverlay();
+                        this.updateGameStatus('Ready to play');
+                        break;
+                    case 'PLAYING':
+                        startBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Restart';
+                        startBtn.disabled = false;
+                        pauseBtn.innerHTML = '<i class="bi bi-pause-fill"></i> Pause';
+                        pauseBtn.disabled = false;
+                        this.hideGameStateOverlay();
+                        this.updateGameStatus('Playing');
+                        break;
+                    case 'PAUSED':
+                        pauseBtn.innerHTML = '<i class="bi bi-play-fill"></i> Resume';
+                        this.showGameStateOverlay('PAUSED', 'Press SPACE to resume or ESC for menu');
+                        this.updateGameStatus('Paused');
+                        break;
+                    case 'GAME_OVER':
+                        startBtn.innerHTML = '<i class="bi bi-play-fill"></i> New Game';
+                        pauseBtn.disabled = true;
+                        const winner = this.scores.player1 >= this.settings.scoreLimit ? 'Player 1' : 'Player 2';
+                        this.showGameStateOverlay('GAME OVER', `${winner} Wins! Press SPACE for new game`);
+                        this.updateGameStatus('Game Over');
+                        break;
+                }
+                this.updateGameInfo();
+            }
+            
+            updateScoreDisplay() {
+                document.getElementById('player1Score').textContent = this.scores.player1;
+                document.getElementById('player2Score').textContent = this.scores.player2;
+            }
+            
+            showMainMenu() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw main menu
+                this.ctx.fillStyle = '#00ff88';
+                this.ctx.font = 'bold 48px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText('PING PONG', this.canvas.width / 2, this.canvas.height / 2 - 50);
+                
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.font = '24px Arial';
+                this.ctx.fillText('Press SPACE or click Start to begin', this.canvas.width / 2, this.canvas.height / 2 + 20);
+                
+                this.ctx.font = '16px Arial';
+                this.ctx.fillStyle = '#cccccc';
+                this.ctx.fillText('Controls: W/S or ↑/↓ (Player 1) | I/K (Player 2)', this.canvas.width / 2, this.canvas.height / 2 + 60);
+            }
+            
+            gameLoop(currentTime = 0) {
+                // Calculate delta time
+                this.deltaTime = currentTime - this.lastTime;
+                this.lastTime = currentTime;
+                
+                // Calculate FPS (less frequently for performance)
+                this.frameCount++;
+                if (this.frameCount % 60 === 0) {
+                    this.fps = Math.round(1000 / this.deltaTime);
+                }
+                
+                // Update and render based on game state
+                switch (this.gameState) {
+                    case 'PLAYING':
+                        this.update(this.deltaTime);
+                        this.render();
+                        break;
+                    case 'PAUSED':
+                    case 'GAME_OVER':
+                        this.render(); // Still render the game, overlay will show on top
+                        break;
+                    case 'MENU':
+                        // Menu is rendered once, no need to continuously update
+                        break;
+                }
+                
+                // Continue game loop
+                this.animationId = requestAnimationFrame((time) => this.gameLoop(time));
+            }
+            
+            update(deltaTime) {
+                // Update all game objects
+                for (let obj of this.gameObjects) {
+                    if (obj.update) {
+                        if (obj instanceof Ball) {
+                            obj.update(deltaTime, this.canvas.width, this.canvas.height);
+                        } else {
+                            obj.update(deltaTime, this.keys);
+                        }
+                    }
+                }
+                
+                // Update particle system
+                this.particleSystem.update(deltaTime);
+                
+                // Check collision detection
+                this.checkCollisions();
+                
+                // Check for game end conditions
+                this.checkGameEndConditions();
+            }
+            
+            render() {
+                // Clear canvas
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Draw game field
+                this.drawGameField();
+                
+                // Render all game objects
+                for (let obj of this.gameObjects) {
+                    if (obj.render) {
+                        obj.render(this.ctx);
+                    }
+                }
+                
+                // Render particle effects
+                this.particleSystem.render(this.ctx);
+                
+                // Draw debug info if needed
+                if (this.showDebugInfo) {
+                    this.drawDebugInfo();
+                }
+            }
+            
+            drawGameField() {
+                // Draw center line with glow effect
+                this.ctx.save();
+                
+                // Glow effect
+                this.ctx.shadowColor = '#444444';
+                this.ctx.shadowBlur = 10;
+                this.ctx.strokeStyle = '#444444';
+                this.ctx.lineWidth = 2;
+                this.ctx.setLineDash([10, 10]);
+                this.ctx.beginPath();
+                this.ctx.moveTo(this.canvas.width / 2, 0);
+                this.ctx.lineTo(this.canvas.width / 2, this.canvas.height);
+                this.ctx.stroke();
+                
+                // Center circle
+                this.ctx.setLineDash([]);
+                this.ctx.beginPath();
+                this.ctx.arc(this.canvas.width / 2, this.canvas.height / 2, 50, 0, Math.PI * 2);
+                this.ctx.stroke();
+                
+                this.ctx.restore();
+            }
+
+            
+            checkGameEndConditions() {
+                if (this.scores.player1 >= this.settings.scoreLimit || this.scores.player2 >= this.settings.scoreLimit) {
+                    this.gameState = 'GAME_OVER';
+                    this.audioManager.playSound('gameOver');
+                    this.updateUIState();
+                    console.log('Game ended:', this.scores);
+                }
+            }
+            
+            // Collision detection system
+            checkCollisions() {
+                if (!this.ball || !this.ball.active) return;
+                
+                // Check ball-paddle collisions
+                this.checkBallPaddleCollisions();
+            }
+            
+            checkBallPaddleCollisions() {
+                // Player 1 paddle collision
+                if (this.player1 && this.ball.intersects(this.player1)) {
+                    // Only handle collision if ball is moving towards paddle
+                    if (this.ball.velocityX < 0) {
+                        this.ball.handlePaddleCollision(this.player1);
+                        // Create collision effect
+                        this.particleSystem.createCollisionEffect(
+                            this.ball.getCenterX(), 
+                            this.ball.getCenterY(), 
+                            '#00ff88', 
+                            8
+                        );
+                    }
+                }
+                
+                // Player 2 paddle collision
+                if (this.player2 && this.ball.intersects(this.player2)) {
+                    // Only handle collision if ball is moving towards paddle
+                    if (this.ball.velocityX > 0) {
+                        this.ball.handlePaddleCollision(this.player2);
+                        // Create collision effect
+                        this.particleSystem.createCollisionEffect(
+                            this.ball.getCenterX(), 
+                            this.ball.getCenterY(), 
+                            '#ffffff', 
+                            8
+                        );
+                    }
+                }
+            }
+            
+            drawDebugInfo() {
+                this.ctx.fillStyle = '#00ff88';
+                this.ctx.font = '12px monospace';
+                this.ctx.textAlign = 'left';
+                this.ctx.fillText(`FPS: ${this.fps}`, 10, 20);
+                this.ctx.fillText(`State: ${this.gameState}`, 10, 35);
+                this.ctx.fillText(`Objects: ${this.gameObjects.length}`, 10, 50);
+                this.ctx.fillText(`Particles: ${this.particleSystem.getParticleCount()}`, 10, 65);
+                if (this.ball) {
+                    this.ctx.fillText(`Ball: (${Math.round(this.ball.x)}, ${Math.round(this.ball.y)})`, 10, 80);
+                    this.ctx.fillText(`Speed: ${Math.round(Math.sqrt(this.ball.velocityX**2 + this.ball.velocityY**2))}`, 10, 95);
+                }
+            }
+            
+            // UI Management Methods
+            showGameStateOverlay(title, subtitle) {
+                if (this.overlayTitle) this.overlayTitle.textContent = title;
+                if (this.overlaySubtitle) this.overlaySubtitle.textContent = subtitle;
+                if (this.gameStateOverlay) this.gameStateOverlay.style.display = 'flex';
+            }
+            
+            hideGameStateOverlay() {
+                if (this.gameStateOverlay) this.gameStateOverlay.style.display = 'none';
+            }
+            
+            updateGameStatus(status) {
+                if (this.gameStatus) this.gameStatus.textContent = status;
+            }
+            
+            updateGameInfo() {
+                if (!this.gameInfo) return;
+                
+                let info = `Mode: ${this.gameMode === 'singlePlayer' ? 'Single Player' : 'Two Player'}`;
+                if (this.gameMode === 'singlePlayer') {
+                    info += ` (${this.difficulty.charAt(0).toUpperCase() + this.difficulty.slice(1)})`;
+                }
+                info += ` | Score Limit: ${this.settings.scoreLimit}`;
+                
+                this.gameInfo.textContent = info;
+            }
+            
+            // Utility methods
+            addGameObject(obj) {
+                this.gameObjects.push(obj);
+            }
+            
+            removeGameObject(obj) {
+                const index = this.gameObjects.indexOf(obj);
+                if (index > -1) {
+                    this.gameObjects.splice(index, 1);
+                }
+            }
+            
+            // Cleanup method
+            destroy() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+                // Remove event listeners if needed
+            }
+            
+            // Input handling helper methods
+            normalizeKey(key) {
+                // Normalize key names for consistent handling
+                const keyMap = {
+                    'ArrowUp': 'arrowup',
+                    'ArrowDown': 'arrowdown',
+                    'ArrowLeft': 'arrowleft',
+                    'ArrowRight': 'arrowright',
+                    ' ': 'space',
+                    'Enter': 'enter',
+                    'Escape': 'escape'
+                };
+                
+                return keyMap[key] || key.toLowerCase();
+            }
+            
+            isGameControlKey(key) {
+                const controlKeys = [
+                    'w', 's', 'i', 'k', 'arrowup', 'arrowdown',
+                    'space', 'escape', 'm', 'r', 'f', 'd'
+                ];
+                return controlKeys.includes(key);
+            }
+            
+            handleTouch(e) {
+                if (e.touches.length === 0) return;
+                
+                const touch = e.touches[0];
+                const rect = this.canvas.getBoundingClientRect();
+                const touchY = touch.clientY - rect.top;
+                
+                // Simple touch control: top half moves up, bottom half moves down
+                const centerY = this.canvas.height / 2;
+                
+                if (this.gameMode === 'singlePlayer' && this.player1) {
+                    if (touchY < centerY) {
+                        this.keys['w'] = true;
+                        this.keys['s'] = false;
+                    } else {
+                        this.keys['s'] = true;
+                        this.keys['w'] = false;
+                    }
+                }
+            }
+            
+            toggleFullscreen() {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log('Fullscreen not supported:', err);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+            
+            // Handle scoring
+            handleScore(scoringPlayer) {
+                if (scoringPlayer === 'player1') {
+                    this.scores.player1++;
+                } else {
+                    this.scores.player2++;
+                }
+                
+                this.updateScoreDisplay();
+                
+                // Play score sound
+                this.audioManager.playSound('score');
+                
+                // Create score effect
+                const x = scoringPlayer === 'player1' ? this.canvas.width * 0.25 : this.canvas.width * 0.75;
+                const y = this.canvas.height * 0.2;
+                this.particleSystem.createScoreEffect(x, y, '#ffff00');
+                
+                // Reset ball for next round
+                if (this.ball) {
+                    setTimeout(() => {
+                        this.ball.reset();
+                    }, 1000);
+                }
+                
+                console.log('Score updated:', this.scores);
+            }
+        }
+        
+        // Initialize game when page loads
+        let game;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, initializing game...');
+            game = new GameEngine();
+            window.game = game; // Make game accessible globally for ball scoring
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (game) {
+                game.destroy();
+            }
+        });
+        
+        console.log('Ping Pong Game Engine loaded successfully');
+    </script>
+</body>
+</html>
