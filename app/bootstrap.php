@@ -36,7 +36,7 @@ $di->set('logger', fn() => new \Core\Logging\Logger());
 $di->set('exceptionHandler', fn() => new \Core\Exception\ExceptionHandler());
 
 // Set global exception and error handlers
-set_exception_handler(function (Throwable $e) use ($di) {
+set_exception_handler(function (\Throwable $e) use ($di) {
     /** @var \Core\Http\Response $response */
     $response = $di->get('exceptionHandler')->handle($e);
     $response->send();

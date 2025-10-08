@@ -4,7 +4,6 @@ namespace Core\Mvc;
 
 use Core\Mvc\AbstractModule;
 use Core\Di\Injectable;
-use Core\Events\EventAware;
 use Core\Exception\NotFoundException;
 use Core\Http\Request;
 use Core\Http\Response;
@@ -14,9 +13,17 @@ use Core\Http\Response;
  */
 class App
 {
-    use Injectable, EventAware;
+    use Injectable;
 
-    private $dispatcher;
+    /**
+     * Returns dispatcher instance
+     *
+     * @return \Core\Events\Manager
+     */
+    public function getEventsManager()
+    {
+        return $this->getDI()->get('eventsManager');
+    }
 
     /**
      * Initialize all Modules
@@ -40,6 +47,7 @@ class App
             }
             /** @var AbstractModule $moduleInstance */
             $moduleInstance = $this->getDI()->get($moduleClass);
+            $moduleInstance->setDI($this->getDI());
             $moduleInstance->initialize($module, $moduleConfig);
             $modules[] = $moduleInstance;
         }
@@ -52,8 +60,8 @@ class App
     public function run()
     {
         $di = $this->getDI();
-        $this->fireEvent('app.beforeInitModule', $this);
-        $modules = $this->initModules();
+        $this->getEventsManager()->trigger('app.beforeInitModule', $this);
+        $modules    = $this->initModules();
         /** @var Request $request */
         $request    = $di->get('request');
         /** @var Response $response */
@@ -62,8 +70,7 @@ class App
         $router     = $di->get('\Core\Mvc\Router');
         /** @var \Core\Mvc\Dispatcher $dispatcher */
         $dispatcher = $di->get('\Core\Mvc\Dispatcher');
-
-        $route = false;
+        $route      = false;
         foreach ($modules as $module) {
             $route = $router->matchRouteGroup(
             $request->uri(), 
@@ -93,7 +100,7 @@ class App
                 $response = $result;
             }
         }
-        $this->fireEvent('app.beforeSendResponse', $this);
+        $this->getEventsManager()->trigger('app.beforeSendResponse', $this);
         $response->send();
         return;
     }

@@ -62,26 +62,32 @@ class Manager
     public function getListenersForEvent(Event $event): iterable
     {
         $eventName = $event->getName();
-        if (!isset($this->sorted[$eventName])) {
-            $this->sortListeners($eventName);
-        }
-        $listeners = $this->sorted[$eventName] ?? [];
-        // Add wildcard listeners
-        foreach ($this->listeners as $eventPattern => $priorityListeners) {
-            if (str_ends_with($eventPattern, '*') && str_starts_with($eventName, rtrim($eventPattern, '*'))) {
-                if (!isset($this->sorted[$eventPattern])) {
-                    $this->sortListeners($eventPattern);
-                }
-                $listeners = array_merge($listeners, $this->sorted[$eventPattern]);
+        $listenersByPriority = [];
+        // Process direct event match
+        if (isset($this->listeners[$eventName])) {
+            foreach ($this->listeners[$eventName] as $priority => $priorityListeners) {
+                $listenersByPriority[$priority] = array_merge(
+                    $listenersByPriority[$priority] ?? [],
+                    $priorityListeners
+                );
             }
         }
-        // Re-sort if wildcards were added
-        if (count($listeners) > count($this->sorted[$eventName] ?? [])) {
-            // This is a simplified sort for the combined list.
-            // A more robust implementation would re-sort based on original priorities.
-            return $listeners;
+        // Process wildcard matches
+        foreach ($this->listeners as $eventPattern => $priorityListeners) {
+            if ($eventPattern !== $eventName && 
+                str_ends_with($eventPattern, '*') && 
+                str_starts_with($eventName, rtrim($eventPattern, '*'))) {
+                foreach ($priorityListeners as $priority => $wildcardListeners) {
+                    $listenersByPriority[$priority] = array_merge(
+                        $listenersByPriority[$priority] ?? [],
+                        $wildcardListeners
+                    );
+                }
+            }
         }
-        return $listeners;
+        // Sort by priority (highest first) and flatten
+        krsort($listenersByPriority);
+        return array_merge(...array_values($listenersByPriority));
     }
 
     protected function sortListeners(string $event): void
