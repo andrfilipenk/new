@@ -1,4 +1,5 @@
 <?php
+// app/_Core/Exception/ExceptionHandler.php
 namespace Core\Exception;
 
 use Core\Di\Injectable;
@@ -44,7 +45,7 @@ class ExceptionHandler
         $response->setStatusCode($statusCode);
         $message = $e->getMessage();
 
-        $debugOn = $config[['app']['debug']] ?? false;
+        $debugOn = $config['app']['debug'] ?? false;
         if ($debugOn) {
             $message = [
                 'message'   => $e->getMessage(), 

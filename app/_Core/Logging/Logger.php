@@ -1,4 +1,5 @@
 <?php
+// app/_Core/Logging/Logger.php
 namespace Core\Logging;
 
 use Core\Di\Injectable;
@@ -8,7 +9,9 @@ class Logger implements LoggerInterface
     use Injectable;
 
     protected string $logFile;
+
     protected string $minLevel;
+
     protected array $levels = [
         'emergency' => 0,
         'alert'     => 1,
@@ -19,7 +22,9 @@ class Logger implements LoggerInterface
         'info'      => 6,
         'debug'     => 7
     ];
+
     protected array $buffer = [];
+    
     protected int $bufferSize = 10;
 
     public function __construct()
@@ -98,7 +103,7 @@ class Logger implements LoggerInterface
         $request = $this->getDI()->get('request');
         $session = $this->getDI()->has('session') ? $this->getDI()->get('session') : null;
         return array_merge([
-            'request_uri'   => $request ? $request->getUri() : '',
+            'request_uri'   => $request ? $request->uri() : '',
             'user_id'       => $session && $session->has('user') ? $session->get('user')['id'] : null,
             'ip'            => $request ? $request->ip() : ''
         ], $context);

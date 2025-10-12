@@ -3,16 +3,34 @@
 namespace Core\Mvc;
 
 use Core\Di\Injectable;
-use Core\Events\EventAware;
 
 class Dispatcher
 {
-    use Injectable, EventAware;
+    use Injectable;
 
+    /**
+     * @var string
+     */
     protected $module;
+
+    /**
+     * @var string
+     */
     protected $action;
+
+    /**
+     * @var string
+     */
     protected $controller;
+
+    /**
+     * @var array
+     */
     protected $params = [];
+
+    /**
+     * @var boolean
+     */
     protected $forwarded = false;
 
     /**
@@ -48,79 +66,140 @@ class Dispatcher
     }
 
     /**
+     * Returns instance of controller
+     *
+     * @return \Core\Mvc\Controller
+     */
+    public function getControllerInstance()
+    {
+        if (!class_exists($this->getController())) {
+            throw new \Exception("Controller {$this->getController()} not found");
+        }
+        /** @var \Core\Mvc\Controller $controller */
+        $controller = $this->getDI()->get($this->getController());
+        return $controller;
+    }
+
+    /**
+     *
+     * @return \Core\Events\Manager
+     */
+    public function getEventsManager()
+    {
+        return $this->getDI()->get('eventsManager');
+    }
+
+    /**
      * Dispatche route
      *
      * @return string|array|object
      */
     public function dispatch()
     {
-        if (!class_exists($this->getController())) {
-            throw new \Exception("Controller {$this->getController()} not found");
-        }
+        $this->getControllerInstance()->initialize();
+        $this->getEventsManager()->trigger('dispatcher.beforeExecute', $this);
+        $this->getControllerInstance()->beforeExecute();
 
-        /** @var \Core\Mvc\Controller $controller */
-        $controller = $this->getDI()->get($this->getController());
-        if (!method_exists($controller, $this->getActionMethod())) {
+        if (!method_exists($this->getControllerInstance(), $this->getActionMethod())) {
             throw new \Exception("Action {$this->getActionMethod()} not found in Controller {$this->getController()}");
         }
-        $controller->initialize();
-        $controller->beforeExecute();
-        $this->fireEvent('dispatcher.beforeExecute', $this);
 
-        $result = call_user_func([$controller, $this->getActionMethod()]);
-        $controller->afterExecute();
-        $this->fireEvent('dispatcher.afterExecute', $this);
-
+        $result = call_user_func([$this->getControllerInstance(), $this->getActionMethod()]);
+        $this->getControllerInstance()->afterExecute();
+        $this->getEventsManager()->trigger('dispatcher.afterExecute', $this);
+        
         if ($result instanceof Dispatcher) {
             $result = $result->dispatch();
         }
         return $result;
     }
 
-    public function setModule($module)
+    /**
+     *
+     * @param string $module
+     * @return $this
+     */
+    public function setModule(string $module)
     {
         $this->module = $module;
         return $this;
     }
 
+    /**
+     *
+     * @return string
+     */
     public function getModule(): string
     {
         return $this->module;
     }
 
-    public function setController($controller) {
+    /**
+     *
+     * @param string $controller
+     * @return $this
+     */
+    public function setController(string $controller) {
         $this->controller = $controller;
         return $this;
     }
 
+    /**
+     *
+     * @return string
+     */
     public function getController(): string
     {
         return $this->controller;
     }
 
-    public function setAction($action)
+    /**
+     *
+     * @param string $action
+     * @return $this
+     */
+    public function setAction(string $action)
     {
         $this->action = $action;
         return $this;
     }
 
+    /**
+     *
+     * @return string
+     */
     public function getAction(): string
     {
         return $this->action;
     }
 
+    /**
+     * 
+     * @return string
+     */
     public function getActionMethod() 
     {
         return $this->getAction() . 'Action';
     }
 
-    public function setParams($params) 
+    /**
+     *
+     * @param array $params
+     * @return $this
+     */
+    public function setParams(array $params) 
     {
         $this->params = $params;
         return $this;
     }
 
-    public function getParam($key, $default = null)
+    /**
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getParam(string $key, $default = null)
     {
         return $this->params[$key] ?? $default;
     }

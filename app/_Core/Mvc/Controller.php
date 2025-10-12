@@ -3,20 +3,40 @@
 namespace Core\Mvc;
 
 use Core\Di\Injectable;
-use Core\Events\EventAware;
 
 class Controller
 {
-    use Injectable, EventAware;
-        
+    use Injectable;
+
+    /**
+     * Initializes as first
+     *
+     * @return $this
+     */
     public function initialize() {
         $dispatcher = $this->getDispatcher();
         $viewPath   = APP_PATH . $dispatcher->getModule() . '/views/';
         $this->getView()->setTemplatePath($viewPath);
+        return $this;
     }
 
-    public function beforeExecute() {}
-    public function afterExecute() {}
+    /**
+     * Extendable by child-class
+     *
+     * @return $this
+     */
+    public function beforeExecute() {
+        return $this;
+    }
+
+    /**
+     * Extendable by child-class
+     *
+     * @return $this
+     */
+    public function afterExecute() {
+        return $this;
+    }
 
     /**
      * Check csrf token
@@ -140,7 +160,14 @@ class Controller
         return $this->getRequest()->post($key, $default);
     }
 
-    public function flashMessage($type, $message)
+    /**
+     * Set message to session
+     *
+     * @param string $type
+     * @param string $message
+     * @return $this
+     */
+    public function flashMessage(string $type, string $message)
     {
         $messages = $this->getSession()->get('messages', []);
         $messages[] = [
@@ -151,12 +178,24 @@ class Controller
         return $this;
     }
 
-    public function flashSuccess($message)
+    /**
+     * Set success message
+     *
+     * @param string $message
+     * @return $this
+     */
+    public function flashSuccess(string $message)
     {
         return $this->flashMessage('success', $message);
     }
 
-    public function flashError($message)
+    /**
+     * Set error message
+     *
+     * @param string $message
+     * @return $this
+     */
+    public function flashError(string $message)
     {
         return $this->flashMessage('error', $message);
     }

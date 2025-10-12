@@ -4,11 +4,10 @@ namespace Core\Mvc;
 
 use Core\Di\Injectable;
 use Core\Di\Interface\Container as ContainerInterface;
-use Core\Events\EventAware;
 
 abstract class AbstractModule implements ModuleInterface
 {
-    use Injectable, EventAware;
+    use Injectable;
 
     protected $_name;
 
@@ -59,13 +58,15 @@ abstract class AbstractModule implements ModuleInterface
     public function initialize($name, $config) {
         $this->_name   = $name;
         $this->_config = $config;
-        $this->fireEvent('module.onInitialize', $this);
+        /** @var \Core\Events\Manager $em */
+        $em = $this->getDI()->get('eventsManager');
+        $em->trigger('module.onInitialize', $this);
         if ($providers = $this->getConfig(key: 'provider')) {
             foreach ($providers as $provider) {
                 $this->getDI()->register($provider);
             }
         }
-        $this->fireEvent('module.afterInitialize', $this);
+        $em->trigger('module.afterInitialize', $this);
         return $this;
     }
 
@@ -83,6 +84,7 @@ abstract class AbstractModule implements ModuleInterface
 
     /**
      * Summary of boot
+     * 
      * @param mixed $di
      * @param mixed $module
      * @param mixed $controller
