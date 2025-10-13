@@ -1,0 +1,93 @@
+<?php
+/**
+ * Default Composite Field Template
+ * 
+ * Template for rendering composite fields (grouped fields)
+ * 
+ * Available variables:
+ * @var \Core\Forms\Fields\CompositeField $field The field instance
+ * @var array $context Rendering context
+ * @var array $options Rendering options
+ */
+
+// Get field data
+$fieldName = $field->getName();
+$fieldLabel = $field->getLabel();
+$fieldHelp = $field->getHelpText();
+$isRequired = $field->isRequired();
+$renderMode = $field->getRenderMode();
+$showFieldLabels = method_exists($field, 'getShowFieldLabels') ? $field->getShowFieldLabels() : true;
+
+// Get child fields
+$childFields = $field->getFields();
+
+// Get errors
+$errors = $context['errors'][$fieldName] ?? [];
+if (!is_array($errors)) {
+    $errors = [$errors];
+}
+$hasErrors = !empty($errors);
+
+// Determine wrapper classes
+$wrapperClasses = ['composite-field', 'composite-' . $renderMode];
+if ($hasErrors) {
+    $wrapperClasses[] = 'has-error';
+}
+?>
+<div class="<?= implode(' ', $wrapperClasses) ?>" data-composite-field="<?= htmlspecialchars($fieldName, ENT_QUOTES, 'UTF-8') ?>">
+    <?php if ($fieldLabel): ?>
+    <div class="composite-label">
+        <?= htmlspecialchars($fieldLabel, ENT_QUOTES, 'UTF-8') ?>
+        <?php if ($isRequired): ?>
+        <span class="required-indicator" aria-label="required">*</span>
+        <?php endif; ?>
+    </div>
+    <?php endif; ?>
+    
+    <?php if ($fieldHelp): ?>
+    <small class="composite-help"><?= htmlspecialchars($fieldHelp, ENT_QUOTES, 'UTF-8') ?></small>
+    <?php endif; ?>
+    
+    <div class="composite-fields">
+        <?php foreach ($childFields as $key => $childField): ?>
+        <div class="composite-field-item" data-field-key="<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>">
+            <?php if ($showFieldLabels && $childField->getLabel()): ?>
+            <label for="<?= htmlspecialchars($childField->getAttribute('id', $childField->getName()), ENT_QUOTES, 'UTF-8') ?>" class="field-label">
+                <?= htmlspecialchars($childField->getLabel(), ENT_QUOTES, 'UTF-8') ?>
+                <?php if ($childField->isRequired()): ?>
+                <span class="required-indicator" aria-label="required">*</span>
+                <?php endif; ?>
+            </label>
+            <?php endif; ?>
+            
+            <?= $childField->render($context) ?>
+            
+            <?php if ($childField->getHelpText()): ?>
+            <small class="field-help"><?= htmlspecialchars($childField->getHelpText(), ENT_QUOTES, 'UTF-8') ?></small>
+            <?php endif; ?>
+            
+            <?php if (isset($context['errors'][$childField->getName()])): ?>
+            <?php
+            $childErrors = $context['errors'][$childField->getName()];
+            if (!is_array($childErrors)) {
+                $childErrors = [$childErrors];
+            }
+            ?>
+            <div class="field-errors">
+                <?php foreach ($childErrors as $error): ?>
+                <div class="field-error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    
+    <?php if ($hasErrors): ?>
+    <div class="composite-errors">
+        <?php foreach ($errors as $error): ?>
+        <div class="field-error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+</div>

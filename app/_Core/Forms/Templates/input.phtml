@@ -1,0 +1,84 @@
+<?php
+/**
+ * Default Input Field Template
+ * 
+ * Template for rendering input fields (text, email, password, number, etc.)
+ * 
+ * Available variables:
+ * @var \Core\Forms\Fields\FieldInterface $field The field instance
+ * @var array $context Rendering context (errors, theme, etc.)
+ * @var array $options Rendering options
+ */
+
+// Build attributes
+$attributes = $field->getAttributes();
+$attributes['type'] = $field->getType();
+
+// Get field data
+$fieldName = $field->getName();
+$fieldId = $attributes['id'] ?? $fieldName;
+$fieldLabel = $field->getLabel();
+$fieldHelp = $field->getHelpText();
+$fieldValue = $field->getValue();
+$isRequired = $field->isRequired();
+
+// Get errors for this field
+$errors = $context['errors'][$fieldName] ?? [];
+if (!is_array($errors)) {
+    $errors = [$errors];
+}
+$hasErrors = !empty($errors);
+
+// Add error class if needed
+if ($hasErrors) {
+    $classes = $attributes['class'] ?? '';
+    $attributes['class'] = trim($classes . ' is-invalid');
+}
+
+// Build attribute string
+$attrString = '';
+foreach ($attributes as $name => $value) {
+    if ($name === 'value') continue; // Handle separately
+    if (is_bool($value)) {
+        $attrString .= $value ? ' ' . htmlspecialchars($name, ENT_QUOTES, 'UTF-8') : '';
+    } else {
+        $attrString .= sprintf(
+            ' %s="%s"',
+            htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
+        );
+    }
+}
+
+// Add value attribute
+if ($fieldValue !== null && $fieldValue !== '') {
+    $attrString .= sprintf(
+        ' value="%s"',
+        htmlspecialchars($fieldValue, ENT_QUOTES, 'UTF-8')
+    );
+}
+?>
+<div class="form-field input-field<?= $hasErrors ? ' has-error' : '' ?>">
+    <?php if ($fieldLabel): ?>
+    <label for="<?= htmlspecialchars($fieldId, ENT_QUOTES, 'UTF-8') ?>" class="field-label">
+        <?= htmlspecialchars($fieldLabel, ENT_QUOTES, 'UTF-8') ?>
+        <?php if ($isRequired): ?>
+        <span class="required-indicator" aria-label="required">*</span>
+        <?php endif; ?>
+    </label>
+    <?php endif; ?>
+    
+    <input<?= $attrString ?> />
+    
+    <?php if ($fieldHelp): ?>
+    <small class="field-help"><?= htmlspecialchars($fieldHelp, ENT_QUOTES, 'UTF-8') ?></small>
+    <?php endif; ?>
+    
+    <?php if ($hasErrors): ?>
+    <div class="field-errors">
+        <?php foreach ($errors as $error): ?>
+        <div class="field-error"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+</div>
