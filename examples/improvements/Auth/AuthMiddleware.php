@@ -1,5 +1,5 @@
 <?php
-// app/_Core/Auth/AuthMiddleware.php
+// app/Core/Auth/AuthMiddleware.php
 namespace Core\Auth;
 
 use Core\Http\Request;

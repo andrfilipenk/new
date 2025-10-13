@@ -2,7 +2,7 @@
 // public/index.php
 date_default_timezone_set('Europe/Berlin');
 
-require '../app/bootstrap.php';
+require '../bootstrap.php';
 /** @var \Core\Mvc\App $app */
 $app        = $di->get('\Core\Mvc\App');
 $app->setDI($di);

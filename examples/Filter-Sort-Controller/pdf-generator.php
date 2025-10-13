@@ -1,5 +1,5 @@
 <?php
-// app/_Core/Utils/SimplePdfGenerator.php
+// app/Core/Utils/SimplePdfGenerator.php
 namespace Core\Utils;
 
 class SimplePdfGenerator

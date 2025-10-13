@@ -1,19 +1,8 @@
 <?php
 /** @var \Core\Utils\Url $url */
 $url = $this->getDI()->get('url');
-$navigation = [
-    'Home' => 'house',
-    'Calendar' => 'calendar3',
-    'Tasks' => 'list-task',
-    'Flow Builder' => 'diagram-3',
-    'User Management' => 'people-fill',
-    'Access Control' => 'ui-checks',
-    'Settings' => 'gear-fill',
-];
-?>
-<!DOCTYPE html>
+?><!DOCTYPE html>
 <html lang="de">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,49 +11,14 @@ $navigation = [
     <link rel="stylesheet" href="<?= $url->get('css/bootstrap-icons.min.css', [], true) ?>">
     <link rel="stylesheet" href="<?= $url->get('css/app.css', [], true) ?>">
 </head>
-
 <body>
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-auto sticky-top bg-dark">
-            <div class="d-flex flex-sm-column flex-row flex-nowrap align-items-center">
-                <a href="/" class="d-block p-3 link-light text-decoration-none" title="">
-                    <i class="bi-bootstrap fs-1"></i>
-                </a>
-                <ul class="nav nav-pills nav-flush flex-sm-column flex-row flex-nowrap mb-auto mx-auto text-center justify-content-between w-100 px-3 align-items-center">
-                    <?php foreach($navigation as $label => $icon): ?>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link py-3 px-3" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="<?=$label?>">
-                                <i class="bi bi-<?=$icon?> fs-1"></i>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center justify-content-center p-3 link-dark text-decoration-none dropdown-toggle" id="dropdownUser3" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle h2"></i>
-                    </a>
-                    <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser3">
-                        <?php if (isset($navigation['user'])): ?>
-                            <?php foreach($navigation['user']['items'] as $item): ?>
-                                <li><a class="dropdown-item" href="<?= $item['url'] ?: '#' ?>">
-                                    <?php if (!empty($item['icon'])): ?>
-                                        <i class="bi bi-<?= htmlspecialchars($item['icon']) ?> me-2"></i>
-                                    <?php endif; ?>
-                                    <?= htmlspecialchars($item['label']) ?>
-                                </a></li>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Settings</a></li>
-                    </ul>
-                </div>
-            </div>
+            <?=$this->partial('layout/ui/sidebar')?>
         </div>
-        <div class="col-sm p-3 min-vh-100">
-            <div class="content">
-                <?php echo $this->yield('content'); ?>
-            </div>
+        <div class="col-sm min-vh-100 content">
+            <?php echo $this->yield('content'); ?>
         </div>
     </div>
 </div>

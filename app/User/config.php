@@ -2,8 +2,37 @@
 // app/User/config.php
 return [
     'provider' => [
-        '\User\Provider\SessionServiceProvider',
-        '\User\Provider\AclServiceProvider',
+
+    ],
+
+    'navbar' => [
+        [
+            'label' => 'Users',
+            'icon' => 'people',
+            'url'  => '/user',
+        ],
+        [
+            'label' => 'Groups',
+            'icon' => 'diagram-3',
+            'url' => '/group',
+        ],
+        [
+            'label' => 'Permissions',
+            'icon' => 'ui-checks',
+            'url' => '/permissions',
+        ],
+    ],
+
+    'test' => [
+        '/login'                => 'User.Auth.login@GET|POST',
+        '/logout'               => 'User.Auth.logout@GET',
+        '/my-profile'           => 'User.Profile.index@GET',
+        '/edit-profile'         => 'User.Profile.edit@GET|POST',
+        '/change-password'      => 'User.Profile.password@GET|POST',
+
+        '/user-list'            => 'User.Account.list@GET',
+        '/user-group'           => 'User.Group.list@GET',
+        ''
     ],
 
     'routes' => [

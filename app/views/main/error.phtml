@@ -1,0 +1,26 @@
+<?php
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url');
+?><!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
+    <link rel="stylesheet" href="<?= $url->get('css/bootstrap.min.css', [], true) ?>">
+    <link rel="stylesheet" href="<?= $url->get('css/bootstrap-icons.min.css', [], true) ?>">
+    <link rel="stylesheet" href="<?= $url->get('css/app.css', [], true) ?>">
+</head>
+<body>
+  <div class="container">
+    <div class="px-4 py-5 my-5">
+      <h1 class="display-1">ERROR</h1>
+      <p class="lead"><?=$exception->message ?></p>
+      <?php if(($context = $exception->context)): ?>
+        <p><b>Line: <?=$context['line']?></b> in <b><?=$context['file']?></b></p>
+        <code><?=$context['trace']?></code>
+      <?php endif; ?>
+    </div>
+  </div>
+</body>
+</html>

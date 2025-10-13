@@ -1,5 +1,5 @@
 <?php
-// app/_Core/Auth/AuthService.php
+// app/Core/Auth/AuthService.php
 namespace Core\Auth;
 
 use Admin\Model\User;
