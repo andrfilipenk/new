@@ -82,6 +82,7 @@ class App
             }
         }
         if (!$route) {
+            $route = $router->getErrorRoute();
             throw new NotFoundException('Route not found', 'Notfound', [
                 'uri' => $request->uri(),
                 'method' => $request->method(),

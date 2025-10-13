@@ -22,7 +22,7 @@ class Module extends AbstractModule
             // get db access if logged in
             if (!$access) {
                 $event->stopPropagation();
-                exit;
+                #exit;
                 return false;
             }
         });

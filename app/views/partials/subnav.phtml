@@ -1,0 +1,9 @@
+<ul class="nav nav-tabs">
+    <?php foreach ($subnav as $item): ?>
+        <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="<?=$item['url']?>">
+                <?=$item['label']?>
+            </a>
+        </li>
+    <?php endforeach; ?>
+</ul>

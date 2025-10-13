@@ -157,4 +157,13 @@ class Router
             $value
         );
     }
+
+    public function getErrorRoute()
+    {
+        return [
+            'module' => 'base',
+            'controller' => 'error',
+            'action' => 'index'
+        ];
+    }
 }

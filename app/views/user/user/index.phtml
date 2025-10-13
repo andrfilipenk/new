@@ -1,13 +1,20 @@
 <?php 
 /** @var \Core\Utils\Url $url */
 $url = $this->getDI()->get('url'); 
+$subnav = [
+    [
+        'url'=> $url->get('user/create'),
+        'label' => 'Add User'
+    ],
+    [
+        'url'=> $url->get('user/groups'),
+        'label' => 'Manage Groups'
+    ]
+];
 ?>
 <h1>User Management</h1>
 
-<div class="mb-3">
-    <a href="<?= $url->get('user/create') ?>" class="btn btn-primary">Add User</a>
-    <a href="<?= $url->get('user/groups') ?>" class="btn btn-secondary">Manage Groups</a>
-</div>
+<?=$this->partial('partials/subnav', ['subnav' => $subnav])?>
 
 <?php if (!empty($users)): ?>
     <table class="table table-striped">

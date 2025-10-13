@@ -8,10 +8,14 @@ class Form implements FormInterface
 {
     protected array $fields = [];
     protected array $values = [];
+    protected array $errors = [];
+    protected array $validationRules = [];
     protected array $renderers;
     protected $action;
+    protected bool $csrfProtection = true;
+    protected string $csrfFieldName = '_token';
     protected string $template = '<form method="post" action="{action}">{fields}</form>';
-    protected string $fieldTemplate = '<div class="form-group">{label}{field}</div>';
+    protected string $fieldTemplate = '<div class="form-group{error_class}">{label}{field}{error}</div>';
 
     public function __construct()
     {
@@ -101,6 +105,12 @@ class Form implements FormInterface
             'options'       => $options['options'] ?? [],
             'renderer'      => $options['renderer'] ?? null,
         ];
+        
+        // Store validation rules if provided
+        if (isset($options['rules'])) {
+            $this->validationRules[$name] = $options['rules'];
+        }
+        
         return $this;
     }
 
@@ -113,6 +123,14 @@ class Form implements FormInterface
     public function render(): string
     {
         $output = $this->template;
+        
+        // Add CSRF token if enabled
+        if ($this->csrfProtection) {
+            $csrfField = $this->renderCsrfField();
+            // Insert CSRF field after opening form tag
+            $output = preg_replace('/(<form[^>]*>)/', '$1' . $csrfField, $output);
+        }
+        
         // Replace individual field placeholders first
         foreach (array_keys($this->fields) as $name) {
             $placeholder = '{field_' . $name . '}';
@@ -139,12 +157,24 @@ class Form implements FormInterface
         $value      = $this->values[$name] ?? null;
         $renderer   = $field['renderer'] ?? $this->renderers[$field['type']] ?? $this->renderers['text'];
         $fieldHtml  = $renderer($name, $field, $value);
+        
         if ($field['type'] === 'button' || $field['type'] === 'hidden') {
             return $fieldHtml;
         }
+        
+        // Add error state
+        $hasError = $this->hasError($name);
+        $errorClass = $hasError ? ' has-error' : '';
+        $errorMessages = $hasError ? $this->renderErrors($name) : '';
+        
         return str_replace(
-            ['{label}', '{field}'],
-            [Tag::label($field['label'], ['for' => $name]), $fieldHtml],
+            ['{label}', '{field}', '{error}', '{error_class}'],
+            [
+                Tag::label($field['label'], ['for' => $name]),
+                $fieldHtml,
+                $errorMessages,
+                $errorClass
+            ],
             $this->fieldTemplate
         );
     }
@@ -209,5 +239,88 @@ class Form implements FormInterface
     {
         $this->fieldTemplate = $fieldTemplate;
         return $this;
+    }
+    
+    public function setErrors(array $errors): static
+    {
+        $this->errors = $errors;
+        return $this;
+    }
+    
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+    
+    public function hasError(string $field): bool
+    {
+        return isset($this->errors[$field]) && !empty($this->errors[$field]);
+    }
+    
+    public function getValidationRules(): array
+    {
+        return $this->validationRules;
+    }
+    
+    public function enableCsrfProtection(bool $enable = true): static
+    {
+        $this->csrfProtection = $enable;
+        return $this;
+    }
+    
+    protected function renderErrors(string $name): string
+    {
+        if (!isset($this->errors[$name])) return '';
+        
+        $errors = (array) $this->errors[$name];
+        $html = '<div class="field-errors">';
+        foreach ($errors as $error) {
+            $html .= '<span class="error-message text-danger">' . htmlspecialchars($error) . '</span>';
+        }
+        $html .= '</div>';
+        return $html;
+    }
+    
+    protected function renderCsrfField(): string
+    {
+        $token = $this->getCsrfToken();
+        return Tag::input([
+            'type' => 'hidden',
+            'name' => $this->csrfFieldName,
+            'value' => $token
+        ]);
+    }
+    
+    protected function getCsrfToken(): string
+    {
+        // Try to get session from DI container
+        try {
+            if (class_exists('\Core\Di\Container')) {
+                $container = \Core\Di\Container::getInstance();
+                if ($container->has('session')) {
+                    $session = $container->get('session');
+                    
+                    if (!$token = $session->get('csrf_token')) {
+                        $token = bin2hex(random_bytes(32));
+                        $session->set('csrf_token', $token);
+                    }
+                    
+                    return $token;
+                }
+            }
+        } catch (\Exception $e) {
+            // Fallback if DI not available
+        }
+        
+        // Fallback: use PHP session
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        if (!isset($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        
+        return $_SESSION['csrf_token'];
     }
 }

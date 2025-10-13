@@ -39,6 +39,8 @@ class Builder
         $options    = [];
         // Normalize attributes: merge all options into 'attributes'
         $attributes = [];
+        $rules = [];
+        
         // For select/radio: args[3], for button: args[2], otherwise: args[2]
         if (in_array($type, ['select', 'radio'])) {
             $attributes = $args[3] ?? [];
@@ -47,6 +49,13 @@ class Builder
         } else {
             $attributes = $args[2] ?? [];
         }
+        
+        // Extract validation rules if provided
+        if (isset($attributes['rules'])) {
+            $rules = $attributes['rules'];
+            unset($attributes['rules']);
+        }
+        
         // Move standard HTML attributes from options to 'attributes'
         foreach (['required', 'placeholder', 'class', 'id', 'min', 'max', 'step', 'readonly', 'disabled', 'autocomplete', 'pattern'] as $attrKey) {
             if (isset($attributes[$attrKey])) {
@@ -61,7 +70,8 @@ class Builder
             $options = [
                 'options'       => $args[1] ?? [],
                 'label'         => $args[2] ?? null,
-                'attributes'    => $attributes
+                'attributes'    => $attributes,
+                'rules'         => $rules
             ];
         } elseif ($type === 'button') {
             $options = [
@@ -71,7 +81,8 @@ class Builder
         } else {
             $options = [
                 'label'         => $args[1] ?? null,
-                'attributes'    => $attributes
+                'attributes'    => $attributes,
+                'rules'         => $rules
             ];
         }
         $this->form->addField($fieldName, $type, array_filter($options));

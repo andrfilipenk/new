@@ -73,19 +73,44 @@ class User extends Controller
     public function createAction()
     {
         $form = UserForm::build();
+        
         if ($this->isPost()) {
-            $data = $this->getRequest()->all();
-            $user = new UserModel($data);
-            if ($user->save()) {
-                $this->flashSuccess('User created.');
-                return $this->redirect('user');
-            } else {
-                $this->flashError('Failed to create user.');
+            // Validate CSRF token
+            if (!$this->validateCsrfToken()) {
+                $this->flashError('Invalid security token. Please try again.');
+                return $this->render('user/form', ['form' => $form]);
             }
+            
+            $data = $this->getRequest()->all();
+            
+            // Validate using form rules
+            $validator = $this->getValidator();
+            try {
+                $validator->validate($data, $form->getValidationRules());
+                
+                // Validation passed, create user
+                $user = new UserModel($data);
+                if ($user->save()) {
+                    $this->flashSuccess('User created.');
+                    return $this->redirect('user');
+                } else {
+                    $this->flashError('Failed to create user.');
+                }
+            } catch (\Exception $e) {
+                // Validation failed - set errors on form
+                if (method_exists($e, 'getErrors')) {
+                    $form->setErrors($e->getErrors());
+                } else {
+                    $this->flashError('Validation failed: ' . $e->getMessage());
+                }
+            }
+            
+            // Repopulate form with submitted data
             $form->setValues($data);
         }
+        
         return $this->render('user/form', [
-            'form' => $form->render()
+            'form' => $form
         ]);
     }
 
@@ -96,20 +121,46 @@ class User extends Controller
         if (!$user) {
             return $this->redirect('use');
         }
+        
         $form = UserForm::build($user->getData());
+        
         if ($this->isPost()) {
-            $data = $this->getRequest()->all();
-            $user->fill($data);
-            if ($user->save()) {
-                $this->flashSuccess('User updated.');
-                return $this->redirect('user');
-            } else {
-                $this->flashError('Failed to update user.');
+            // Validate CSRF token
+            if (!$this->validateCsrfToken()) {
+                $this->flashError('Invalid security token. Please try again.');
+                return $this->render('user/form', ['form' => $form, 'user' => $user]);
             }
+            
+            $data = $this->getRequest()->all();
+            
+            // Validate using form rules
+            $validator = $this->getValidator();
+            try {
+                $validator->validate($data, $form->getValidationRules());
+                
+                // Validation passed, update user
+                $user->fill($data);
+                if ($user->save()) {
+                    $this->flashSuccess('User updated.');
+                    return $this->redirect('user');
+                } else {
+                    $this->flashError('Failed to update user.');
+                }
+            } catch (\Exception $e) {
+                // Validation failed - set errors on form
+                if (method_exists($e, 'getErrors')) {
+                    $form->setErrors($e->getErrors());
+                } else {
+                    $this->flashError('Validation failed: ' . $e->getMessage());
+                }
+            }
+            
+            // Repopulate form with submitted data
             $form->setValues($data);
         }
+        
         return $this->render('user/form', [
-            'form' => $form->render(),
+            'form' => $form,
             'user' => $user
         ]);
     }

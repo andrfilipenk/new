@@ -23,4 +23,11 @@ class Error extends Controller
         $this->getView()->setLayout('window');
         return $this->render('error/default', ['message' => 'Application error!']);
     }
+
+    
+    protected function render(string $template = null, array $data = []): string
+    {
+        $template = 'base' . '/' . $template;
+        return $this->getView()->render($template, $data);
+    }
 }

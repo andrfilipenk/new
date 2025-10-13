@@ -10,8 +10,8 @@ class Dashboard extends Controller
     public function indexAction()
     {
         // Get current date or date from request
-        $currentDate = $this->request->get('date') ? new \DateTime($this->request->get('date')) : new \DateTime();
-        $view = $this->request->get('view', 'month'); // Default to month view
+        $currentDate = $this->getRequest()->get('date') ? new \DateTime($this->getRequest()->get('date')) : new \DateTime();
+        $view = $this->getRequest()->get('view', 'month'); // Default to month view
         
         // Generate calendar data based on view
         $calendarData = $this->getCalendarData($currentDate, $view);

@@ -14,9 +14,6 @@ class Controller
      * @return $this
      */
     public function initialize() {
-        $dispatcher = $this->getDispatcher();
-        $viewPath   = APP_PATH . $dispatcher->getModule() . '/views/';
-        $this->getView()->setTemplatePath($viewPath);
         return $this;
     }
 
@@ -47,7 +44,8 @@ class Controller
     {
         if ($this->isPost()) {
             $token = $this->getRequest()->post('_token');
-            return ($this->getSession()->get('csrf_token') === $token);
+            $sessionToken = $this->getSession()->get('csrf_token');
+            return $token && $sessionToken && hash_equals($sessionToken, $token);
         }
         return true;
     }
@@ -234,9 +232,11 @@ class Controller
      */
     protected function render(string $template = null, array $data = []): string
     {
+        $dispatcher = $this->getDispatcher();
         if ($template === null) {
-            $dispatcher = $this->getDispatcher();
-            $template = $dispatcher->getController() . '/' . $dispatcher->getAction();
+            $template = $dispatcher->getModule() . '/' . $dispatcher->getController() . '/' . $dispatcher->getAction();
+        } else {
+            $template = $dispatcher->getModule() . '/' . $template;
         }
         return $this->getView()->render($template, $data);
     }
