@@ -1,14 +1,4 @@
 <?php
-/**
- * FormValidator Class
- * 
- * Handles form-level validation including cross-field validation
- * and complex business rules that span multiple fields.
- * 
- * @package Core\Forms\Validation
- * @since 2.0.0
- */
-
 namespace Core\Forms\Validation;
 
 use Core\Forms\FormDefinition;

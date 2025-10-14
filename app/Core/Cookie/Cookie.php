@@ -23,49 +23,18 @@ class Cookie implements CookieInterface
         $this->defaults = array_merge($this->defaults, $defaults);
     }
 
-    public function set(string $name, string $value, array $options = []): bool
+    public function set(string $name, string $value, array $options = [], ?int $expires = null): bool
     {
-        // Merge with defaults
         $options = array_merge($this->defaults, $options);
-        // Convert expires from days to timestamp if needed
-        if (is_numeric($options['expires']) && $options['expires'] > 0) {
-            $options['expires'] = time() + (int)($options['expires'] * 86400); // Convert days to seconds
+        if ($expires !== null) {
+            $options['expires'] = $expires > 0 ? time() + $expires * 86400 : $expires;
         }
-        // Trigger beforeSet event
-        $event = $this->fireEvent('cookie:beforeSet', [$this, 
-            [
-                'name'      => $name,
-                'value'     => $value,
-                'options'   => $options
-            ]
-        ]);
-        if ($event->isPropagationStopped()) {
-            return false;
-        }
-        // Set the cookie
-        $result = setcookie(
-            $name,
-            $value,
-            [
-                'expires'   => $options['expires'],
-                'path'      => $options['path'],
-                'domain'    => $options['domain'],
-                'secure'    => $options['secure'],
-                'httponly'  => $options['httponly'],
-                'samesite'  => $options['samesite']
-            ]
-        );
+        $event = $this->fireEvent('cookie:beforeSet', [$this, ['name' => $name, 'value' => $value, 'options' => $options]]);
+        if ($event->isPropagationStopped()) return false;
+        $result = setcookie($name, $value, $options);
         if ($result) {
-            // Also set in $_COOKIE for immediate access
             $_COOKIE[$name] = $value;
-            // Trigger afterSet event
-            $this->fireEvent('cookie:afterSet', [$this,
-                [
-                    'name'      => $name,
-                    'value'     => $value,
-                    'options'   => $options
-                ]
-            ]);
+            $this->fireEvent('cookie:afterSet', [$this, ['name' => $name, 'value' => $value, 'options' => $options]]);
         }
         return $result;
     }

@@ -1,14 +1,4 @@
 <?php
-/**
- * ErrorAggregator Class
- * 
- * Collects and organizes validation errors from multiple sources,
- * providing methods for error formatting and retrieval.
- * 
- * @package Core\Forms\Validation
- * @since 2.0.0
- */
-
 namespace Core\Forms\Validation;
 
 class ErrorAggregator

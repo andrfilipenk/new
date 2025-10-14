@@ -1,45 +1,32 @@
 <?php
-// app/User/Controller/Profile.php
+// app/User/Controller/ProfileController.php
 namespace User\Controller;
 
-use Core\Mvc\Controller;
+use Core\Di\Container;
 use User\Model\User as UserModel;
 
-class Profile extends Controller
+class ProfileController extends AbstractController
 {
-    /**
-     * Summary of getCurrentUser
-     * 
-     * @return \Core\Acl\User|false
-     */
-    protected function getCurrentUser()
-    {
-        $sessionUser = $this->getSession()->get('user');
-        if (!$sessionUser) {
-            return false;
-        }
-        return UserModel::find($sessionUser['id']);
-    }
 
     /**
      * View user profile
      */
     public function indexAction()
     {
-        $user = $this->getCurrentUser();
+        $user = $this->getDI()->get('auth')->getUser();
         if (!$user) {
             $this->flashError('Please log in to access your profile.');
             return $this->redirect('user/login');
         }
-        return $this->render('profile/index', [
+        return $this->render('user/profile', [
             'user' => $user,
             'userGroups' => $user->groups
         ]);
     }
 
-    /**
+    /*
      * Edit user profile
-     */
+     
     public function editAction()
     {
         $user = $this->getCurrentUser();
@@ -69,11 +56,12 @@ class Profile extends Controller
             }
         }
         return $this->render('profile/edit', ['user' => $user]);
-    }
+    }*/
 
-    /**
+
+    /*
      * Change user password
-     */
+    
     public function passwordAction()
     {
         $user = $this->getCurrentUser();
@@ -106,5 +94,5 @@ class Profile extends Controller
             }
         }
         return $this->render('profile/password', ['user' => $user]);
-    }
+    } */
 }

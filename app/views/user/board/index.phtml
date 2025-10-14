@@ -4,7 +4,6 @@
 $tz = new DateTimeZone('Europe/Berlin');
 $dt = new DateTimeImmutable("now", $tz);
 $dd = $dt->modify("first day of january");
-var_dump($dd->format("d-m-Y"));
 ?>
 <h2 style="margin: 0 0 30px 0; height: 30px; line-height: 30px;">Month</h2>
 <div class="grid-month" style="width: 210px">

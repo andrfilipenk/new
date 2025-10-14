@@ -69,19 +69,19 @@ return [
         ],
 
         // Profile routes
-        '/user/profile' => [
+        '/profile' => [
             'module'     => 'User',
             'controller' => 'Profile',
             'action'     => 'index',
             'method'     => 'GET'
         ],
-        '/user/profile/edit' => [
+        '/profile/edit' => [
             'module'     => 'User',
             'controller' => 'Profile',
             'action'     => 'edit',
             'method'     => ['GET', 'POST']
         ],
-        '/user/profile/password' => [
+        '/profile/password' => [
             'module'     => 'User',
             'controller' => 'Profile',
             'action'     => 'password',

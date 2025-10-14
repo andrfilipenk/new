@@ -22,7 +22,7 @@ class UserController extends AbstractController
     {
         $user = $this->userByGetID();
         $allGroups = GroupModel::all();
-        $userGroups = $user->groups();
+        $userGroups = $user->groups;
         return $this->render('user/user/view', [
             'user' => $user,
             'userGroups' => $userGroups,
@@ -68,7 +68,7 @@ class UserController extends AbstractController
                     $this->flashSuccess('User created.');
                     return $this->redirect('user');
                 } else {
-                    $errors = '<br>' . implode('<br>', $user->getErrors());
+                    $errors = '<br>' . implode('<br>', $formManager->getErrors());
                     $this->flashError('Failed to create user: ' . $errors);
                 }
             }
@@ -90,7 +90,7 @@ class UserController extends AbstractController
                     $this->flashSuccess('User updated.');
                     return $this->redirect('user');
                 } else {
-                    $errors = '<br>' . implode('<br>', $user->getErrors());
+                    $errors = '<br>' . implode('<br>', $formManager->getErrors());
                     $this->flashError('Failed to update user: ' . $errors);
                 }
             }
@@ -104,7 +104,7 @@ class UserController extends AbstractController
         $user = $this->userByGetID();
         if ($user) {
             // Remove from all groups first
-            $user->groups()->detach();
+            $user->groups->detach();
             if ($user->delete()) {
                 $this->flashSuccess('User deleted.');
             } else {

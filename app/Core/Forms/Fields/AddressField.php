@@ -1,15 +1,4 @@
 <?php
-/**
- * AddressField Class
- * 
- * Specialized composite field for address input with street, city, state,
- * postal code, and country fields. Includes built-in validation for
- * different address formats.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 class AddressField extends CompositeField

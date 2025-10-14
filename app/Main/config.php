@@ -1,11 +1,6 @@
 <?php
 // app/Main/config.php
 return [
-    'provider' => [
-        '\Core\Provider\CookieServiceProvider',
-        '\Core\Provider\SessionServiceProvider',
-        '\Main\Provider\ViewServiceProvider',
-    ],
 
     'navbaraaa' => [
         [

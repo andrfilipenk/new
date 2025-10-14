@@ -1,14 +1,4 @@
 <?php
-/**
- * ValidationPipeline Class
- * 
- * Orchestrates the complete validation process by coordinating
- * field validators, form validators, and error aggregation.
- * 
- * @package Core\Forms\Validation
- * @since 2.0.0
- */
-
 namespace Core\Forms\Validation;
 
 use Core\Forms\FormDefinition;

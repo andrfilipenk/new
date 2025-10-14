@@ -1,14 +1,4 @@
 <?php
-/**
- * ValidationResult Class
- * 
- * Represents the outcome of a validation operation, storing
- * validation status, error messages, and metadata.
- * 
- * @package Core\Forms\Validation
- * @since 2.0.0
- */
-
 namespace Core\Forms\Validation;
 
 class ValidationResult

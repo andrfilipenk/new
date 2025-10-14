@@ -1,14 +1,4 @@
 <?php
-/**
- * FormRenderer Class
- * 
- * Handles form rendering with theme support and template processing.
- * Generates HTML output from form definitions.
- * 
- * @package Core\Forms\Rendering
- * @since 2.0.0
- */
-
 namespace Core\Forms\Rendering;
 
 use Core\Forms\FormDefinition;
@@ -114,11 +104,14 @@ class FormRenderer
         $hasError = isset($context['errors'][$fieldName]);
 
         // Check for custom template
+        /** @var AbstractField $field */
         if ($field->getTemplate()) {
+            /** @var FieldInterface $field */
             return $this->renderWithTemplate($field, $context, $options);
         }
 
         // Use theme-based rendering
+        /** @var FieldInterface $field */
         return $this->renderWithTheme($field, $context, $options);
     }
 
@@ -132,8 +125,9 @@ class FormRenderer
      */
     private function renderWithTemplate(FieldInterface $field, array $context, array $options): string
     {
+        /** @var AbstractField $field */
         $template = $field->getTemplate();
-        
+         /** @var FieldInterface $field */
         // Simple template processing (replace variables)
         $html = file_get_contents($template);
         

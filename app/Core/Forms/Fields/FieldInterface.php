@@ -1,15 +1,4 @@
 <?php
-/**
- * Field Interface
- * 
- * Defines the contract for all form field types in the enhanced form system.
- * Each field must implement methods for value management, validation, 
- * rendering, and attribute handling.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use Core\Forms\Validation\ValidationResult;

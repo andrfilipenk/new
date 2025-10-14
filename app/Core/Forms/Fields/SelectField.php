@@ -1,14 +1,4 @@
 <?php
-/**
- * SelectField Class
- * 
- * Represents HTML select/dropdown fields with option management,
- * optgroup support, and multiple selection capability.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use Core\Forms\Validation\ValidationResult;

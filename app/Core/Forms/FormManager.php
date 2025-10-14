@@ -1,14 +1,4 @@
 <?php
-/**
- * FormManager Class
- * 
- * Orchestrates the complete form lifecycle including creation,
- * validation, submission handling, and data binding.
- * 
- * @package Core\Forms
- * @since 2.0.0
- */
-
 namespace Core\Forms;
 
 use Core\Forms\Validation\ValidationPipeline;

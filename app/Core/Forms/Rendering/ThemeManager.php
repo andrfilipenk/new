@@ -1,14 +1,4 @@
 <?php
-/**
- * ThemeManager Class
- * 
- * Manages rendering themes for forms, providing support for
- * different CSS frameworks and custom styling approaches.
- * 
- * @package Core\Forms\Rendering
- * @since 2.0.0
- */
-
 namespace Core\Forms\Rendering;
 
 use Core\Forms\Fields\FieldInterface;

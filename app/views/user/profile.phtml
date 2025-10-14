@@ -9,8 +9,8 @@ $url = $this->getDI()->get('url');
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h4 class="mb-0">My Profile</h4>
                     <div>
-                        <a href="<?= $url->get('user/profile/edit') ?>" class="btn btn-primary btn-sm">Edit Profile</a>
-                        <a href="<?= $url->get('user/profile/password') ?>" class="btn btn-warning btn-sm">Change Password</a>
+                        <a href="<?= $url->get('profile/edit') ?>" class="btn btn-primary btn-sm">Edit Profile</a>
+                        <a href="<?= $url->get('profile/password') ?>" class="btn btn-warning btn-sm">Change Password</a>
                     </div>
                 </div>
                 <div class="card-body">
@@ -56,9 +56,9 @@ $url = $this->getDI()->get('url');
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="<?= $url->get('user/profile/edit') ?>" class="btn btn-outline-primary btn-sm">Edit Profile</a>
-                        <a href="<?= $url->get('user/profile/password') ?>" class="btn btn-outline-warning btn-sm">Change Password</a>
-                        <a href="<?= $url->get('user/logout') ?>" class="btn btn-outline-danger btn-sm">Logout</a>
+                        <a href="<?= $url->get('profile/edit') ?>" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                        <a href="<?= $url->get('profile/password') ?>" class="btn btn-outline-warning btn-sm">Change Password</a>
+                        <a href="<?= $url->get('logout') ?>" class="btn btn-outline-danger btn-sm">Logout</a>
                     </div>
                 </div>
             </div>

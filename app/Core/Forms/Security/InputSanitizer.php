@@ -1,14 +1,4 @@
 <?php
-/**
- * InputSanitizer Class
- * 
- * Provides input sanitization to prevent XSS attacks and other
- * security vulnerabilities through context-aware filtering.
- * 
- * @package Core\Forms\Security
- * @since 2.0.0
- */
-
 namespace Core\Forms\Security;
 
 class InputSanitizer

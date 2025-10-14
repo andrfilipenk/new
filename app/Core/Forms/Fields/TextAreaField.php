@@ -1,13 +1,4 @@
 <?php
-/**
- * TextAreaField Class
- * 
- * Represents HTML textarea fields for multi-line text input.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 class TextAreaField extends AbstractField

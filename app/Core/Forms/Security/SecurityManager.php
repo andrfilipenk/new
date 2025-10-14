@@ -1,14 +1,4 @@
 <?php
-/**
- * SecurityManager Class
- * 
- * Coordinates all security features for forms including CSRF protection
- * and input sanitization. Provides centralized security management.
- * 
- * @package Core\Forms\Security
- * @since 2.0.0
- */
-
 namespace Core\Forms\Security;
 
 use Core\Forms\FormDefinition;

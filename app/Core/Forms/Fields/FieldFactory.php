@@ -1,14 +1,4 @@
 <?php
-/**
- * FieldFactory Class
- * 
- * Factory for creating field instances based on type and configuration.
- * Provides a centralized way to instantiate fields with type mapping.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use InvalidArgumentException;
@@ -165,5 +155,10 @@ class FieldFactory
     public static function textarea(string $name, array $config = []): TextAreaField
     {
         return TextAreaField::make($name, $config);
+    }
+
+    public static function tel(string $name, array $config = []): InputField
+    {
+        return InputField::tel($name, $config);
     }
 }

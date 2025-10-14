@@ -1,14 +1,4 @@
 <?php
-/**
- * FormEvent Class
- * 
- * Event object for form lifecycle events. Carries form context
- * and data through the event system.
- * 
- * @package Core\Forms\Events
- * @since 2.0.0
- */
-
 namespace Core\Forms\Events;
 
 use Core\Forms\FormDefinition;

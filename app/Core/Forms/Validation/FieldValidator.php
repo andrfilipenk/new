@@ -1,14 +1,4 @@
 <?php
-/**
- * FieldValidator Class
- * 
- * Validates individual field values using a chain of validation rules.
- * Supports built-in rules and custom validator registration.
- * 
- * @package Core\Forms\Validation
- * @since 2.0.0
- */
-
 namespace Core\Forms\Validation;
 
 use Core\Forms\Fields\FieldInterface;

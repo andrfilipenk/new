@@ -64,6 +64,7 @@ class Blueprint
         return $this->addColumn('FOREIGN', $column);
     }
 
+    /*
     public function toSql(): string
     {
         $columnsSql     = [];
@@ -89,5 +90,24 @@ class Blueprint
         }
         $sql .= "\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
         return $sql;
+    }*/
+
+    public function toSql(): string
+    {
+        $columns = $primaries = $foreigns = [];
+        foreach ($this->columns as $column) {
+            if ($column->get('type') === 'FOREIGN') {
+                $foreigns[] = $column->toSql();
+            } else {
+                $columns[] = $column->toSql();
+            }
+            if ($column->get('primary')) {
+                $primaries[] = $column->get('name');
+            }
+        }
+        $sql = "CREATE TABLE `{$this->table}` (\n    " . implode(",\n    ", $columns);
+        if ($primaries) $sql .= ",\n    PRIMARY KEY (`" . implode('`,`', $primaries) . "`)";
+        if ($foreigns) $sql .= ",\n    " . implode(",\n    ", $foreigns);
+        return "$sql\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
     }
 }

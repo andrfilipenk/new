@@ -1,15 +1,4 @@
 <?php
-/**
- * DynamicListField Class
- * 
- * Field that allows users to add, remove, and reorder multiple items.
- * Useful for things like multiple phone numbers, email addresses, or any
- * repeating data structure.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use Core\Forms\Validation\ValidationResult;

@@ -1,14 +1,4 @@
 <?php
-/**
- * FormBuilder Class
- * 
- * Provides a fluent interface for building forms declaratively.
- * Simplifies form creation with method chaining.
- * 
- * @package Core\Forms
- * @since 2.0.0
- */
-
 namespace Core\Forms;
 
 use Core\Forms\Fields\FieldFactory;

@@ -1,14 +1,4 @@
 <?php
-/**
- * FileUploadField Class
- * 
- * Handles file upload fields with MIME type validation, file size limits,
- * and comprehensive security checks. Supports single and multiple file uploads.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use Core\Forms\Validation\ValidationResult;

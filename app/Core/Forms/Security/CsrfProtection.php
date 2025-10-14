@@ -1,13 +1,4 @@
 <?php
-/**
- * CsrfProtection Class
- * 
- * Provides CSRF (Cross-Site Request Forgery) protection for forms
- * through token generation, validation, and rotation.
- * 
- * @package Core\Forms\Security
- * @since 2.0.0
- */
 
 namespace Core\Forms\Security;
 
@@ -43,7 +34,7 @@ class CsrfProtection
     /**
      * @var Session|null Session instance
      */
-    private ?Session $session = null;
+    private $session = null;
 
     /**
      * Create a new CSRF protection instance
@@ -51,7 +42,7 @@ class CsrfProtection
      * @param string $tokenFieldName Custom token field name
      * @param Session|null $session Session instance
      */
-    public function __construct(string $tokenFieldName = self::DEFAULT_TOKEN_FIELD, ?Session $session = null)
+    public function __construct(string $tokenFieldName = self::DEFAULT_TOKEN_FIELD, $session = null)
     {
         $this->tokenFieldName = $tokenFieldName;
         $this->session = $session;

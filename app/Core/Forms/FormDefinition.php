@@ -1,14 +1,4 @@
 <?php
-/**
- * FormDefinition Class
- * 
- * Defines the declarative structure of a form, including fields,
- * validation rules, security settings, and rendering configuration.
- * 
- * @package Core\Forms
- * @since 2.0.0
- */
-
 namespace Core\Forms;
 
 use Core\Forms\Fields\FieldInterface;

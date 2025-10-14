@@ -1,14 +1,4 @@
 <?php
-/**
- * FieldCollection Class
- * 
- * Manages a collection of form fields with support for ordering,
- * iteration, and field relationship management.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use ArrayIterator;

@@ -1,14 +1,4 @@
 <?php
-/**
- * InputField Class
- * 
- * Represents standard HTML input fields (text, email, password, number, etc.)
- * with type-specific validation and rendering.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use Core\Forms\Validation\ValidationResult;

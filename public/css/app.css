@@ -4,6 +4,16 @@
 }
 
 
+.usernav {
+    position: absolute;
+    font-weight: bold;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 30px;
+    background: #eee;
+}
+
 .grid-month {
 
 }
@@ -17,11 +27,11 @@
     position: relative;
     flex: 1;
     background: 
-        linear-gradient(90deg, #eee 1px, transparent 1px),
-        linear-gradient(#eee 1px, transparent 1px);
+        linear-gradient(90deg, #fff 1px, transparent 1px),
+        linear-gradient(#fff 1px, transparent 1px);
     background-size: 30px 30px;
     overflow: auto;
-    padding: 30px;
+    padding: 60px 30px 30px;
 }
 
 

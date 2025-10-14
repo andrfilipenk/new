@@ -1,15 +1,4 @@
 <?php
-/**
- * CompositeField Class
- * 
- * Groups multiple fields together as a single logical unit.
- * Useful for creating reusable field groups like addresses, date/time pickers,
- * or custom compound inputs. Supports nested validation and rendering.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use Core\Forms\Validation\ValidationResult;

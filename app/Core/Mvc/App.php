@@ -1,44 +1,43 @@
 <?php
-// app/Core/Mvc/App.php
 namespace Core\Mvc;
 
-use Core\Mvc\AbstractModule;
 use Core\Di\Injectable;
 use Core\Exception\NotFoundException;
-use Core\Http\Request;
 use Core\Http\Response;
 
-/**
- * Optimized App class with reduced DI lookups and better error handling
- */
 class App
 {
     use Injectable;
 
-    /**
-     * Returns dispatcher instance
-     *
-     * @return \Core\Events\Manager
-     */
+    protected $middlewareManager;
+
+    public function __construct()
+    {
+        $this->getDI()->set('app', $this);
+        $this->getDI()->set('middlewareManager', '\Core\Mvc\Middleware\MiddlewareManager');
+        $this->middlewareManager = $this->getDI()->get('middlewareManager');
+        $this->middlewareManager->setDI($this->getDI());
+    }
+
     public function getEventsManager()
     {
         return $this->getDI()->get('eventsManager');
     }
 
-    /**
-     * Initialize all Modules
-     * 
-     * @return \Core\Mvc\AbstractModule[]
-     */
+    public function addMiddleware(string $middleware, array $config = []): self
+    {
+        $this->middlewareManager->add($middleware, $config);
+        return $this;
+    }
+
     public function initModules(): array
     {
         $modules = [];
-        $config  = $this->getDI()->get('config');
-        foreach ($config['app']['module'] as $module) {
-            $moduleConfig   = [];
-            $moduleNs       = $module . '\\';
-            $moduleClass    = $moduleNs . 'Module';
-            $configFile     = APP_PATH . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . 'config.php';
+        $config = $this->getDI()->get('config');
+        foreach ($config['app']['module'] ?? [] as $module) {
+            $moduleConfig = [];
+            $moduleClass = "\\{$module}\\Module";
+            $configFile = APP_PATH . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . 'config.php';
             if (!class_exists($moduleClass)) {
                 continue;
             }
@@ -54,33 +53,27 @@ class App
         return $modules;
     }
 
-    /**
-     * Run the application
-     */
-    public function run()
+    public function run(): void
     {
         $di = $this->getDI();
-        $this->getEventsManager()->trigger('app.beforeInitModule', $this);
+        $events = $this->getEventsManager();
+        $events->trigger('app.beforeInitModule', $this);
+
         $modules    = $this->initModules();
-        /** @var Request $request */
         $request    = $di->get('request');
-        /** @var Response $response */
         $response   = $di->get('response');
-        /** @var \Core\Mvc\Router $router */
-        $router     = $di->get('\Core\Mvc\Router');
-        /** @var \Core\Mvc\Dispatcher $dispatcher */
+        $router     = $di->get('router');
         $dispatcher = $di->get('dispatcher');
-        $route      = false;
+
+        $route = false;
         foreach ($modules as $module) {
-            $route = $router->matchRouteGroup(
-            $request->uri(), 
-            $request->method(), 
-            $module->getRoutes());
+            $route = $router->matchRouteGroup($request->uri(), $request->method(), $module->getRoutes());
             if ($route) {
                 $module->boot($di, $route['module'], $route['controller'], $route['action']);
                 break;
             }
         }
+
         if (!$route) {
             $route = $router->getErrorRoute();
             throw new NotFoundException('Route not found', 'Notfound', [
@@ -88,21 +81,25 @@ class App
                 'method' => $request->method(),
             ]);
         }
+
+        if (!$this->middlewareManager->handle($route['module'], $route['controller'], $route['action'])) {
+            $events->trigger('app:middlewareFailed', [$this, $route['module'], $route['controller'], $route['action']]);
+            return;
+        }
+
+        $events->trigger('app:beforeDispatch', [$this, $dispatcher]);
         $dispatcher->prepare($route);
         $result = $dispatcher->dispatch();
+
         if (is_array($result)) {
             $response->json($result);
-        }
-        if (is_string($result)) {
+        } elseif (is_string($result)) {
             $response->setContent($result);
+        } elseif ($result instanceof Response) {
+            $response = $result;
         }
-        if (is_object($result)) {
-            if ($result instanceof Response) {
-                $response = $result;
-            }
-        }
-        $this->getEventsManager()->trigger('app.beforeSendResponse', $this);
+
+        $events->trigger('app.beforeSendResponse', $this);
         $response->send();
-        return;
     }
 }

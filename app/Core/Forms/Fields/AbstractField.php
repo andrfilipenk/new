@@ -1,14 +1,4 @@
 <?php
-/**
- * AbstractField Class
- * 
- * Base implementation for all form fields, providing common functionality
- * for value management, validation, attributes, and rendering.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 use Core\Forms\Validation\ValidationResult;

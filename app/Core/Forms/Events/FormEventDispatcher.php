@@ -1,14 +1,4 @@
 <?php
-/**
- * FormEventDispatcher Class
- * 
- * Simple event dispatcher for form lifecycle events.
- * Allows listeners to hook into form creation, rendering, validation, and submission.
- * 
- * @package Core\Forms\Events
- * @since 2.0.0
- */
-
 namespace Core\Forms\Events;
 
 class FormEventDispatcher

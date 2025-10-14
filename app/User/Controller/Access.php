@@ -265,6 +265,7 @@ class Access extends Controller
     }
 
     // Helper method to assign user permission
+    /*
     private function assignUserPermission(int $userId, int $permissionId, int $granted = 1)
     {
         $db = User::db();
@@ -286,6 +287,20 @@ class Access extends Controller
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
         }
+    }*/
+
+    private function assignUserPermission(int $userId, int $permissionId, int $granted = 1): void
+    {
+        $db = User::db()->table('acl_user_permission');
+        $data = [
+            'user_id'       => $userId, 
+            'permission_id' => $permissionId, 
+            'granted'       => $granted, 
+            'updated_at'    => date('Y-m-d H:i:s')
+        ];
+        $db->where('user_id', $userId)->where('permission_id', $permissionId)->first() ?
+            $db->update($data) :
+            $db->insert($data + ['created_at' => date('Y-m-d H:i:s')]);
     }
 
     // Helper method to remove user permission

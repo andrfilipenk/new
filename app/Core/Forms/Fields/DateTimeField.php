@@ -1,14 +1,4 @@
 <?php
-/**
- * DateTimeField Class
- * 
- * Specialized composite field for date/time input with support for
- * timezone selection and various date/time format combinations.
- * 
- * @package Core\Forms\Fields
- * @since 2.0.0
- */
-
 namespace Core\Forms\Fields;
 
 class DateTimeField extends CompositeField

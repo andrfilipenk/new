@@ -270,6 +270,7 @@ class Database
         return $sql;
     }
 
+    /*
     private function buildWhere(): string
     {
         if (empty($this->query['where'])) {
@@ -293,6 +294,25 @@ class Database
             }
         }
         return $conditions ? ' WHERE ' . implode('', $conditions) : '';
+    }*/
+
+    private function buildWhere(): string
+    {
+        if (!$this->query['where']) return '';
+        $conditions = [];
+        foreach ($this->query['where'] as $i => [$column, $operator, $value, $boolean]) {
+            $prefix = $i ? " $boolean " : '';
+            if ($column === 'RAW') {
+                $conditions[] = "$prefix$operator";
+            } else {
+                if (($operator === 'IN' || $operator === 'NOT IN') && $value) {
+                    $conditions[] = "$prefix$column $operator (" . str_repeat('?,', count($value) - 1) . '?)';
+                } else {
+                    $conditions[] = "$prefix$column $operator" . ($value !== null ? ' ?' : '');
+                }
+            }
+        }
+        return ' WHERE ' . implode('', $conditions);
     }
 
     private function buildHaving(): string

@@ -4,7 +4,7 @@ namespace Core\Mvc;
 
 use Core\Di\Injectable;
 
-class Controller
+abstract class Controller
 {
     use Injectable;
 
@@ -22,32 +22,21 @@ class Controller
      *
      * @return $this
      */
-    public function beforeExecute() {
-        return $this;
-    }
-
-    /**
-     * Extendable by child-class
-     *
-     * @return $this
-     */
     public function afterExecute() {
         return $this;
     }
 
-    /**
-     * Check csrf token
-     *
-     * @return bool
-     */
-    protected function validateCsrfToken()
+    public function beforeExecute()
     {
-        if ($this->isPost()) {
-            $token = $this->getRequest()->post('_token');
-            $sessionToken = $this->getSession()->get('csrf_token');
-            return $token && $sessionToken && hash_equals($sessionToken, $token);
+        $session = $this->getDI()->get('session');
+        if (!$session->has('_csrf')) {
+            $session->set('_csrf', bin2hex(random_bytes(16)));
         }
-        return true;
+    }
+
+    protected function getCsrfToken(): string
+    {
+        return $this->getDI()->get('session')->get('_csrf');
     }
     
     /**
@@ -58,16 +47,6 @@ class Controller
     public function getView()
     {
         return $this->getDI()->get('view');
-    }
-
-    /**
-     * Returns validator instance
-     *
-     * @return \Core\Validation\Validator
-     */
-    public function getValidator()
-    {
-        return $this->getDI()->get('\Core\Validation\Validator');
     }
 
     /**
