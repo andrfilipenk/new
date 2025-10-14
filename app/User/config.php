@@ -2,10 +2,15 @@
 // app/User/config.php
 return [
     'provider' => [
-
+        '\User\Provider\AuthServiceProvider',
     ],
 
     'navbar' => [
+        [
+            'label' => 'Dashboard',
+            'icon' => 'calendar3',
+            'url' => '/board'
+        ],
         [
             'label' => 'Users',
             'icon' => 'people',
@@ -21,9 +26,16 @@ return [
             'icon' => 'ui-checks',
             'url' => '/permissions',
         ],
+        [
+            'label' => 'My Profile',
+            'icon' => 'gear-fill',
+            'url' => '/profile',
+        ],
+ 
     ],
 
     'test' => [
+        '/board'                => 'User.Board.index@GET',
         '/login'                => 'User.Auth.login@GET|POST',
         '/logout'               => 'User.Auth.logout@GET',
         '/my-profile'           => 'User.Profile.index@GET',
@@ -36,14 +48,20 @@ return [
     ],
 
     'routes' => [
+        '/board' => [
+            'module'     => 'User',
+            'controller' => 'Board',
+            'action'     => 'index',
+            'method'     => ['GET']
+        ],
         // Authentication routes 
-        '/user/login' => [
+        '/login' => [
             'module'     => 'User',
             'controller' => 'Auth',
             'action'     => 'login',
             'method'     => ['GET', 'POST']
         ],
-        '/user/logout' => [
+        '/logout' => [
             'module'     => 'User',
             'controller' => 'Auth',
             'action'     => 'logout',
@@ -106,21 +124,22 @@ return [
         ],
 
         // Group routes
-        '/user/groups' => [
+        '/group' => [
             'module'     => 'User',
             'controller' => 'Group',
             'action'     => 'index'
         ],
-        '/user/groups/create' => [
+        '/group/create' => [
             'module'     => 'User',
             'controller' => 'Group',
             'action'     => 'create',
             'method'     => ['GET', 'POST']
         ],
-        '/user/groups/delete/{id}' => [
+        '/group/delete/{id}' => [
             'module'     => 'User',
             'controller' => 'Group',
-            'action'     => 'delete'
+            'action'     => 'delete',
+            'method'     => ['GET', 'POST']
         ],
 
         // Access Control routes

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation Index</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .doc-card {
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+        
+        .doc-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center p-4">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8 col-xl-6">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <h1 class="display-4 gradient-text mb-3">
+                            <i class="bi bi-book me-3"></i>Documentation
+                        </h1>
+                        <p class="lead text-muted mb-4">Comprehensive guides and API references</p>
+                        
+                        <div class="list-group list-group-flush">
+                            <a href="form-component-documentation.html" class="list-group-item list-group-item-action doc-card border-0 rounded-3 mb-3 p-4">
+                                <div class="d-flex w-100 justify-content-between align-items-start">
+                                    <div>
+                                        <h5 class="mb-2">
+                                            <i class="bi bi-file-earmark-code me-2 text-primary"></i>
+                                            Form Component System
+                                            <span class="badge bg-primary ms-2">v2.0.0</span>
+                                        </h5>
+                                        <p class="mb-1 text-muted">
+                                            Complete documentation for the modern PHP form generation system including field types, validation, security, and best practices.
+                                        </p>
+                                        <small class="text-success">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                            Bootstrap 5 Styled • PHP Syntax Highlighted
+                                        </small>
+                                    </div>
+                                    <i class="bi bi-arrow-right text-primary"></i>
+                                </div>
+                            </a>
+                            
+                            <!-- Placeholder for future documentation -->
+                            <div class="list-group-item border-0 rounded-3 p-4 bg-light">
+                                <div class="d-flex align-items-center text-muted">
+                                    <i class="bi bi-plus-circle me-3"></i>
+                                    <span>More documentation coming soon...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <footer class="text-center mt-4 text-white">
+                    <p class="mb-1">&copy; 2025 Project Documentation</p>
+                    <p class="small opacity-75">Built with Bootstrap 5 • Styled with love</p>
+                </footer>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

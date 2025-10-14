@@ -45,7 +45,7 @@ class FormDefinition
      * @var array Security configuration
      */
     private array $securityConfig = [
-        'csrf_enabled' => true,
+        'csrf_enabled' => false,
         'csrf_field_name' => '_csrf_token',
         'sanitize_input' => true,
     ];
@@ -54,8 +54,8 @@ class FormDefinition
      * @var array Rendering configuration
      */
     private array $renderConfig = [
-        'template' => null,
-        'theme' => 'default',
+        'template' => 'form-bootstrap',
+        'rendering' => 'bootstrap',
         'layout' => 'vertical',
         'show_labels' => true,
         'show_errors' => true,

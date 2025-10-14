@@ -4,35 +4,37 @@ namespace User\Form;
 
 use Core\Forms\FormBuilder;
 
-// name, email, custom_id, password
-
-
 class UserForm
 {
     public static function build($id = null)
     {
         $userForm = FormBuilder::create('user_form', [
-            'action' => '/register',
+            'action' => '/user',
             'method' => 'POST'
         ])
         ->text('name', [
             'label'         => 'Username',
             'required'      => true,
-            'placeholder'   => 'johndoe'
+            'placeholder'   => 'johndoe',
+            'class' => 'form-control'
         ])
         ->email('email', [
             'label'         => 'Email',
-            'required'      => true
+            'required'      => true,
+            'class' => 'form-control'
         ])
         ->text('custom_id', [
             'label'         => 'Custom ID',
-            'required'      => true
+            'required'      => true,
+            'class' => 'form-control'
         ])
         ->password('password', [
             'label'         => 'Password',
-            'required'      => true
+            'required'      => true,
+            'class' => 'form-control'
         ])
-        ->csrf();
+        #->csrf()
+        ;
         if ($id) {
             $userForm->hidden('user_id', $id);
         }

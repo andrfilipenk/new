@@ -7,12 +7,7 @@ return [
         '\Main\Provider\ViewServiceProvider',
     ],
 
-    'navbar' => [
-        [
-            'label' => 'Dashboard',
-            'icon' => 'calendar3',
-            'url' => '/board'
-        ],
+    'navbaraaa' => [
         [
             'label' => 'Tasks',
             'icon' => 'list-task',
@@ -21,12 +16,11 @@ return [
     ],
 
     'routes' => [
-        // '/' => 'Main.Hello.index',
         '/' => [
             'module'     => 'Main',
-            'controller' => 'Hello',
+            'controller' => 'Home',
             'action'     => 'index',
-            'method'     => 'GET'
+            'method'     => ['GET','POST']
         ],
     ]
 ];

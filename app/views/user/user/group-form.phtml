@@ -1,0 +1,38 @@
+<?php 
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url'); 
+?>
+<h1>Create New Group</h1>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Group Information</h5>
+            </div>
+            <div class="card-body">
+                <?=$form?>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li><strong>Group Name:</strong> A human-readable name that will be displayed in the interface.</li>
+                    <li><strong>Group Code:</strong> A unique identifier used internally. Use lowercase letters, numbers, and dashes.</li>
+                    <li>Examples:
+                        <ul>
+                            <li>Name: "Administrators", Code: "admin"</li>
+                            <li>Name: "Sales Team", Code: "sales"</li>
+                            <li>Name: "IT Support", Code: "it-support"</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

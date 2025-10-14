@@ -1,10 +1,8 @@
 <?php
-// app/Main/Controller/HelloController.php
-namespace Main\Controller;
+// app/User/Controller/BoardController.php
+namespace User\Controller;
 
-use Core\Mvc\Controller;
-
-class HelloController extends Controller
+class BoardController extends AbstractController
 {
 
     public function indexAction()
@@ -16,7 +14,7 @@ class HelloController extends Controller
         // Generate calendar data based on view
         $calendarData = $this->getCalendarData($currentDate, $view);
         
-        return $this->render('hello/index', [
+        return $this->render('user/board/index', [
             'calendarData'  => $calendarData,
             'currentDate'   => $currentDate,
             'display'       => $view,

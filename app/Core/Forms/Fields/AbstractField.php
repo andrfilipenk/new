@@ -231,6 +231,11 @@ abstract class AbstractField implements FieldInterface
      */
     public function getAttribute(string $name, mixed $default = null): mixed
     {
+        // Special handling for 'id' attribute - auto-generate if not set
+        if ($name === 'id' && !isset($this->attributes['id'])) {
+            return $this->generateId();
+        }
+        
         return $this->attributes[$name] ?? $default;
     }
 

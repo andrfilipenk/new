@@ -12,17 +12,7 @@ $url = $this->getDI()->get('url');
     <link rel="stylesheet" href="<?= $url->get('css/app.css', [], true) ?>">
 </head>
 <body>
-    <main class="form-signin w-100 m-auto">
-        <?php if (isset($errors) && count($errors) > 0): ?>
-            <div class="alert alert-danger" role="alert">
-                <?php foreach ($errors as $error): ?>
-                    <p><?=$error?></p>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-        <?=$form?>
-    </main>
-    <script src="<?= $url->get('js/bootstrap.bundle.min.js') ?>"></script>
-    <script src="<?= $url->get('js/app.js') ?>"></script>
+    <?php echo $this->yield('content'); ?>
+    <script src="/assets/js/bootstrap.min.js"></script>
 </body>
 </html>

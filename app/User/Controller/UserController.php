@@ -22,7 +22,7 @@ class UserController extends AbstractController
     {
         $user = $this->userByGetID();
         $allGroups = GroupModel::all();
-        $userGroups = $user->groups;
+        $userGroups = $user->groups();
         return $this->render('user/user/view', [
             'user' => $user,
             'userGroups' => $userGroups,
@@ -61,13 +61,15 @@ class UserController extends AbstractController
     {
         $formManager = new FormManager(UserForm::build());
         if ($this->isPost()) {
-            if ($formManager->handleRequest($this->getRequest()->post())->isValid()) {
+            $formManager->handleRequest($this->getRequest()->post());
+            if ($formManager->isSubmitted() && $formManager->isValid()) {
                 $user = new UserModel($formManager->getValidatedData());
                 if ($user->save()) {
                     $this->flashSuccess('User created.');
                     return $this->redirect('user');
                 } else {
-                    $this->flashError('Failed to create user.');
+                    $errors = '<br>' . implode('<br>', $user->getErrors());
+                    $this->flashError('Failed to create user: ' . $errors);
                 }
             }
         }
@@ -81,13 +83,15 @@ class UserController extends AbstractController
         $formManager = new FormManager(UserForm::build($user->id));
         $formManager->populateFields($user->getData());
         if ($this->isPost()) {
-            if ($formManager->handleRequest($this->getRequest()->post())->isValid()) {
+            $formManager->handleRequest($this->getRequest()->post());
+            if ($formManager->isSubmitted() && $formManager->isValid()) {
                 $user->fill($formManager->getValidatedData());
                 if ($user->save()) {
                     $this->flashSuccess('User updated.');
                     return $this->redirect('user');
                 } else {
-                    $this->flashError('Failed to update user.');
+                    $errors = '<br>' . implode('<br>', $user->getErrors());
+                    $this->flashError('Failed to update user: ' . $errors);
                 }
             }
         }

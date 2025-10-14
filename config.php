@@ -10,26 +10,18 @@ return [
         'module' => [
             'Main',
             'User',
-            'Admin',
-            'Intern',
-            'Crm'
+            'Crm',
         ],
     ],
 
     'logging' => [
         'file'              => APP_PATH . '../public/logs/app.log',
-        'level'             => 'error', // Options: emergency, alert, critical, error, warning, notice, info, debug
-        'buffer_size'       => 10, // Buffer logs to reduce I/O
-        'rotation_size'     => 5242880 // 5MB in bytes
-    ],
-
-    'data' => [
-        'accounts' => [
-            '1000' => 'user',
-            '2000' => 'worker',
-            '3000' => 'leader',
-            '4000' => 'admin',
-        ]
+        // emergency, alert, critical, error, warning, notice, info, debug
+        'level'             => 'error', 
+        // Buffer logs to reduce I/O
+        'buffer_size'       => 10, 
+         // 5MB in bytes
+        'rotation_size'     => 5242880
     ],
 
     'migrations' => [
@@ -45,13 +37,6 @@ return [
         'password'          => '',
         'charset'           => 'utf8mb4',
         'persistent'        => true, // for connection pooling
-    ],
-
-    'navigation' => [
-        'Dashboard'         => '',
-        'Users'             => 'admin/users',
-        'Tasks'             => 'admin/tasks',
-        'Log'               => 'admin/logs'
     ],
 
     'session' => [
@@ -82,12 +67,9 @@ return [
 
     'acl' => [
         'public' => [
-            ['base', 'dashboard',   'index'],
-            ['base', 'error',       'denied'],
-            ['base', 'error',       'notfound'],
-            ['base', 'error',       'error'],
-            ['user', 'auth',        'login'],
-            ['user', 'auth',        'kuhnle'],
+            ['Main', 'Home',  'index'],
+            ['Main', 'Error', 'page'],
+            ['User', 'Auth',  'login'],
         ]
     ],
 ];

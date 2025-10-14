@@ -1,39 +1,38 @@
 <?php
-// app/User/Controller/Group.php
+// app/User/Controller/GroupController.php
 namespace User\Controller;
 
-use Core\Mvc\Controller;
+use Core\Forms\FormManager;
+use User\Form\GroupForm;
 use User\Model\Groups as GroupModel;
 
-class Group extends Controller
+class GroupController extends AbstractController
 {
     // List all groups
     public function indexAction()
     {
         $groups = GroupModel::with(['users'])->get();
-        return $this->render('user/groups', ['groups' => $groups]);
+        return $this->render('user/user/groups', ['groups' => $groups]);
     }
 
     // Create new group
     public function createAction()
     {
+        $action = $this->url('group/create');
+        $formManager = new FormManager(GroupForm::build()->setAction($action));
         if ($this->isPost()) {
-            $data = $this->getRequest()->all();
-            $name = trim($data['name'] ?? '');
-            $code = trim($data['code'] ?? '');
-            if ($name && $code) {
-                $group = GroupModel::createGroup($name, $code);
-                if ($group) {
+            $formManager->handleRequest($this->getRequest()->post());
+            if ($formManager->isSubmitted() && $formManager->isValid()) {
+                $group = new GroupModel($formManager->getValidatedData());
+                if ($group->save()) {
                     $this->flashSuccess('Group created successfully.');
+                    return $this->redirect('group');
                 } else {
                     $this->flashError('Failed to create group.');
                 }
-            } else {
-                $this->flashError('Name and code are required.');
             }
-            return $this->redirect('user/groups');
         }
-        return $this->render('user/create-group');
+        return $this->render('user/user/group-form', ['form' => $formManager->render()]);
     }
 
     // Delete group
@@ -53,6 +52,6 @@ class Group extends Controller
         } else {
             $this->flashError('Group not found.');
         }
-        return $this->redirect('user/groups');
+        return $this->redirect('group');
     }
 }

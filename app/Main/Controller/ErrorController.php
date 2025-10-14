@@ -14,8 +14,6 @@ class ErrorController extends Controller
         }
         
         $this->getView()->disableLayout();
-        #var_dump($exception);
-        #$this->getView()->setLayout('window');
         return $this->render('error', ['message' => 'access denied!', 'exception' => $e]);
     }
 }

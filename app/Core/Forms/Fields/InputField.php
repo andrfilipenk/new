@@ -138,7 +138,7 @@ class InputField extends AbstractField
         $html = [];
         
         // Field wrapper
-        $fieldClasses = ['form-field', 'form-field-' . $inputType];
+        $fieldClasses = ['form-field mb-3', 'form-field-' . $inputType];
         if (isset($context['errors'][$this->name])) {
             $fieldClasses[] = 'has-error';
         }
@@ -148,7 +148,7 @@ class InputField extends AbstractField
         if ($this->label) {
             $requiredMark = $this->required ? ' <span class="required">*</span>' : '';
             $html[] = sprintf(
-                '<label for="%s">%s%s</label>',
+                '<label for="%s" class="form-label">%s%s</label>',
                 $this->getAttribute('id'),
                 $this->escape($this->label),
                 $requiredMark

@@ -11,7 +11,7 @@ class User extends \Core\Acl\User
     /**
      * Get groups this user belongs to
      */
-    public function groups()
+    public function group()
     {
         return $this->belongsToMany(Groups::class, 'user_group', 'user_id', 'group_id');
     }

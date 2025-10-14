@@ -104,7 +104,7 @@ class Logger implements LoggerInterface
         $session = $this->getDI()->has('session') ? $this->getDI()->get('session') : null;
         return array_merge([
             'request_uri'   => $request ? $request->uri() : '',
-            'user_id'       => $session && $session->has('user') ? $session->get('user')['id'] : null,
+            'user_id'       => $session && $session->has('user') ? $session->get('user') : null,
             'ip'            => $request ? $request->ip() : ''
         ], $context);
     }

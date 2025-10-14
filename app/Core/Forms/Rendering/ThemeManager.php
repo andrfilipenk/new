@@ -23,7 +23,7 @@ class ThemeManager
     /**
      * @var string Default theme
      */
-    private string $defaultTheme = 'default';
+    private string $defaultTheme = 'boostrap';
 
     /**
      * Initialize theme manager

@@ -335,7 +335,7 @@ $testForm->handleRequest(['test_field' => 'test value']);
 $history = FormEventDispatcher::getHistory();
 
 echo "Event History (" . count($history) . " events):\n";
-foreach ($history as $index => $event) {
+foreach ($history as $index => $rendering) {
     echo "  " . ($index + 1) . ". {$event['event']} - Form: {$event['form']}\n";
 }
 
