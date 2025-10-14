@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Calendar Library - Complete Documentation</title>
+    
+    <!-- Prism.js for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        nav {
+            background: #2c3e50;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        section:last-child {
+            border-bottom: none;
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        h3 {
+            color: #764ba2;
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        h4 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        pre[class*="language-"] {
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        code[class*="language-"] {
+            font-family: 'Courier New', Consolas, Monaco, monospace;
+            font-size: 0.9rem;
+        }
+        
+        p code, li code {
+            background: #f0f0f0;
+            color: #e83e8c;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.85rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature-card h4 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .example-box {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .example-box h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+        
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background: #667eea;
+            color: white;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📅 SVG Calendar Library</h1>
+            <p>Enterprise-Grade Calendar Visualization for PHP Applications</p>
+        </header>
+        
+        <nav>
+            <a href="#introduction">Introduction</a>
+            <a href="#installation">Installation</a>
+            <a href="#quick-start">Quick Start</a>
+            <a href="#views">View Types</a>
+            <a href="#themes">Theming</a>
+            <a href="#data-providers">Data Providers</a>
+            <a href="#interactivity">Interactivity</a>
+            <a href="#examples">Examples</a>
+            <a href="#api">API Reference</a>
+        </nav>
+        
+        <div class="content">
+            <!-- Introduction -->
+            <section id="introduction">
+                <h2>Introduction</h2>
+                <p>The SVG Calendar Library is a high-performance, enterprise-grade calendar visualization tool that generates responsive, interactive calendars using SVG rendering. It's designed for modern PHP applications requiring robust date-based data visualization.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>🎨 Multiple Views</h4>
+                        <p>Day, Week, Multi-Week, Month, Year, and Custom Period views</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🖼️ SVG Rendering</h4>
+                        <p>Crystal-clear visuals at any screen resolution</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>⚡ Interactive</h4>
+                        <p>Date selection, range selection, and clickable events</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🎭 Customizable Themes</h4>
+                        <p>Pre-built themes or create your own</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Bar Overlays</h4>
+                        <p>Display tasks, events, or any time-based data</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔌 Data Providers</h4>
+                        <p>Array, Database, or Custom callback sources</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Installation -->
+            <section id="installation">
+                <h2>Installation</h2>
+                <p>The calendar library is located in <code>app/Core/Calendar</code> and integrates seamlessly with your application through the Service Provider pattern.</p>
+                
+                <h3>Step 1: Register the Service Provider</h3>
+                <p>Add the <code>CalendarServiceProvider</code> to your <code>bootstrap.php</code> file:</p>
+                
+                <pre><code class="language-php">use Core\Calendar\CalendarServiceProvider;
+
+$providers = [
+    // ... other providers
+    CalendarServiceProvider::class,
+];</code></pre>
+
+                <h3>Step 2: Use the Factory</h3>
+                <p>The library is now ready to use! Access it through the <code>CalendarFactory</code>:</p>
+                
+                <pre><code class="language-php">use Core\Calendar\CalendarFactory;
+
+// Create a calendar
+$calendar = CalendarFactory::month()-&gt;build();
+echo $calendar-&gt;render();</code></pre>
+                
+                <div class="success">
+                    <strong>✓ That's it!</strong> No additional configuration required. The library works out of the box with sensible defaults.
+                </div>
+            </section>
+            
+            <!-- Quick Start -->
+            <section id="quick-start">
+                <h2>Quick Start</h2>
+                
+                <h3>Basic Month Calendar</h3>
+                <p>Create a simple calendar in just two lines:</p>
+                
+                <pre><code class="language-php">use Core\Calendar\CalendarFactory;
+
+$calendar = CalendarFactory::month()-&gt;build();
+echo $calendar-&gt;render(); // Outputs SVG</code></pre>
+                
+                <h3>Calendar with Events/Tasks</h3>
+                <p>Add bars to display events or tasks on specific dates:</p>
+                
+                <pre><code class="language-php">use Core\Calendar\CalendarFactory;
+use Core\Calendar\Models\Bar;
+use DateTimeImmutable;
+
+// Create event bars
+$events = [
+    new Bar(
+        id: 'meeting1',
+        title: 'Team Meeting',
+        startDate: new DateTimeImmutable('2025-10-15 09:00'),
+        endDate: new DateTimeImmutable('2025-10-15 10:30'),
+        backgroundColor: '#4CAF50'
+    ),
+    new Bar(
+        id: 'sprint1',
+        title: 'Development Sprint',
+        startDate: new DateTimeImmutable('2025-10-16'),
+        endDate: new DateTimeImmutable('2025-10-20'),
+        backgroundColor: '#2196F3'
+    ),
+];
+
+// Build calendar with events
+$calendar = CalendarFactory::month()
+    -&gt;addBars($events)
+    -&gt;enableWeekNumbers()
+    -&gt;build();
+
+echo $calendar-&gt;toHtml(); // Outputs SVG + JavaScript</code></pre>
+                
+                <h3>Interactive Calendar</h3>
+                <p>Enable date selection and handle user interactions:</p>
+                
+                <pre><code class="language-php">$calendar = CalendarFactory::month()
+    -&gt;enableSelection()
+    -&gt;onDateClick('handleDateSelection')
+    -&gt;bindToFormFields(['date' =&gt; 'selected_date'])
+    -&gt;build();
+
+echo $calendar-&gt;toHtml();</code></pre>
+                
+                <p>Add corresponding JavaScript handler:</p>
+                
+                <pre><code class="language-javascript">function handleDateSelection(date, element) {
+    console.log('Selected date:', date);
+    alert('You selected: ' + date);
+}</code></pre>
+            </section>
+            
+            <!-- View Types -->
+            <section id="views">
+                <h2>View Types</h2>
+                <p>The library supports multiple calendar views for different use cases:</p>
+                
+                <h3>Month View <span class="badge">DEFAULT</span></h3>
+                <p>Display a full month calendar with optional week numbers:</p>
+                
+                <pre><code class="language-php">$calendar = CalendarFactory::month()
+    -&gt;setDate(new DateTimeImmutable('2025-10-15'))
+    -&gt;enableWeekNumbers()
+    -&gt;build();</code></pre>
+                
+                <h3>Week View</h3>
+                <p>Show a single week with customizable start day:</p>
+                
+                <pre><code class="language-php">$calendar = CalendarFactory::week()
+    -&gt;setDate(new DateTimeImmutable('2025-10-15'))
+    -&gt;setFirstDayOfWeek(1) // Monday
+    -&gt;build();</code></pre>
+                
+                <h3>Multi-Week View</h3>
+                <p>Display multiple consecutive weeks:</p>
+                
+                <pre><code class="language-php">$calendar = CalendarFactory::multiWeek(
+    new DateTimeImmutable('2025-10-01'),
+    4 // Number of weeks
+)-&gt;build();</code></pre>
+                
+                <h3>Year View</h3>
+                <p>Show an entire year at a glance:</p>
+                
+                <pre><code class="language-php">$calendar = CalendarFactory::year(2025)-&gt;build();</code></pre>
+                
+                <h3>Day View</h3>
+                <p>Focus on a single day:</p>
+                
+                <pre><code class="language-php">$calendar = CalendarFactory::create('single-day')
+    -&gt;setView('day')
+    -&gt;setDate(new DateTimeImmutable('2025-10-15'))
+    -&gt;build();</code></pre>
+                
+                <h3>Custom Period View</h3>
+                <p>Define your own date range:</p>
+                
+                <pre><code class="language-php">$calendar = CalendarFactory::custom(
+    new DateTimeImmutable('2025-10-01'),
+    new DateTimeImmutable('2025-10-31')
+)-&gt;build();</code></pre>
+            </section>
+            
+            <!-- Theming -->
+            <section id="themes">
+                <h2>Theming & Customization</h2>
+                <p>The library includes pre-built themes and supports custom theme creation.</p>
+                
+                <h3>Pre-built Themes</h3>
+                
+                <h4>Default Theme</h4>
+                <pre><code class="language-php">use Core\Calendar\Styling\Themes\DefaultTheme;
+
+$calendar = CalendarFactory::month()
+    -&gt;withTheme(new DefaultTheme())
+    -&gt;build();</code></pre>
+                
+                <h4>Dark Theme</h4>
+                <pre><code class="language-php">use Core\Calendar\Styling\Themes\DarkTheme;
+
+$calendar = CalendarFactory::month()
+    -&gt;withTheme(new DarkTheme())
+    -&gt;build();</code></pre>
+                
+                <h4>Minimal Theme</h4>
+                <pre><code class="language-php">use Core\Calendar\Styling\Themes\MinimalTheme;
+
+$calendar = CalendarFactory::month()
+    -&gt;withTheme(new MinimalTheme())
+    -&gt;build();</code></pre>
+                
+                <h4>Colorful Theme</h4>
+                <pre><code class="language-php">use Core\Calendar\Styling\Themes\ColorfulTheme;
+
+$calendar = CalendarFactory::month()
+    -&gt;withTheme(new ColorfulTheme())
+    -&gt;build();</code></pre>
+                
+                <h3>Creating Custom Themes</h3>
+                <p>Extend the base <code>Theme</code> class to create your own theme:</p>
+                
+                <pre><code class="language-php">use Core\Calendar\Styling\Theme;
+
+class MyCustomTheme extends Theme
+{
+    protected string $primaryColor = '#ff6b6b';
+    protected string $secondaryColor = '#4ecdc4';
+    protected string $backgroundColor = '#ffffff';
+    protected string $textColor = '#2c3e50';
+    protected string $borderColor = '#e0e0e0';
+    protected string $headerBackgroundColor = '#ff6b6b';
+    protected string $headerTextColor = '#ffffff';
+    protected string $weekendBackgroundColor = '#f8f9fa';
+    protected string $todayBackgroundColor = '#ffe66d';
+    protected string $selectedBackgroundColor = '#4ecdc4';
+    protected string $hoverBackgroundColor = '#a8e6cf';
+}
+
+// Use your custom theme
+$calendar = CalendarFactory::month()
+    -&gt;withTheme(new MyCustomTheme())
+    -&gt;build();</code></pre>
+            </section>
+            
+            <!-- Data Providers -->
+            <section id="data-providers">
+                <h2>Data Providers</h2>
+                <p>Data Providers are responsible for fetching and supplying calendar data (events, tasks, bars) from various sources.</p>
+                
+                <h3>Array Data Provider <span class="badge">DEFAULT</span></h3>
+                <p>The simplest provider - pass an array of <code>Bar</code> objects:</p>
+                
+                <pre><code class=" language-php\>use Core\Calendar\Models\Bar;
+
+$bars = [
+    new Bar(
+        id: 'task1',
+        title: 'Project Meeting',
+        startDate: new DateTimeImmutable('2025-10-15'),
+        endDate: new DateTimeImmutable('2025-10-15'),
+        backgroundColor: '#4CAF50'
+    ),
+];
+
+$calendar = CalendarFactory::month()
+    -&gt;addBars($bars)
+    -&gt;build();</code></pre>
+                
+                <h3>Database Data Provider</h3>
+                <p>Automatically fetch data from your database:</p>
+                
+                <pre><code class=" language-php\>use Core\Calendar\DataProviders\DatabaseDataProvider;
+
+$provider = new DatabaseDataProvider(
+    db: $container-&gt;get('database'),
+    tableName: 'events',
+    fieldMapping: [
+        'id' =&gt; 'event_id',
+        'title' =&gt; 'event_name',
+        'start_date' =&gt; 'start_time',
+        'end_date' =&gt; 'end_time',
+        'color' =&gt; 'display_color',
+        'background_color' =&gt; 'bg_color',
+    ]
+);
+
+$calendar = CalendarFactory::month()
+    -&gt;withDataProvider($provider)
+    -&gt;build();</code></pre>
+                
+                <div class="info">
+                    <strong>ℹ️ Note:</strong> The provider only fetches data for the visible date range, optimizing performance.
+                </div>
+                
+                <h3>Callback Data Provider</h3>
+                <p>Use a custom callback function to fetch data from any source:</p>
+                
+                <pre><code class=" language-php\>use Core\Calendar\DataProviders\CallbackDataProvider;
+use Core\Calendar\Models\Bar;
+
+$provider = new CallbackDataProvider(function($dateRange) {
+    // Fetch from API, service, or any custom logic
+    $events = MyEventService::getEventsForRange(
+        $dateRange-&gt;getStartDate(),
+        $dateRange-&gt;getEndDate()
+    );
+    
+    // Convert to Bar objects
+    $bars = [];
+    foreach ($events as $event) {
+        $bars[] = new Bar(
+            id: $event['id'],
+            title: $event['title'],
+            startDate: new DateTimeImmutable($event['start']),
+            endDate: new DateTimeImmutable($event['end']),
+            backgroundColor: $event['color']
+        );
+    }
+    
+    return $bars;
+});
+
+$calendar = CalendarFactory::month()
+    -&gt;withDataProvider($provider)
+    -&gt;build();</code></pre>
+                
+                <h3>Creating Custom Data Providers</h3>
+                <p>Implement the <code>DataProviderInterface</code> for complete control:</p>
+                
+                <pre><code class=" language-php\>use Core\Calendar\DataProviders\DataProviderInterface;
+use Core\Calendar\Models\DateRange;
+use Core\Calendar\Models\CalendarData;
+
+class MyCustomProvider implements DataProviderInterface
+{
+    public function getDataForRange(DateRange $range): CalendarData
+    {
+        // Your custom logic here
+        $bars = $this-&gt;fetchBarsFromSource($range);
+        
+        $data = new CalendarData();
+        foreach ($bars as $bar) {
+            $data-&gt;addBar($bar);
+        }
+        
+        return $data;
+    }
+    
+    private function fetchBarsFromSource(DateRange $range): array
+    {
+        // Implementation here
+        return [];
+    }
+}</code></pre>
+            </section>
+            
+            <!-- Interactivity -->
+            <section id="interactivity">
+                <h2>Interactivity</h2>
+                <p>Make your calendars interactive with built-in event handlers and form bindings.</p>
+                
+                <h3>Date Selection</h3>
+                <p>Allow users to select dates and trigger custom JavaScript handlers:</p>
+                
+                <pre><code class=" language-php\>\$calendar = CalendarFactory::month()
+    -&gt;enableSelection()
+    -&gt;onDateClick('handleDateClick')
+    -&gt;build();</code></pre>
+                
+                <p>JavaScript handler:</p>
+                
+                <pre><code class=" language-javascript\>
+function handleDateClick(date, element) {
+    console.log('Date clicked:', date);
+    // date format: 'YYYY-MM-DD'
+    
+    // Update UI
+    document.getElementById('selected-date').textContent = date;
+    
+    // Make API call
+    fetch('/api/events?date=' + date)
+        .then(response =&gt; response.json())
+        .then(data =&gt; console.log(data));
+}
+</code></pre>
+                
+                <h3>Range Selection</h3>
+                <p>Enable users to select date ranges (e.g., for booking systems):</p>
+                
+                <pre><code class=" language-php\>\$calendar = CalendarFactory::month()
+    -&gt;enableRangeSelection()
+    -&gt;onRangeSelect('handleRangeSelect')
+    -&gt;build();</code></pre>
+                
+                <p>JavaScript handler:</p>
+                
+                <pre><code class=" language-javascript\>
+function handleRangeSelect(startDate, endDate, element) {
+    console.log('Range selected:', startDate, 'to', endDate);
+    
+    // Update form fields
+    document.getElementById('start_date').value = startDate;
+    document.getElementById('end_date').value = endDate;
+}
+</code></pre>
+                
+                <h3>Form Field Binding</h3>
+                <p>Automatically update form fields when dates are selected:</p>
+                
+                <pre><code class=" language-php\>\$calendar = CalendarFactory::month()
+    -&gt;enableSelection()
+    -&gt;bindToFormFields(['date' =&gt; 'booking_date'])
+    -&gt;build();</code></pre>
+                
+                <p>For range selection:</p>
+                
+                <pre><code class=" language-php\>\$calendar = CalendarFactory::month()
+    -&gt;enableRangeSelection()
+    -&gt;bindToFormFields([
+        'start' =&gt; 'start_date_field',
+        'end' =&gt; 'end_date_field'
+    ])
+    -&gt;build();</code></pre>
+                
+                <h3>Bar Click Events</h3>
+                <p>Handle clicks on event/task bars:</p>
+                
+                <pre><code class=" language-php\>\$calendar = CalendarFactory::month()
+    -&gt;addBars($tasks)
+    -&gt;onBarClick('handleBarClick')
+    -&gt;build();</code></pre>
+                
+                <p>JavaScript handler:</p>
+                
+                <pre><code class=" language-javascript\>
+function handleBarClick(barId, metadata, element) {
+    console.log('Bar clicked:', barId);
+    console.log('Metadata:', metadata);
+    
+    // Redirect to detail page
+    window.location.href = '/events/' + barId;
+}
+</code></pre>
+                
+                <h3>Week Click Events</h3>
+                <p>Handle clicks on week numbers (when enabled):</p>
+                
+                <pre><code class=" language-php\>\$calendar = CalendarFactory::month()
+    -&gt;enableWeekNumbers()
+    -&gt;onWeekClick('handleWeekClick')
+    -&gt;build();</code></pre>
+            </section>
+            
+            <!-- Examples -->
+            <section id="examples">
+                <h2>Practical Examples</h2>
+                
+                <div class="example-box">
+                    <h4>Example 1: Task Management Dashboard</h4>
+                    <p>Display team tasks on a monthly calendar:</p>
+                    
+                    <pre><code class=" language-php\>use Core\Calendar\CalendarFactory;
+use Core\Calendar\Models\Bar;
+use DateTimeImmutable;
+
+// Fetch tasks from database
+$tasks = Task::where('team_id', $teamId)
+    -&gt;whereBetween('due_date', [$startOfMonth, $endOfMonth])
+    -&gt;get();
+
+// Convert to bars
+$bars = [];
+foreach ($tasks as $task) {
+    $bars[] = new Bar(
+        id: 'task-' . $task-&gt;id,
+        title: $task-&gt;title,
+        startDate: new DateTimeImmutable($task-&gt;due_date),
+        endDate: new DateTimeImmutable($task-&gt;due_date),
+        backgroundColor: $task-&gt;priority === 'high' ? '#f44336' : '#4CAF50',
+        url: '/tasks/' . $task-&gt;id,
+        metadata: ['priority' =&gt; $task-&gt;priority, 'assignee' =&gt; $task-&gt;assignee]
+    );
+}
+
+// Create calendar
+$calendar = CalendarFactory::month()
+    -&gt;setDate(new DateTimeImmutable())
+    -&gt;addBars($bars)
+    -&gt;enableWeekNumbers()
+    -&gt;onBarClick('openTaskDetail')
+    -&gt;build();
+
+echo $calendar-&gt;toHtml();</code></pre>
+                </div>
+                
+                <div class="example-box">
+                    <h4>Example 2: Hotel Booking Calendar</h4>
+                    <p>Interactive date range selection for reservations:</p>
+                    
+                    <pre><code class=" language-php\>use Core\Calendar\CalendarFactory;
+use Core\Calendar\Models\Bar;
+use Core\Calendar\Styling\Themes\MinimalTheme;
+
+// Show existing bookings
+$bookings = Booking::where('room_id', $roomId)
+    -&gt;where('status', 'confirmed')
+    -&gt;get();
+
+$bars = [];
+foreach ($bookings as $booking) {
+    $bars[] = new Bar(
+        id: 'booking-' . $booking-&gt;id,
+        title: 'Booked',
+        startDate: new DateTimeImmutable($booking-&gt;check_in),
+        endDate: new DateTimeImmutable($booking-&gt;check_out),
+        backgroundColor: '#e0e0e0',
+        color: '#999'
+    );
+}
+
+// Create interactive calendar
+$calendar = CalendarFactory::month()
+    -&gt;addBars($bars)
+    -&gt;enableRangeSelection()
+    -&gt;withTheme(new MinimalTheme())
+    -&gt;onRangeSelect('handleBookingSelection')
+    -&gt;bindToFormFields([
+        'start' =&gt; 'check_in_date',
+        'end' =&gt; 'check_out_date'
+    ])
+    -&gt;build();
+
+echo $calendar-&gt;toHtml();</code></pre>
+                </div>
+                
+                <div class="example-box">
+                    <h4>Example 3: Event Calendar with Database Provider</h4>
+                    <p>Automatically load events from database:</p>
+                    
+                    <pre><code class=" language-php\>use Core\Calendar\CalendarFactory;
+use Core\Calendar\DataProviders\DatabaseDataProvider;
+use Core\Calendar\Styling\Themes\ColorfulTheme;
+
+// Setup database provider
+$provider = new DatabaseDataProvider(
+    db: $db,
+    tableName: 'calendar_events',
+    fieldMapping: [
+        'id' =&gt; 'id',
+        'title' =&gt; 'event_title',
+        'start_date' =&gt; 'event_start',
+        'end_date' =&gt; 'event_end',
+        'background_color' =&gt; 'color',
+    ]
+);
+
+// Create calendar
+$calendar = CalendarFactory::month()
+    -&gt;withDataProvider($provider)
+    -&gt;withTheme(new ColorfulTheme())
+    -&gt;enableSelection()
+    -&gt;onDateClick('addNewEvent')
+    -&gt;onBarClick('editEvent')
+    -&gt;build();
+
+echo $calendar-&gt;toHtml();</code></pre>
+                </div>
+                
+                <div class="example-box">
+                    <h4>Example 4: Multi-View Calendar Controller</h4>
+                    <p>Implement view switching in your controller:</p>
+                    
+                    <pre><code>public function calendarAction()
+{
+    $view = $_GET['view'] ?? 'month';
+    $date = new DateTimeImmutable($_GET['date'] ?? 'now');
+    
+    // Fetch events
+    $events = $this-&gt;eventService-&gt;getEvents();
+    
+    // Create calendar based on view type
+    $calendar = match($view) {
+        'day' =&gt; CalendarFactory::create('calendar')
+            -&gt;setView('day')
+            -&gt;setDate($date),
+        'week' =&gt; CalendarFactory::week($date),
+        'month' =&gt; CalendarFactory::month($date),
+        'year' =&gt; CalendarFactory::year($date-&gt;format('Y')),
+        default =&gt; CalendarFactory::month($date)
+    };
+    
+    // Add events and build
+    $calendar = $calendar
+        -&gt;addBars($this-&gt;convertToB ars($events))
+        -&gt;enableSelection()
+        -&gt;build();
+    
+    $this-&gt;view-&gt;setVar('calendar', $calendar-&gt;toHtml());
+    $this-&gt;view-&gt;setVar('currentView', $view);
+}</code></pre>
+                </div>
+                
+                <div class="example-box">
+                    <h4>Example 5: Year Overview with Navigation</h4>
+                    <p>Create a year view with drill-down capability:</p>
+                    
+                    <pre><code class=" language-php\>\$calendar = CalendarFactory::year(2025)
+    -&gt;onDateClick('drillDownToMonth')
+    -&gt;build();
+
+echo $calendar-&gt;toHtml();</code></pre>
+                    
+                    <p>JavaScript for drill-down:</p>
+                    
+                    <pre><code class=" language-javascript\>
+function drillDownToMonth(date) {
+    // Extract year and month
+    const [year, month] = date.split('-');
+    
+    // Navigate to month view
+    window.location.href = `/calendar?view=month&date=${year}-${month}-01`;
+}
+</code></pre>
+                </div>
+            </section>
+            
+            <!-- API Reference -->
+            <section id="api">
+                <h2>API Reference</h2>
+                
+                <h3>CalendarFactory</h3>
+                <p>Static factory methods for quick calendar creation:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Parameters</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>create()</code></td>
+                            <td>string $name, array $config</td>
+                            <td>Create calendar with custom name and config</td>
+                        </tr>
+                        <tr>
+                            <td><code>month()</code></td>
+                            <td>?DateTimeInterface $date</td>
+                            <td>Create month view calendar</td>
+                        </tr>
+                        <tr>
+                            <td><code>week()</code></td>
+                            <td>?DateTimeInterface $date</td>
+                            <td>Create week view calendar</td>
+                        </tr>
+                        <tr>
+                            <td><code>multiWeek()</code></td>
+                            <td>?DateTimeInterface $date, int $weekCount</td>
+                            <td>Create multi-week view calendar</td>
+                        </tr>
+                        <tr>
+                            <td><code>year()</code></td>
+                            <td>?int $year</td>
+                            <td>Create year view calendar</td>
+                        </tr>
+                        <tr>
+                            <td><code>custom()</code></td>
+                            <td>DateTimeInterface $start, DateTimeInterface $end</td>
+                            <td>Create custom date range calendar</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>CalendarBuilder Methods</h3>
+                <p>Fluent configuration methods:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Parameters</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>setView()</code></td>
+                            <td>string $type</td>
+                            <td>Set view type: day, week, multi-week, month, year, custom</td>
+                        </tr>
+                        <tr>
+                            <td><code>setDate()</code></td>
+                            <td>DateTimeInterface</td>
+                            <td>Set calendar date</td>
+                        </tr>
+                        <tr>
+                            <td><code>setDateRange()</code></td>
+                            <td>DateTimeInterface $start, $end</td>
+                            <td>Set custom date range</td>
+                        </tr>
+                        <tr>
+                            <td><code>withLocale()</code></td>
+                            <td>string $locale</td>
+                            <td>Set locale (default: en_US)</td>
+                        </tr>
+                        <tr>
+                            <td><code>setFirstDayOfWeek()</code></td>
+                            <td>int $day</td>
+                            <td>0=Sunday, 1=Monday, etc.</td>
+                        </tr>
+                        <tr>
+                            <td><code>enableWeekNumbers()</code></td>
+                            <td>bool $enable</td>
+                            <td>Show/hide week numbers</td>
+                        </tr>
+                        <tr>
+                            <td><code>enableSelection()</code></td>
+                            <td>bool $enable</td>
+                            <td>Enable date selection</td>
+                        </tr>
+                        <tr>
+                            <td><code>enableRangeSelection()</code></td>
+                            <td>bool $enable</td>
+                            <td>Enable date range selection</td>
+                        </tr>
+                        <tr>
+                            <td><code>enableClickable()</code></td>
+                            <td>bool $enable</td>
+                            <td>Enable click events</td>
+                        </tr>
+                        <tr>
+                            <td><code>withTheme()</code></td>
+                            <td>ThemeInterface</td>
+                            <td>Apply theme</td>
+                        </tr>
+                        <tr>
+                            <td><code>withDataProvider()</code></td>
+                            <td>DataProviderInterface</td>
+                            <td>Set data provider</td>
+                        </tr>
+                        <tr>
+                            <td><code>addBar()</code></td>
+                            <td>Bar</td>
+                            <td>Add single bar overlay</td>
+                        </tr>
+                        <tr>
+                            <td><code>addBars()</code></td>
+                            <td>Bar[]</td>
+                            <td>Add multiple bars</td>
+                        </tr>
+                        <tr>
+                            <td><code>onDateClick()</code></td>
+                            <td>string $handler</td>
+                            <td>JavaScript function for date clicks</td>
+                        </tr>
+                        <tr>
+                            <td><code>onRangeSelect()</code></td>
+                            <td>string $handler</td>
+                            <td>JavaScript function for range selection</td>
+                        </tr>
+                        <tr>
+                            <td><code>onBarClick()</code></td>
+                            <td>string $handler</td>
+                            <td>JavaScript function for bar clicks</td>
+                        </tr>
+                        <tr>
+                            <td><code>onWeekClick()</code></td>
+                            <td>string $handler</td>
+                            <td>JavaScript function for week clicks</td>
+                        </tr>
+                        <tr>
+                            <td><code>onNavigate()</code></td>
+                            <td>string $handler</td>
+                            <td>JavaScript function for navigation</td>
+                        </tr>
+                        <tr>
+                            <td><code>bindToFormFields()</code></td>
+                            <td>array $fields</td>
+                            <td>Bind selections to form fields</td>
+                        </tr>
+                        <tr>
+                            <td><code>setOption()</code></td>
+                            <td>string $key, mixed $value</td>
+                            <td>Set custom option</td>
+                        </tr>
+                        <tr>
+                            <td><code>build()</code></td>
+                            <td>-</td>
+                            <td>Build and return Calendar instance</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Calendar Methods</h3>
+                <p>Calendar instance methods:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Returns</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>render()</code></td>
+                            <td>string</td>
+                            <td>Generate SVG output</td>
+                        </tr>
+                        <tr>
+                            <td><code>toSvg()</code></td>
+                            <td>string</td>
+                            <td>Same as render(), explicit SVG output</td>
+                        </tr>
+                        <tr>
+                            <td><code>toHtml()</code></td>
+                            <td>string</td>
+                            <td>Generate HTML with optional JavaScript</td>
+                        </tr>
+                        <tr>
+                            <td><code>getClientScript()</code></td>
+                            <td>string</td>
+                            <td>Get JavaScript for interactivity</td>
+                        </tr>
+                        <tr>
+                            <td><code>getBars()</code></td>
+                            <td>Bar[]</td>
+                            <td>Get all bars</td>
+                        </tr>
+                        <tr>
+                            <td><code>getDateRange()</code></td>
+                            <td>DateRange</td>
+                            <td>Get active date range</td>
+                        </tr>
+                        <tr>
+                            <td><code>getConfig()</code></td>
+                            <td>CalendarConfig</td>
+                            <td>Get configuration</td>
+                        </tr>
+                        <tr>
+                            <td><code>getName()</code></td>
+                            <td>string</td>
+                            <td>Get calendar name</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>Bar Model</h3>
+                <p>Create bar overlays for events/tasks:</p>
+                
+                <pre><code class=" language-php\>use Core\Calendar\Models\Bar;
+use DateTimeImmutable;
+
+$bar = new Bar(
+    id: 'unique-id',              // Required: Unique identifier
+    title: 'Event Title',         // Required: Display title
+    startDate: new DateTimeImmutable('2025-10-15 09:00'),  // Required
+    endDate: new DateTimeImmutable('2025-10-15 10:30'),    // Required
+    color: '#ffffff',             // Optional: Text color
+    backgroundColor: '#4CAF50',   // Optional: Background color
+    url: '/events/123',           // Optional: Click URL
+    clickHandler: 'handleClick',  // Optional: JS handler name
+    metadata: ['key' =&gt; 'value'], // Optional: Custom data
+    zIndex: 10                    // Optional: Stacking order
+);</code></pre>
+                
+                <h3>Available Themes</h3>
+                <ul>
+                    <li><code>Core\Calendar\Styling\Themes\DefaultTheme</code> - Clean blue-based design</li>
+                    <li><code>Core\Calendar\Styling\Themes\DarkTheme</code> - Dark mode with high contrast</li>
+                    <li><code>Core\Calendar\Styling\Themes\MinimalTheme</code> - Subtle colors and minimal borders</li>
+                    <li><code>Core\Calendar\Styling\Themes\ColorfulTheme</code> - Vibrant colors</li>
+                </ul>
+                
+                <h3>Data Provider Interfaces</h3>
+                <ul>
+                    <li><code>Core\Calendar\DataProviders\ArrayDataProvider</code> - Array-based data</li>
+                    <li><code>Core\Calendar\DataProviders\DatabaseDataProvider</code> - Database queries</li>
+                    <li><code>Core\Calendar\DataProviders\CallbackDataProvider</code> - Custom callback function</li>
+                </ul>
+            </section>
+            
+            <!-- Configuration Options -->
+            <section id="configuration">
+                <h2>Configuration Options</h2>
+                
+                <h3>View-Specific Options</h3>
+                <p>Customize view rendering with the <code>setOption()</code> method:</p>
+                
+                <h4>Month View Options</h4>
+                <pre><code class=" language-php\>\$calendar = CalendarFactory::month()
+    -&gt;setOption('cellHeight', 100)
+    -&gt;setOption('cellWidth', 120)
+    -&gt;setOption('headerHeight', 80)
+    -&gt;setOption('fontSize', 14)
+    -&gt;build();</code></pre>
+                
+                <h4>Multi-Week Options</h4>
+                <pre><code class=" language-php\>\$calendar = CalendarFactory::multiWeek()
+    -&gt;setOption('weekCount', 4)
+    -&gt;setOption('showWeekNumbers', true)
+    -&gt;build();</code></pre>
+                
+                <h3>Locale Support</h3>
+                <p>Set the locale for day/month names:</p>
+                
+                <pre><code>// English (default)
+$calendar = CalendarFactory::month()
+    -&gt;withLocale('en_US')
+    -&gt;build();
+
+// German
+$calendar = CalendarFactory::month()
+    -&gt;withLocale('de_DE')
+    -&gt;build();
+
+// French
+$calendar = CalendarFactory::month()
+    -&gt;withLocale('fr_FR')
+    -&gt;build();</code></pre>
+                
+                <h3>First Day of Week</h3>
+                <p>Customize which day starts the week:</p>
+                
+                <pre><code>// Sunday (0) - Default
+$calendar = CalendarFactory::month()
+    -&gt;setFirstDayOfWeek(0)
+    -&gt;build();
+
+// Monday (1) - Common in Europe
+$calendar = CalendarFactory::month()
+    -&gt;setFirstDayOfWeek(1)
+    -&gt;build();</code></pre>
+            </section>
+            
+            <!-- Best Practices -->
+            <section id="best-practices">
+                <h2>Best Practices</h2>
+                
+                <div class="success">
+                    <h4>✓ Performance Optimization</h4>
+                    <ul>
+                        <li>Use <code>DatabaseDataProvider</code> for large datasets to leverage database indexing</li>
+                        <li>Implement caching for frequently accessed calendar data</li>
+                        <li>Use <code>CallbackDataProvider</code> for lazy loading and on-demand data fetching</li>
+                        <li>Limit the number of bars displayed per day to avoid visual clutter</li>
+                    </ul>
+                </div>
+                
+                <div class="info">
+                    <h4>ℹ️ Accessibility</h4>
+                    <ul>
+                        <li>Provide meaningful <code>title</code> attributes for bars</li>
+                        <li>Use sufficient color contrast ratios in custom themes</li>
+                        <li>Include keyboard navigation support in your JavaScript handlers</li>
+                        <li>Add ARIA labels for screen reader support</li>
+                    </ul>
+                </div>
+                
+                <div class="warning">
+                    <h4>⚠️ Common Pitfalls</h4>
+                    <ul>
+                        <li>Don't forget to call <code>build()</code> after configuring the builder</li>
+                        <li>Always use <code>DateTimeImmutable</code> instead of <code>DateTime</code> for thread safety</li>
+                        <li>Ensure JavaScript handler function names are globally accessible</li>
+                        <li>When using range selection, handle edge cases like single-day ranges</li>
+                    </ul>
+                </div>
+                
+                <h3>Code Organization</h3>
+                <p>Recommended structure for calendar implementation:</p>
+                
+                <pre><code class="language-php">// Controller
+public function calendarAction()
+{
+    $calendarService = $this-&gt;container-&gt;get('calendarService');
+    $calendar = $calendarService-&gt;buildMonthCalendar();
+    
+    $this-&gt;view-&gt;setVar('calendar', $calendar-&gt;toHtml());
+}
+
+// Service Layer
+class CalendarService
+{
+    public function buildMonthCalendar(): Calendar
+    {
+        $events = $this-&gt;eventRepository-&gt;getUpcomingEvents();
+        $bars = $this-&gt;convertEventsToBars($events);
+        
+        return CalendarFactory::month()
+            -&gt;addBars($bars)
+            -&gt;withTheme($this-&gt;getTheme())
+            -&gt;enableSelection()
+            -&gt;build();
+    }
+    
+    private function convertEventsToBars(array $events): array
+    {
+        // Conversion logic
+    }
+}</code></pre>
+            </section>
+            
+            <!-- Troubleshooting -->
+            <section id="troubleshooting">
+                <h2>Troubleshooting</h2>
+                
+                <h3>Calendar Not Rendering</h3>
+                <p><strong>Issue:</strong> Calendar output is empty or shows errors.</p>
+                <p><strong>Solution:</strong></p>
+                <ul>
+                    <li>Ensure <code>CalendarServiceProvider</code> is registered in bootstrap</li>
+                    <li>Check that you're calling <code>build()</code> on the builder</li>
+                    <li>Verify date values are valid <code>DateTimeInterface</code> instances</li>
+                    <li>Check error logs for exceptions</li>
+                </ul>
+                
+                <h3>JavaScript Handlers Not Working</h3>
+                <p><strong>Issue:</strong> Click events don't trigger JavaScript functions.</p>
+                <p><strong>Solution:</strong></p>
+                <ul>
+                    <li>Ensure handler functions are defined in global scope</li>
+                    <li>Check browser console for JavaScript errors</li>
+                    <li>Verify you're using <code>toHtml()</code> instead of <code>render()</code> to include scripts</li>
+                    <li>Make sure <code>enableClickable()</code> is called if using interactive features</li>
+                </ul>
+                
+                <h3>Bars Not Displaying</h3>
+                <p><strong>Issue:</strong> Event/task bars are not visible on the calendar.</p>
+                <p><strong>Solution:</strong></p>
+                <ul>
+                    <li>Verify bar dates fall within the visible date range</li>
+                    <li>Check that bars have valid <code>startDate</code> and <code>endDate</code> values</li>
+                    <li>Ensure data provider is returning bars correctly</li>
+                    <li>Try using a contrasting <code>backgroundColor</code> for visibility</li>
+                </ul>
+                
+                <h3>Theme Not Applied</h3>
+                <p><strong>Issue:</strong> Custom or pre-built theme colors are not showing.</p>
+                <p><strong>Solution:</strong></p>
+                <ul>
+                    <li>Verify theme class extends <code>Core\Calendar\Styling\Theme</code></li>
+                    <li>Ensure <code>withTheme()</code> is called before <code>build()</code></li>
+                    <li>Check that theme colors are valid hex codes</li>
+                </ul>
+            </section>
+            
+            <!-- Architecture -->
+            <section id="architecture">
+                <h2>Library Architecture</h2>
+                <p>Understanding the internal structure:</p>
+                
+                <pre><code class="language-bash">app/Core/Calendar/
+├── CalendarFactory.php              # Entry point - Static factory methods
+├── CalendarBuilder.php              # Fluent API builder
+├── Calendar.php                     # Main calendar instance
+├── CalendarConfig.php               # Configuration holder
+├── CalendarServiceProvider.php      # DI registration
+│
+├── Renderers/                       # View rendering
+│   ├── ViewRendererInterface.php
+│   ├── MonthViewRenderer.php
+│   ├── WeekViewRenderer.php
+│   ├── MultiWeekRenderer.php
+│   ├── YearViewRenderer.php
+│   ├── DayViewRenderer.php
+│   └── CustomViewRenderer.php
+│
+├── DataProviders/                   # Data sources
+│   ├── DataProviderInterface.php
+│   ├── ArrayDataProvider.php
+│   ├── DatabaseDataProvider.php
+│   └── CallbackDataProvider.php
+│
+├── Models/                          # Data models
+│   ├── Bar.php
+│   ├── DateRange.php
+│   └── CalendarData.php
+│
+├── Styling/                         # Themes & styles
+│   ├── ThemeInterface.php
+│   ├── Theme.php
+│   └── Themes/
+│       ├── DefaultTheme.php
+│       ├── DarkTheme.php
+│       ├── MinimalTheme.php
+│       └── ColorfulTheme.php
+│
+├── Events/                          # Event handling
+│   ├── EventHandler.php
+│   └── InteractionConfig.php
+│
+├── Svg/                            # SVG generation
+│   ├── SvgBuilder.php
+│   └── SvgElement.php
+│
+├── Utilities/                       # Helper classes
+│   ├── DateCalculator.php
+│   └── DateFormatter.php
+│
+└── Exceptions/                      # Custom exceptions
+    ├── InvalidConfigException.php
+    └── RenderException.php</code></pre>
+            </section>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025 SVG Calendar Library. Part of the Internal Framework.</p>
+            <p>For support and updates, refer to the project repository.</p>
+        </footer>
+    </div>
+    
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+</body>
+</html>
