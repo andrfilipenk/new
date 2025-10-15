@@ -26,7 +26,6 @@
 
   /**
    * Debounce function execution
-   */
   function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {

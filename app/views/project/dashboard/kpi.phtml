@@ -1,0 +1,351 @@
+<?php $this->layout('layout/enterprise'); ?>
+
+<!-- Toolbar -->
+<div class="enterprise-toolbar">
+    <div class="enterprise-breadcrumb">
+        <a href="/">Home</a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <span>KPI Dashboard</span>
+    </div>
+    
+    <div class="enterprise-toolbar__actions">
+        <button class="enterprise-button enterprise-button--secondary" id="refreshBtn">
+            🔄 Refresh
+        </button>
+        <a href="/dashboard/kpi/export?<?= http_build_query($filters) ?>" class="enterprise-button enterprise-button--ghost">
+            📊 Export CSV
+        </a>
+    </div>
+</div>
+
+<!-- Filters Bar -->
+<div class="enterprise-filters">
+    <form method="GET" action="/dashboard/kpi" class="enterprise-filters__form" id="kpiFiltersForm">
+        <div class="enterprise-filters__group">
+            <input type="date" name="date_from" class="enterprise-input" placeholder="From Date" 
+                   value="<?= htmlspecialchars($filters['date_from'] ?? '') ?>">
+        </div>
+        
+        <div class="enterprise-filters__group">
+            <input type="date" name="date_to" class="enterprise-input" placeholder="To Date"
+                   value="<?= htmlspecialchars($filters['date_to'] ?? '') ?>">
+        </div>
+        
+        <div class="enterprise-filters__group">
+            <select name="status" class="enterprise-input enterprise-input--select">
+                <option value="">All Statuses</option>
+                <?php foreach ($statuses as $status): ?>
+                    <option value="<?= htmlspecialchars($status) ?>" <?= ($filters['status'] === $status) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($status) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        
+        <button type="submit" class="enterprise-button enterprise-button--primary">Apply Filters</button>
+        <a href="/dashboard/kpi" class="enterprise-button enterprise-button--ghost">Reset</a>
+    </form>
+</div>
+
+<!-- Top Metrics Row -->
+<div class="kpi-metrics-row">
+    <?php foreach ($topMetrics as $metric): ?>
+    <div class="enterprise-metric-card enterprise-metric-card--large">
+        <div class="enterprise-metric-card__label"><?= htmlspecialchars($metric['label']) ?></div>
+        <div class="enterprise-metric-card__value">
+            <?php if ($metric['type'] === 'currency'): ?>
+                $<?= number_format($metric['value'], 2) ?>
+            <?php elseif ($metric['type'] === 'percentage'): ?>
+                <?= number_format($metric['value'], 2) ?>%
+            <?php else: ?>
+                <?= number_format($metric['value']) ?>
+            <?php endif; ?>
+        </div>
+        <?php if ($metric['trend'] != 0): ?>
+        <div class="enterprise-metric-card__trend <?= $metric['trend'] > 0 ? 'trend-up' : 'trend-down' ?>">
+            <?= $metric['trend'] > 0 ? '↑' : '↓' ?> <?= abs($metric['trend']) ?>%
+        </div>
+        <?php endif; ?>
+    </div>
+    <?php endforeach; ?>
+</div>
+
+<!-- Two Column Layout for Charts and Grids -->
+<div class="kpi-dashboard-grid">
+    
+    <!-- Left Column -->
+    <div class="kpi-dashboard-column">
+        
+        <!-- Project Performance Card -->
+        <div class="enterprise-card">
+            <h3>Project Performance</h3>
+            <div class="kpi-stats-grid">
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Total Projects</div>
+                    <div class="kpi-stat__value"><?= $projectStats['total_projects'] ?></div>
+                </div>
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Completed</div>
+                    <div class="kpi-stat__value"><?= $projectStats['completed_projects'] ?></div>
+                </div>
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Completion Rate</div>
+                    <div class="kpi-stat__value"><?= $projectStats['completion_rate'] ?>%</div>
+                </div>
+            </div>
+            
+            <!-- Projects by Status Chart -->
+            <div class="chart-container">
+                <canvas id="projectsStatusChart"></canvas>
+            </div>
+            
+            <div class="kpi-breakdown">
+                <?php foreach ($projectStats['by_status'] as $status => $count): ?>
+                <div class="kpi-breakdown__item">
+                    <span class="kpi-breakdown__label"><?= htmlspecialchars($status) ?></span>
+                    <span class="kpi-breakdown__value"><?= $count ?></span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        
+        <!-- Order Metrics Card -->
+        <div class="enterprise-card">
+            <h3>Order Metrics</h3>
+            <div class="kpi-stats-grid">
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Total Orders</div>
+                    <div class="kpi-stat__value"><?= $orderStats['total_orders'] ?></div>
+                </div>
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Total Value</div>
+                    <div class="kpi-stat__value">$<?= number_format($orderStats['total_value'], 0) ?></div>
+                </div>
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Avg Value</div>
+                    <div class="kpi-stat__value">$<?= number_format($orderStats['average_value'], 0) ?></div>
+                </div>
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">On-Time Rate</div>
+                    <div class="kpi-stat__value"><?= $orderStats['on_time_delivery_rate'] ?>%</div>
+                </div>
+            </div>
+            
+            <!-- Orders by Status Chart -->
+            <div class="chart-container">
+                <canvas id="ordersStatusChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Financial KPIs Card -->
+        <div class="enterprise-card">
+            <h3>Financial Overview</h3>
+            <div class="kpi-financial-grid">
+                <div class="kpi-financial-item">
+                    <div class="kpi-financial-item__label">Total Revenue</div>
+                    <div class="kpi-financial-item__value">$<?= number_format($financialKPIs['total_revenue'], 2) ?></div>
+                </div>
+                <div class="kpi-financial-item">
+                    <div class="kpi-financial-item__label">Total Cost</div>
+                    <div class="kpi-financial-item__value">$<?= number_format($financialKPIs['total_cost'], 2) ?></div>
+                </div>
+                <div class="kpi-financial-item">
+                    <div class="kpi-financial-item__label">Profit</div>
+                    <div class="kpi-financial-item__value kpi-financial-item__value--positive">
+                        $<?= number_format($financialKPIs['profit'], 2) ?>
+                    </div>
+                </div>
+                <div class="kpi-financial-item">
+                    <div class="kpi-financial-item__label">Profit Margin</div>
+                    <div class="kpi-financial-item__value"><?= $financialKPIs['profit_margin'] ?>%</div>
+                </div>
+            </div>
+            
+            <!-- Revenue by Project Chart -->
+            <div class="chart-container">
+                <canvas id="revenueByProjectChart"></canvas>
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Right Column -->
+    <div class="kpi-dashboard-column">
+        
+        <!-- Resource Utilization Card -->
+        <div class="enterprise-card">
+            <h3>Resource Utilization</h3>
+            <div class="kpi-stats-grid">
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Total Hours</div>
+                    <div class="kpi-stat__value"><?= number_format($resourceStats['total_hours'], 0) ?></div>
+                </div>
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Active Employees</div>
+                    <div class="kpi-stat__value"><?= $resourceStats['employee_count'] ?></div>
+                </div>
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Avg Hours/Employee</div>
+                    <div class="kpi-stat__value"><?= number_format($resourceStats['average_hours_per_employee'], 1) ?></div>
+                </div>
+                <div class="kpi-stat">
+                    <div class="kpi-stat__label">Material Cost</div>
+                    <div class="kpi-stat__value">$<?= number_format($resourceStats['material_cost'], 0) ?></div>
+                </div>
+            </div>
+            
+            <!-- Hours by Project Chart -->
+            <div class="chart-container">
+                <canvas id="hoursByProjectChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Projects Summary Grid -->
+        <div class="enterprise-card">
+            <h3>Projects Summary</h3>
+            <div class="enterprise-grid enterprise-grid--compact">
+                <table class="enterprise-grid__table">
+                    <thead>
+                        <tr>
+                            <th>Project</th>
+                            <th>Status</th>
+                            <th>Orders</th>
+                            <th>Budget</th>
+                            <th>Team</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($projectsGrid as $project): ?>
+                        <tr onclick="window.location='/projects/<?= $project->id ?>'" style="cursor: pointer;">
+                            <td><?= htmlspecialchars($project->name) ?></td>
+                            <td>
+                                <span class="enterprise-badge enterprise-badge--sm enterprise-badge--<?= $project->getStatusBadgeClass() ?>">
+                                    <?= htmlspecialchars($project->status) ?>
+                                </span>
+                            </td>
+                            <td><?= $project->orders()->count() ?></td>
+                            <td>$<?= number_format($project->budget, 0) ?></td>
+                            <td>-</td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+
+<!-- Last Updated Info -->
+<div class="kpi-dashboard-footer">
+    <div class="kpi-dashboard-footer__info">
+        Last updated: <?= date('M d, Y H:i:s') ?>
+    </div>
+    <div class="kpi-dashboard-footer__actions">
+        <label class="kpi-dashboard-footer__toggle">
+            <input type="checkbox" id="autoRefreshToggle">
+            Auto-refresh (5 min)
+        </label>
+    </div>
+</div>
+
+<!-- Chart.js for visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+// Chart Data from PHP
+const chartData = <?= json_encode($chartData) ?>;
+
+// Projects by Status Pie Chart
+if (chartData.projects_by_status) {
+    new Chart(document.getElementById('projectsStatusChart'), {
+        type: 'pie',
+        data: {
+            labels: chartData.projects_by_status.labels,
+            datasets: [{
+                data: chartData.projects_by_status.data,
+                backgroundColor: ['#4CAF50', '#2196F3', '#FFC107', '#9E9E9E', '#F44336']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+}
+
+// Orders by Status Bar Chart
+if (chartData.orders_by_status) {
+    new Chart(document.getElementById('ordersStatusChart'), {
+        type: 'bar',
+        data: {
+            labels: chartData.orders_by_status.labels,
+            datasets: [{
+                label: 'Orders',
+                data: chartData.orders_by_status.data,
+                backgroundColor: '#2196F3'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+}
+
+// Revenue by Project Horizontal Bar
+if (chartData.revenue_by_project) {
+    new Chart(document.getElementById('revenueByProjectChart'), {
+        type: 'bar',
+        data: {
+            labels: chartData.revenue_by_project.labels,
+            datasets: [{
+                label: 'Revenue',
+                data: chartData.revenue_by_project.data,
+                backgroundColor: '#4CAF50'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+}
+
+// Hours by Project
+if (chartData.hours_by_project) {
+    new Chart(document.getElementById('hoursByProjectChart'), {
+        type: 'bar',
+        data: {
+            labels: chartData.hours_by_project.labels,
+            datasets: [{
+                label: 'Hours',
+                data: chartData.hours_by_project.data,
+                backgroundColor: '#FF9800'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true
+        }
+    });
+}
+
+// Auto-refresh functionality
+let autoRefreshInterval;
+document.getElementById('autoRefreshToggle')?.addEventListener('change', function() {
+    if (this.checked) {
+        autoRefreshInterval = setInterval(() => {
+            window.location.reload();
+        }, 5 * 60 * 1000); // 5 minutes
+    } else {
+        clearInterval(autoRefreshInterval);
+    }
+});
+
+// Manual refresh
+document.getElementById('refreshBtn')?.addEventListener('click', function() {
+    window.location.reload();
+});
+</script>

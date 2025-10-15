@@ -1,0 +1,249 @@
+<?php $this->layout('layout/enterprise'); ?>
+
+<!-- Toolbar -->
+<div class="enterprise-toolbar">
+    <div class="enterprise-breadcrumb">
+        <a href="/">Home</a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <a href="/projects">Projects</a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <span><?= htmlspecialchars($project->name) ?></span>
+    </div>
+    
+    <div class="enterprise-toolbar__actions">
+        <a href="/projects/<?= $project->id ?>/edit" class="enterprise-button enterprise-button--secondary">
+            Edit Project
+        </a>
+    </div>
+</div>
+
+<!-- Project Header Card -->
+<div class="enterprise-card project-detail-header">
+    <div class="project-detail-header__main">
+        <h1 class="project-detail-header__title"><?= htmlspecialchars($project->name) ?></h1>
+        <span class="enterprise-badge enterprise-badge--<?= $project->getStatusBadgeClass() ?>">
+            <?= htmlspecialchars($project->status) ?>
+        </span>
+    </div>
+    
+    <div class="project-detail-header__info">
+        <div><strong>Code:</strong> <?= htmlspecialchars($project->code) ?></div>
+        <div><strong>Duration:</strong> <?= date('M d, Y', strtotime($project->start_date)) ?> - 
+             <?= $project->end_date ? date('M d, Y', strtotime($project->end_date)) : 'Ongoing' ?></div>
+        <div><strong>Budget:</strong> $<?= number_format($project->budget, 2) ?></div>
+    </div>
+</div>
+
+<!-- Metrics Row -->
+<div class="project-metrics-row">
+    <div class="enterprise-metric-card">
+        <div class="enterprise-metric-card__label">Total Orders</div>
+        <div class="enterprise-metric-card__value"><?= $metrics['orders']['total'] ?></div>
+        <div class="enterprise-metric-card__detail">
+            Ready: <?= $metrics['orders']['ready'] ?> | Active: <?= $metrics['orders']['active'] ?>
+        </div>
+    </div>
+    
+    <div class="enterprise-metric-card">
+        <div class="enterprise-metric-card__label">Budget Utilization</div>
+        <div class="enterprise-metric-card__value"><?= round($metrics['budget']['utilization']) ?>%</div>
+        <div class="enterprise-metric-card__detail">
+            Spent: $<?= number_format($metrics['budget']['spent'], 2) ?>
+        </div>
+    </div>
+    
+    <div class="enterprise-metric-card">
+        <div class="enterprise-metric-card__label">Team Size</div>
+        <div class="enterprise-metric-card__value"><?= $metrics['team']['size'] ?></div>
+        <div class="enterprise-metric-card__detail">
+            Hours: <?= number_format($metrics['team']['hours_logged'], 1) ?>
+        </div>
+    </div>
+    
+    <div class="enterprise-metric-card">
+        <div class="enterprise-metric-card__label">Tasks</div>
+        <div class="enterprise-metric-card__value"><?= $metrics['tasks']['completed'] ?>/<?= $metrics['tasks']['total'] ?></div>
+        <div class="enterprise-metric-card__detail">
+            <?= $metrics['tasks']['completion'] ?>% Complete
+        </div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="enterprise-tabs">
+    <ul class="enterprise-tabs__nav">
+        <li class="enterprise-tabs__item <?= $activeTab === 'overview' ? 'enterprise-tabs__item--active' : '' ?>">
+            <a href="?tab=overview" class="enterprise-tabs__link">Overview</a>
+        </li>
+        <li class="enterprise-tabs__item <?= $activeTab === 'orders' ? 'enterprise-tabs__item--active' : '' ?>">
+            <a href="?tab=orders" class="enterprise-tabs__link">Orders</a>
+        </li>
+        <li class="enterprise-tabs__item <?= $activeTab === 'employees' ? 'enterprise-tabs__item--active' : '' ?>">
+            <a href="?tab=employees" class="enterprise-tabs__link">Employees</a>
+        </li>
+        <li class="enterprise-tabs__item <?= $activeTab === 'timeline' ? 'enterprise-tabs__item--active' : '' ?>">
+            <a href="?tab=timeline" class="enterprise-tabs__link">Timeline</a>
+        </li>
+    </ul>
+    
+    <div class="enterprise-tabs__content">
+        
+        <!-- Overview Tab -->
+        <?php if ($activeTab === 'overview'): ?>
+        <div class="enterprise-tab-pane">
+            <div class="project-overview-grid">
+                <div class="project-overview-section">
+                    <h3>Project Description</h3>
+                    <p><?= htmlspecialchars($project->description ?? 'No description provided') ?></p>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Orders Tab -->
+        <?php if ($activeTab === 'orders'): ?>
+        <div class="enterprise-tab-pane">
+            <div class="enterprise-toolbar enterprise-toolbar--sm">
+                <h3>Orders</h3>
+                <a href="/projects/<?= $project->id ?>/orders/create" class="enterprise-button enterprise-button--primary enterprise-button--sm">
+                    Add Order
+                </a>
+            </div>
+            
+            <div class="enterprise-grid">
+                <table class="enterprise-grid__table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Title</th>
+                            <th>Status</th>
+                            <th>Positions</th>
+                            <th>Value</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Progress</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($orders as $order): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($order->order_number) ?></td>
+                            <td><?= htmlspecialchars($order->title) ?></td>
+                            <td>
+                                <span class="enterprise-badge enterprise-badge--<?= $order->getStatusBadgeClass() ?>">
+                                    <?= htmlspecialchars($order->status) ?>
+                                </span>
+                            </td>
+                            <td><?= $order->positions()->count() ?></td>
+                            <td>$<?= number_format($order->total_value, 2) ?></td>
+                            <td><?= date('M d, Y', strtotime($order->start_date)) ?></td>
+                            <td><?= date('M d, Y', strtotime($order->end_date)) ?></td>
+                            <td>
+                                <div class="enterprise-progress">
+                                    <div class="enterprise-progress__bar" style="width: <?= $order->getProgressPercentage() ?>%"></div>
+                                </div>
+                                <?= round($order->getProgressPercentage()) ?>%
+                            </td>
+                            <td>
+                                <a href="/orders/<?= $order->id ?>" class="enterprise-button enterprise-button--sm">View</a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Employees Tab -->
+        <?php if ($activeTab === 'employees'): ?>
+        <div class="enterprise-tab-pane">
+            <h3>Team Members</h3>
+            <div class="enterprise-grid">
+                <table class="enterprise-grid__table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Hours Logged</th>
+                            <th>Last Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php 
+                        $employeeActivities = [];
+                        foreach ($activities as $activity) {
+                            $empId = $activity->employee_id;
+                            if (!isset($employeeActivities[$empId])) {
+                                $employeeActivities[$empId] = [
+                                    'employee' => $activity->employee,
+                                    'hours' => 0,
+                                    'last_activity' => $activity->activity_date,
+                                ];
+                            }
+                            $employeeActivities[$empId]['hours'] += $activity->hours;
+                            if ($activity->activity_date > $employeeActivities[$empId]['last_activity']) {
+                                $employeeActivities[$empId]['last_activity'] = $activity->activity_date;
+                            }
+                        }
+                        ?>
+                        <?php foreach ($employeeActivities as $empData): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($empData['employee']->name ?? 'Unknown') ?></td>
+                            <td><?= number_format($empData['hours'], 1) ?> hrs</td>
+                            <td><?= date('M d, Y', strtotime($empData['last_activity'])) ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Timeline Tab -->
+        <?php if ($activeTab === 'timeline'): ?>
+        <div class="enterprise-tab-pane">
+            <h3>Project Timeline</h3>
+            <div class="project-timeline">
+                <?php foreach ($timeline['orders'] as $orderTimeline): ?>
+                <div class="project-timeline__item">
+                    <h4><?= htmlspecialchars($orderTimeline['title']) ?></h4>
+                    <div class="project-timeline__dates">
+                        <?= date('M d, Y', strtotime($orderTimeline['start_date'])) ?> - 
+                        <?= date('M d, Y', strtotime($orderTimeline['end_date'])) ?>
+                    </div>
+                    <div class="project-timeline__phases">
+                        <?php foreach ($orderTimeline['phases'] as $phase): ?>
+                        <div class="project-timeline__phase">
+                            <span class="enterprise-badge enterprise-badge--sm"><?= htmlspecialchars($phase['name']) ?></span>
+                            <span><?= date('M d', strtotime($phase['start_date'])) ?> - <?= date('M d', strtotime($phase['end_date'])) ?></span>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+    </div>
+</div>
+
+<!-- Right Sidebar with Recent Activity -->
+<aside class="project-detail-sidebar">
+    <div class="enterprise-card">
+        <h3>Recent Activity</h3>
+        <div class="activity-stream">
+            <?php foreach ($recentActivity as $activity): ?>
+            <div class="activity-stream__item">
+                <div class="activity-stream__icon">👤</div>
+                <div class="activity-stream__content">
+                    <div class="activity-stream__user"><?= htmlspecialchars($activity->employee->name ?? 'Unknown') ?></div>
+                    <div class="activity-stream__action"><?= htmlspecialchars($activity->activity_type) ?></div>
+                    <div class="activity-stream__time"><?= date('M d, H:i', strtotime($activity->activity_date)) ?></div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</aside>

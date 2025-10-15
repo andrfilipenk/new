@@ -1,0 +1,257 @@
+<?php $this->layout('layout/enterprise'); ?>
+
+<!-- Toolbar -->
+<div class="enterprise-toolbar">
+    <div class="enterprise-breadcrumb">
+        <a href="/">Home</a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <a href="/projects">Projects</a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <a href="/projects/<?= $project->id ?>"><?= htmlspecialchars($project->name) ?></a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <span>Order #<?= htmlspecialchars($order->order_number) ?></span>
+    </div>
+    
+    <div class="enterprise-toolbar__actions">
+        <a href="/orders/<?= $order->id ?>/edit" class="enterprise-button enterprise-button--secondary">
+            Edit Order
+        </a>
+    </div>
+</div>
+
+<!-- Order Header Card -->
+<div class="enterprise-card order-detail-header">
+    <div class="order-detail-header__main">
+        <h1>Order #<?= htmlspecialchars($order->order_number) ?> - <?= htmlspecialchars($order->title) ?></h1>
+        <span class="enterprise-badge enterprise-badge--<?= $order->getStatusBadgeClass() ?>">
+            <?= htmlspecialchars($order->status) ?>
+        </span>
+    </div>
+    
+    <div class="order-detail-header__info">
+        <div><strong>Project:</strong> <?= htmlspecialchars($project->name) ?></div>
+        <div><strong>Duration:</strong> <?= date('M d, Y', strtotime($order->start_date)) ?> - 
+             <?= date('M d, Y', strtotime($order->end_date)) ?></div>
+        <div><strong>Total Value:</strong> $<?= number_format($order->total_value, 2) ?></div>
+        <div><strong>Positions:</strong> <?= count($positions) ?></div>
+    </div>
+    
+    <div class="order-detail-header__progress">
+        <div class="enterprise-progress">
+            <div class="enterprise-progress__bar" style="width: <?= $progress ?>%"></div>
+        </div>
+        <span><?= round($progress) ?>% Complete</span>
+    </div>
+</div>
+
+<!-- Phase Timeline -->
+<div class="enterprise-card">
+    <h3>Order Phases</h3>
+    <div class="phase-timeline">
+        <div class="phase-timeline__container">
+            <div class="phase-timeline__dates">
+                <span><?= date('M d, Y', strtotime($phaseTimeline['order_start'])) ?></span>
+                <span><?= date('M d, Y', strtotime($phaseTimeline['order_end'])) ?></span>
+            </div>
+            <div class="phase-timeline__track">
+                <?php foreach ($phaseTimeline['phases'] as $phase): ?>
+                <div class="phase-timeline__phase phase-timeline__phase--<?= strtolower(str_replace(' ', '-', $phase['status'])) ?>"
+                     style="left: <?= $phase['position']['left'] ?>%; width: <?= $phase['position']['width'] ?>%"
+                     title="<?= htmlspecialchars($phase['name']) ?>">
+                    <div class="phase-timeline__phase-label"><?= htmlspecialchars($phase['name']) ?></div>
+                    <div class="phase-timeline__phase-dates">
+                        <?= date('M d', strtotime($phase['start_date'])) ?> - <?= date('M d', strtotime($phase['end_date'])) ?>
+                    </div>
+                    <?php if ($phase['is_delayed']): ?>
+                    <span class="phase-timeline__delayed-indicator">⚠️</span>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="enterprise-tabs">
+    <ul class="enterprise-tabs__nav">
+        <li class="enterprise-tabs__item <?= $activeTab === 'positions' ? 'enterprise-tabs__item--active' : '' ?>">
+            <a href="?tab=positions" class="enterprise-tabs__link">Positions</a>
+        </li>
+        <li class="enterprise-tabs__item <?= $activeTab === 'materials' ? 'enterprise-tabs__item--active' : '' ?>">
+            <a href="?tab=materials" class="enterprise-tabs__link">Materials</a>
+        </li>
+        <li class="enterprise-tabs__item <?= $activeTab === 'activities' ? 'enterprise-tabs__item--active' : '' ?>">
+            <a href="?tab=activities" class="enterprise-tabs__link">Activities</a>
+        </li>
+        <li class="enterprise-tabs__item <?= $activeTab === 'comments' ? 'enterprise-tabs__item--active' : '' ?>">
+            <a href="?tab=comments" class="enterprise-tabs__link">Comments</a>
+        </li>
+    </ul>
+    
+    <div class="enterprise-tabs__content">
+        
+        <!-- Positions Tab -->
+        <?php if ($activeTab === 'positions'): ?>
+        <div class="enterprise-tab-pane">
+            <div class="enterprise-toolbar enterprise-toolbar--sm">
+                <h3>Positions</h3>
+                <a href="/orders/<?= $order->id ?>/positions/create" class="enterprise-button enterprise-button--primary enterprise-button--sm">
+                    Add Position
+                </a>
+            </div>
+            
+            <div class="enterprise-grid">
+                <table class="enterprise-grid__table">
+                    <thead>
+                        <tr>
+                            <th>Position #</th>
+                            <th>Product Code</th>
+                            <th>Description</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($positions as $position): ?>
+                        <tr>
+                            <td><?= $position->position_number ?></td>
+                            <td><?= htmlspecialchars($position->product_code) ?></td>
+                            <td><?= htmlspecialchars($position->description) ?></td>
+                            <td><?= number_format($position->quantity, 2) ?> <?= htmlspecialchars($position->unit) ?></td>
+                            <td>$<?= number_format($position->unit_price, 2) ?></td>
+                            <td>$<?= number_format($position->total_price, 2) ?></td>
+                            <td>
+                                <span class="enterprise-badge enterprise-badge--<?= $position->getStatusBadgeClass() ?>">
+                                    <?= htmlspecialchars($position->status) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <a href="/positions/<?= $position->id ?>" class="enterprise-button enterprise-button--sm">View</a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Materials Tab -->
+        <?php if ($activeTab === 'materials'): ?>
+        <div class="enterprise-tab-pane">
+            <h3>Material Usage</h3>
+            <div class="material-summary">
+                <strong>Total Material Cost:</strong> $<?= number_format($materials['total_cost'], 2) ?>
+            </div>
+            
+            <div class="enterprise-grid">
+                <table class="enterprise-grid__table">
+                    <thead>
+                        <tr>
+                            <th>Material Type</th>
+                            <th>Specification</th>
+                            <th>Quantity</th>
+                            <th>Unit Cost</th>
+                            <th>Total Cost</th>
+                            <th>Position</th>
+                            <th>Usage Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($materials['all_materials'] as $material): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($material->material_type) ?></td>
+                            <td><?= htmlspecialchars($material->specification ?? '-') ?></td>
+                            <td><?= number_format($material->quantity, 2) ?> <?= htmlspecialchars($material->unit) ?></td>
+                            <td>$<?= number_format($material->unit_cost, 2) ?></td>
+                            <td>$<?= number_format($material->total_cost, 2) ?></td>
+                            <td><?= $material->position ? '#' . $material->position->position_number : '-' ?></td>
+                            <td><?= $material->usage_date ? date('M d, Y', strtotime($material->usage_date)) : '-' ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Activities Tab -->
+        <?php if ($activeTab === 'activities'): ?>
+        <div class="enterprise-tab-pane">
+            <h3>Employee Activities</h3>
+            <div class="activity-timeline">
+                <?php foreach ($activities as $activity): ?>
+                <div class="activity-timeline__item">
+                    <div class="activity-timeline__marker"></div>
+                    <div class="activity-timeline__content">
+                        <div class="activity-timeline__header">
+                            <strong><?= htmlspecialchars($activity->employee->name ?? 'Unknown') ?></strong>
+                            <span class="enterprise-badge enterprise-badge--<?= $activity->getTypeBadgeClass() ?>">
+                                <?= htmlspecialchars($activity->activity_type) ?>
+                            </span>
+                        </div>
+                        <div class="activity-timeline__details">
+                            <div><?= htmlspecialchars($activity->description ?? '') ?></div>
+                            <div><strong>Hours:</strong> <?= number_format($activity->hours, 1) ?></div>
+                            <div><strong>Date:</strong> <?= date('M d, Y', strtotime($activity->activity_date)) ?></div>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Comments Tab -->
+        <?php if ($activeTab === 'comments'): ?>
+        <div class="enterprise-tab-pane">
+            <h3>Comments</h3>
+            
+            <!-- New Comment Form -->
+            <div class="comment-form">
+                <form method="POST" action="/orders/<?= $order->id ?>/comments">
+                    <textarea name="content" class="enterprise-input" rows="3" placeholder="Add a comment..."></textarea>
+                    <button type="submit" class="enterprise-button enterprise-button--primary">Post Comment</button>
+                </form>
+            </div>
+            
+            <!-- Comments Thread -->
+            <div class="comment-thread">
+                <?php foreach ($comments as $commentData): ?>
+                <div class="comment-thread__item">
+                    <div class="comment-thread__header">
+                        <strong><?= htmlspecialchars($commentData['user']->name ?? 'Unknown') ?></strong>
+                        <span class="comment-thread__time"><?= date('M d, Y H:i', strtotime($commentData['comment']->created_at)) ?></span>
+                    </div>
+                    <div class="comment-thread__content">
+                        <?= $commentData['comment']->getFormattedContent() ?>
+                    </div>
+                    
+                    <!-- Replies -->
+                    <?php if (!empty($commentData['replies'])): ?>
+                    <div class="comment-thread__replies">
+                        <?php foreach ($commentData['replies'] as $replyData): ?>
+                        <div class="comment-thread__reply">
+                            <div class="comment-thread__header">
+                                <strong><?= htmlspecialchars($replyData['user']->name ?? 'Unknown') ?></strong>
+                                <span class="comment-thread__time"><?= date('M d, Y H:i', strtotime($replyData['comment']->created_at)) ?></span>
+                            </div>
+                            <div class="comment-thread__content">
+                                <?= $replyData['comment']->getFormattedContent() ?>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+    </div>
+</div>

@@ -1,0 +1,297 @@
+<?php $this->layout('layout/enterprise'); ?>
+
+<!-- Toolbar -->
+<div class="enterprise-toolbar">
+    <div class="enterprise-breadcrumb">
+        <a href="/">Home</a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <a href="/projects">Projects</a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <a href="/orders/<?= $order->id ?>">Order #<?= htmlspecialchars($order->order_number) ?></a>
+        <span class="enterprise-breadcrumb__separator">/</span>
+        <span>Position #<?= $position->position_number ?></span>
+    </div>
+    
+    <div class="enterprise-toolbar__actions">
+        <a href="/positions/<?= $position->id ?>/edit" class="enterprise-button enterprise-button--secondary">
+            Edit Position
+        </a>
+    </div>
+</div>
+
+<!-- Position Detail Card -->
+<div class="enterprise-card position-detail-header">
+    <h1>Position #<?= $position->position_number ?> in Order #<?= htmlspecialchars($order->order_number) ?></h1>
+    
+    <div class="position-detail-grid">
+        <div class="position-detail-item">
+            <strong>Product Code:</strong>
+            <span><?= htmlspecialchars($position->product_code) ?></span>
+        </div>
+        
+        <div class="position-detail-item">
+            <strong>Description:</strong>
+            <span><?= htmlspecialchars($position->description) ?></span>
+        </div>
+        
+        <div class="position-detail-item">
+            <strong>Quantity:</strong>
+            <span><?= number_format($position->quantity, 2) ?> <?= htmlspecialchars($position->unit) ?></span>
+        </div>
+        
+        <div class="position-detail-item">
+            <strong>Unit Price:</strong>
+            <span>$<?= number_format($position->unit_price, 2) ?></span>
+        </div>
+        
+        <div class="position-detail-item">
+            <strong>Total Value:</strong>
+            <span>$<?= number_format($position->total_price, 2) ?></span>
+        </div>
+        
+        <div class="position-detail-item">
+            <strong>Status:</strong>
+            <span class="enterprise-badge enterprise-badge--<?= $position->getStatusBadgeClass() ?>">
+                <?= htmlspecialchars($position->status) ?>
+            </span>
+        </div>
+        
+        <?php if ($position->assigned_to): ?>
+        <div class="position-detail-item">
+            <strong>Assigned To:</strong>
+            <span><?= htmlspecialchars($position->assignedEmployee->name ?? 'Unknown') ?></span>
+        </div>
+        <?php endif; ?>
+        
+        <?php if ($position->target_date): ?>
+        <div class="position-detail-item">
+            <strong>Target Date:</strong>
+            <span><?= date('M d, Y', strtotime($position->target_date)) ?></span>
+        </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="enterprise-tabs">
+    <ul class="enterprise-tabs__nav">
+        <li class="enterprise-tabs__item enterprise-tabs__item--active">
+            <a href="#specifications" class="enterprise-tabs__link">Specifications</a>
+        </li>
+        <li class="enterprise-tabs__item">
+            <a href="#materials" class="enterprise-tabs__link">Materials</a>
+        </li>
+        <li class="enterprise-tabs__item">
+            <a href="#history" class="enterprise-tabs__link">History</a>
+        </li>
+    </ul>
+    
+    <div class="enterprise-tabs__content">
+        
+        <!-- Specifications Tab -->
+        <div class="enterprise-tab-pane" id="specifications">
+            <h3>Technical Specifications</h3>
+            <?php if ($position->specifications): ?>
+            <div class="specifications-content">
+                <?php foreach ($position->specifications as $key => $value): ?>
+                <div class="specification-item">
+                    <strong><?= htmlspecialchars($key) ?>:</strong>
+                    <span><?= htmlspecialchars($value) ?></span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+            <p>No specifications provided</p>
+            <?php endif; ?>
+        </div>
+        
+        <!-- Materials Tab -->
+        <div class="enterprise-tab-pane" id="materials">
+            <div class="enterprise-toolbar enterprise-toolbar--sm">
+                <h3>Bill of Materials</h3>
+                <button class="enterprise-button enterprise-button--primary enterprise-button--sm" id="addMaterialBtn">
+                    Add Material
+                </button>
+            </div>
+            
+            <div class="material-breakdown-summary">
+                <div class="enterprise-metric-card">
+                    <div class="enterprise-metric-card__label">Total Material Cost</div>
+                    <div class="enterprise-metric-card__value">$<?= number_format($totalCost, 2) ?></div>
+                </div>
+            </div>
+            
+            <div class="enterprise-grid">
+                <table class="enterprise-grid__table">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Specification</th>
+                            <th>Required Qty</th>
+                            <th>Used Qty</th>
+                            <th>Remaining</th>
+                            <th>Unit Cost</th>
+                            <th>Total Cost</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($materials as $material): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($material->material_type) ?></td>
+                            <td><?= htmlspecialchars($material->specification ?? '-') ?></td>
+                            <td><?= number_format($material->quantity, 2) ?> <?= htmlspecialchars($material->unit) ?></td>
+                            <td><?= number_format($material->quantity, 2) ?></td>
+                            <td>0.00</td>
+                            <td>$<?= number_format($material->unit_cost, 2) ?></td>
+                            <td>$<?= number_format($material->total_cost, 2) ?></td>
+                            <td>
+                                <button class="enterprise-button enterprise-button--sm edit-material-btn" 
+                                        data-material-id="<?= $material->id ?>">
+                                    Edit
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        
+                        <?php if (empty($materials->toArray())): ?>
+                        <tr>
+                            <td colspan="8" class="text-center">No materials assigned yet</td>
+                        </tr>
+                        <?php endif; ?>
+                    </tbody>
+                    <tfoot>
+                        <tr class="enterprise-grid__total-row">
+                            <td colspan="6"><strong>Total</strong></td>
+                            <td><strong>$<?= number_format($totalCost, 2) ?></strong></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        
+        <!-- History Tab -->
+        <div class="enterprise-tab-pane" id="history">
+            <h3>Position History</h3>
+            <div class="position-history">
+                <div class="position-history__item">
+                    <div class="position-history__date"><?= date('M d, Y H:i', strtotime($position->created_at)) ?></div>
+                    <div class="position-history__action">Position created</div>
+                </div>
+                
+                <div class="position-history__item">
+                    <div class="position-history__date"><?= date('M d, Y H:i', strtotime($position->updated_at)) ?></div>
+                    <div class="position-history__action">Last updated</div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="position-actions">
+    <button class="enterprise-button enterprise-button--primary" id="updateStatusBtn">Update Status</button>
+    <button class="enterprise-button enterprise-button--secondary" id="adjustQuantityBtn">Adjust Quantity</button>
+    <button class="enterprise-button enterprise-button--ghost" id="printSpecBtn">Print Specification</button>
+</div>
+
+<!-- Material Modal (hidden by default) -->
+<div class="enterprise-modal" id="materialModal" style="display: none;">
+    <div class="enterprise-modal__overlay"></div>
+    <div class="enterprise-modal__container">
+        <div class="enterprise-modal__header">
+            <h3>Add/Edit Material</h3>
+            <button class="enterprise-modal__close">&times;</button>
+        </div>
+        <div class="enterprise-modal__body">
+            <form id="materialForm">
+                <input type="hidden" name="material_id" id="materialId">
+                
+                <div class="enterprise-form-group">
+                    <label>Material Type</label>
+                    <input type="text" name="material_type" class="enterprise-input" required>
+                </div>
+                
+                <div class="enterprise-form-group">
+                    <label>Specification</label>
+                    <input type="text" name="specification" class="enterprise-input">
+                </div>
+                
+                <div class="enterprise-form-group">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" step="0.01" class="enterprise-input" required>
+                </div>
+                
+                <div class="enterprise-form-group">
+                    <label>Unit</label>
+                    <input type="text" name="unit" class="enterprise-input" required>
+                </div>
+                
+                <div class="enterprise-form-group">
+                    <label>Unit Cost</label>
+                    <input type="number" name="unit_cost" step="0.01" class="enterprise-input" required>
+                </div>
+                
+                <div class="enterprise-form-group">
+                    <label>Supplier</label>
+                    <input type="text" name="supplier" class="enterprise-input">
+                </div>
+                
+                <div class="enterprise-form-group">
+                    <label>Usage Date</label>
+                    <input type="date" name="usage_date" class="enterprise-input">
+                </div>
+            </form>
+        </div>
+        <div class="enterprise-modal__footer">
+            <button class="enterprise-button enterprise-button--primary" id="saveMaterialBtn">Save Material</button>
+            <button class="enterprise-button enterprise-button--secondary" id="cancelMaterialBtn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Material modal handling
+document.getElementById('addMaterialBtn')?.addEventListener('click', function() {
+    document.getElementById('materialForm').reset();
+    document.getElementById('materialId').value = '';
+    document.getElementById('materialModal').style.display = 'flex';
+});
+
+document.querySelectorAll('.edit-material-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const materialId = this.dataset.materialId;
+        // Load material data and populate form
+        document.getElementById('materialId').value = materialId;
+        document.getElementById('materialModal').style.display = 'flex';
+    });
+});
+
+document.getElementById('cancelMaterialBtn')?.addEventListener('click', function() {
+    document.getElementById('materialModal').style.display = 'none';
+});
+
+document.querySelector('.enterprise-modal__close')?.addEventListener('click', function() {
+    document.getElementById('materialModal').style.display = 'none';
+});
+
+document.getElementById('saveMaterialBtn')?.addEventListener('click', function() {
+    const form = document.getElementById('materialForm');
+    const formData = new FormData(form);
+    
+    fetch('/positions/<?= $position->id ?>/materials', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Failed to save material');
+        }
+    });
+});
+</script>
