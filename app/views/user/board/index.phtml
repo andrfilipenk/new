@@ -1,52 +1,211 @@
+<div class="enterprise-alert enterprise-alert--info" style="display: none ;">
+    <div class="enterprise-alert__icon">
+        <i class="bi bi-info-circle"></i>
+    </div>
+    <div class="enterprise-alert__content">
+        <div class="enterprise-alert__title">System Maintenance Scheduled</div>
+        <div class="enterprise-alert__message">
+            The system will undergo scheduled maintenance on October 20, 2025 from 2:00 AM to 4:00 AM UTC.
+        </div>
+    </div>
+</div>
 
-<?php
 
-$tz = new DateTimeZone('Europe/Berlin');
-$dt = new DateTimeImmutable("now", $tz);
-$dd = $dt->modify("first day of january");
-?>
-<h2 style="margin: 0 0 30px 0; height: 30px; line-height: 30px;">Month</h2>
-<div class="grid-month" style="width: 210px">
-    <ul class="cols">
-        <li>M</li><li>D</li><li>M</li><li>D</li><li>F</li><li class="we">S</li><li class="we">S</li>
-    </ul>
-    <ul class="days">
-        <?php foreach(range(1,31) as $n): ?>
-            <li><a href="#"><?=$n?></a></li>
+<h2>Tasks assigned to my Person</h2>
+<div class="enterprise-card">
+    <div class="enterprise-card__header">
+        <h2 class="enterprise-card__title">List of Tasks</h2>
+        <div class="enterprise-card__actions">
+            <input type="search" class="enterprise-input" placeholder="Filter tasks..." style="width: 200px; height: 32px; font-size: 12px;">
+        </div>
+    </div>
+
+    <div class="inline-form">
+        <div class="row">
+            <div class="col">
+            1 of 3
+            </div>
+            <div class="col-6">
+            2 of 3 (wider)
+            </div>
+            <div class="col">
+            3 of 3
+            </div>
+        </div>
+    </div>
+
+    <div class="enterprise-grid">
+        <div class="enterprise-grid__wrapper">
+            <table class="enterprise-grid__table">
+                <thead class="enterprise-grid__header">
+                    <tr>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--checkbox">
+                            <input type="checkbox" aria-label="Select all">
+                        </th>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="id">
+                            ID
+                            <span class="enterprise-grid__sort-icon">▲</span>
+                        </th>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="title">
+                            Title
+                            <span class="enterprise-grid__sort-icon">▲</span>
+                        </th>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="author">
+                            Author
+                            <span class="enterprise-grid__sort-icon">▲</span>
+                        </th>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="status">
+                            Status
+                            <span class="enterprise-grid__sort-icon">▲</span>
+                        </th>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="priority">
+                            Priority
+                            <span class="enterprise-grid__sort-icon">▲</span>
+                        </th>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="due_date">
+                            Due Date
+                            <span class="enterprise-grid__sort-icon">▲</span>
+                        </th>
+                        <th class="enterprise-grid__header-cell">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="enterprise-grid__body">
+                    <?php foreach ($tasks as $task) : ?>
+                        <?php $task = new \Intern\Model\Task($task) ?>
+                        <tr class="enterprise-grid__row" data-row-id="<?=$task->id?>">
+                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                <input type="checkbox" aria-label="Select row">
+                            </td>
+                            <td class="enterprise-grid__cell">#<?=$task->id?></td>
+                            <td class="enterprise-grid__cell"><b><?=$task->title?></b></td>
+                            <td class="enterprise-grid__cell"><?=$task->creator->name?></td>
+                            <td class="enterprise-grid__cell">
+                                <span class="enterprise-badge enterprise-badge--<?=$task->status->color?>">
+                                    <?=$task->status->title?>
+                                </span>
+                            </td>
+                            <td class="enterprise-grid__cell">
+                                <span class="enterprise-badge enterprise-badge--<?=$task->priority->color?>">
+                                    <?=$task->priority->title?>
+                                </span>
+                            </td>
+                            <td class="enterprise-grid__cell">
+                                <?=$task->dateFormated('end_date')?>
+                            </td>
+                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                <div class="enterprise-grid__cell-actions">
+                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="enterprise-pagination">
+            <div class="enterprise-pagination__info">
+                 <?=$totalTasks?> entries
+            </div>
+            <?=$pagination->render()?>
+            <div class="enterprise-pagination__controls">
+                <button class="enterprise-pagination__button" disabled="">Previous</button>
+                <button class="enterprise-pagination__button enterprise-pagination__button--active">1</button>
+                <button class="enterprise-pagination__button" disabled="">Next</button>
+            </div>
+        </div>
+
+        <!--
+        <div class="enterprise-pagination">
+            <div class="enterprise-pagination__info">
+                Showing 1 to 5 of <?=$totalTasks?> entries
+            </div>
+            <?=$pagination->render()?>
+            <div class="enterprise-pagination__controls">
+                <button class="enterprise-pagination__button" disabled="">Previous</button>
+                <button class="enterprise-pagination__button enterprise-pagination__button--active">1</button>
+                <button class="enterprise-pagination__button">2</button>
+                <button class="enterprise-pagination__button">3</button>
+                <button class="enterprise-pagination__button">...</button>
+                <button class="enterprise-pagination__button">50</button>
+                <button class="enterprise-pagination__button">Next</button>
+            </div>
+        </div>
+        -->
+    </div>
+</div>
+
+<div class="enterprise-modal" id="myModal">
+    <div class="enterprise-modal__backdrop"></div>
+    <div class="enterprise-modal__container">
+        <div class="enterprise-modal__header">
+            <h2 class="enterprise-modal__title">Modal Title</h2>
+            <button class="enterprise-modal__close">×</button>
+        </div>
+        <div class="enterprise-modal__body">
+            Modal content goes here
+        </div>
+        <div class="enterprise-modal__footer">
+            <button class="enterprise-button enterprise-button--secondary">Cancel</button>
+            <button class="enterprise-button enterprise-button--primary">Confirm</button>
+        </div>
+    </div>
+</div>
+<?php $this->startSection('bottom-js'); ?>
+    <script>
+        let demoModalInstance;
+        
+        function openDemoModal() {
+            const modal = document.getElementById('myModal');
+            if (!demoModalInstance) {
+                demoModalInstance = new window.EnterpriseUI.Modal(modal);
+            }
+            demoModalInstance.open();
+        }
+        
+        function closeDemoModal() {
+            if (demoModalInstance) {
+                demoModalInstance.close();
+            }
+        }
+    </script>
+<?php $this->endSection(); ?>
+
+
+
+
+<?php $this->startSection('toolbar-right'); ?>
+<button class="enterprise-button enterprise-button--secondary" style="display:none">
+    <i class="bi bi-download"></i>
+    Export
+</button>
+<button class="enterprise-button enterprise-button--primary" onclick="openDemoModal()">
+    <i class="bi bi-plus-lg"></i>
+    Add new Task
+</button>
+<?php $this->endSection(); ?>
+
+
+
+<?php $this->startSection('sidebar-right'); ?>
+<aside class="enterprise-sidebar enterprise-sidebar--right">
+    <div class="enterprise-card__header">
+        <h3 class="enterprise-card__title">Global Activities</h3>
+    </div>
+    <div class="enterprise-card__body">
+        <?php foreach ($activities as $activity): ?>
+            <div class="activity-item" style="padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid #ccc">
+                <p><?=$activity['content']?></p>
+                <div class="activity-item-date">
+                    <?=\Core\Utils\Dates::humanReadable(new DateTimeImmutable($activity['created_at']))?>
+                </div>
+            </div>
         <?php endforeach; ?>
-    </ul>
-</div>
-
-
-
-
-
-
-<br><br><br><br><br><br><br><br><br><br>
-<!-- Compact Calendar with Task Bars -->
-<div class="calendar">
-    <!-- Header & Navigation -->
-    <div class="cal-header">
-        <a href="?view=<?= $display ?>&date=<?= $calendarData['prev'] ?>" class="nav-btn">‹</a>
-        <h2><?= $calendarData['title'] ?></h2>
-        <a href="?view=<?= $display ?>&date=<?= $calendarData['next'] ?>" class="nav-btn">›</a>
     </div>
-    
-    <div class="view-tabs">
-        <a href="?view=week&date=<?= $currentDate->format('Y-m-d') ?>" class="tab <?= $display === 'week' ? 'active' : '' ?>">Week</a>
-        <a href="?view=month&date=<?= $currentDate->format('Y-m-d') ?>" class="tab <?= $display === 'month' ? 'active' : '' ?>">Month</a>
-        <a href="?view=year&date=<?= $currentDate->format('Y-m-d') ?>" class="tab <?= $display === 'year' ? 'active' : '' ?>">Year</a>
-    </div>
-    
-    <!-- Calendar Content -->
-    <?php if ($display === 'week'): ?>
-        <?php include __DIR__ . '/partials/week-view.phtml'; ?>
-    <?php elseif ($display === 'month'): ?>
-        <?php include __DIR__ . '/partials/month-view.phtml'; ?>
-    <?php else: ?>
-        <?php include __DIR__ . '/partials/year-view.phtml'; ?>
-    <?php endif; ?>
-</div>
-
-<link rel="stylesheet" href="/new/css/calendar.css">
-<script src="/new/js/calendar.js"></script>
+</aside>
+<?php $this->endSection(); ?>

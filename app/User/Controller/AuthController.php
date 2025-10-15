@@ -23,7 +23,7 @@ class AuthController extends AbstractController
             $formManager->handleRequest($this->getRequest()->post());
             if ($formManager->isSubmitted() && $formManager->isValid()) {
                 $data = $formManager->getValidatedData();
-                $user = UserModel::find($data['custom_id'], 'custom_id');
+                $user = UserModel::byCustomID($data['custom_id']);
                 if ($user && $user->verifyPassword($data['password'])) {
                     $this->getSession()->set('user', $user->id);
                     $this->flashSuccess(message: 'Logged in successfully.');

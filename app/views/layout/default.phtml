@@ -9,23 +9,26 @@ $url = $this->getDI()->get('url');
     <title><?= htmlspecialchars($title ?? 'Our Framework') ?></title>
     <link rel="stylesheet" href="<?= $url->get('css/bootstrap.min.css', [], true) ?>">
     <link rel="stylesheet" href="<?= $url->get('css/bootstrap-icons.min.css', [], true) ?>">
+    <link rel="stylesheet" href="<?= $url->get('css/kit-enterprise.css', [], true) ?>">
     <link rel="stylesheet" href="<?= $url->get('css/app.css', [], true) ?>">
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-auto sticky-top bg-dark">
-                <?=$this->partial('layout/ui/sidebar')?>
-            </div>
-            <div class="col-sm min-vh-100 content">
-                <?=$this->partial('layout/ui/usernav')?>
-                
-                <?=$this->partial('layout/ui/messages')?>
-                <?php echo $this->yield('content'); ?>
-            </div>
+    <div class="enterprise-layout">
+        <?=$this->partial('layout/ui/header')?>
+        <div class="enterprise-main">
+            <?=$this->partial('layout/ui/sidebar')?>
+            <main class="enterprise-content">
+                <?=$this->partial('layout/ui/toolbar')?>
+                <div class="enterprise-content__body">
+                    <?php echo $this->yield('content'); ?>
+                </div>
+            </main>
+            <?php echo $this->yield('sidebar-right'); ?>
         </div>
     </div>
     <script src="<?= $url->get('js/bootstrap.bundle.min.js') ?>"></script>
+    <script src="<?= $url->get('js/kit-enterprise.js') ?>"></script>
     <script src="<?= $url->get('js/app.js') ?>"></script>
+    <?php echo $this->yield('bottom-js'); ?>
 </body>
 </html>

@@ -11,10 +11,10 @@ class CreateEmployeeActivitiesTable extends Migration
     {
         $this->createTable('employee_activities', function($table) {
             $table->id();
-            $table->unsignedBigInteger('project_id')->nullable();
-            $table->unsignedBigInteger('order_id')->nullable();
-            $table->unsignedBigInteger('position_id')->nullable();
-            $table->unsignedBigInteger('employee_id');
+            $table->integer('project_id')->unsigned()->nullable();
+            $table->integer('order_id')->unsigned()->nullable();
+            $table->integer('position_id')->unsigned()->nullable();
+            $table->integer('employee_id')->unsigned();
             $table->string('activity_type', 100);
             $table->decimal('hours', 8, 2);
             $table->date('activity_date');
@@ -31,7 +31,7 @@ class CreateEmployeeActivitiesTable extends Migration
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('position_id')->references('id')->on('positions')->onDelete('cascade');
-            $table->foreign('employee_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('employee_id')->references('id')->on('user')->onDelete('cascade');
         });
     }
 

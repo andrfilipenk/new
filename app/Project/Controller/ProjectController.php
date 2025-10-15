@@ -2,21 +2,20 @@
 
 namespace Project\Controller;
 
-use Core\Mvc\Controller;
 use Project\Service\ProjectService;
 use Project\Model\Project;
+use User\Controller\AbstractController;
 
 /**
  * ProjectController
  * Handles project listing, detail view, and CRUD operations
  */
-class ProjectController extends Controller
+class ProjectController extends AbstractController
 {
     protected $projectService;
 
     public function __construct()
     {
-        parent::__construct();
         $this->projectService = new ProjectService();
     }
 
@@ -47,13 +46,17 @@ class ProjectController extends Controller
             'completed_projects' => Project::where('status', Project::STATUS_COMPLETED)->count(),
         ];
 
-        $this->view->setVar('projects', $result['projects']);
-        $this->view->setVar('pagination', $result['pagination']);
-        $this->view->setVar('filters', $filters);
-        $this->view->setVar('totalStats', $totalStats);
-        $this->view->setVar('statuses', Project::getStatuses());
+        $this->getView()->setLayout('enterprise');
+      
 
-        $this->view->render('project/overview/index');
+
+        return $this->render('project/overview/index', [
+            'projects' => $result['projects'],
+            'pagination' => $result['pagination'],
+            'filters' => $filters,
+            'totalStats' => $totalStats,
+            'statuses' => Project::getStatuses(),
+        ]);
     }
 
     /**
@@ -73,15 +76,17 @@ class ProjectController extends Controller
         // Get recent activity (last 10)
         $recentActivity = $data['activities']->take(10);
 
-        $this->view->setVar('project', $data['project']);
-        $this->view->setVar('metrics', $data['metrics']);
-        $this->view->setVar('orders', $data['orders']);
-        $this->view->setVar('activities', $data['activities']);
-        $this->view->setVar('timeline', $timeline);
-        $this->view->setVar('recentActivity', $recentActivity);
-        $this->view->setVar('activeTab', $activeTab);
 
-        $this->view->render('project/detail/index');
+
+        return $this->render('project/detail/index', [
+            'project' => $data['project'],
+            'metrics' => $data['metrics'],
+            'orders' => $data['orders'],
+            'activities' => $data['activities'],
+            'timeline' => $timeline,
+            'recentActivity' => $recentActivity,
+            'activeTab' => $activeTab,
+        ]);
     }
 
     /**
@@ -107,16 +112,18 @@ class ProjectController extends Controller
             
             if ($project->save()) {
                 $this->session->setFlash('success', 'Project created successfully');
-                $this->response->redirect('/projects/' . $project->id);
+                $this->response->redirect('projects/' . $project->id);
                 return;
             } else {
                 $this->session->setFlash('error', 'Failed to create project');
             }
         }
 
-        $this->view->setVar('statuses', Project::getStatuses());
-        $this->view->setVar('priorities', Project::getPriorities());
-        $this->view->render('project/create');
+        
+        return $this->render('project/create', [
+            'statuses' => Project::getStatuses(),
+            'priorities' => Project::getPriorities(),
+        ]);
     }
 
     /**
@@ -145,17 +152,17 @@ class ProjectController extends Controller
             
             if ($project->save()) {
                 $this->session->setFlash('success', 'Project updated successfully');
-                $this->response->redirect('/projects/' . $project->id);
+                $this->response->redirect('projects/' . $project->id);
                 return;
             } else {
                 $this->session->setFlash('error', 'Failed to update project');
             }
         }
-
-        $this->view->setVar('project', $project);
-        $this->view->setVar('statuses', Project::getStatuses());
-        $this->view->setVar('priorities', Project::getPriorities());
-        $this->view->render('project/edit');
+        return $this->render('project/edit', [
+            'project' => $project,
+            'statuses' => Project::getStatuses(),
+            'priorities' => Project::getPriorities(),
+        ]);
     }
 
     /**
@@ -173,10 +180,10 @@ class ProjectController extends Controller
 
         if ($project->delete()) {
             $this->session->setFlash('success', 'Project deleted successfully');
-            $this->response->redirect('/projects');
+            $this->response->redirect('projects');
         } else {
             $this->session->setFlash('error', 'Failed to delete project');
-            $this->response->redirect('/projects/' . $projectId);
+            $this->response->redirect('projects/' . $projectId);
         }
     }
 }

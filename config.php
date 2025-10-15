@@ -10,6 +10,7 @@ return [
         'module' => [
             'Main',
             'User',
+            'Project',
             'Crm',
         ],
     ],

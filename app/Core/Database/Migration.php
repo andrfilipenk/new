@@ -34,7 +34,13 @@ abstract class Migration
         $blueprint = new Blueprint($tableName);
         $callback($blueprint);
         $sql = $blueprint->toSql();
-        self::db()->execute($sql);
+        try {
+            self::db()->execute($sql);
+        } catch (\Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+            echo $sql;
+            exit;
+        }
     }
 
     /**
@@ -54,7 +60,13 @@ abstract class Migration
         $callback($table);
         $sql = $table->toSql();
         if (!empty($sql)) {
-            self::db()->execute($sql);
+            try {
+                self::db()->execute($sql);
+            } catch (\Exception $e) {
+                echo $e->getMessage() . PHP_EOL;
+                echo $sql;
+                exit;
+            }
         }
     }
 

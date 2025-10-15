@@ -1,0 +1,17 @@
+<div class="enterprise-toolbar">
+    <div class="enterprise-toolbar__left">
+        <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" data-sidebar-toggle="" title="Toggle sidebar">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <nav class="enterprise-breadcrumb">
+            <a href="#" class="enterprise-breadcrumb__item">Home</a>
+            <span class="enterprise-breadcrumb__separator">/</span>
+            <span class="enterprise-breadcrumb__item enterprise-breadcrumb__item--active">Dashboard</span>
+        </nav>
+    </div>
+
+    <div class="enterprise-toolbar__right">
+        <?php echo $this->yield('toolbar-right'); ?>
+    </div>
+</div>

@@ -11,7 +11,7 @@ class CreateOrderPhasesTable extends Migration
     {
         $this->createTable('order_phases', function($table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
+            $table->integer('order_id')->unsigned();
             $table->string('name', 255);
             $table->text('description')->nullable();
             $table->date('start_date');

@@ -38,6 +38,11 @@ class Blueprint
         return $this->addColumn('INT', $name);
     }
 
+    public function decimal(string $name, int $total = 8, int $places = 2): ColumnDefinition
+    {
+        return $this->addColumn("DECIMAL({$total},{$places})", $name);
+    }
+
     public function text(string $name): ColumnDefinition
     {
         return $this->addColumn('TEXT', $name);
@@ -62,6 +67,18 @@ class Blueprint
     public function foreign(string $column): ColumnDefinition
     {
         return $this->addColumn('FOREIGN', $column);
+    }
+
+    public function index($columns, $name = null, $type = 'INDEX'): self
+    {
+        $columns = (array) $columns;
+        $name = $name ?? 'idx_' . $this->table . '_' . implode('_', $columns);
+        $this->columns[] = new ColumnDefinition([
+            'type' => $type,
+            'name' => $name,
+            'columns' => $columns
+        ]);
+        return $this;
     }
 
     /*
@@ -94,10 +111,13 @@ class Blueprint
 
     public function toSql(): string
     {
-        $columns = $primaries = $foreigns = [];
+        $columns = $primaries = $foreigns = $indexes = [];
         foreach ($this->columns as $column) {
-            if ($column->get('type') === 'FOREIGN') {
+            $type = $column->get('type');
+            if ($type === 'FOREIGN') {
                 $foreigns[] = $column->toSql();
+            } elseif ($type === 'INDEX' || $type === 'UNIQUE') {
+                $indexes[] = $column->toSql();
             } else {
                 $columns[] = $column->toSql();
             }
@@ -106,8 +126,15 @@ class Blueprint
             }
         }
         $sql = "CREATE TABLE `{$this->table}` (\n    " . implode(",\n    ", $columns);
-        if ($primaries) $sql .= ",\n    PRIMARY KEY (`" . implode('`,`', $primaries) . "`)";
-        if ($foreigns) $sql .= ",\n    " . implode(",\n    ", $foreigns);
+        if ($primaries) {
+            $sql .= ",\n    PRIMARY KEY (`" . implode('`,`', $primaries) . "`)";
+        }
+        if ($foreigns) {
+            $sql .= ",\n    " . implode(",\n    ", $foreigns);
+        }
+        if ($indexes) {
+            $sql .= ",\n    " . implode(",\n    ", $indexes);
+        }
         return "$sql\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
     }
 }

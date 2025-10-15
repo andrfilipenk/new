@@ -10,10 +10,10 @@ use Core\Database\Model;
  */
 class Project extends Model
 {
-    protected static $table = 'projects';
-    protected static $primaryKey = 'id';
+    protected $table = 'projects';
+    protected $primaryKey = 'id';
 
-    protected $fillable = [
+    protected array $fillable = [
         'name',
         'code',
         'description',
@@ -27,7 +27,7 @@ class Project extends Model
         'updated_by',
     ];
 
-    protected $casts = [
+    protected array $casts = [
         'budget' => 'decimal:2',
         'start_date' => 'date',
         'end_date' => 'date',

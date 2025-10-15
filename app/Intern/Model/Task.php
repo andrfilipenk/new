@@ -3,7 +3,8 @@
 namespace Intern\Model;
 
 use Core\Database\Model;
-use Admin\Model\User;
+use Core\Utils\Dates;
+use User\Model\User;
 
 class Task extends Model
 {
@@ -13,12 +14,17 @@ class Task extends Model
         'title', 
         'begin_date', 
         'end_date', 
-        
         'created_by', 
         'assigned_to', 
         'status_id', 
         'priority_id'
     ];
+
+    public function dateFormated($column)
+    {
+        $date = Dates::createFromString($this->$column);
+        return $date->format("d.m.Y");
+    }
     
     public function creator()
     {

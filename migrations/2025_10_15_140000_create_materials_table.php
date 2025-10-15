@@ -11,8 +11,8 @@ class CreateMaterialsTable extends Migration
     {
         $this->createTable('materials', function($table) {
             $table->id();
-            $table->unsignedBigInteger('order_id');
-            $table->unsignedBigInteger('position_id')->nullable();
+            $table->integer('order_id')->unsigned();
+            $table->integer('position_id')->unsigned()->nullable();
             $table->string('material_type', 255);
             $table->string('specification', 255)->nullable();
             $table->decimal('quantity', 12, 2);

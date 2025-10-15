@@ -7,10 +7,10 @@ use Core\Database\Model;
 
 class DatabasePaginator implements PaginatorInterface
 {
-    protected QueryBuilder $query;
-    protected ?string $countQuery = null;
+    protected $query;
+    protected $countQuery = null;
 
-    public function __construct(QueryBuilder $query)
+    public function __construct($query)
     {
         $this->query = $query;
     }
@@ -24,6 +24,7 @@ class DatabasePaginator implements PaginatorInterface
             throw new \InvalidArgumentException("Class must extend " . Model::class);
         }
 
+        /** @var Model $model  */
         $model = new $modelClass();
         $query = $model->newQuery();
         

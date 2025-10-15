@@ -2,12 +2,22 @@
 // app/User/Model/User.php
 namespace User\Model;
 
-use Core\Database\Model;
 use Intern\Model\Task;
 use Intern\Model\TaskComment;
 
 class User extends \Core\Acl\User
 {
+
+    /**
+     *
+     * @param int $id
+     * @return User
+     */
+    static public function byCustomID($id)
+    {
+        return self::find($id, 'custom_id');
+    }
+
     /**
      * Get groups this user belongs to
      *

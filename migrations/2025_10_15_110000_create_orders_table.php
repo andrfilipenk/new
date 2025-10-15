@@ -11,7 +11,7 @@ class CreateOrdersTable extends Migration
     {
         $this->createTable('orders', function($table) {
             $table->id();
-            $table->unsignedBigInteger('project_id');
+            $table->integer('project_id')->unsigned();
             $table->string('order_number', 100)->unique();
             $table->string('title', 255);
             $table->text('description')->nullable();
@@ -19,8 +19,8 @@ class CreateOrdersTable extends Migration
             $table->date('end_date')->nullable();
             $table->string('status', 50)->default('Draft');
             $table->decimal('total_value', 15, 2)->default(0);
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->integer('created_by')->unsigned()->nullable();
+            $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();
 
             $table->index('project_id');
@@ -28,8 +28,8 @@ class CreateOrdersTable extends Migration
             $table->index('order_number');
             
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('created_by')->references('id')->on('user')->onDelete('set null');
+            $table->foreign('updated_by')->references('id')->on('user')->onDelete('set null');
         });
     }
 

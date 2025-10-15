@@ -14,14 +14,14 @@ class CreateProjectsTable extends Migration
             $table->string('name', 255);
             $table->string('code', 50)->unique();
             $table->text('description')->nullable();
-            $table->unsignedBigInteger('client_id')->nullable();
+            $table->integer('client_id')->unsigned()->nullable();
             $table->date('start_date');
             $table->date('end_date')->nullable();
             $table->string('status', 50)->default('Planning');
             $table->decimal('budget', 15, 2)->default(0);
             $table->string('priority', 50)->default('Medium');
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
+            $table->integer('created_by')->unsigned()->nullable();
+            $table->integer('updated_by')->unsigned()->nullable();
             $table->timestamps();
 
             $table->index('status');
@@ -29,9 +29,9 @@ class CreateProjectsTable extends Migration
             $table->index('start_date');
             $table->index('end_date');
             
-            $table->foreign('client_id')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('client_id')->references('id')->on('user')->onDelete('set null');
+            $table->foreign('created_by')->references('id')->on('user')->onDelete('set null');
+            $table->foreign('updated_by')->references('id')->on('user')->onDelete('set null');
         });
     }
 

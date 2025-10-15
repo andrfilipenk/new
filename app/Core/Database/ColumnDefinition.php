@@ -64,17 +64,36 @@ class ColumnDefinition
         return $this;
     }
 
+    public function onDelete(string $action): self
+    {
+        $this->attributes['on_delete'] = strtoupper($action);
+        return $this;
+    }
+
     public function toSql(): string
     {
-        if ($this->get('type') === 'FOREIGN') {
-            return sprintf(
+        $type = $this->get('type');
+        if ($type === 'FOREIGN') {
+            $sql = sprintf(
                 "FOREIGN KEY (`%s`) REFERENCES `%s`(`%s`)",
                 $this->get('name'),
                 $this->get('on'),
                 $this->get('references')
             );
+            if ($onDelete = $this->get('on_delete')) {
+                $sql .= " ON DELETE $onDelete";
+            }
+            return $sql;
         }
-        $sql = "`{$this->get('name')}` {$this->get('type')}";
+        if ($type === 'INDEX' || $type === 'UNIQUE') {
+            return sprintf(
+                "%s `%s` (`%s`)",
+                $type,
+                $this->get('name'),
+                implode('`,`', $this->get('columns'))
+            );
+        }
+        $sql = "`{$this->get('name')}` {$type}";
         if ($this->get('unsigned')) $sql .= ' UNSIGNED';
         $sql .= $this->get('nullable') ? ' NULL' : ' NOT NULL';
         if ($this->get('auto_increment')) $sql .= ' AUTO_INCREMENT';
@@ -82,15 +101,11 @@ class ColumnDefinition
         if (array_key_exists('default', $this->attributes)) {
             $default = $this->get('default');
             if (is_string($default)) {
-                if ($default === 'CURRENT_TIMESTAMP') {
-                    $sql .= " DEFAULT {$default}";
-                } else {
-                    $sql .= " DEFAULT '{$default}'";
-                }
+                $sql .= $default === 'CURRENT_TIMESTAMP' ? " DEFAULT $default" : " DEFAULT '$default'";
             } else if ($default === null) {
                 $sql .= " DEFAULT NULL";
             } else {
-                $sql .= " DEFAULT {$default}";
+                $sql .= " DEFAULT $default";
             }
         }
         return $sql;

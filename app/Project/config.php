@@ -9,14 +9,14 @@ return [
     ],
 
     'routes' => [
-        // Projects Overview
-        [
-            'path' => '/projects',
-            'controller' => 'Project\Controller\ProjectController',
+        '/projects' => [
+            'module' => 'Project',
+            'controller' => 'Project',
             'action' => 'index',
-            'name' => 'projects.index',
-            'methods' => ['GET'],
+            'method' => ['GET'],
         ],
+
+
         [
             'path' => '/projects/create',
             'controller' => 'Project\Controller\ProjectController',

@@ -1,7 +1,7 @@
 <?php
 // filepath: c:\xampp\htdocs\new\migrate.php
 
-require '../app/bootstrap.php';
+require '../bootstrap.php';
 
 $di = \Core\Di\Container::getDefault();
 /** @var \Core\Database\Migrator $migrator */
