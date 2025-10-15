@@ -1,0 +1,785 @@
+/**
+ * Kit Meridian - Spatial Computing Workspace
+ * Advanced 3D Enterprise Interface
+ * Theme: Architectural spatial computing with environmental awareness
+ */
+
+/* ===================================
+   CSS VARIABLES & COLOR PALETTE
+   =================================== */
+:root {
+    /* Spatial Color Palette */
+    --meridian-deep-space: #050A14;
+    --meridian-depth-gradient: #0D1B2A;
+    --meridian-grid-blue: #1B4965;
+    --meridian-glass-white: rgba(255, 255, 255, 0.8);
+    --meridian-active-teal: #00D9FF;
+    --meridian-ambient-amber: #FFA500;
+    --meridian-alert-red: #FF0844;
+    
+    /* Gradients */
+    --meridian-bg-gradient: linear-gradient(180deg, #050A14 0%, #0D1B2A 100%);
+    --meridian-glass-gradient: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    
+    /* Typography */
+    --meridian-font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --meridian-font-spatial: 'Orbitron', sans-serif;
+    
+    /* Z-Depth Layers */
+    --meridian-z-far: -1000px;
+    --meridian-z-archive: -700px;
+    --meridian-z-reference: -500px;
+    --meridian-z-work: -300px;
+    --meridian-z-near: -100px;
+    --meridian-z-active: 0px;
+    
+    /* Transitions */
+    --meridian-transition: 400ms cubic-bezier(0.4, 0.0, 0.2, 1);
+    --meridian-fast: 200ms ease-out;
+    --meridian-slow: 600ms ease-in-out;
+}
+
+/* ===================================
+   GLOBAL & BASE STYLES
+   =================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.meridian-theme {
+    font-family: var(--meridian-font-primary);
+    background: var(--meridian-bg-gradient);
+    color: var(--meridian-active-teal);
+    overflow: hidden;
+    perspective: 2000px;
+    perspective-origin: 50% 50%;
+}
+
+body.meridian-theme::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        repeating-linear-gradient(0deg, transparent, transparent 50px, var(--meridian-grid-blue) 50px, var(--meridian-grid-blue) 51px),
+        repeating-linear-gradient(90deg, transparent, transparent 50px, var(--meridian-grid-blue) 50px, var(--meridian-grid-blue) 51px);
+    opacity: 0.1;
+    pointer-events: none;
+    animation: gridFlow 20s linear infinite;
+}
+
+@keyframes gridFlow {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(50px); }
+}
+
+/* ===================================
+   INFINITE WORKSPACE CANVAS
+   =================================== */
+.spatial-workspace {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    transform-style: preserve-3d;
+    transition: transform var(--meridian-transition);
+}
+
+.workspace-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+/* Layer Depth Positioning */
+.layer-ambient {
+    transform: translateZ(var(--meridian-z-far));
+    opacity: 0.3;
+}
+
+.layer-archive {
+    transform: translateZ(var(--meridian-z-archive));
+    opacity: 0.5;
+}
+
+.layer-reference {
+    transform: translateZ(var(--meridian-z-reference));
+    opacity: 0.7;
+}
+
+.layer-work {
+    transform: translateZ(var(--meridian-z-work));
+    opacity: 0.9;
+}
+
+.layer-near {
+    transform: translateZ(var(--meridian-z-near));
+    opacity: 1;
+}
+
+/* ===================================
+   SPATIAL PANELS (3D Cards)
+   =================================== */
+.spatial-panel {
+    position: absolute;
+    background: rgba(13, 27, 42, 0.8);
+    border: 1px solid rgba(27, 73, 101, 0.5);
+    border-radius: 16px;
+    padding: 24px;
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 0 20px rgba(0, 217, 255, 0.05);
+    transform-style: preserve-3d;
+    transition: all var(--meridian-transition);
+    cursor: grab;
+    user-select: none;
+}
+
+.spatial-panel:active {
+    cursor: grabbing;
+}
+
+.spatial-panel:hover {
+    border-color: var(--meridian-active-teal);
+    box-shadow: 
+        0 12px 48px rgba(0, 217, 255, 0.3),
+        inset 0 0 30px rgba(0, 217, 255, 0.1);
+    transform: translateZ(20px);
+}
+
+.spatial-panel::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), transparent);
+    border-radius: 16px;
+    opacity: 0;
+    transition: opacity var(--meridian-fast);
+    pointer-events: none;
+}
+
+.spatial-panel:hover::before {
+    opacity: 1;
+}
+
+/* Panel Sizes */
+.panel-small {
+    width: 300px;
+    height: 200px;
+}
+
+.panel-medium {
+    width: 450px;
+    height: 320px;
+}
+
+.panel-large {
+    width: 600px;
+    height: 450px;
+}
+
+.panel-wide {
+    width: 800px;
+    height: 350px;
+}
+
+/* Panel Content */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(27, 73, 101, 0.3);
+}
+
+.panel-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--meridian-active-teal);
+    margin: 0;
+}
+
+.panel-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.panel-btn {
+    width: 28px;
+    height: 28px;
+    background: rgba(0, 217, 255, 0.1);
+    border: 1px solid rgba(0, 217, 255, 0.3);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--meridian-fast);
+}
+
+.panel-btn:hover {
+    background: rgba(0, 217, 255, 0.2);
+    border-color: var(--meridian-active-teal);
+}
+
+.panel-content {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ===================================
+   DIMENSIONAL DATA CUBES
+   =================================== */
+.data-cube-container {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    transform-style: preserve-3d;
+    transition: transform var(--meridian-slow);
+}
+
+.data-cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transform: rotateX(-15deg) rotateY(25deg);
+    animation: cubeFloat 6s ease-in-out infinite;
+}
+
+@keyframes cubeFloat {
+    0%, 100% { transform: rotateX(-15deg) rotateY(25deg) translateY(0); }
+    50% { transform: rotateX(-15deg) rotateY(25deg) translateY(-20px); }
+}
+
+.cube-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: rgba(27, 73, 101, 0.2);
+    border: 2px solid rgba(0, 217, 255, 0.4);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--meridian-active-teal);
+    transition: all var(--meridian-fast);
+}
+
+.cube-face:hover {
+    background: rgba(0, 217, 255, 0.3);
+    border-color: var(--meridian-active-teal);
+    transform: translateZ(20px);
+}
+
+/* Cube Face Positioning */
+.cube-face-front {
+    transform: rotateY(0deg) translateZ(200px);
+}
+
+.cube-face-back {
+    transform: rotateY(180deg) translateZ(200px);
+}
+
+.cube-face-left {
+    transform: rotateY(-90deg) translateZ(200px);
+}
+
+.cube-face-right {
+    transform: rotateY(90deg) translateZ(200px);
+}
+
+.cube-face-top {
+    transform: rotateX(90deg) translateZ(200px);
+}
+
+.cube-face-bottom {
+    transform: rotateX(-90deg) translateZ(200px);
+}
+
+/* ===================================
+   SPATIAL TASK ORCHESTRATOR
+   =================================== */
+.task-pipeline {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+.workflow-zone {
+    position: absolute;
+    width: 200px;
+    height: 400px;
+    border: 2px dashed rgba(27, 73, 101, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    transform-style: preserve-3d;
+}
+
+.zone-creation {
+    left: 50px;
+    top: 50%;
+    transform: translateY(-50%) translateZ(-100px);
+    border-color: rgba(0, 217, 255, 0.3);
+}
+
+.zone-planning {
+    left: 300px;
+    top: 50%;
+    transform: translateY(-50%) translateZ(-50px);
+    border-color: rgba(27, 73, 101, 0.5);
+}
+
+.zone-execution {
+    left: 550px;
+    top: 50%;
+    transform: translateY(-50%) translateZ(0px);
+    border-color: rgba(255, 165, 0, 0.4);
+}
+
+.zone-completion {
+    left: 800px;
+    top: 50%;
+    transform: translateY(-50%) translateZ(50px);
+    border-color: rgba(0, 255, 136, 0.4);
+}
+
+.zone-blocked {
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%) translateZ(-75px);
+    border-color: rgba(255, 8, 68, 0.4);
+}
+
+.zone-label {
+    position: absolute;
+    top: -30px;
+    left: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Task Objects */
+.task-object {
+    width: 80px;
+    height: 80px;
+    background: rgba(0, 217, 255, 0.2);
+    border: 2px solid var(--meridian-active-teal);
+    border-radius: 12px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: move;
+    transition: all var(--meridian-transition);
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.task-object:hover {
+    transform: translateZ(30px) scale(1.1);
+    box-shadow: 0 8px 32px rgba(0, 217, 255, 0.4);
+}
+
+/* Task Priority Colors */
+.task-critical {
+    background: rgba(255, 8, 68, 0.3);
+    border-color: var(--meridian-alert-red);
+}
+
+.task-high {
+    background: rgba(255, 165, 0, 0.3);
+    border-color: var(--meridian-ambient-amber);
+}
+
+.task-normal {
+    background: rgba(0, 217, 255, 0.2);
+    border-color: var(--meridian-active-teal);
+}
+
+.task-low {
+    background: rgba(27, 73, 101, 0.3);
+    border-color: var(--meridian-grid-blue);
+}
+
+/* ===================================
+   ENVIRONMENTAL CONTEXT LAYER
+   =================================== */
+.environmental-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    transform-style: preserve-3d;
+}
+
+.facility-marker {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.marker-icon {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 217, 255, 0.2);
+    border: 2px solid var(--meridian-active-teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: all var(--meridian-fast);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+}
+
+.marker-icon:hover {
+    background: rgba(0, 217, 255, 0.4);
+    transform: scale(1.2);
+    box-shadow: 0 0 40px rgba(0, 217, 255, 0.6);
+}
+
+.marker-label {
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
+}
+
+/* ===================================
+   DEPTH-AWARE NOTIFICATIONS
+   =================================== */
+.spatial-notification {
+    position: absolute;
+    min-width: 300px;
+    padding: 16px 20px;
+    background: rgba(13, 27, 42, 0.95);
+    border: 1px solid;
+    border-radius: 12px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    transform-style: preserve-3d;
+    transition: all var(--meridian-transition);
+    cursor: pointer;
+}
+
+.notification-critical {
+    border-color: var(--meridian-alert-red);
+    background: rgba(255, 8, 68, 0.1);
+    transform: translateZ(0px);
+    animation: notificationPulse 1s ease-in-out infinite;
+}
+
+@keyframes notificationPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 8, 68, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(255, 8, 68, 0.8); }
+}
+
+.notification-high {
+    border-color: var(--meridian-ambient-amber);
+    transform: translateZ(-50px);
+}
+
+.notification-medium {
+    border-color: var(--meridian-active-teal);
+    transform: translateZ(-150px);
+}
+
+.notification-low {
+    border-color: var(--meridian-grid-blue);
+    transform: translateZ(-300px);
+    opacity: 0.7;
+}
+
+/* ===================================
+   SPATIAL NAVIGATION
+   =================================== */
+.spatial-controls {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 16px;
+    z-index: 1000;
+}
+
+.control-btn {
+    width: 50px;
+    height: 50px;
+    background: rgba(13, 27, 42, 0.9);
+    border: 2px solid var(--meridian-active-teal);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--meridian-fast);
+    backdrop-filter: blur(10px);
+}
+
+.control-btn:hover {
+    background: rgba(0, 217, 255, 0.2);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+/* ===================================
+   MINI-MAP NAVIGATOR
+   =================================== */
+.spatial-minimap {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 200px;
+    height: 150px;
+    background: rgba(13, 27, 42, 0.95);
+    border: 2px solid var(--meridian-grid-blue);
+    border-radius: 12px;
+    padding: 12px;
+    backdrop-filter: blur(15px);
+    z-index: 1000;
+}
+
+.minimap-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--meridian-active-teal);
+    margin-bottom: 8px;
+}
+
+.minimap-view {
+    width: 100%;
+    height: calc(100% - 24px);
+    border: 1px solid rgba(27, 73, 101, 0.3);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.minimap-viewport {
+    position: absolute;
+    border: 2px solid var(--meridian-active-teal);
+    background: rgba(0, 217, 255, 0.1);
+    pointer-events: none;
+}
+
+.minimap-object {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--meridian-active-teal);
+    border-radius: 50%;
+}
+
+/* ===================================
+   COLLABORATION FEATURES
+   =================================== */
+.user-avatar-spatial {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid var(--meridian-active-teal);
+    background: rgba(0, 217, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    transition: all var(--meridian-fast);
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.user-avatar-spatial:hover {
+    transform: scale(1.2) translateZ(20px);
+    box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
+}
+
+.user-status-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--meridian-deep-space);
+}
+
+.status-online {
+    background: #00FF88;
+}
+
+.status-busy {
+    background: var(--meridian-ambient-amber);
+}
+
+.status-offline {
+    background: #666;
+}
+
+/* ===================================
+   GESTURE VISUALIZATIONS
+   =================================== */
+.gesture-trail {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--meridian-active-teal);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: trailFade 1s ease-out forwards;
+}
+
+@keyframes trailFade {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(3);
+    }
+}
+
+/* ===================================
+   RESPONSIVE DEPTH SCALING
+   =================================== */
+@media (max-width: 1920px) {
+    :root {
+        --meridian-z-far: -800px;
+        --meridian-z-archive: -560px;
+        --meridian-z-reference: -400px;
+        --meridian-z-work: -240px;
+        --meridian-z-near: -80px;
+    }
+}
+
+@media (max-width: 1366px) {
+    :root {
+        --meridian-z-far: -600px;
+        --meridian-z-archive: -420px;
+        --meridian-z-reference: -300px;
+        --meridian-z-work: -180px;
+        --meridian-z-near: -60px;
+    }
+    
+    .spatial-panel {
+        padding: 16px;
+    }
+    
+    .panel-large {
+        width: 500px;
+        height: 380px;
+    }
+}
+
+@media (max-width: 768px) {
+    body.meridian-theme {
+        perspective: 1000px;
+    }
+    
+    :root {
+        --meridian-z-far: -300px;
+        --meridian-z-archive: -210px;
+        --meridian-z-reference: -150px;
+        --meridian-z-work: -90px;
+        --meridian-z-near: -30px;
+    }
+    
+    .spatial-panel {
+        position: static !important;
+        margin: 16px;
+        transform: none !important;
+    }
+    
+    .workflow-zone {
+        position: static;
+        margin: 16px;
+        transform: none !important;
+    }
+}
+
+/* ===================================
+   ACCESSIBILITY
+   =================================== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    body.meridian-theme {
+        perspective: none;
+    }
+    
+    .spatial-workspace,
+    .spatial-panel,
+    .data-cube {
+        transform: none !important;
+    }
+}
+
+.focus-indicator {
+    outline: 3px solid var(--meridian-active-teal);
+    outline-offset: 4px;
+}
+
+/* ===================================
+   UTILITY CLASSES
+   =================================== */
+.text-teal {
+    color: var(--meridian-active-teal);
+}
+
+.text-amber {
+    color: var(--meridian-ambient-amber);
+}
+
+.bg-glass {
+    background: rgba(13, 27, 42, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.glow-teal {
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+}
+
+.spatial-hidden {
+    transform: translateZ(-2000px);
+    opacity: 0;
+    pointer-events: none;
+}

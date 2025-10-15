@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Holographic Command - 3D Mission Control Dashboard">
+    <title>Holographic Command Center</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Kit Zeta Styles -->
+    <link rel="stylesheet" href="assets/css/kit-zeta.css">
+    <link rel="stylesheet" href="assets/css/effects.css">
+</head>
+<body class="holographic-command" data-3d-enabled="true">
+    
+    <!-- Holographic HUD Navigation -->
+    <nav class="hud-nav" role="navigation" aria-label="Main navigation">
+        <div class="hud-corners">
+            <div class="corner-tl"></div>
+            <div class="corner-tr"></div>
+            <div class="corner-bl"></div>
+            <div class="corner-br"></div>
+        </div>
+        
+        <div class="hud-content">
+            <div class="hud-left">
+                <div class="hud-logo">
+                    <div class="logo-hex">
+                        <i class="bi bi-hexagon-fill"></i>
+                    </div>
+                    <span class="logo-text">HOLOGRAPHIC</span>
+                </div>
+                
+                <div class="system-time">
+                    <span id="current-time">22:47:33</span>
+                    <span class="time-zone">UTC</span>
+                </div>
+            </div>
+            
+            <div class="hud-center">
+                <div class="radial-menu">
+                    <button class="radial-btn active" data-module="mission" aria-label="Mission Control">
+                        <i class="bi bi-bullseye"></i>
+                        <span class="hologram-label">MISSION</span>
+                    </button>
+                    <button class="radial-btn" data-module="tactical" aria-label="Tactical View">
+                        <i class="bi bi-grid-3x3"></i>
+                        <span class="hologram-label">TACTICAL</span>
+                    </button>
+                    <button class="radial-btn" data-module="data" aria-label="Data Analysis">
+                        <i class="bi bi-graph-up"></i>
+                        <span class="hologram-label">DATA</span>
+                    </button>
+                    <button class="radial-btn" data-module="comms" aria-label="Communications">
+                        <i class="bi bi-broadcast"></i>
+                        <span class="hologram-label">COMMS</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="hud-right">
+                <button class="hud-btn voice-btn" id="voiceCommand" aria-label="Voice command">
+                    <i class="bi bi-mic"></i>
+                    <span class="pulse-ring"></span>
+                </button>
+                
+                <div class="alert-status">
+                    <div class="status-indicator nominal">
+                        <div class="indicator-glow"></div>
+                    </div>
+                    <span class="status-text">NOMINAL</span>
+                </div>
+                
+                <div class="user-profile-3d">
+                    <div class="profile-cube">
+                        <div class="cube-face front">JD</div>
+                        <div class="cube-face back">JD</div>
+                        <div class="cube-face left">JD</div>
+                        <div class="cube-face right">JD</div>
+                        <div class="cube-face top">JD</div>
+                        <div class="cube-face bottom">JD</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Command View -->
+    <main class="command-view" role="main">
+        <div class="perspective-grid">
+            
+            <!-- Mission Control Dashboard -->
+            <section class="holo-panel mission-panel" data-depth="1" aria-labelledby="mission-title">
+                <div class="panel-frame">
+                    <div class="frame-corner tl"></div>
+                    <div class="frame-corner tr"></div>
+                    <div class="frame-corner bl"></div>
+                    <div class="frame-corner br"></div>
+                </div>
+                
+                <div class="panel-header">
+                    <h2 id="mission-title" class="holo-title">
+                        <span class="title-glyph">◢</span>
+                        MISSION STATUS
+                        <span class="title-glyph">◣</span>
+                    </h2>
+                    <div class="header-actions">
+                        <button class="holo-btn-sm" aria-label="Expand view">
+                            <i class="bi bi-arrows-fullscreen"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="panel-body">
+                    <div class="hexgrid-container">
+                        <div class="hex-tile" data-status="operational" role="button" tabindex="0" aria-label="Primary Systems - Operational">
+                            <div class="hex-shape">
+                                <svg viewBox="0 0 100 100" class="hex-svg">
+                                    <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" class="hex-border"/>
+                                </svg>
+                                <div class="hex-content">
+                                    <i class="bi bi-cpu"></i>
+                                    <span class="hex-label">PRIMARY</span>
+                                    <span class="hex-value">98%</span>
+                                </div>
+                                <div class="hex-pulse"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="hex-tile" data-status="operational" role="button" tabindex="0" aria-label="Power Grid - Operational">
+                            <div class="hex-shape">
+                                <svg viewBox="0 0 100 100" class="hex-svg">
+                                    <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" class="hex-border"/>
+                                </svg>
+                                <div class="hex-content">
+                                    <i class="bi bi-lightning-charge"></i>
+                                    <span class="hex-label">POWER</span>
+                                    <span class="hex-value">100%</span>
+                                </div>
+                                <div class="hex-pulse"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="hex-tile" data-status="warning" role="button" tabindex="0" aria-label="Communications - Warning">
+                            <div class="hex-shape">
+                                <svg viewBox="0 0 100 100" class="hex-svg">
+                                    <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" class="hex-border"/>
+                                </svg>
+                                <div class="hex-content">
+                                    <i class="bi bi-wifi"></i>
+                                    <span class="hex-label">COMMS</span>
+                                    <span class="hex-value">87%</span>
+                                </div>
+                                <div class="hex-pulse"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="hex-tile" data-status="operational" role="button" tabindex="0" aria-label="Defense Systems - Operational">
+                            <div class="hex-shape">
+                                <svg viewBox="0 0 100 100" class="hex-svg">
+                                    <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" class="hex-border"/>
+                                </svg>
+                                <div class="hex-content">
+                                    <i class="bi bi-shield-check"></i>
+                                    <span class="hex-label">DEFENSE</span>
+                                    <span class="hex-value">95%</span>
+                                </div>
+                                <div class="hex-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Gesture Task Matrix -->
+            <section class="holo-panel task-matrix" data-depth="2" aria-labelledby="tasks-title">
+                <div class="panel-frame">
+                    <div class="frame-corner tl"></div>
+                    <div class="frame-corner tr"></div>
+                    <div class="frame-corner bl"></div>
+                    <div class="frame-corner br"></div>
+                </div>
+                
+                <div class="panel-header">
+                    <h2 id="tasks-title" class="holo-title">
+                        <span class="title-glyph">◢</span>
+                        TACTICAL OBJECTIVES
+                        <span class="title-glyph">◣</span>
+                    </h2>
+                </div>
+                
+                <div class="panel-body">
+                    <div class="gesture-hint">
+                        <i class="bi bi-hand-index"></i>
+                        <span>Swipe: Right=Complete | Left=Defer | Up=Priority</span>
+                    </div>
+                    
+                    <div class="task-grid">
+                        <div class="task-card" data-priority="critical" data-gesture-enabled="true">
+                            <div class="card-hologram"></div>
+                            <div class="task-indicator critical"></div>
+                            <div class="task-content">
+                                <h4 class="task-title">SECURE PERIMETER BREACH - SECTOR 7</h4>
+                                <div class="task-meta">
+                                    <span class="task-code">OBJ-2547</span>
+                                    <span class="task-priority">CRITICAL</span>
+                                    <span class="task-time">
+                                        <i class="bi bi-clock"></i>
+                                        <span class="countdown">00:23:45</span>
+                                    </span>
+                                </div>
+                                <div class="task-assigned">
+                                    <div class="assignee-holo">TEAM-ALPHA</div>
+                                </div>
+                            </div>
+                            <div class="swipe-actions">
+                                <button class="swipe-action complete" aria-label="Complete task"><i class="bi bi-check"></i></button>
+                                <button class="swipe-action defer" aria-label="Defer task"><i class="bi bi-clock-history"></i></button>
+                                <button class="swipe-action escalate" aria-label="Escalate priority"><i class="bi bi-arrow-up-circle"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="task-card" data-priority="high" data-gesture-enabled="true">
+                            <div class="card-hologram"></div>
+                            <div class="task-indicator high"></div>
+                            <div class="task-content">
+                                <h4 class="task-title">SYSTEM DIAGNOSTICS - MAIN REACTOR</h4>
+                                <div class="task-meta">
+                                    <span class="task-code">OBJ-2543</span>
+                                    <span class="task-priority">HIGH</span>
+                                    <span class="task-time">
+                                        <i class="bi bi-calendar"></i>
+                                        <span>DUE 2H 15M</span>
+                                    </span>
+                                </div>
+                                <div class="task-assigned">
+                                    <div class="assignee-holo">TEAM-BETA</div>
+                                </div>
+                            </div>
+                            <div class="swipe-actions">
+                                <button class="swipe-action complete" aria-label="Complete task"><i class="bi bi-check"></i></button>
+                                <button class="swipe-action defer" aria-label="Defer task"><i class="bi bi-clock-history"></i></button>
+                                <button class="swipe-action escalate" aria-label="Escalate priority"><i class="bi bi-arrow-up-circle"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="task-card" data-priority="medium" data-gesture-enabled="true">
+                            <div class="card-hologram"></div>
+                            <div class="task-indicator medium"></div>
+                            <div class="task-content">
+                                <h4 class="task-title">UPDATE TACTICAL DATABASE PROTOCOLS</h4>
+                                <div class="task-meta">
+                                    <span class="task-code">OBJ-2539</span>
+                                    <span class="task-priority">MEDIUM</span>
+                                    <span class="task-time">
+                                        <i class="bi bi-calendar"></i>
+                                        <span>DUE TOMORROW</span>
+                                    </span>
+                                </div>
+                                <div class="task-assigned">
+                                    <div class="assignee-holo">TEAM-DELTA</div>
+                                </div>
+                            </div>
+                            <div class="swipe-actions">
+                                <button class="swipe-action complete" aria-label="Complete task"><i class="bi bi-check"></i></button>
+                                <button class="swipe-action defer" aria-label="Defer task"><i class="bi bi-clock-history"></i></button>
+                                <button class="swipe-action escalate" aria-label="Escalate priority"><i class="bi bi-arrow-up-circle"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Holographic Alert Grid -->
+            <section class="holo-panel alert-grid" data-depth="3" aria-labelledby="alerts-title">
+                <div class="panel-frame">
+                    <div class="frame-corner tl"></div>
+                    <div class="frame-corner tr"></div>
+                    <div class="frame-corner bl"></div>
+                    <div class="frame-corner br"></div>
+                </div>
+                
+                <div class="panel-header">
+                    <h2 id="alerts-title" class="holo-title">
+                        <span class="title-glyph">◢</span>
+                        ALERT MATRIX
+                        <span class="title-glyph">◣</span>
+                    </h2>
+                </div>
+                
+                <div class="panel-body">
+                    <div class="alert-matrix">
+                        <div class="alert-item" data-severity="critical">
+                            <div class="alert-pulse"></div>
+                            <div class="alert-icon">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">UNAUTHORIZED ACCESS DETECTED</div>
+                                <div class="alert-location">SECTOR 7-B</div>
+                                <div class="alert-timestamp">22:45:12 UTC</div>
+                            </div>
+                            <div class="alert-actions">
+                                <button class="alert-btn respond" aria-label="Respond to alert">RESPOND</button>
+                                <button class="alert-btn dismiss" aria-label="Dismiss alert">DISMISS</button>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-item" data-severity="warning">
+                            <div class="alert-pulse"></div>
+                            <div class="alert-icon">
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">POWER FLUCTUATION</div>
+                                <div class="alert-location">GRID-DELTA</div>
+                                <div class="alert-timestamp">22:42:08 UTC</div>
+                            </div>
+                            <div class="alert-actions">
+                                <button class="alert-btn respond" aria-label="Respond to alert">RESPOND</button>
+                                <button class="alert-btn dismiss" aria-label="Dismiss alert">DISMISS</button>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-item" data-severity="info">
+                            <div class="alert-pulse"></div>
+                            <div class="alert-icon">
+                                <i class="bi bi-info-circle-fill"></i>
+                            </div>
+                            <div class="alert-content">
+                                <div class="alert-title">ROUTINE MAINTENANCE SCHEDULED</div>
+                                <div class="alert-location">ALL SECTORS</div>
+                                <div class="alert-timestamp">22:30:00 UTC</div>
+                            </div>
+                            <div class="alert-actions">
+                                <button class="alert-btn acknowledge" aria-label="Acknowledge alert">ACKNOWLEDGE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Holographic Message Cube -->
+            <section class="holo-panel message-cube-container" data-depth="4" aria-labelledby="comms-title">
+                <div class="panel-frame">
+                    <div class="frame-corner tl"></div>
+                    <div class="frame-corner tr"></div>
+                    <div class="frame-corner bl"></div>
+                    <div class="frame-corner br"></div>
+                </div>
+                
+                <div class="panel-header">
+                    <h2 id="comms-title" class="holo-title">
+                        <span class="title-glyph">◢</span>
+                        COMM CHANNELS
+                        <span class="title-glyph">◣</span>
+                    </h2>
+                    <div class="cube-controls">
+                        <button class="cube-rotate-btn" data-axis="y" aria-label="Rotate cube">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="panel-body">
+                    <div class="message-cube" id="messageCube">
+                        <div class="cube-3d">
+                            <div class="cube-face front" data-channel="command">
+                                <div class="face-label">COMMAND</div>
+                                <div class="message-preview">
+                                    <div class="msg-item">
+                                        <span class="msg-from">CMD-ALPHA</span>
+                                        <span class="msg-text">Status report received</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cube-face back" data-channel="tactical">
+                                <div class="face-label">TACTICAL</div>
+                                <div class="message-preview">
+                                    <div class="msg-item">
+                                        <span class="msg-from">TAC-TEAM</span>
+                                        <span class="msg-text">Formation complete</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cube-face left" data-channel="intel">
+                                <div class="face-label">INTEL</div>
+                                <div class="message-preview">
+                                    <div class="msg-item">
+                                        <span class="msg-from">INT-DELTA</span>
+                                        <span class="msg-text">Data analysis ready</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cube-face right" data-channel="support">
+                                <div class="face-label">SUPPORT</div>
+                                <div class="message-preview">
+                                    <div class="msg-item">
+                                        <span class="msg-from">SUP-BETA</span>
+                                        <span class="msg-text">Logistics confirmed</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cube-face top" data-channel="emergency">
+                                <div class="face-label">EMERGENCY</div>
+                                <div class="message-preview">
+                                    <div class="msg-item">
+                                        <span class="msg-from">EMG-ALPHA</span>
+                                        <span class="msg-text">All clear</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cube-face bottom" data-channel="archive">
+                                <div class="face-label">ARCHIVE</div>
+                                <div class="message-preview">
+                                    <div class="msg-item">
+                                        <span class="msg-from">ARCHIVE</span>
+                                        <span class="msg-text">124 messages</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+        </div>
+    </main>
+    
+    <!-- Voice Command Interface -->
+    <div class="voice-interface" id="voiceInterface" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="voice-title">
+        <div class="voice-backdrop"></div>
+        <div class="voice-container">
+            <h3 id="voice-title" class="voice-title">VOICE COMMAND</h3>
+            <div class="voice-visualizer">
+                <div class="wave-bar" style="--i:1"></div>
+                <div class="wave-bar" style="--i:2"></div>
+                <div class="wave-bar" style="--i:3"></div>
+                <div class="wave-bar" style="--i:4"></div>
+                <div class="wave-bar" style="--i:5"></div>
+            </div>
+            <div class="voice-status">LISTENING...</div>
+            <div class="voice-recognized"></div>
+            <button class="voice-cancel" aria-label="Cancel voice command">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Kit Zeta Scripts -->
+    <script src="assets/js/kit-zeta.js"></script>
+    <script src="assets/js/gestures.js"></script>
+</body>
+</html>

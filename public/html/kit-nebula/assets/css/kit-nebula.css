@@ -1,0 +1,303 @@
+/**
+ * Kit Nebula - Cosmic Intelligence Interface
+ * Main Stylesheet
+ */
+
+/* ============================================
+   CUSTOM PROPERTIES
+   ============================================ */
+:root {
+    /* Color Palette */
+    --nebula-deep-space: #000814;
+    --nebula-void-black: #001219;
+    --nebula-purple: #7209B7;
+    --nebula-cyan: #00F5FF;
+    --nebula-gold: #FFBA08;
+    --nebula-red: #F72585;
+    --nebula-white: #F8F9FA;
+    --nebula-gray: #B8C5D0;
+    
+    /* Typography */
+    --font-display: 'Orbitron', sans-serif;
+    --font-header: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    
+    /* Animation Durations */
+    --duration-fast: 150ms;
+    --duration-normal: 200ms;
+    --duration-slow: 400ms;
+    --duration-slower: 800ms;
+    
+    /* Effects */
+    --glow-inner: 0 0 4px;
+    --glow-mid: 0 0 16px;
+    --glow-outer: 0 0 40px;
+    --glow-atmosphere: 0 0 100px;
+    
+    /* Perspective */
+    --perspective: 1000px;
+}
+
+/* ============================================
+   RESET & BASE STYLES
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--nebula-white);
+    background: var(--nebula-deep-space);
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+.kit-nebula-display {
+    font-family: var(--font-display);
+    font-size: 4.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.kit-nebula-h1 {
+    font-family: var(--font-header);
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.kit-nebula-h2 {
+    font-family: var(--font-header);
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.kit-nebula-body {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+}
+
+.kit-nebula-metric {
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.kit-nebula-label {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.kit-nebula-micro {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--nebula-gray);
+}
+
+/* ============================================
+   STAR FIELD BACKGROUND
+   ============================================ */
+.kit-nebula-starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--nebula-deep-space);
+    z-index: -1;
+    overflow: hidden;
+}
+
+.kit-nebula-starfield::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20% 30%, white, transparent),
+        radial-gradient(2px 2px at 60% 70%, white, transparent),
+        radial-gradient(1px 1px at 50% 50%, white, transparent),
+        radial-gradient(1px 1px at 80% 10%, white, transparent),
+        radial-gradient(2px 2px at 90% 60%, white, transparent),
+        radial-gradient(1px 1px at 33% 80%, white, transparent),
+        radial-gradient(1px 1px at 75% 25%, white, transparent);
+    background-size: 200% 200%;
+    background-position: 0% 0%;
+    animation: twinkle 8s ease-in-out infinite;
+    opacity: 0.6;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 0.9; }
+}
+
+/* ============================================
+   LAYOUT CONTAINER
+   ============================================ */
+.kit-nebula-container {
+    max-width: 1920px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    min-height: 100vh;
+    position: relative;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.kit-nebula-glow-cyan {
+    text-shadow: 
+        var(--glow-inner) var(--nebula-cyan),
+        var(--glow-mid) var(--nebula-cyan),
+        var(--glow-outer) var(--nebula-cyan);
+}
+
+.kit-nebula-glow-purple {
+    text-shadow: 
+        var(--glow-inner) var(--nebula-purple),
+        var(--glow-mid) var(--nebula-purple),
+        var(--glow-outer) var(--nebula-purple);
+}
+
+.kit-nebula-glow-gold {
+    text-shadow: 
+        var(--glow-inner) var(--nebula-gold),
+        var(--glow-mid) var(--nebula-gold),
+        var(--glow-outer) var(--nebula-gold);
+}
+
+.kit-nebula-preserve-3d {
+    transform-style: preserve-3d;
+}
+
+.kit-nebula-perspective {
+    perspective: var(--perspective);
+}
+
+/* GPU Acceleration */
+.kit-nebula-gpu {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* ============================================
+   STATE CLASSES
+   ============================================ */
+.is-idle {
+    animation: pulse-slow 3s ease-in-out infinite;
+}
+
+.is-loading {
+    animation: rotate-continuous 2s linear infinite;
+}
+
+.is-error {
+    animation: shake 0.3s ease-in-out;
+}
+
+@keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes rotate-continuous {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+@media (max-width: 1919px) {
+    .kit-nebula-display { font-size: 3.5rem; }
+    .kit-nebula-h1 { font-size: 2.5rem; }
+}
+
+@media (max-width: 1439px) {
+    .kit-nebula-display { font-size: 3rem; }
+    .kit-nebula-h1 { font-size: 2rem; }
+    .kit-nebula-container { padding: var(--spacing-md); }
+}
+
+@media (max-width: 767px) {
+    .kit-nebula-display { font-size: 2rem; }
+    .kit-nebula-h1 { font-size: 1.5rem; }
+    .kit-nebula-h2 { font-size: 1.25rem; }
+    .kit-nebula-container { padding: var(--spacing-sm); }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.kit-nebula-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus Styles */
+*:focus-visible {
+    outline: 3px solid var(--nebula-cyan);
+    outline-offset: 3px;
+    box-shadow: 0 0 20px var(--nebula-cyan);
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .kit-nebula-starfield::before {
+        animation: none;
+    }
+}

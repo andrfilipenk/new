@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kit Meridian - Spatial Computing Workspace for Enterprise Operations">
+    <title>Spatial Workspace - Kit Meridian</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Kit Meridian CSS -->
+    <link href="assets/css/kit-meridian.css" rel="stylesheet">
+</head>
+<body class="meridian-theme">
+    <!-- Spatial Workspace Container -->
+    <div class="spatial-workspace">
+        <!-- Near Layer (Z: -100px) - Immediate Actions -->
+        <div class="workspace-layer layer-near">
+            <div class="spatial-panel panel-medium" style="left: 100px; top: 100px;">
+                <div class="panel-header">
+                    <h3 class="panel-title">Urgent Actions</h3>
+                    <div class="panel-controls">
+                        <button class="panel-btn" data-action="minimize" title="Minimize">−</button>
+                        <button class="panel-btn" data-action="expand" title="Expand">□</button>
+                        <button class="panel-btn" data-action="close" title="Close">×</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="padding: 12px; background: rgba(255, 8, 68, 0.1); border-left: 3px solid #FF0844; border-radius: 6px;">
+                            <div style="font-weight: 600; margin-bottom: 4px;">Critical System Alert</div>
+                            <div style="font-size: 13px; opacity: 0.8;">Server cluster requires immediate attention</div>
+                        </div>
+                        <div style="padding: 12px; background: rgba(255, 165, 0, 0.1); border-left: 3px solid #FFA500; border-radius: 6px;">
+                            <div style="font-weight: 600; margin-bottom: 4px;">Budget Approval Needed</div>
+                            <div style="font-size: 13px; opacity: 0.8;">Q4 allocation pending executive sign-off</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="spatial-panel panel-small" style="right: 120px; top: 80px;">
+                <div class="panel-header">
+                    <h3 class="panel-title">Quick Stats</h3>
+                    <div class="panel-controls">
+                        <button class="panel-btn" data-action="close">×</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div style="font-size: 32px; font-weight: 700; color: #00D9FF; margin-bottom: 8px;">98.7%</div>
+                    <div style="font-size: 14px;">System Uptime</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Work Layer (Z: -300px) - Primary Workspace -->
+        <div class="workspace-layer layer-work">
+            <div class="spatial-panel panel-large" style="left: 50%; top: 50%; transform: translate(-50%, -50%);">
+                <div class="panel-header">
+                    <h3 class="panel-title">Operations Dashboard</h3>
+                    <div class="panel-controls">
+                        <button class="panel-btn" data-action="minimize">−</button>
+                        <button class="panel-btn" data-action="expand">□</button>
+                        <button class="panel-btn" data-action="close">×</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                        <div>
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">Active Projects</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #00D9FF;">47</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">Team Members</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #00D9FF;">156</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">Tasks Completed</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #00FF88;">1,247</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">Efficiency</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #FFA500;">92%</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(27,73,101,0.3);">
+                        <div style="font-size: 13px; font-weight: 600; margin-bottom: 12px;">Recent Activity</div>
+                        <ul style="list-style: none; display: flex; flex-direction: column; gap: 8px;">
+                            <li style="font-size: 12px; opacity: 0.8;">
+                                <span style="color: #00D9FF;">Engineering</span> deployed v2.5.0 to production
+                            </li>
+                            <li style="font-size: 12px; opacity: 0.8;">
+                                <span style="color: #00D9FF;">Design</span> completed UI mockups for Project Phoenix
+                            </li>
+                            <li style="font-size: 12px; opacity: 0.8;">
+                                <span style="color: #00D9FF;">Operations</span> resolved 12 support tickets
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Cube -->
+            <div class="data-cube-container" style="right: 100px; top: 150px;">
+                <div class="data-cube">
+                    <div class="cube-face cube-face-front">
+                        Revenue<br/>$2.4M
+                    </div>
+                    <div class="cube-face cube-face-back">
+                        Costs<br/>$1.8M
+                    </div>
+                    <div class="cube-face cube-face-left">
+                        EMEA<br/>34%
+                    </div>
+                    <div class="cube-face cube-face-right">
+                        APAC<br/>28%
+                    </div>
+                    <div class="cube-face cube-face-top">
+                        Growth<br/>+12%
+                    </div>
+                    <div class="cube-face cube-face-bottom">
+                        Risk<br/>Low
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reference Layer (Z: -500px) - Supporting Info -->
+        <div class="workspace-layer layer-reference">
+            <div class="spatial-panel panel-medium" style="left: 150px; bottom: 150px;">
+                <div class="panel-header">
+                    <h3 class="panel-title">Documentation</h3>
+                    <div class="panel-controls">
+                        <button class="panel-btn" data-action="minimize">−</button>
+                        <button class="panel-btn" data-action="close">×</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px;">
+                        <li style="padding: 10px; background: rgba(27,73,101,0.2); border-radius: 6px; cursor: pointer;">
+                            <div style="font-weight: 600; margin-bottom: 4px;">API Documentation</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Updated 2 hours ago</div>
+                        </li>
+                        <li style="padding: 10px; background: rgba(27,73,101,0.2); border-radius: 6px; cursor: pointer;">
+                            <div style="font-weight: 600; margin-bottom: 4px;">System Architecture</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Updated 1 day ago</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Archive Layer (Z: -700px) - Historical Data -->
+        <div class="workspace-layer layer-archive">
+            <div class="spatial-panel panel-small" style="right: 200px; bottom: 200px;">
+                <div class="panel-header">
+                    <h3 class="panel-title">Archives</h3>
+                    <div class="panel-controls">
+                        <button class="panel-btn" data-action="close">×</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <div style="font-size: 13px; opacity: 0.6;">
+                        <div>Q3 Reports</div>
+                        <div>Historical Metrics</div>
+                        <div>Completed Projects</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ambient Layer (Z: -1000px) - Background Monitoring -->
+        <div class="workspace-layer layer-ambient">
+            <div class="spatial-panel panel-small" style="left: 50px; bottom: 100px;">
+                <div class="panel-header">
+                    <h3 class="panel-title">System Monitor</h3>
+                </div>
+                <div class="panel-content">
+                    <div style="font-size: 12px; opacity: 0.5;">
+                        All systems operational
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Environmental Layer - Facility Markers -->
+        <div class="environmental-layer"></div>
+        
+        <!-- Task Pipeline -->
+        <div class="task-pipeline">
+            <!-- Creation Zone -->
+            <div class="workflow-zone zone-creation">
+                <div class="zone-label">Creation</div>
+                <div class="task-object task-normal" style="position: absolute; left: 10px; top: 50px;">
+                    New Task
+                </div>
+            </div>
+            
+            <!-- Planning Zone -->
+            <div class="workflow-zone zone-planning">
+                <div class="zone-label">Planning</div>
+                <div class="task-object task-high" style="position: absolute; left: 10px; top: 50px;">
+                    Plan A
+                </div>
+            </div>
+            
+            <!-- Execution Zone -->
+            <div class="workflow-zone zone-execution">
+                <div class="zone-label">Execution</div>
+                <div class="task-object task-high" style="position: absolute; left: 10px; top: 50px;">
+                    Deploy
+                </div>
+                <div class="task-object task-normal" style="position: absolute; left: 10px; top: 140px;">
+                    Build
+                </div>
+            </div>
+            
+            <!-- Completion Zone -->
+            <div class="workflow-zone zone-completion">
+                <div class="zone-label">Completion</div>
+                <div class="task-object task-normal" style="position: absolute; left: 10px; top: 50px;">
+                    Done
+                </div>
+            </div>
+            
+            <!-- Blocked Zone -->
+            <div class="workflow-zone zone-blocked">
+                <div class="zone-label">Blocked</div>
+                <div class="task-object task-critical" style="position: absolute; left: 10px; top: 50px;">
+                    Blocked
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Spatial Controls -->
+    <div class="spatial-controls">
+        <button class="control-btn" data-action="zoom-in" title="Zoom In">+</button>
+        <button class="control-btn" data-action="reset" title="Reset View">⊙</button>
+        <button class="control-btn" data-action="zoom-out" title="Zoom Out">−</button>
+        <button class="control-btn" data-action="layer-up" title="Move Layer Up">↑</button>
+        <button class="control-btn" data-action="layer-down" title="Move Layer Down">↓</button>
+    </div>
+    
+    <!-- Minimap -->
+    <div class="spatial-minimap">
+        <div class="minimap-title">Spatial Navigator</div>
+        <div class="minimap-view">
+            <div class="minimap-viewport"></div>
+        </div>
+    </div>
+    
+    <!-- Help Overlay -->
+    <div style="position: fixed; bottom: 20px; left: 20px; background: rgba(13,27,42,0.95); border: 1px solid rgba(27,73,101,0.5); border-radius: 12px; padding: 16px; max-width: 300px; font-size: 13px; backdrop-filter: blur(10px);">
+        <div style="font-weight: 600; margin-bottom: 8px; color: #00D9FF;">Spatial Controls</div>
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: 4px; color: rgba(255,255,255,0.7);">
+            <li>🖱️ Drag panels to move</li>
+            <li>🔄 Drag cubes to rotate</li>
+            <li>⌨️ Shift + Arrows: Rotate view</li>
+            <li>⌨️ +/− : Zoom in/out</li>
+            <li>⌨️ Home: Reset view</li>
+            <li>🎯 Click cube faces to focus</li>
+        </ul>
+    </div>
+    
+    <!-- Kit Meridian JavaScript -->
+    <script src="assets/js/kit-meridian.js"></script>
+    
+    <script>
+        // Initialize demo features
+        window.addEventListener('load', () => {
+            // Create facility markers
+            if (window.spatialWorkspace) {
+                window.spatialWorkspace.createFacilityMarker('Warehouse A', '🏭', 300, 500);
+                window.spatialWorkspace.createFacilityMarker('Office HQ', '🏢', 700, 400);
+                window.spatialWorkspace.createFacilityMarker('Data Center', '💾', 500, 600);
+                
+                // Show welcome notification
+                setTimeout(() => {
+                    window.spatialWorkspace.createSpatialNotification(
+                        'Welcome to Spatial Workspace. Drag panels and rotate cubes to explore.',
+                        'medium',
+                        5000
+                    );
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

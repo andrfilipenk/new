@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic UI Kits - Advanced Visual Effects Suite</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #00F5FF, #FF00FF, #FFFF00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: #B8C5D0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .description {
+            color: #6C757D;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+        
+        .kits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        
+        .kit-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 2.5rem;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        
+        .kit-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, transparent, var(--kit-color), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
+            transition: opacity 0.4s ease;
+        }
+        
+        .kit-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .kit-card:hover::before {
+            opacity: 1;
+        }
+        
+        .kit-nebula {
+            --kit-color: #00F5FF;
+        }
+        
+        .kit-prism {
+            --kit-color: #FF6B9D;
+        }
+        
+        .kit-void {
+            --kit-color: #00FFF0;
+        }
+        
+        .kit-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .kit-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--kit-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .kit-tagline {
+            color: #B8C5D0;
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
+        }
+        
+        .kit-features {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+        
+        .kit-features li {
+            color: #8A8FB0;
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .kit-features li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--kit-color);
+        }
+        
+        .kit-btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.875rem 2rem;
+            background: var(--kit-color);
+            color: #0a0e27;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .kit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--kit-color);
+        }
+        
+        .features-section {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+        
+        .features-section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-item {
+            text-align: center;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-desc {
+            color: #8A8FB0;
+            font-size: 0.9375rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: #6C757D;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 4rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .kits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Futuristic UI Kits</h1>
+            <p class="subtitle">Advanced Visual Effects Suite</p>
+            <p class="description">
+                Three next-generation UI kits with cutting-edge visual effects and interaction paradigms,
+                projecting 10-15 years into the future of enterprise interfaces.
+            </p>
+        </header>
+        
+        <!-- Kits Grid -->
+        <section class="kits-grid">
+            <!-- Kit Nebula -->
+            <div class="kit-card kit-nebula" onclick="location.href='kit-nebula/dashboard.html'">
+                <div class="kit-icon">🌌</div>
+                <h3 class="kit-name">Kit Nebula</h3>
+                <p class="kit-tagline">Cosmic Intelligence Interface</p>
+                <p>Space-themed interface with cosmic phenomena, particle systems, and 3D effects.</p>
+                <ul class="kit-features">
+                    <li>Stellar Navigation Orb</li>
+                    <li>Nebula Data Cards</li>
+                    <li>Particle Engine System</li>
+                    <li>Aurora Command Palette</li>
+                </ul>
+                <a href="kit-nebula/dashboard.html" class="kit-btn">View Dashboard</a>
+            </div>
+            
+            <!-- Kit Prism -->
+            <div class="kit-card kit-prism" onclick="location.href='kit-prism/dashboard.html'">
+                <div class="kit-icon">💎</div>
+                <h3 class="kit-name">Kit Prism</h3>
+                <p class="kit-tagline">Liquid Crystal Interface</p>
+                <p>Iridescent interface with holographic displays, liquid morphing, and rainbow effects.</p>
+                <ul class="kit-features">
+                    <li>Holographic Data Panels</li>
+                    <li>Liquid Crystal Navigation</li>
+                    <li>Iridescence Engine</li>
+                    <li>Prismatic Data Flow</li>
+                </ul>
+                <a href="kit-prism/dashboard.html" class="kit-btn">View Dashboard</a>
+            </div>
+            
+            <!-- Kit Void -->
+            <div class="kit-card kit-void" onclick="location.href='kit-void/dashboard.html'">
+                <div class="kit-icon">⬛</div>
+                <h3 class="kit-name">Kit Void</h3>
+                <p class="kit-tagline">Abstract Geometric Interface</p>
+                <p>Wireframe aesthetics with geometric primitives, isometric grids, and matrix design.</p>
+                <ul class="kit-features">
+                    <li>Wireframe Renderer</li>
+                    <li>Isometric Command Grid</li>
+                    <li>Matrix Timeline</li>
+                    <li>Geometric Modal System</li>
+                </ul>
+                <a href="kit-void/dashboard.html" class="kit-btn">View Dashboard</a>
+            </div>
+        </section>
+        
+        <!-- Common Features -->
+        <section class="features-section">
+            <h2>Common Features</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-title">60 FPS Performance</div>
+                    <div class="feature-desc">GPU-accelerated animations with optimized rendering</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">♿</div>
+                    <div class="feature-title">Full Accessibility</div>
+                    <div class="feature-desc">ARIA labels, keyboard navigation, reduced motion support</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-title">Responsive Design</div>
+                    <div class="feature-desc">Adapts to desktop, tablet, and mobile devices</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🎨</div>
+                    <div class="feature-title">Customizable</div>
+                    <div class="feature-desc">CSS custom properties for easy theming</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🔧</div>
+                    <div class="feature-title">Zero Dependencies</div>
+                    <div class="feature-desc">Pure HTML5, CSS3, and Vanilla JavaScript</div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🚀</div>
+                    <div class="feature-title">Production Ready</div>
+                    <div class="feature-desc">Enterprise-grade code quality and documentation</div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Futuristic UI Kits - Advanced Visual Effects Suite</p>
+        <p style="margin-top: 0.5rem;">Built for next-generation enterprise dashboards</p>
+    </footer>
+</body>
+</html>

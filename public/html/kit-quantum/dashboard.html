@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kit Quantum - Probabilistic Decision Engine for Strategic Planning">
+    <title>Quantum Decision Engine - Kit Quantum</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Kit Quantum CSS -->
+    <link href="assets/css/kit-quantum.css" rel="stylesheet">
+</head>
+<body class="quantum-theme">
+    <!-- Main Container -->
+    <div style="max-width: 1600px; margin: 0 auto; padding: 40px 20px;">
+        <!-- Header -->
+        <header style="text-align: center; margin-bottom: 60px;">
+            <h1 style="font-size: 48px; font-weight: 700; background: var(--quantum-wave-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px;">
+                Quantum Decision Engine
+            </h1>
+            <p style="font-size: 18px; color: rgba(255,255,255,0.6);">
+                Probabilistic Analysis & Strategic Scenario Planning
+            </p>
+        </header>
+        
+        <!-- Superposition State Viewer -->
+        <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; margin-bottom: 24px; color: var(--quantum-cyan);">Scenario Superposition</h2>
+            <div class="superposition-viewer">
+                <!-- Scenario Alpha -->
+                <div class="quantum-state state-active">
+                    <div class="state-header">
+                        <h3 class="state-title">Scenario α - Aggressive Growth</h3>
+                        <div class="state-probability">35%</div>
+                    </div>
+                    <div class="state-metrics">
+                        <div class="metric-row">
+                            <span class="metric-label">Revenue Impact:</span>
+                            <span class="metric-value text-quantum-green">+45%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Risk Level:</span>
+                            <span class="metric-value text-quantum-red">High</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Investment Required:</span>
+                            <span class="metric-value">$50M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Timeline:</span>
+                            <span class="metric-value">18 months</span>
+                        </div>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 35%"></div>
+                    </div>
+                </div>
+                
+                <!-- Scenario Beta -->
+                <div class="quantum-state">
+                    <div class="state-header">
+                        <h3 class="state-title">Scenario β - Conservative</h3>
+                        <div class="state-probability">60%</div>
+                    </div>
+                    <div class="state-metrics">
+                        <div class="metric-row">
+                            <span class="metric-label">Revenue Impact:</span>
+                            <span class="metric-value text-quantum-cyan">+15%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Risk Level:</span>
+                            <span class="metric-value text-quantum-green">Low</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Investment Required:</span>
+                            <span class="metric-value">$10M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Timeline:</span>
+                            <span class="metric-value">12 months</span>
+                        </div>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 60%"></div>
+                    </div>
+                </div>
+                
+                <!-- Scenario Gamma -->
+                <div class="quantum-state">
+                    <div class="state-header">
+                        <h3 class="state-title">Scenario γ - Innovation Pivot</h3>
+                        <div class="state-probability">20%</div>
+                    </div>
+                    <div class="state-metrics">
+                        <div class="metric-row">
+                            <span class="metric-label">Revenue Impact:</span>
+                            <span class="metric-value text-quantum-green">+60%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Risk Level:</span>
+                            <span class="metric-value text-quantum-red">Very High</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Investment Required:</span>
+                            <span class="metric-value">$75M</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Timeline:</span>
+                            <span class="metric-value">24 months</span>
+                        </div>
+                    </div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 20%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Quantum Decision Tree -->
+        <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; margin-bottom: 24px; color: var(--quantum-cyan);">Decision Tree Topology</h2>
+            <div class="quantum-tree-container">
+                <div class="decision-tree"></div>
+            </div>
+        </section>
+        
+        <!-- State Collapse Simulator -->
+        <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; margin-bottom: 24px; color: var(--quantum-cyan);">State Collapse Simulator</h2>
+            <div class="collapse-simulator">
+                <div class="simulator-controls">
+                    <button class="quantum-btn btn-collapse">⚛️ Collapse to Decision</button>
+                    <button class="quantum-btn">🔄 Restore Superposition</button>
+                    <button class="quantum-btn">💾 Save State</button>
+                    <button class="quantum-btn">📊 Generate Report</button>
+                </div>
+                <div class="collapse-visualization"></div>
+            </div>
+        </section>
+        
+        <!-- Probability Landscape -->
+        <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; margin-bottom: 24px; color: var(--quantum-cyan);">Probability Landscape</h2>
+            <div class="probability-landscape">
+                <div class="landscape-terrain">
+                    <div class="terrain-grid">
+                        <!-- Generated by JavaScript: 400 cells (20x20 grid) -->
+                        <script>
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const grid = document.querySelector('.terrain-grid');
+                                if (grid) {
+                                    for (let i = 0; i < 400; i++) {
+                                        const cell = document.createElement('div');
+                                        cell.className = 'terrain-cell';
+                                        grid.appendChild(cell);
+                                    }
+                                }
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Probability Flow Streams -->
+        <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; margin-bottom: 24px; color: var(--quantum-cyan);">Probability Flow Dynamics</h2>
+            <div class="probability-stream">
+                <div class="stream-container"></div>
+            </div>
+        </section>
+        
+        <!-- Entanglement Network -->
+        <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; margin-bottom: 24px; color: var(--quantum-cyan);">Metric Entanglement Network</h2>
+            <div class="entanglement-network"></div>
+        </section>
+        
+        <!-- Temporal Probability Navigator -->
+        <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; margin-bottom: 24px; color: var(--quantum-cyan);">Temporal Navigator</h2>
+            <div class="temporal-navigator">
+                <p style="color: rgba(255,255,255,0.7); margin-bottom: 16px;">
+                    Explore how probabilities evolve across time horizons
+                </p>
+                <div class="timeline-slider">
+                    <div class="timeline-track"></div>
+                    <div class="timeline-marker" style="left: 50%"></div>
+                </div>
+                <div class="timeline-labels">
+                    <span>Historical</span>
+                    <span>Recent Past</span>
+                    <span style="color: var(--quantum-cyan); font-weight: 600;">Present</span>
+                    <span>Near Future</span>
+                    <span>Far Future</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Key Metrics Dashboard -->
+        <section style="margin-bottom: 60px;">
+            <h2 style="font-size: 28px; margin-bottom: 24px; color: var(--quantum-cyan);">Quantum Metrics</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+                <div class="quantum-card">
+                    <div class="card-title">Certainty Index</div>
+                    <div class="card-value">72%</div>
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.6);">High confidence level</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 72%"></div>
+                    </div>
+                </div>
+                
+                <div class="quantum-card">
+                    <div class="card-title">Risk Exposure</div>
+                    <div class="card-value text-quantum-red">Medium</div>
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.6);">Manageable risk profile</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 45%; background: linear-gradient(90deg, #FF0000, #FFA500);"></div>
+                    </div>
+                </div>
+                
+                <div class="quantum-card">
+                    <div class="card-title">Optimal Path</div>
+                    <div class="card-value text-quantum-green">β</div>
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.6);">Conservative approach recommended</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 60%"></div>
+                    </div>
+                </div>
+                
+                <div class="quantum-card">
+                    <div class="card-title">Volatility Score</div>
+                    <div class="card-value">0.38</div>
+                    <div style="font-size: 13px; color: rgba(255,255,255,0.6);">Moderate fluctuation expected</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" style="width: 38%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Help Panel -->
+        <div style="background: rgba(13,13,13,0.9); border: 1px solid rgba(0,255,255,0.2); border-radius: 12px; padding: 24px; margin-bottom: 40px;">
+            <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--quantum-cyan);">Quantum Controls Guide</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; font-size: 14px; color: rgba(255,255,255,0.7);">
+                <div>
+                    <strong style="color: var(--quantum-white);">Keyboard Shortcuts:</strong>
+                    <ul style="margin-top: 8px; margin-left: 20px;">
+                        <li><code style="background: rgba(0,255,255,0.1); padding: 2px 6px; border-radius: 3px;">C</code> - Collapse quantum state</li>
+                        <li><code style="background: rgba(0,255,255,0.1); padding: 2px 6px; border-radius: 3px;">R</code> - Restore superposition</li>
+                        <li><code style="background: rgba(0,255,255,0.1); padding: 2px 6px; border-radius: 3px;">Ctrl+S</code> - Save current state</li>
+                    </ul>
+                </div>
+                <div>
+                    <strong style="color: var(--quantum-white);">Interactions:</strong>
+                    <ul style="margin-top: 8px; margin-left: 20px;">
+                        <li>Click decision nodes to explore paths</li>
+                        <li>Click terrain cells for probability details</li>
+                        <li>Drag temporal marker for time travel</li>
+                        <li>Hover over network nodes for entanglement info</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer style="text-align: center; padding: 40px 0; border-top: 1px solid rgba(0,255,255,0.2); color: rgba(255,255,255,0.4);">
+            <p>Kit Quantum - Probabilistic Decision Engine v1.0.0</p>
+            <p style="font-size: 13px; margin-top: 8px;">Quantum-inspired interface for strategic planning</p>
+        </footer>
+    </div>
+    
+    <!-- Kit Quantum JavaScript -->
+    <script src="assets/js/kit-quantum.js"></script>
+</body>
+</html>

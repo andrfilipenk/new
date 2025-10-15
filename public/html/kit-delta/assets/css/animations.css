@@ -1,0 +1,198 @@
+/* ===================================================================
+   Kit Delta - Animations & Effects
+   Advanced animations for Neural Interface theme
+   =================================================================== */
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes hexPulse {
+    0%, 100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(0, 245, 255, 0.6), 0 0 30px rgba(0, 245, 255, 0.3);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInFromTop {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUpFade {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scanline {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+@keyframes dataStream {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        border-color: rgba(0, 245, 255, 0.3);
+    }
+    50% {
+        border-color: rgba(0, 245, 255, 0.8);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes countdownBlink {
+    0%, 50%, 100% {
+        opacity: 1;
+    }
+    25%, 75% {
+        opacity: 0.3;
+    }
+}
+
+/* Apply animations */
+.command-bar {
+    animation: slideInFromTop 0.4s ease-out;
+}
+
+.panel {
+    animation: slideUpFade 0.5s ease-out backwards;
+}
+
+.panel:nth-child(1) { animation-delay: 0.1s; }
+.panel:nth-child(2) { animation-delay: 0.2s; }
+.panel:nth-child(3) { animation-delay: 0.3s; }
+.panel:nth-child(4) { animation-delay: 0.4s; }
+
+.metric-card[data-status="danger"],
+.task-item[data-status="overdue"] {
+    animation: glowPulse 2s infinite;
+}
+
+.event-item {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.notification-item.unread .notification-icon {
+    animation: pulse 2s infinite;
+}
+
+.command-palette-modal {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.command-palette-container {
+    animation: slideUpFade 0.3s ease-out;
+}
+
+.task-due.countdown[data-urgent="true"] {
+    animation: countdownBlink 1s infinite;
+}
+
+/* Hover effects */
+.module-link:hover,
+.btn-icon:hover,
+.task-item:hover {
+    animation: none;
+}
+
+.hex-service:hover .hex-pulse {
+    animation: hexPulse 1s ease-out;
+}
+
+/* Loading states */
+.loading-shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 245, 255, 0.0) 0%,
+        rgba(0, 245, 255, 0.2) 50%,
+        rgba(0, 245, 255, 0.0) 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+}
+
+/* Motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

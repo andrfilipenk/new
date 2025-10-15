@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kit Nebula - Cosmic Intelligence Interface">
+    <title>Kit Nebula Dashboard - Cosmic Intelligence Interface</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Kit Nebula Styles -->
+    <link rel="stylesheet" href="assets/css/kit-nebula.css">
+    <link rel="stylesheet" href="assets/css/particles.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    
+    <style>
+        /* Component-specific styles inline for this demo */
+        
+        /* Stellar Navigation Orb */
+        .kit-nebula-stellar-orb {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 50px auto;
+            perspective: var(--perspective);
+            transform-style: preserve-3d;
+        }
+        
+        .kit-nebula-orb-sphere {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            animation: rotate-slow 40s linear infinite;
+        }
+        
+        .kit-nebula-orb-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            height: 150px;
+            margin: -75px 0 0 -75px;
+            background: radial-gradient(circle, var(--nebula-purple), var(--nebula-cyan));
+            border-radius: 50%;
+            box-shadow: 
+                0 0 20px var(--nebula-purple),
+                0 0 40px var(--nebula-cyan),
+                0 0 60px rgba(114, 9, 183, 0.5),
+                inset 0 0 30px var(--nebula-purple);
+            animation: glow-pulse-purple 3s ease-in-out infinite;
+        }
+        
+        .kit-nebula-orb-node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 245, 255, 0.2);
+            border: 2px solid var(--nebula-cyan);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--nebula-cyan);
+            box-shadow: 0 0 10px var(--nebula-cyan);
+        }
+        
+        .kit-nebula-orb-node:hover,
+        .kit-nebula-orb-node.is-hovered {
+            transform: scale(1.2);
+            background: rgba(0, 245, 255, 0.4);
+            box-shadow: 0 0 20px var(--nebula-cyan), 0 0 40px var(--nebula-cyan);
+        }
+        
+        .kit-nebula-orb-node.is-active {
+            background: rgba(0, 245, 255, 0.6);
+            border-color: var(--nebula-gold);
+            box-shadow: 0 0 30px var(--nebula-gold);
+            animation: glow-pulse-gold 2s ease-in-out infinite;
+        }
+        
+        /* Position nodes in orbit */
+        .kit-nebula-orb-node:nth-child(1) { top: 10%; left: 50%; transform: translateX(-50%); }
+        .kit-nebula-orb-node:nth-child(2) { top: 30%; right: 10%; }
+        .kit-nebula-orb-node:nth-child(3) { top: 50%; right: 5%; }
+        .kit-nebula-orb-node:nth-child(4) { bottom: 30%; right: 10%; }
+        .kit-nebula-orb-node:nth-child(5) { bottom: 10%; left: 50%; transform: translateX(-50%); }
+        .kit-nebula-orb-node:nth-child(6) { bottom: 30%; left: 10%; }
+        .kit-nebula-orb-node:nth-child(7) { top: 50%; left: 5%; }
+        .kit-nebula-orb-node:nth-child(8) { top: 30%; left: 10%; }
+        
+        /* Nebula Data Cards */
+        .kit-nebula-data-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .kit-nebula-data-card {
+            background: linear-gradient(135deg, rgba(114, 9, 183, 0.2), rgba(0, 245, 255, 0.2));
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            animation: float-gentle 6s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+        }
+        
+        .kit-nebula-data-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.1) 0%, transparent 70%);
+            animation: nebula-swirl 15s linear infinite;
+        }
+        
+        .kit-nebula-data-card:hover,
+        .kit-nebula-data-card.is-hovered {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 
+                0 0 30px rgba(0, 245, 255, 0.4),
+                0 10px 40px rgba(0, 0, 0, 0.5);
+            border-color: var(--nebula-cyan);
+        }
+        
+        .kit-nebula-data-card.is-expanded {
+            grid-column: span 2;
+            transform: scale(1.05);
+        }
+        
+        .kit-nebula-card-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .kit-nebula-card-label {
+            font-size: 0.875rem;
+            color: var(--nebula-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+        
+        .kit-nebula-card-value {
+            font-family: var(--font-mono);
+            font-size: 3rem;
+            font-weight: 600;
+            color: var(--nebula-cyan);
+            text-shadow: 0 0 20px var(--nebula-cyan);
+            margin-bottom: 0.5rem;
+        }
+        
+        .kit-nebula-card-trend {
+            font-size: 1.125rem;
+            color: var(--nebula-gold);
+        }
+        
+        .kit-nebula-card-trend.positive::before {
+            content: '↗ ';
+        }
+        
+        .kit-nebula-card-trend.negative::before {
+            content: '↘ ';
+        }
+        
+        .kit-nebula-card-sparkline {
+            margin-top: 1rem;
+            height: 60px;
+            background: linear-gradient(90deg, 
+                rgba(0, 245, 255, 0.1) 0%, 
+                rgba(0, 245, 255, 0.3) 50%, 
+                rgba(0, 245, 255, 0.1) 100%);
+            border-radius: 5px;
+        }
+        
+        /* Command Palette */
+        .kit-nebula-command-palette {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .kit-nebula-command-palette.is-visible {
+            display: flex;
+        }
+        
+        .kit-nebula-palette-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            animation: fade-in 0.3s ease;
+        }
+        
+        .kit-nebula-palette-content {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 600px;
+            background: linear-gradient(135deg, rgba(0, 8, 20, 0.95), rgba(0, 18, 25, 0.95));
+            border: 2px solid var(--nebula-cyan);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 
+                0 0 40px var(--nebula-cyan),
+                0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: fade-in-scale 0.4s ease;
+        }
+        
+        .kit-nebula-palette-input {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            font-size: 1.5rem;
+            font-family: var(--font-body);
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 10px;
+            color: var(--nebula-white);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .kit-nebula-palette-input:focus {
+            background: rgba(0, 245, 255, 0.15);
+            border-color: var(--nebula-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+        
+        .kit-nebula-palette-input::placeholder {
+            color: var(--nebula-gray);
+        }
+        
+        .kit-nebula-palette-results {
+            margin-top: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        /* Aurora Sweep Effect */
+        .kit-nebula-aurora-sweep {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(114, 9, 183, 0.3) 25%,
+                rgba(0, 245, 255, 0.3) 50%,
+                rgba(255, 186, 8, 0.3) 75%,
+                transparent 100%);
+            pointer-events: none;
+            z-index: 9999;
+            animation: aurora-sweep 1s ease-out forwards;
+        }
+        
+        @keyframes aurora-sweep {
+            from { left: -100%; }
+            to { left: 100%; }
+        }
+        
+        /* Notifications */
+        .kit-nebula-notifications {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+        }
+        
+        .kit-nebula-notification {
+            background: linear-gradient(135deg, rgba(0, 8, 20, 0.95), rgba(0, 18, 25, 0.95));
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+        
+        .kit-nebula-notification--info {
+            border-left: 4px solid var(--nebula-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+        
+        .kit-nebula-notification--success {
+            border-left: 4px solid var(--nebula-gold);
+            box-shadow: 0 0 20px rgba(255, 186, 8, 0.3);
+        }
+        
+        .kit-nebula-notification--warning {
+            border-left: 4px solid var(--nebula-gold);
+            box-shadow: 0 0 20px rgba(255, 186, 8, 0.3);
+        }
+        
+        .kit-nebula-notification--critical {
+            border-left: 4px solid var(--nebula-red);
+            box-shadow: 0 0 20px rgba(247, 37, 133, 0.3);
+            animation: glow-pulse-gold 1s ease-in-out infinite;
+        }
+        
+        .kit-nebula-notif-content {
+            flex: 1;
+            color: var(--nebula-white);
+        }
+        
+        .kit-nebula-notif-close {
+            background: none;
+            border: none;
+            color: var(--nebula-gray);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 0 0 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .kit-nebula-notif-close:hover {
+            color: var(--nebula-white);
+        }
+        
+        /* Dashboard Header */
+        .kit-nebula-header {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+        
+        .kit-nebula-header h1 {
+            margin-bottom: 1rem;
+        }
+        
+        .kit-nebula-header p {
+            color: var(--nebula-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield Background -->
+    <div class="kit-nebula-starfield"></div>
+    
+    <!-- Main Container -->
+    <div class="kit-nebula-container">
+        <!-- Header -->
+        <header class="kit-nebula-header" role="banner">
+            <h1 class="kit-nebula-display kit-nebula-glow-cyan">Kit Nebula</h1>
+            <p class="kit-nebula-body">Cosmic Intelligence Interface</p>
+            <p class="kit-nebula-micro" style="margin-top: 1rem;">Press <kbd>Ctrl+K</kbd> to open command palette</p>
+        </header>
+        
+        <!-- Stellar Navigation Orb -->
+        <section aria-label="Navigation">
+            <div class="kit-nebula-stellar-orb kit-nebula-perspective">
+                <div class="kit-nebula-orb-sphere kit-nebula-preserve-3d">
+                    <div class="kit-nebula-orb-core"></div>
+                    <button class="kit-nebula-orb-node" aria-label="Dashboard" title="Dashboard">🏠</button>
+                    <button class="kit-nebula-orb-node" aria-label="Analytics" title="Analytics">📊</button>
+                    <button class="kit-nebula-orb-node" aria-label="Reports" title="Reports">📈</button>
+                    <button class="kit-nebula-orb-node" aria-label="Settings" title="Settings">⚙️</button>
+                    <button class="kit-nebula-orb-node" aria-label="Users" title="Users">👥</button>
+                    <button class="kit-nebula-orb-node" aria-label="Messages" title="Messages">💬</button>
+                    <button class="kit-nebula-orb-node" aria-label="Notifications" title="Notifications">🔔</button>
+                    <button class="kit-nebula-orb-node" aria-label="Search" title="Search">🔍</button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Nebula Data Cards -->
+        <section aria-label="Metrics Dashboard">
+            <div class="kit-nebula-data-cards">
+                <div class="kit-nebula-data-card kit-nebula-gpu">
+                    <div class="kit-nebula-card-content">
+                        <div class="kit-nebula-card-label">Total Revenue</div>
+                        <div class="kit-nebula-card-value">$2.4M</div>
+                        <div class="kit-nebula-card-trend positive">+15.3%</div>
+                        <div class="kit-nebula-card-sparkline"></div>
+                    </div>
+                </div>
+                
+                <div class="kit-nebula-data-card kit-nebula-gpu" style="animation-delay: 0.5s">
+                    <div class="kit-nebula-card-content">
+                        <div class="kit-nebula-card-label">Active Users</div>
+                        <div class="kit-nebula-card-value">12.8K</div>
+                        <div class="kit-nebula-card-trend positive">+8.2%</div>
+                        <div class="kit-nebula-card-sparkline"></div>
+                    </div>
+                </div>
+                
+                <div class="kit-nebula-data-card kit-nebula-gpu" style="animation-delay: 1s">
+                    <div class="kit-nebula-card-content">
+                        <div class="kit-nebula-card-label">Conversion Rate</div>
+                        <div class="kit-nebula-card-value">3.7%</div>
+                        <div class="kit-nebula-card-trend positive">+2.1%</div>
+                        <div class="kit-nebula-card-sparkline"></div>
+                    </div>
+                </div>
+                
+                <div class="kit-nebula-data-card kit-nebula-gpu" style="animation-delay: 1.5s">
+                    <div class="kit-nebula-card-content">
+                        <div class="kit-nebula-card-label">System Health</div>
+                        <div class="kit-nebula-card-value">99.9%</div>
+                        <div class="kit-nebula-card-trend positive">+0.1%</div>
+                        <div class="kit-nebula-card-sparkline"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Notifications Container -->
+    <div class="kit-nebula-notifications" role="region" aria-label="Notifications" aria-live="polite"></div>
+    
+    <!-- Scripts -->
+    <script src="assets/js/particle-engine.js"></script>
+    <script src="assets/js/three-d-effects.js"></script>
+    <script src="assets/js/kit-nebula.js"></script>
+    
+    <script>
+        // Initialize Kit Nebula
+        const kitNebula = new KitNebula({
+            enableParticles: true,
+            enable3D: true,
+            particleCount: 200
+        });
+        
+        // Demo: Show some notifications
+        setTimeout(() => {
+            kitNebula.showNotification('Welcome to Kit Nebula!', 'info');
+        }, 1000);
+        
+        setTimeout(() => {
+            kitNebula.showNotification('System initialized successfully', 'success');
+        }, 2000);
+        
+        // Demo: Update card data periodically
+        setInterval(() => {
+            const randomCard = Math.floor(Math.random() * 4);
+            const randomValue = (Math.random() * 10 + 5).toFixed(1);
+            kitNebula.components.dataCards?.updateData(randomCard, {
+                value: `${randomValue}K`,
+                trend: `+${(Math.random() * 5).toFixed(1)}%`
+            });
+        }, 10000);
+    </script>
+</body>
+</html>

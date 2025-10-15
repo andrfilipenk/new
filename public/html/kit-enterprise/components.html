@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Components Showcase - Enterprise UI Kit</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Enterprise UI Kit CSS -->
+    <link href="assets/css/kit-enterprise.css" rel="stylesheet">
+    
+    <style>
+        .showcase-section {
+            margin-bottom: 48px;
+            padding-bottom: 48px;
+            border-bottom: 1px solid #d0d0d0;
+        }
+        .showcase-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #1a1a1a;
+        }
+        .showcase-subtitle {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 32px 0 16px 0;
+            color: #1a1a1a;
+        }
+        .showcase-example {
+            padding: 24px;
+            background-color: #fafafa;
+            border: 1px solid #d0d0d0;
+            margin-bottom: 16px;
+        }
+        .showcase-code {
+            background-color: #f5f5f5;
+            border: 1px solid #d0d0d0;
+            padding: 16px;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+        }
+        .color-swatch {
+            display: inline-block;
+            width: 100px;
+            height: 60px;
+            border: 1px solid #d0d0d0;
+            margin-right: 16px;
+            margin-bottom: 16px;
+        }
+        .color-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="enterprise-layout">
+        <!-- Header -->
+        <header class="enterprise-header">
+            <div class="enterprise-header__brand">
+                <i class="bi bi-grid-3x3-gap"></i> Enterprise UI Kit
+            </div>
+            <div class="enterprise-header__actions">
+                <a href="dashboard.html" class="enterprise-button enterprise-button--secondary">
+                    <i class="bi bi-speedometer2"></i>
+                    View Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="enterprise-main">
+            <!-- Sidebar Navigation -->
+            <aside class="enterprise-sidebar">
+                <nav class="enterprise-nav">
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">Foundation</div>
+                        <a href="#colors" class="enterprise-nav-item">
+                            <i class="bi bi-palette enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Colors</span>
+                        </a>
+                        <a href="#typography" class="enterprise-nav-item">
+                            <i class="bi bi-fonts enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Typography</span>
+                        </a>
+                    </div>
+                    
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">Components</div>
+                        <a href="#buttons" class="enterprise-nav-item">
+                            <i class="bi bi-cursor enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Buttons</span>
+                        </a>
+                        <a href="#forms" class="enterprise-nav-item">
+                            <i class="bi bi-input-cursor enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Forms</span>
+                        </a>
+                        <a href="#cards" class="enterprise-nav-item">
+                            <i class="bi bi-card-text enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Cards</span>
+                        </a>
+                        <a href="#grid" class="enterprise-nav-item">
+                            <i class="bi bi-table enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Data Grid</span>
+                        </a>
+                        <a href="#navigation" class="enterprise-nav-item">
+                            <i class="bi bi-signpost enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Navigation</span>
+                        </a>
+                        <a href="#badges" class="enterprise-nav-item">
+                            <i class="bi bi-tag enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Badges</span>
+                        </a>
+                        <a href="#modals" class="enterprise-nav-item">
+                            <i class="bi bi-window enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Modals</span>
+                        </a>
+                        <a href="#alerts" class="enterprise-nav-item">
+                            <i class="bi bi-exclamation-triangle enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Alerts</span>
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Content -->
+            <main class="enterprise-content">
+                <div class="enterprise-content__body">
+                    <h1>Enterprise UI Kit - Component Showcase</h1>
+                    <p class="enterprise-text-secondary">
+                        A professional, functional-first design system for business applications.
+                        All components follow WCAG 2.1 Level AA accessibility standards.
+                    </p>
+
+                    <!-- Colors Section -->
+                    <section class="showcase-section" id="colors">
+                        <h2 class="showcase-title">Colors</h2>
+                        
+                        <h3 class="showcase-subtitle">Primary Colors</h3>
+                        <div class="showcase-example">
+                            <div class="color-swatch" style="background-color: #fafafa;">
+                                <div class="color-info">#fafafa<br>Background Primary</div>
+                            </div>
+                            <div class="color-swatch" style="background-color: #f0f0f0;">
+                                <div class="color-info">#f0f0f0<br>Background Secondary</div>
+                            </div>
+                            <div class="color-swatch" style="background-color: #1a1a1a;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#1a1a1a<br>Text Primary</div>
+                            </div>
+                            <div class="color-swatch" style="background-color: #0066cc;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#0066cc<br>Accent</div>
+                            </div>
+                        </div>
+
+                        <h3 class="showcase-subtitle">Status Colors</h3>
+                        <div class="showcase-example">
+                            <div class="color-swatch" style="background-color: #28a745;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#28a745<br>Success</div>
+                            </div>
+                            <div class="color-swatch" style="background-color: #ffc107;">
+                                <div class="color-info" style="padding: 4px;">#ffc107<br>Warning</div>
+                            </div>
+                            <div class="color-swatch" style="background-color: #dc3545;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#dc3545<br>Danger</div>
+                            </div>
+                            <div class="color-swatch" style="background-color: #0c5460;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#0c5460<br>Info</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Typography Section -->
+                    <section class="showcase-section" id="typography">
+                        <h2 class="showcase-title">Typography</h2>
+                        
+                        <div class="showcase-example">
+                            <h1>Heading 1 - 24px, Weight 600</h1>
+                            <h2>Heading 2 - 18px, Weight 600</h2>
+                            <h3>Heading 3 - 16px, Weight 600</h3>
+                            <p>Body text - 14px, Weight 400, Line height 1.5</p>
+                            <p class="enterprise-text-small">Small text - 12px</p>
+                            <code>Code text - Monospace, 13px</code>
+                        </div>
+                    </section>
+
+                    <!-- Buttons Section -->
+                    <section class="showcase-section" id="buttons">
+                        <h2 class="showcase-title">Buttons</h2>
+                        
+                        <h3 class="showcase-subtitle">Button Variants</h3>
+                        <div class="showcase-example">
+                            <button class="enterprise-button enterprise-button--primary">Primary</button>
+                            <button class="enterprise-button enterprise-button--secondary">Secondary</button>
+                            <button class="enterprise-button enterprise-button--danger">Danger</button>
+                            <button class="enterprise-button enterprise-button--ghost">Ghost</button>
+                            <button class="enterprise-button enterprise-button--primary" disabled>Disabled</button>
+                        </div>
+
+                        <div class="showcase-code">&lt;button class="enterprise-button enterprise-button--primary"&gt;Primary&lt;/button&gt;
+&lt;button class="enterprise-button enterprise-button--secondary"&gt;Secondary&lt;/button&gt;
+&lt;button class="enterprise-button enterprise-button--danger"&gt;Danger&lt;/button&gt;
+&lt;button class="enterprise-button enterprise-button--ghost"&gt;Ghost&lt;/button&gt;</div>
+
+                        <h3 class="showcase-subtitle">Buttons with Icons</h3>
+                        <div class="showcase-example">
+                            <button class="enterprise-button enterprise-button--primary">
+                                <i class="bi bi-plus-lg"></i>
+                                New Item
+                            </button>
+                            <button class="enterprise-button enterprise-button--secondary">
+                                <i class="bi bi-download"></i>
+                                Export
+                            </button>
+                            <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                        </div>
+
+                        <h3 class="showcase-subtitle">Small Buttons</h3>
+                        <div class="showcase-example">
+                            <button class="enterprise-button enterprise-button--primary enterprise-button--small">Small Primary</button>
+                            <button class="enterprise-button enterprise-button--secondary enterprise-button--small">Small Secondary</button>
+                        </div>
+                    </section>
+
+                    <!-- Forms Section -->
+                    <section class="showcase-section" id="forms">
+                        <h2 class="showcase-title">Form Components</h2>
+                        
+                        <h3 class="showcase-subtitle">Text Inputs</h3>
+                        <div class="showcase-example">
+                            <div class="enterprise-form-group">
+                                <label class="enterprise-label">Label</label>
+                                <input type="text" class="enterprise-input" placeholder="Enter text">
+                            </div>
+                            
+                            <div class="enterprise-form-group">
+                                <label class="enterprise-label enterprise-label--required">Required Field</label>
+                                <input type="text" class="enterprise-input" required placeholder="Required">
+                                <span class="enterprise-help-text">This is helper text</span>
+                            </div>
+                        </div>
+
+                        <h3 class="showcase-subtitle">Validation States</h3>
+                        <div class="showcase-example">
+                            <div class="enterprise-form-group">
+                                <label class="enterprise-label">Success State</label>
+                                <input type="text" class="enterprise-input enterprise-input--success" value="Valid input">
+                                <span class="enterprise-success-text">Input is valid</span>
+                            </div>
+                            
+                            <div class="enterprise-form-group">
+                                <label class="enterprise-label">Error State</label>
+                                <input type="text" class="enterprise-input enterprise-input--error" value="Invalid">
+                                <span class="enterprise-error-text">This field has an error</span>
+                            </div>
+                        </div>
+
+                        <h3 class="showcase-subtitle">Select and Textarea</h3>
+                        <div class="showcase-example">
+                            <div class="enterprise-form-group">
+                                <label class="enterprise-label">Select Dropdown</label>
+                                <select class="enterprise-select">
+                                    <option>Option 1</option>
+                                    <option>Option 2</option>
+                                    <option>Option 3</option>
+                                </select>
+                            </div>
+                            
+                            <div class="enterprise-form-group">
+                                <label class="enterprise-label">Textarea</label>
+                                <textarea class="enterprise-textarea" placeholder="Enter multiple lines"></textarea>
+                            </div>
+                        </div>
+
+                        <h3 class="showcase-subtitle">Checkboxes and Radios</h3>
+                        <div class="showcase-example">
+                            <label class="enterprise-checkbox">
+                                <input type="checkbox">
+                                Checkbox option
+                            </label>
+                            <label class="enterprise-checkbox">
+                                <input type="checkbox" checked>
+                                Checked option
+                            </label>
+                            <br><br>
+                            <label class="enterprise-radio">
+                                <input type="radio" name="radio-group">
+                                Radio option 1
+                            </label>
+                            <label class="enterprise-radio">
+                                <input type="radio" name="radio-group">
+                                Radio option 2
+                            </label>
+                        </div>
+                    </section>
+
+                    <!-- Cards Section -->
+                    <section class="showcase-section" id="cards">
+                        <h2 class="showcase-title">Cards</h2>
+                        
+                        <div class="showcase-example">
+                            <div class="enterprise-card">
+                                <div class="enterprise-card__header">
+                                    <h3 class="enterprise-card__title">Card Title</h3>
+                                    <div class="enterprise-card__actions">
+                                        <button class="enterprise-button enterprise-button--ghost enterprise-button--small">Action</button>
+                                    </div>
+                                </div>
+                                <div class="enterprise-card__body">
+                                    This is the card body content. Cards are used to group related information.
+                                </div>
+                                <div class="enterprise-card__footer">
+                                    Card footer with metadata
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="showcase-subtitle">Metric Cards</h3>
+                        <div class="showcase-example">
+                            <div class="enterprise-metrics">
+                                <div class="enterprise-metric-card">
+                                    <div class="enterprise-metric-card__label">Total Users</div>
+                                    <div class="enterprise-metric-card__value">1,247</div>
+                                    <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                        <i class="bi bi-arrow-up"></i>
+                                        <span>12% increase</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="enterprise-metric-card">
+                                    <div class="enterprise-metric-card__label">Revenue</div>
+                                    <div class="enterprise-metric-card__value">$45.2K</div>
+                                    <div class="enterprise-metric-card__trend enterprise-metric-card__trend--down">
+                                        <i class="bi bi-arrow-down"></i>
+                                        <span>3% decrease</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Data Grid Section -->
+                    <section class="showcase-section" id="grid">
+                        <h2 class="showcase-title">Data Grid</h2>
+                        
+                        <div class="showcase-example" style="background: white; padding: 0;">
+                            <div class="enterprise-grid">
+                                <table class="enterprise-grid__table">
+                                    <thead class="enterprise-grid__header">
+                                        <tr>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--checkbox">
+                                                <input type="checkbox">
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="id">
+                                                ID
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="name">
+                                                Name
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell">Status</th>
+                                            <th class="enterprise-grid__header-cell">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="enterprise-grid__body">
+                                        <tr class="enterprise-grid__row" data-row-id="1">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#001</td>
+                                            <td class="enterprise-grid__cell">Sample Item 1</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Active</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <button class="enterprise-button enterprise-button--ghost enterprise-button--small">Edit</button>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="2">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#002</td>
+                                            <td class="enterprise-grid__cell">Sample Item 2</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">Pending</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <button class="enterprise-button enterprise-button--ghost enterprise-button--small">Edit</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Navigation Section -->
+                    <section class="showcase-section" id="navigation">
+                        <h2 class="showcase-title">Navigation Components</h2>
+                        
+                        <h3 class="showcase-subtitle">Tabs</h3>
+                        <div class="showcase-example">
+                            <div class="enterprise-tabs">
+                                <button class="enterprise-tab enterprise-tab--active" data-tab="tab1">Tab 1</button>
+                                <button class="enterprise-tab" data-tab="tab2">Tab 2</button>
+                                <button class="enterprise-tab" data-tab="tab3">Tab 3</button>
+                            </div>
+                        </div>
+
+                        <h3 class="showcase-subtitle">Breadcrumb</h3>
+                        <div class="showcase-example">
+                            <nav class="enterprise-breadcrumb">
+                                <a href="#" class="enterprise-breadcrumb__item">Home</a>
+                                <span class="enterprise-breadcrumb__separator">/</span>
+                                <a href="#" class="enterprise-breadcrumb__item">Products</a>
+                                <span class="enterprise-breadcrumb__separator">/</span>
+                                <span class="enterprise-breadcrumb__item enterprise-breadcrumb__item--active">Details</span>
+                            </nav>
+                        </div>
+                    </section>
+
+                    <!-- Badges Section -->
+                    <section class="showcase-section" id="badges">
+                        <h2 class="showcase-title">Status Badges</h2>
+                        
+                        <div class="showcase-example">
+                            <span class="enterprise-badge enterprise-badge--success">Success</span>
+                            <span class="enterprise-badge enterprise-badge--warning">Warning</span>
+                            <span class="enterprise-badge enterprise-badge--danger">Danger</span>
+                            <span class="enterprise-badge enterprise-badge--info">Info</span>
+                            <span class="enterprise-badge enterprise-badge--default">Default</span>
+                        </div>
+
+                        <div class="showcase-code">&lt;span class="enterprise-badge enterprise-badge--success"&gt;Success&lt;/span&gt;
+&lt;span class="enterprise-badge enterprise-badge--warning"&gt;Warning&lt;/span&gt;
+&lt;span class="enterprise-badge enterprise-badge--danger"&gt;Danger&lt;/span&gt;</div>
+                    </section>
+
+                    <!-- Modals Section -->
+                    <section class="showcase-section" id="modals">
+                        <h2 class="showcase-title">Modal Dialogs</h2>
+                        
+                        <div class="showcase-example">
+                            <button class="enterprise-button enterprise-button--primary" onclick="openDemoModal()">
+                                Open Modal
+                            </button>
+                        </div>
+
+                        <p class="enterprise-text-secondary">
+                            Modals appear centered on screen with a backdrop. They support keyboard navigation (Escape to close)
+                            and focus management.
+                        </p>
+                    </section>
+
+                    <!-- Alerts Section -->
+                    <section class="showcase-section" id="alerts">
+                        <h2 class="showcase-title">Alerts</h2>
+                        
+                        <div class="showcase-example">
+                            <div class="enterprise-alert enterprise-alert--success">
+                                <div class="enterprise-alert__icon">
+                                    <i class="bi bi-check-circle"></i>
+                                </div>
+                                <div class="enterprise-alert__content">
+                                    <div class="enterprise-alert__title">Success</div>
+                                    <div class="enterprise-alert__message">Operation completed successfully</div>
+                                </div>
+                            </div>
+
+                            <div class="enterprise-alert enterprise-alert--warning">
+                                <div class="enterprise-alert__icon">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div class="enterprise-alert__content">
+                                    <div class="enterprise-alert__title">Warning</div>
+                                    <div class="enterprise-alert__message">Please review the information before proceeding</div>
+                                </div>
+                            </div>
+
+                            <div class="enterprise-alert enterprise-alert--danger">
+                                <div class="enterprise-alert__icon">
+                                    <i class="bi bi-x-circle"></i>
+                                </div>
+                                <div class="enterprise-alert__content">
+                                    <div class="enterprise-alert__title">Error</div>
+                                    <div class="enterprise-alert__message">An error occurred while processing your request</div>
+                                </div>
+                            </div>
+
+                            <div class="enterprise-alert enterprise-alert--info">
+                                <div class="enterprise-alert__icon">
+                                    <i class="bi bi-info-circle"></i>
+                                </div>
+                                <div class="enterprise-alert__content">
+                                    <div class="enterprise-alert__title">Information</div>
+                                    <div class="enterprise-alert__message">Here's some helpful information for you</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="showcase-subtitle">Toast Notifications</h3>
+                        <div class="showcase-example">
+                            <button class="enterprise-button enterprise-button--primary" onclick="window.EnterpriseToast.success('Success!', 'This is a success message')">
+                                Show Success Toast
+                            </button>
+                            <button class="enterprise-button enterprise-button--secondary" onclick="window.EnterpriseToast.warning('Warning', 'This is a warning message')">
+                                Show Warning Toast
+                            </button>
+                            <button class="enterprise-button enterprise-button--danger" onclick="window.EnterpriseToast.danger('Error', 'This is an error message')">
+                                Show Error Toast
+                            </button>
+                            <button class="enterprise-button enterprise-button--ghost" onclick="window.EnterpriseToast.info('Info', 'This is an info message')">
+                                Show Info Toast
+                            </button>
+                        </div>
+                    </section>
+
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Demo Modal -->
+    <div class="enterprise-modal" id="demoModal">
+        <div class="enterprise-modal__backdrop"></div>
+        <div class="enterprise-modal__container">
+            <div class="enterprise-modal__header">
+                <h2 class="enterprise-modal__title">Example Modal</h2>
+                <button class="enterprise-modal__close">×</button>
+            </div>
+            <div class="enterprise-modal__body">
+                <p>This is an example modal dialog. It demonstrates the modal component with header, body, and footer sections.</p>
+                <p>Press Escape or click the backdrop to close.</p>
+            </div>
+            <div class="enterprise-modal__footer">
+                <button class="enterprise-button enterprise-button--secondary" onclick="closeDemoModal()">Cancel</button>
+                <button class="enterprise-button enterprise-button--primary" onclick="closeDemoModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Enterprise UI Kit JS -->
+    <script src="assets/js/kit-enterprise.js"></script>
+    
+    <script>
+        let demoModalInstance;
+        
+        function openDemoModal() {
+            const modal = document.getElementById('demoModal');
+            if (!demoModalInstance) {
+                demoModalInstance = new window.EnterpriseUI.Modal(modal);
+            }
+            demoModalInstance.open();
+        }
+        
+        function closeDemoModal() {
+            if (demoModalInstance) {
+                demoModalInstance.close();
+            }
+        }
+        
+        // Smooth scroll for navigation
+        document.querySelectorAll('.enterprise-nav-item').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

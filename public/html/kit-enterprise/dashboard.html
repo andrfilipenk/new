@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Dashboard - UI Kit</title>
+    
+    <!-- Bootstrap CSS (Foundation) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Enterprise UI Kit CSS -->
+    <link href="assets/css/kit-enterprise.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Root Layout Container -->
+    <div class="enterprise-layout">
+        
+        <!-- Header Bar -->
+        <header class="enterprise-header">
+            <div class="enterprise-header__brand">
+                <i class="bi bi-grid-3x3-gap"></i> Enterprise
+            </div>
+            
+            <div class="enterprise-header__search">
+                <input type="search" 
+                       class="enterprise-input" 
+                       placeholder="Search... (Ctrl+K)"
+                       aria-label="Global search">
+            </div>
+            
+            <div class="enterprise-header__actions">
+                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                        title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </button>
+                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                        title="Settings">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <button class="enterprise-button enterprise-button--secondary" 
+                        title="User menu">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Admin User</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="enterprise-main">
+            
+            <!-- Left Sidebar -->
+            <aside class="enterprise-sidebar">
+                <nav class="enterprise-nav">
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">Main</div>
+                        <a href="#" class="enterprise-nav-item enterprise-nav-item--active">
+                            <i class="bi bi-speedometer2 enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Dashboard</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-list-check enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Tasks</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-folder enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Projects</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-people enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Users</span>
+                        </a>
+                    </div>
+                    
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">Reports</div>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-bar-chart enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Analytics</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-file-earmark-text enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Documents</span>
+                        </a>
+                    </div>
+                    
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">System</div>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-gear enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Settings</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-question-circle enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Help</span>
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="enterprise-content">
+                
+                <!-- Toolbar -->
+                <div class="enterprise-toolbar">
+                    <div class="enterprise-toolbar__left">
+                        <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                                data-sidebar-toggle
+                                title="Toggle sidebar">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        
+                        <nav class="enterprise-breadcrumb">
+                            <a href="#" class="enterprise-breadcrumb__item">Home</a>
+                            <span class="enterprise-breadcrumb__separator">/</span>
+                            <span class="enterprise-breadcrumb__item enterprise-breadcrumb__item--active">Dashboard</span>
+                        </nav>
+                    </div>
+                    
+                    <div class="enterprise-toolbar__right">
+                        <button class="enterprise-button enterprise-button--secondary">
+                            <i class="bi bi-download"></i>
+                            Export
+                        </button>
+                        <button class="enterprise-button enterprise-button--primary">
+                            <i class="bi bi-plus-lg"></i>
+                            New Task
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <div class="enterprise-content__body">
+                    
+                    <!-- Metrics Row -->
+                    <div class="enterprise-metrics">
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Total Tasks</div>
+                            <div class="enterprise-metric-card__value">1,247</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>12% from last month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Completed</div>
+                            <div class="enterprise-metric-card__value">892</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>8% from last month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">In Progress</div>
+                            <div class="enterprise-metric-card__value">245</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--neutral">
+                                <i class="bi bi-dash"></i>
+                                <span>No change</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Overdue</div>
+                            <div class="enterprise-metric-card__value">110</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--down">
+                                <i class="bi bi-arrow-down"></i>
+                                <span>3% from last month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alert Example -->
+                    <div class="enterprise-alert enterprise-alert--info">
+                        <div class="enterprise-alert__icon">
+                            <i class="bi bi-info-circle"></i>
+                        </div>
+                        <div class="enterprise-alert__content">
+                            <div class="enterprise-alert__title">System Maintenance Scheduled</div>
+                            <div class="enterprise-alert__message">
+                                The system will undergo scheduled maintenance on October 20, 2025 from 2:00 AM to 4:00 AM UTC.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Grid -->
+                    <div class="enterprise-card">
+                        <div class="enterprise-card__header">
+                            <h2 class="enterprise-card__title">Recent Tasks</h2>
+                            <div class="enterprise-card__actions">
+                                <input type="search" 
+                                       class="enterprise-input" 
+                                       placeholder="Filter tasks..."
+                                       style="width: 200px; height: 32px; font-size: 12px;">
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-grid">
+                            <div class="enterprise-grid__wrapper">
+                                <table class="enterprise-grid__table">
+                                    <thead class="enterprise-grid__header">
+                                        <tr>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--checkbox">
+                                                <input type="checkbox" aria-label="Select all">
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="id">
+                                                ID
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="title">
+                                                Title
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="assignee">
+                                                Assignee
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="status">
+                                                Status
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="priority">
+                                                Priority
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="due_date">
+                                                Due Date
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="enterprise-grid__body">
+                                        <tr class="enterprise-grid__row" data-row-id="1">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#1001</td>
+                                            <td class="enterprise-grid__cell">Implement user authentication</td>
+                                            <td class="enterprise-grid__cell">John Doe</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Completed</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--danger">High</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2025-10-15</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="2">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#1002</td>
+                                            <td class="enterprise-grid__cell">Design new dashboard layout</td>
+                                            <td class="enterprise-grid__cell">Jane Smith</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">In Progress</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">Medium</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2025-10-18</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="3">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#1003</td>
+                                            <td class="enterprise-grid__cell">Fix database connection issues</td>
+                                            <td class="enterprise-grid__cell">Mike Johnson</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--info">Pending</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--danger">High</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2025-10-16</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="4">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#1004</td>
+                                            <td class="enterprise-grid__cell">Update documentation</td>
+                                            <td class="enterprise-grid__cell">Sarah Williams</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">In Progress</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--default">Low</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2025-10-22</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="5">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#1005</td>
+                                            <td class="enterprise-grid__cell">Optimize database queries</td>
+                                            <td class="enterprise-grid__cell">Robert Brown</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Completed</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">Medium</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2025-10-14</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="enterprise-pagination">
+                                <div class="enterprise-pagination__info">
+                                    Showing 1 to 5 of 247 entries
+                                </div>
+                                <div class="enterprise-pagination__controls">
+                                    <button class="enterprise-pagination__button" disabled>Previous</button>
+                                    <button class="enterprise-pagination__button enterprise-pagination__button--active">1</button>
+                                    <button class="enterprise-pagination__button">2</button>
+                                    <button class="enterprise-pagination__button">3</button>
+                                    <button class="enterprise-pagination__button">...</button>
+                                    <button class="enterprise-pagination__button">50</button>
+                                    <button class="enterprise-pagination__button">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Right Sidebar (Optional) -->
+            <aside class="enterprise-sidebar enterprise-sidebar--right">
+                <div class="enterprise-card">
+                    <div class="enterprise-card__header">
+                        <h3 class="enterprise-card__title">Recent Activity</h3>
+                    </div>
+                    <div class="enterprise-card__body">
+                        <div style="font-size: 12px; color: var(--enterprise-text-secondary);">
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Task #1001 completed</div>
+                                <div>by John Doe</div>
+                                <div style="color: var(--enterprise-text-muted);">2 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">New comment on #1002</div>
+                                <div>by Jane Smith</div>
+                                <div style="color: var(--enterprise-text-muted);">4 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Task #1003 created</div>
+                                <div>by Mike Johnson</div>
+                                <div style="color: var(--enterprise-text-muted);">6 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+
+        <!-- Footer Bar -->
+        <footer class="enterprise-footer">
+            <span>© 2025 Enterprise System</span>
+            <span style="margin-left: auto;">Version 1.0.0</span>
+        </footer>
+
+    </div>
+
+    <!-- Example Modal -->
+    <div class="enterprise-modal" id="exampleModal">
+        <div class="enterprise-modal__backdrop"></div>
+        <div class="enterprise-modal__container">
+            <div class="enterprise-modal__header">
+                <h2 class="enterprise-modal__title">Create New Task</h2>
+                <button class="enterprise-modal__close" aria-label="Close">×</button>
+            </div>
+            <div class="enterprise-modal__body">
+                <form data-validate>
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Task Title</label>
+                        <input type="text" 
+                               class="enterprise-input" 
+                               required
+                               placeholder="Enter task title">
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label">Description</label>
+                        <textarea class="enterprise-textarea" 
+                                  placeholder="Enter task description"></textarea>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Assignee</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select assignee</option>
+                            <option value="1">John Doe</option>
+                            <option value="2">Jane Smith</option>
+                            <option value="3">Mike Johnson</option>
+                        </select>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Priority</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select priority</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Due Date</label>
+                        <input type="date" 
+                               class="enterprise-input" 
+                               required>
+                    </div>
+                </form>
+            </div>
+            <div class="enterprise-modal__footer">
+                <button class="enterprise-button enterprise-button--secondary" onclick="closeModal()">Cancel</button>
+                <button class="enterprise-button enterprise-button--primary">Create Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Enterprise UI Kit JS -->
+    <script src="assets/js/kit-enterprise.js"></script>
+    
+    <!-- Demo Scripts -->
+    <script>
+        // Open modal on "New Task" button
+        document.querySelector('.enterprise-toolbar__right .enterprise-button--primary').addEventListener('click', function() {
+            const modal = document.getElementById('exampleModal');
+            const modalInstance = new window.EnterpriseUI.Modal(modal);
+            modalInstance.open();
+        });
+        
+        function closeModal() {
+            const modal = document.getElementById('exampleModal');
+            const modalInstance = new window.EnterpriseUI.Modal(modal);
+            modalInstance.close();
+        }
+        
+        // Demo toast notifications
+        setTimeout(() => {
+            window.EnterpriseToast.info('Welcome', 'Enterprise UI Kit dashboard loaded successfully');
+        }, 1000);
+        
+        // Grid event listeners
+        document.querySelector('.enterprise-grid').addEventListener('grid:selectionChanged', function(e) {
+            console.log('Selected rows:', e.detail.selectedRows);
+        });
+        
+        document.querySelector('.enterprise-grid').addEventListener('grid:sort', function(e) {
+            console.log('Sort:', e.detail.column, e.detail.direction);
+        });
+    </script>
+</body>
+</html>

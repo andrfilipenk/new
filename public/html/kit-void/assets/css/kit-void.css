@@ -1,0 +1,278 @@
+/**
+ * Kit Void - Abstract Geometric Interface
+ * Main Stylesheet
+ */
+
+/* ============================================
+   CUSTOM PROPERTIES
+   ============================================ */
+:root {
+    /* Color Palette */
+    --void-black: #000000;
+    --void-dark: #0A0A0A;
+    --void-cyan: #00FFF0;
+    --void-magenta: #FF00FF;
+    --void-yellow: #FFFF00;
+    --void-green: #00FF00;
+    --void-red: #FF0000;
+    --void-white: #FFFFFF;
+    --void-gray: #333333;
+    
+    /* Typography */
+    --font-display: 'Audiowide', cursive;
+    --font-header: 'Chakra Petch', sans-serif;
+    --font-body: 'Roboto Mono', monospace;
+    --font-mono: 'Share Tech Mono', monospace;
+    
+    /* Grid */
+    --grid-size: 50px;
+    --grid-color: rgba(0, 255, 240, 0.15);
+    --grid-thick-color: rgba(0, 255, 240, 0.3);
+    
+    /* Perspective */
+    --perspective: 800px;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--void-white);
+    background: var(--void-black);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+.kit-void-display {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 400;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
+.kit-void-h1 {
+    font-family: var(--font-header);
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.kit-void-h2 {
+    font-family: var(--font-header);
+    font-size: 1.625rem;
+    font-weight: 600;
+}
+
+.kit-void-body {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+
+.kit-void-metric {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 400;
+}
+
+.kit-void-label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* ============================================
+   INFINITE GRID BACKGROUND
+   ============================================ */
+.kit-void-grid {
+    position: fixed;
+    inset: 0;
+    background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(var(--grid-thick-color) 2px, transparent 2px),
+        linear-gradient(90deg, var(--grid-thick-color) 2px, transparent 2px);
+    background-size: 
+        var(--grid-size) var(--grid-size),
+        var(--grid-size) var(--grid-size),
+        calc(var(--grid-size) * 5) calc(var(--grid-size) * 5),
+        calc(var(--grid-size) * 5) calc(var(--grid-size) * 5);
+    background-position: 0 0, 0 0, 0 0, 0 0;
+    perspective: var(--perspective);
+    transform-style: preserve-3d;
+    z-index: -1;
+}
+
+.kit-void-grid::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, var(--void-black) 100%);
+    opacity: 0.5;
+}
+
+/* ============================================
+   SCANLINE EFFECT
+   ============================================ */
+.kit-void-scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--void-cyan), transparent);
+    box-shadow: 0 0 10px var(--void-cyan);
+    opacity: 0.3;
+    animation: scanline 5s linear infinite;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+@keyframes scanline {
+    from { transform: translateY(0); }
+    to { transform: translateY(100vh); }
+}
+
+/* ============================================
+   WIREFRAME UTILITIES
+   ============================================ */
+.kit-void-wireframe {
+    border: 1px solid var(--void-cyan);
+    background: transparent;
+}
+
+.kit-void-wireframe-thick {
+    border: 2px solid var(--void-cyan);
+    background: transparent;
+}
+
+.kit-void-glow-cyan {
+    box-shadow: 
+        0 0 5px var(--void-cyan),
+        0 0 10px var(--void-cyan),
+        inset 0 0 5px var(--void-cyan);
+}
+
+.kit-void-glow-magenta {
+    box-shadow: 
+        0 0 5px var(--void-magenta),
+        0 0 10px var(--void-magenta),
+        inset 0 0 5px var(--void-magenta);
+}
+
+/* ============================================
+   LAYOUT
+   ============================================ */
+.kit-void-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+.kit-void-sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--void-cyan);
+    outline-offset: 4px;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes rotate-3d {
+    from {
+        transform: rotateY(0deg) rotateX(0deg);
+    }
+    to {
+        transform: rotateY(360deg) rotateX(360deg);
+    }
+}
+
+@keyframes vertex-pulse {
+    0%, 100% {
+        box-shadow: 0 0 4px var(--void-cyan);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 12px var(--void-cyan), 0 0 20px var(--void-cyan);
+        transform: scale(1.2);
+    }
+}
+
+@keyframes wire-glow {
+    0%, 100% {
+        box-shadow: 0 0 5px var(--void-cyan);
+    }
+    50% {
+        box-shadow: 0 0 15px var(--void-cyan), 0 0 25px var(--void-cyan);
+    }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .kit-void-scanline {
+        display: none;
+    }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1439px) {
+    .kit-void-display { font-size: 3rem; }
+    .kit-void-h1 { font-size: 2rem; }
+}
+
+@media (max-width: 767px) {
+    .kit-void-display { font-size: 2rem; }
+    .kit-void-h1 { font-size: 1.5rem; }
+    .kit-void-container { padding: 1rem; }
+    
+    :root {
+        --grid-size: 30px;
+    }
+}
