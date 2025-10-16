@@ -165,5 +165,6 @@ async function sendData() {
 
 // Take over form submission
 form.addEventListener("submit", (event) => {
-  event.preventDefault();
-  sendData();
+    event.preventDefault();
+    sendData();
+});
