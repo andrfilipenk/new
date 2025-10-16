@@ -1,22 +1,30 @@
+<?php
+
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url');
+?>
 <header class="enterprise-header">
-            <div class="enterprise-header__brand">
-                <i class="bi bi-grid-3x3-gap"></i> Enterprise
-            </div>
-            
-            <div class="enterprise-header__search">
-                <input type="search" class="enterprise-input" placeholder="Search... (Ctrl+K)" aria-label="Global search">
-            </div>
-            
-            <div class="enterprise-header__actions">
-                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" title="Notifications">
-                    <i class="bi bi-bell"></i>
-                </button>
-                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" title="Settings">
-                    <i class="bi bi-gear"></i>
-                </button>
-                <button class="enterprise-button enterprise-button--secondary" title="User menu">
-                    <i class="bi bi-person-circle"></i>
-                    <span><?=$this->getDI()->get('auth')->getUser()->name ?></span>
-                </button>
-            </div>
-        </header>
+    <div class="enterprise-header__brand">
+        <i class="bi bi-grid-3x3-gap"></i> Enterprise
+    </div>
+
+    <div class="enterprise-header__search">
+        <input type="search" class="enterprise-input" placeholder="Search... (Ctrl+K)" aria-label="Global search">
+    </div>
+
+    <div class="enterprise-header__actions">
+        <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" title="Notifications">
+            <i class="bi bi-bell"></i>
+        </button>
+        <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" title="Settings">
+            <i class="bi bi-gear"></i>
+        </button>
+        <button class="enterprise-button enterprise-button--secondary">
+            <i class="bi bi-person-circle"></i>
+            <span><?= $this->getDI()->get('auth')->getUser()->name ?></span>
+        </button>
+        <a href="<?=$url->get('logout')?>" class="enterprise-button enterprise-button--default enterprise-button--icon-only">
+            <i class="bi bi-box-arrow-right"></i>
+        </a>
+    </div>
+</header>

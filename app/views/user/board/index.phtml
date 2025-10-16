@@ -20,7 +20,7 @@
     </div>
 
     <div class="enterprise-card__form">
-        <div class="container">
+        <div class="container-fluid">
             <?=$this->partial('intern/card-form', ['priorities' => $priorities])?>
         </div>
     </div>
@@ -34,30 +34,26 @@
                             <input type="checkbox" aria-label="Select all">
                         </th>
                         <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="id">
-                            ID
-                            <span class="enterprise-grid__sort-icon">▲</span>
+                            ID <span class="enterprise-grid__sort-icon">▲</span>
                         </th>
                         <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="title">
-                            Title
-                            <span class="enterprise-grid__sort-icon">▲</span>
+                            Title <span class="enterprise-grid__sort-icon">▲</span>
                         </th>
                         <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="author">
-                            Author
-                            <span class="enterprise-grid__sort-icon">▲</span>
+                            Author <span class="enterprise-grid__sort-icon">▲</span>
                         </th>
                         <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="status">
-                            Status
-                            <span class="enterprise-grid__sort-icon">▲</span>
+                            Status <span class="enterprise-grid__sort-icon">▲</span>
                         </th>
                         <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="priority">
-                            Priority
-                            <span class="enterprise-grid__sort-icon">▲</span>
+                            Priority <span class="enterprise-grid__sort-icon">▲</span>
                         </th>
-                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="due_date">
-                            Due Date
-                            <span class="enterprise-grid__sort-icon">▲</span>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="begin_date">
+                            Begin Date <span class="enterprise-grid__sort-icon">▲</span>
                         </th>
-                        <th class="enterprise-grid__header-cell">Actions</th>
+                        <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="end_date">
+                            End Date <span class="enterprise-grid__sort-icon">▲</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="enterprise-grid__body">
@@ -66,21 +62,12 @@
                         <tr class="enterprise-grid__row" data-row-id="<?=$task->id?>">
                             <td class="enterprise-grid__cell enterprise-grid__cell--checkbox"><input type="checkbox" aria-label="Select row"></td>
                             <td class="enterprise-grid__cell">#<?=$task->id?></td>
-                            <td class="enterprise-grid__cell"><b><?=$task->title?></b></td>
+                            <td class="enterprise-grid__cell"><a href="#"><b><?=$task->title?></b></a></td>
                             <td class="enterprise-grid__cell"><?=$task->creator->name?></td>
                             <td class="enterprise-grid__cell"><span class="enterprise-badge enterprise-badge--<?=$task->status->code?>"><?=$task->status->title?></span></td>
                             <td class="enterprise-grid__cell"><span class="enterprise-badge enterprise-badge--<?=$task->priority->code?>"><?=$task->priority->title?></span></td>
+                            <td class="enterprise-grid__cell"><?=$task->dateFormated('begin_date')?></td>
                             <td class="enterprise-grid__cell"><?=$task->dateFormated('end_date')?></td>
-                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
-                                <div class="enterprise-grid__cell-actions">
-                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                </div>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -151,17 +138,16 @@
                     const selectedBeginDate = this.value;
                     if (selectedBeginDate) {
                         endDateInput.min = selectedBeginDate;
+                        endDateInput.value = selectedBeginDate;
                         if (endDateInput.value && endDateInput.value < selectedBeginDate) {
                             endDateInput.value = selectedBeginDate;
                         }
-                        endDateInput.focus();
                         endDateInput.showPicker();
+                        endDateInput.focus();
                     }
                 });
             }
         })();
-
-
 
         let demoModalInstance;
         function openDemoModal() {

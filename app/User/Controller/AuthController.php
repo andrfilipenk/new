@@ -4,14 +4,20 @@ namespace User\Controller;
 
 use Core\Forms\FormManager;
 use User\Form\LoginForm;
+use User\Model\Auth as AuthModel;
 use User\Model\User as UserModel;
 
 class AuthController extends AbstractController
 {
-    public function beforeExecute()
+    
+    public function logoutAction()
     {
-         ;
-        return parent::beforeExecute();
+        /** @var AuthModel $auth */
+        $auth = $this->getDI()->get('auth');
+        if ($auth->logout()) {
+            $this->flashSuccess(message: 'Logout successfull.');
+        }
+        return $this->redirect('board');
     }
 
     public function loginAction()

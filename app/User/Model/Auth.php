@@ -16,12 +16,34 @@ class Auth {
         return $this->getDI()->get('session');
     }
 
+    /**
+     *
+     * @return boolean
+     */
     public function isLoggedIn()
     {
         return $this->getSession()->has('user');
     }
 
-    public function getUser() {
+    /**
+     *
+     * @return void
+     */
+    public function logout() 
+    {
+        if ($this->isLoggedIn()) {
+            $this->getSession()->remove('user');
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *
+     * @return User
+     */
+    public function getUser() 
+    {
         if ($this->isLoggedIn()) {
             $id = $this->getSession()->get('user');
             return User::find($id);
