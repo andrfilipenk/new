@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects Management - Enterprise UI Kit</title>
+    
+    <!-- Bootstrap CSS (Foundation) -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="../css/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Enterprise UI Kit CSS -->
+    <link href="../css/kit-enterprise.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Root Layout Container -->
+    <div class="enterprise-layout">
+        
+        <!-- Header Bar -->
+        <header class="enterprise-header">
+            <div class="enterprise-header__brand">
+                <i class="bi bi-grid-3x3-gap"></i> Enterprise
+            </div>
+            
+            <div class="enterprise-header__search">
+                <input type="search" 
+                       class="enterprise-input" 
+                       placeholder="Search... (Ctrl+K)"
+                       aria-label="Global search">
+            </div>
+            
+            <div class="enterprise-header__actions">
+                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                        title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </button>
+                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                        title="Settings">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <button class="enterprise-button enterprise-button--secondary" 
+                        title="User menu">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Admin User</span>
+                </button>
+
+                 <a href="components.html" class="enterprise-button enterprise-button--default">
+                    <i class="bi bi-speedometer2"></i>
+                    Components
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="enterprise-main">
+            
+            <!-- Left Sidebar -->
+            <aside class="enterprise-sidebar">
+                <nav class="enterprise-nav">
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">Main</div>
+                        <a href="dashboard.html" class="enterprise-nav-item">
+                            <i class="bi bi-speedometer2 enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Dashboard</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-list-check enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Tasks</span>
+                        </a>
+                        <a href="projects-view.html" class="enterprise-nav-item enterprise-nav-item--active">
+                            <i class="bi bi-folder enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Projects</span>
+                        </a>
+                        <a href="customers-view.html" class="enterprise-nav-item">
+                            <i class="bi bi-people enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Customers</span>
+                        </a>
+                        <a href="orders-view.html" class="enterprise-nav-item">
+                            <i class="bi bi-cart enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Orders</span>
+                        </a>
+                    </div>
+                    
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">Reports</div>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-bar-chart enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Analytics</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-file-earmark-text enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Documents</span>
+                        </a>
+                    </div>
+                    
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">System</div>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-gear enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Settings</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-question-circle enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Help</span>
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="enterprise-content">
+                
+                <!-- Toolbar -->
+                <div class="enterprise-toolbar">
+                    <div class="enterprise-toolbar__left">
+                        <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                                data-sidebar-toggle
+                                title="Toggle sidebar">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        
+                        <nav class="enterprise-breadcrumb">
+                            <a href="#" class="enterprise-breadcrumb__item">Home</a>
+                            <span class="enterprise-breadcrumb__separator">/</span>
+                            <span class="enterprise-breadcrumb__item enterprise-breadcrumb__item--active">Projects</span>
+                        </nav>
+                    </div>
+                    
+                    <div class="enterprise-toolbar__right">
+                        <button class="enterprise-button enterprise-button--secondary">
+                            <i class="bi bi-download"></i>
+                            Export
+                        </button>
+                        <button class="enterprise-button enterprise-button--primary" id="newProjectBtn">
+                            <i class="bi bi-plus-lg"></i>
+                            New Project
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <div class="enterprise-content__body">
+                    
+                    <!-- Metrics Row -->
+                    <div class="enterprise-metrics">
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Total Projects</div>
+                            <div class="enterprise-metric-card__value">47</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>8% from last quarter</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Active Projects</div>
+                            <div class="enterprise-metric-card__value">32</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>5% from last quarter</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">On Hold</div>
+                            <div class="enterprise-metric-card__value">9</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--neutral">
+                                <i class="bi bi-dash"></i>
+                                <span>No change</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Completed</div>
+                            <div class="enterprise-metric-card__value">6</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>15% from last quarter</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Grid -->
+                    <div class="enterprise-card">
+                        <div class="enterprise-card__header">
+                            <h2 class="enterprise-card__title">Projects</h2>
+                            <div class="enterprise-card__actions">
+                                <input type="search" 
+                                       class="enterprise-input" 
+                                       placeholder="Filter projects..."
+                                       style="width: 200px; height: 32px; font-size: 12px;">
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-grid">
+                            <div class="enterprise-grid__wrapper">
+                                <table class="enterprise-grid__table">
+                                    <thead class="enterprise-grid__header">
+                                        <tr>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--checkbox">
+                                                <input type="checkbox" aria-label="Select all">
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="id">
+                                                Project ID
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="name">
+                                                Project Name
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="manager">
+                                                Manager
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="status">
+                                                Status
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="priority">
+                                                Priority
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="budget">
+                                                Budget
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="start_date">
+                                                Start Date
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="end_date">
+                                                End Date
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="enterprise-grid__body">
+                                        <tr class="enterprise-grid__row" data-row-id="1">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#PRJ-001</td>
+                                            <td class="enterprise-grid__cell">Project Alpha</td>
+                                            <td class="enterprise-grid__cell">Sarah Johnson</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Active</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--danger">High</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">$125,000</td>
+                                            <td class="enterprise-grid__cell">2025-01-15</td>
+                                            <td class="enterprise-grid__cell">2025-06-30</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="2">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#PRJ-002</td>
+                                            <td class="enterprise-grid__cell">Website Redesign</td>
+                                            <td class="enterprise-grid__cell">Mike Chen</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Active</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">Medium</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">$75,000</td>
+                                            <td class="enterprise-grid__cell">2025-02-01</td>
+                                            <td class="enterprise-grid__cell">2025-04-30</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="3">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#PRJ-003</td>
+                                            <td class="enterprise-grid__cell">Mobile App Development</td>
+                                            <td class="enterprise-grid__cell">Emily Davis</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">On Hold</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--danger">High</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">$200,000</td>
+                                            <td class="enterprise-grid__cell">2025-03-01</td>
+                                            <td class="enterprise-grid__cell">2025-09-30</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="4">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#PRJ-004</td>
+                                            <td class="enterprise-grid__cell">Infrastructure Upgrade</td>
+                                            <td class="enterprise-grid__cell">Robert Williams</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Active</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--default">Low</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">$50,000</td>
+                                            <td class="enterprise-grid__cell">2025-01-10</td>
+                                            <td class="enterprise-grid__cell">2025-03-15</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="5">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#PRJ-005</td>
+                                            <td class="enterprise-grid__cell">Marketing Campaign</td>
+                                            <td class="enterprise-grid__cell">Lisa Anderson</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--info">Completed</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">Medium</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">$30,000</td>
+                                            <td class="enterprise-grid__cell">2024-11-01</td>
+                                            <td class="enterprise-grid__cell">2025-01-31</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="enterprise-pagination">
+                                <div class="enterprise-pagination__info">
+                                    Showing 1 to 5 of 47 entries
+                                </div>
+                                <div class="enterprise-pagination__controls">
+                                    <button class="enterprise-pagination__button" disabled>Previous</button>
+                                    <button class="enterprise-pagination__button enterprise-pagination__button--active">1</button>
+                                    <button class="enterprise-pagination__button">2</button>
+                                    <button class="enterprise-pagination__button">3</button>
+                                    <button class="enterprise-pagination__button">...</button>
+                                    <button class="enterprise-pagination__button">10</button>
+                                    <button class="enterprise-pagination__button">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Right Sidebar (Optional) -->
+            <aside class="enterprise-sidebar enterprise-sidebar--right">
+                <div class="enterprise-card">
+                    <div class="enterprise-card__header">
+                        <h3 class="enterprise-card__title">Recent Activity</h3>
+                    </div>
+                    <div class="enterprise-card__body">
+                        <div style="font-size: 12px; color: var(--enterprise-text-secondary);">
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Project Alpha status changed</div>
+                                <div>by Sarah Johnson</div>
+                                <div style="color: var(--enterprise-text-muted);">2 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">New team member assigned to Website Redesign</div>
+                                <div>by Mike Chen</div>
+                                <div style="color: var(--enterprise-text-muted);">4 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Mobile App Development milestone achieved</div>
+                                <div>by Emily Davis</div>
+                                <div style="color: var(--enterprise-text-muted);">6 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Infrastructure Upgrade budget updated</div>
+                                <div>by Robert Williams</div>
+                                <div style="color: var(--enterprise-text-muted);">8 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Marketing Campaign completed</div>
+                                <div>by Lisa Anderson</div>
+                                <div style="color: var(--enterprise-text-muted);">10 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+
+        <!-- Footer Bar -->
+        <footer class="enterprise-footer">
+            <span>© 2025 Enterprise System</span>
+            <span style="margin-left: auto;">Version 1.0.0</span>
+        </footer>
+
+    </div>
+
+    <!-- New Project Modal -->
+    <div class="enterprise-modal" id="newProjectModal">
+        <div class="enterprise-modal__backdrop"></div>
+        <div class="enterprise-modal__container">
+            <div class="enterprise-modal__header">
+                <h2 class="enterprise-modal__title">Create New Project</h2>
+                <button class="enterprise-modal__close" aria-label="Close">×</button>
+            </div>
+            <div class="enterprise-modal__body">
+                <form data-validate>
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Project Name</label>
+                        <input type="text" 
+                               class="enterprise-input" 
+                               required
+                               placeholder="Enter project name">
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label">Description</label>
+                        <textarea class="enterprise-textarea" 
+                                  placeholder="Enter project description"></textarea>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Project Manager</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select project manager</option>
+                            <option value="1">Sarah Johnson</option>
+                            <option value="2">Mike Chen</option>
+                            <option value="3">Emily Davis</option>
+                            <option value="4">Robert Williams</option>
+                            <option value="5">Lisa Anderson</option>
+                        </select>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Start Date</label>
+                        <input type="date" 
+                               class="enterprise-input" 
+                               required>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">End Date</label>
+                        <input type="date" 
+                               class="enterprise-input" 
+                               required>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label">Budget</label>
+                        <input type="number" 
+                               class="enterprise-input" 
+                               placeholder="Enter budget amount"
+                               min="0"
+                               step="1000">
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Priority</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select priority</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Status</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select status</option>
+                            <option value="active">Active</option>
+                            <option value="on_hold">On Hold</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="enterprise-modal__footer">
+                <button class="enterprise-button enterprise-button--secondary" onclick="closeProjectModal()">Cancel</button>
+                <button class="enterprise-button enterprise-button--primary">Create Project</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Enterprise UI Kit JS -->
+    <script src="../js/kit-enterprise.js"></script>
+    
+    <!-- Projects View Scripts -->
+    <script>
+        // Open modal on "New Project" button
+        document.getElementById('newProjectBtn').addEventListener('click', function() {
+            const modal = document.getElementById('newProjectModal');
+            const modalInstance = new window.EnterpriseUI.Modal(modal);
+            modalInstance.open();
+        });
+        
+        function closeProjectModal() {
+            const modal = document.getElementById('newProjectModal');
+            const modalInstance = new window.EnterpriseUI.Modal(modal);
+            modalInstance.close();
+        }
+        
+        // Demo toast notifications
+        setTimeout(() => {
+            window.EnterpriseToast.info('Welcome', 'Projects Management view loaded successfully');
+        }, 1000);
+        
+        // Grid event listeners
+        document.querySelector('.enterprise-grid').addEventListener('grid:selectionChanged', function(e) {
+            console.log('Selected projects:', e.detail.selectedRows);
+        });
+        
+        document.querySelector('.enterprise-grid').addEventListener('grid:sort', function(e) {
+            console.log('Sort:', e.detail.column, e.detail.direction);
+        });
+    </script>
+</body>
+</html>
