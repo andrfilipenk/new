@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers Management - Enterprise UI Kit</title>
+    
+    <!-- Bootstrap CSS (Foundation) -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="../css/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Enterprise UI Kit CSS -->
+    <link href="../css/kit-enterprise.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Root Layout Container -->
+    <div class="enterprise-layout">
+        
+        <!-- Header Bar -->
+        <header class="enterprise-header">
+            <div class="enterprise-header__brand">
+                <i class="bi bi-grid-3x3-gap"></i> Enterprise
+            </div>
+            
+            <div class="enterprise-header__search">
+                <input type="search" 
+                       class="enterprise-input" 
+                       placeholder="Search... (Ctrl+K)"
+                       aria-label="Global search">
+            </div>
+            
+            <div class="enterprise-header__actions">
+                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                        title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </button>
+                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                        title="Settings">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <button class="enterprise-button enterprise-button--secondary" 
+                        title="User menu">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Admin User</span>
+                </button>
+
+                 <a href="components.html" class="enterprise-button enterprise-button--default">
+                    <i class="bi bi-speedometer2"></i>
+                    Components
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="enterprise-main">
+            
+            <!-- Left Sidebar -->
+            <aside class="enterprise-sidebar">
+                <nav class="enterprise-nav">
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">Main</div>
+                        <a href="dashboard.html" class="enterprise-nav-item">
+                            <i class="bi bi-speedometer2 enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Dashboard</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-list-check enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Tasks</span>
+                        </a>
+                        <a href="projects-view.html" class="enterprise-nav-item">
+                            <i class="bi bi-folder enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Projects</span>
+                        </a>
+                        <a href="customers-view.html" class="enterprise-nav-item enterprise-nav-item--active">
+                            <i class="bi bi-people enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Customers</span>
+                        </a>
+                        <a href="orders-view.html" class="enterprise-nav-item">
+                            <i class="bi bi-cart enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Orders</span>
+                        </a>
+                    </div>
+                    
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">Reports</div>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-bar-chart enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Analytics</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-file-earmark-text enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Documents</span>
+                        </a>
+                    </div>
+                    
+                    <div class="enterprise-nav__group">
+                        <div class="enterprise-nav__group-header">System</div>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-gear enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Settings</span>
+                        </a>
+                        <a href="#" class="enterprise-nav-item">
+                            <i class="bi bi-question-circle enterprise-nav-item__icon"></i>
+                            <span class="enterprise-nav-item__text">Help</span>
+                        </a>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Content Area -->
+            <main class="enterprise-content">
+                
+                <!-- Toolbar -->
+                <div class="enterprise-toolbar">
+                    <div class="enterprise-toolbar__left">
+                        <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                                data-sidebar-toggle
+                                title="Toggle sidebar">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        
+                        <nav class="enterprise-breadcrumb">
+                            <a href="#" class="enterprise-breadcrumb__item">Home</a>
+                            <span class="enterprise-breadcrumb__separator">/</span>
+                            <span class="enterprise-breadcrumb__item enterprise-breadcrumb__item--active">Customers</span>
+                        </nav>
+                    </div>
+                    
+                    <div class="enterprise-toolbar__right">
+                        <button class="enterprise-button enterprise-button--secondary">
+                            <i class="bi bi-download"></i>
+                            Export
+                        </button>
+                        <button class="enterprise-button enterprise-button--primary" id="newCustomerBtn">
+                            <i class="bi bi-plus-lg"></i>
+                            New Customer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <div class="enterprise-content__body">
+                    
+                    <!-- Metrics Row -->
+                    <div class="enterprise-metrics">
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Total Customers</div>
+                            <div class="enterprise-metric-card__value">847</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>15% from last month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Active Customers</div>
+                            <div class="enterprise-metric-card__value">682</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>10% from last month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">New This Month</div>
+                            <div class="enterprise-metric-card__value">43</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--up">
+                                <i class="bi bi-arrow-up"></i>
+                                <span>22% from last month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-metric-card">
+                            <div class="enterprise-metric-card__label">Churned</div>
+                            <div class="enterprise-metric-card__value">12</div>
+                            <div class="enterprise-metric-card__trend enterprise-metric-card__trend--down">
+                                <i class="bi bi-arrow-down"></i>
+                                <span>3% from last month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data Grid -->
+                    <div class="enterprise-card">
+                        <div class="enterprise-card__header">
+                            <h2 class="enterprise-card__title">Customers</h2>
+                            <div class="enterprise-card__actions">
+                                <input type="search" 
+                                       class="enterprise-input" 
+                                       placeholder="Filter customers..."
+                                       style="width: 200px; height: 32px; font-size: 12px;">
+                            </div>
+                        </div>
+                        
+                        <div class="enterprise-grid">
+                            <div class="enterprise-grid__wrapper">
+                                <table class="enterprise-grid__table">
+                                    <thead class="enterprise-grid__header">
+                                        <tr>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--checkbox">
+                                                <input type="checkbox" aria-label="Select all">
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="id">
+                                                Customer ID
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="company">
+                                                Company Name
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="contact">
+                                                Contact Person
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="email">
+                                                Email
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell" data-column="phone">
+                                                Phone
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="status">
+                                                Status
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="type">
+                                                Type
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell enterprise-grid__header-cell--sortable" data-column="join_date">
+                                                Join Date
+                                                <span class="enterprise-grid__sort-icon">▲</span>
+                                            </th>
+                                            <th class="enterprise-grid__header-cell">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="enterprise-grid__body">
+                                        <tr class="enterprise-grid__row" data-row-id="1">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#CUS-001</td>
+                                            <td class="enterprise-grid__cell">Acme Corporation</td>
+                                            <td class="enterprise-grid__cell">John Smith</td>
+                                            <td class="enterprise-grid__cell">j.smith@acme.com</td>
+                                            <td class="enterprise-grid__cell">(555) 123-4567</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Active</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--info">Enterprise</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2023-03-15</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="2">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#CUS-002</td>
+                                            <td class="enterprise-grid__cell">Tech Solutions Inc</td>
+                                            <td class="enterprise-grid__cell">Mary Johnson</td>
+                                            <td class="enterprise-grid__cell">mary@techsolutions.com</td>
+                                            <td class="enterprise-grid__cell">(555) 234-5678</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Active</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">SMB</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2024-06-20</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="3">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#CUS-003</td>
+                                            <td class="enterprise-grid__cell">Global Industries</td>
+                                            <td class="enterprise-grid__cell">David Lee</td>
+                                            <td class="enterprise-grid__cell">d.lee@global.com</td>
+                                            <td class="enterprise-grid__cell">(555) 345-6789</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Active</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--info">Enterprise</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2022-11-08</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="4">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#CUS-004</td>
+                                            <td class="enterprise-grid__cell">Startup Labs</td>
+                                            <td class="enterprise-grid__cell">Sarah Wilson</td>
+                                            <td class="enterprise-grid__cell">sarah@startuplabs.io</td>
+                                            <td class="enterprise-grid__cell">(555) 456-7890</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--default">Inactive</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--warning">SMB</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2024-01-12</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="enterprise-grid__row" data-row-id="5">
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
+                                                <input type="checkbox" aria-label="Select row">
+                                            </td>
+                                            <td class="enterprise-grid__cell">#CUS-005</td>
+                                            <td class="enterprise-grid__cell">Retail Chain Co</td>
+                                            <td class="enterprise-grid__cell">Michael Brown</td>
+                                            <td class="enterprise-grid__cell">m.brown@retailchain.com</td>
+                                            <td class="enterprise-grid__cell">(555) 567-8901</td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--success">Active</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">
+                                                <span class="enterprise-badge enterprise-badge--info">Enterprise</span>
+                                            </td>
+                                            <td class="enterprise-grid__cell">2023-09-25</td>
+                                            <td class="enterprise-grid__cell enterprise-grid__cell--actions">
+                                                <div class="enterprise-grid__cell-actions">
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="enterprise-pagination">
+                                <div class="enterprise-pagination__info">
+                                    Showing 1 to 5 of 847 entries
+                                </div>
+                                <div class="enterprise-pagination__controls">
+                                    <button class="enterprise-pagination__button" disabled>Previous</button>
+                                    <button class="enterprise-pagination__button enterprise-pagination__button--active">1</button>
+                                    <button class="enterprise-pagination__button">2</button>
+                                    <button class="enterprise-pagination__button">3</button>
+                                    <button class="enterprise-pagination__button">...</button>
+                                    <button class="enterprise-pagination__button">170</button>
+                                    <button class="enterprise-pagination__button">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </main>
+
+            <!-- Right Sidebar -->
+            <aside class="enterprise-sidebar enterprise-sidebar--right">
+                <div class="enterprise-card">
+                    <div class="enterprise-card__header">
+                        <h3 class="enterprise-card__title">Recent Activity</h3>
+                    </div>
+                    <div class="enterprise-card__body">
+                        <div style="font-size: 12px; color: var(--enterprise-text-secondary);">
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">New customer registered: Acme Corporation</div>
+                                <div>by John Smith</div>
+                                <div style="color: var(--enterprise-text-muted);">2 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Customer profile updated: Tech Solutions Inc</div>
+                                <div>by Mary Johnson</div>
+                                <div style="color: var(--enterprise-text-muted);">4 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Customer status changed: Startup Labs</div>
+                                <div>from Active to Inactive</div>
+                                <div style="color: var(--enterprise-text-muted);">6 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Contract renewed: Global Industries</div>
+                                <div>by David Lee</div>
+                                <div style="color: var(--enterprise-text-muted);">8 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Support ticket resolved for Retail Chain Co</div>
+                                <div>by Michael Brown</div>
+                                <div style="color: var(--enterprise-text-muted);">10 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+
+        <!-- Footer Bar -->
+        <footer class="enterprise-footer">
+            <span>© 2025 Enterprise System</span>
+            <span style="margin-left: auto;">Version 1.0.0</span>
+        </footer>
+
+    </div>
+
+    <!-- New Customer Modal -->
+    <div class="enterprise-modal" id="newCustomerModal">
+        <div class="enterprise-modal__backdrop"></div>
+        <div class="enterprise-modal__container">
+            <div class="enterprise-modal__header">
+                <h2 class="enterprise-modal__title">Create New Customer</h2>
+                <button class="enterprise-modal__close" aria-label="Close">×</button>
+            </div>
+            <div class="enterprise-modal__body">
+                <form data-validate>
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Company Name</label>
+                        <input type="text" 
+                               class="enterprise-input" 
+                               required
+                               placeholder="Enter company name">
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Contact Person</label>
+                        <input type="text" 
+                               class="enterprise-input" 
+                               required
+                               placeholder="Enter contact person name">
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Email</label>
+                        <input type="email" 
+                               class="enterprise-input" 
+                               required
+                               placeholder="Enter email address">
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label">Phone</label>
+                        <input type="tel" 
+                               class="enterprise-input" 
+                               placeholder="Enter phone number">
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label">Address</label>
+                        <textarea class="enterprise-textarea" 
+                                  placeholder="Enter physical or mailing address"></textarea>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Customer Type</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select customer type</option>
+                            <option value="enterprise">Enterprise</option>
+                            <option value="smb">SMB</option>
+                            <option value="individual">Individual</option>
+                        </select>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Status</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label">Notes</label>
+                        <textarea class="enterprise-textarea" 
+                                  placeholder="Enter additional customer information"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="enterprise-modal__footer">
+                <button class="enterprise-button enterprise-button--secondary" onclick="closeCustomerModal()">Cancel</button>
+                <button class="enterprise-button enterprise-button--primary">Create Customer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Enterprise UI Kit JS -->
+    <script src="../js/kit-enterprise.js"></script>
+    
+    <!-- Customers View Scripts -->
+    <script>
+        // Open modal on "New Customer" button
+        document.getElementById('newCustomerBtn').addEventListener('click', function() {
+            const modal = document.getElementById('newCustomerModal');
+            const modalInstance = new window.EnterpriseUI.Modal(modal);
+            modalInstance.open();
+        });
+        
+        function closeCustomerModal() {
+            const modal = document.getElementById('newCustomerModal');
+            const modalInstance = new window.EnterpriseUI.Modal(modal);
+            modalInstance.close();
+        }
+        
+        // Demo toast notifications
+        setTimeout(() => {
+            window.EnterpriseToast.info('Welcome', 'Customers Management view loaded successfully');
+        }, 1000);
+        
+        // Grid event listeners
+        document.querySelector('.enterprise-grid').addEventListener('grid:selectionChanged', function(e) {
+            console.log('Selected customers:', e.detail.selectedRows);
+        });
+        
+        document.querySelector('.enterprise-grid').addEventListener('grid:sort', function(e) {
+            console.log('Sort:', e.detail.column, e.detail.direction);
+        });
+    </script>
+</body>
+</html>
