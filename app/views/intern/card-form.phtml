@@ -1,0 +1,23 @@
+<form class="row">
+    <div class="col-5">
+          <input type="text" name="title" class="enterprise-input" placeholder="This Task must be done by...">
+    </div>
+    <div class="col-2">
+        <select class="enterprise-select" name="priority_id">
+            <option>Priority</option>
+            <?php foreach ($priorities as $prio): ?>
+                <option value="<?=$prio->id?>"><?=$prio->title?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="col">
+        <div class="input-group">
+            <input type="date" class="enterprise-input" value="2025-10-16" name="begin_date" id="begin_date">
+            <span class="input-group-text">-</span>
+            <input type="date" class="enterprise-input" min="2025-10-16" name="end_date" id="end_date" value="">
+        </div>
+    </div>
+    <div class="col-2">
+        <input type="submit" class="enterprise-button enterprise-button--primary" value="Save">
+    </div>
+</form>

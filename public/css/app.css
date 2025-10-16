@@ -1,29 +1,5 @@
-.form-signin {
-    max-width: 330px;
-    padding: 1rem;
-}
 
-
-.usernav {
-    position: absolute;
-    font-weight: bold;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 30px;
-    background: #eee;
-}
-
-.grid-month {
-
-}
-.grid-month ul.cols,
-.grid-month ul.days {margin: 0; padding: 0; list-style-type: none; display: block;}
-.grid-month ul.cols li,
-.grid-month ul.days li {width: 30px;  color: #333; float: left; display: inline-block; text-align: center; font-weight: bold;}
-.grid-month ul.cols li.we {color: maroon; font-weight: normal;}
-.grid-month ul.days li a {display: block; height: 28px; line-height: 28px; margin: 1px; background: #eee; }
-.content {
+.content-bg-pattern {
     position: relative;
     flex: 1;
     background: 

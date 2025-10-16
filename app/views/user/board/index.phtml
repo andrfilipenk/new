@@ -11,26 +11,17 @@
 </div>
 
 
-<h2>Tasks assigned to my Person</h2>
 <div class="enterprise-card">
     <div class="enterprise-card__header">
-        <h2 class="enterprise-card__title">List of Tasks</h2>
+        <h2 class="enterprise-card__title">Tasks assigned to me</h2>
         <div class="enterprise-card__actions">
             <input type="search" class="enterprise-input" placeholder="Filter tasks..." style="width: 200px; height: 32px; font-size: 12px;">
         </div>
     </div>
 
-    <div class="inline-form">
-        <div class="row">
-            <div class="col">
-            1 of 3
-            </div>
-            <div class="col-6">
-            2 of 3 (wider)
-            </div>
-            <div class="col">
-            3 of 3
-            </div>
+    <div class="enterprise-card__form">
+        <div class="container">
+            <?=$this->partial('intern/card-form', ['priorities' => $priorities])?>
         </div>
     </div>
 
@@ -73,25 +64,13 @@
                     <?php foreach ($tasks as $task) : ?>
                         <?php $task = new \Intern\Model\Task($task) ?>
                         <tr class="enterprise-grid__row" data-row-id="<?=$task->id?>">
-                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox">
-                                <input type="checkbox" aria-label="Select row">
-                            </td>
+                            <td class="enterprise-grid__cell enterprise-grid__cell--checkbox"><input type="checkbox" aria-label="Select row"></td>
                             <td class="enterprise-grid__cell">#<?=$task->id?></td>
                             <td class="enterprise-grid__cell"><b><?=$task->title?></b></td>
                             <td class="enterprise-grid__cell"><?=$task->creator->name?></td>
-                            <td class="enterprise-grid__cell">
-                                <span class="enterprise-badge enterprise-badge--<?=$task->status->color?>">
-                                    <?=$task->status->title?>
-                                </span>
-                            </td>
-                            <td class="enterprise-grid__cell">
-                                <span class="enterprise-badge enterprise-badge--<?=$task->priority->color?>">
-                                    <?=$task->priority->title?>
-                                </span>
-                            </td>
-                            <td class="enterprise-grid__cell">
-                                <?=$task->dateFormated('end_date')?>
-                            </td>
+                            <td class="enterprise-grid__cell"><span class="enterprise-badge enterprise-badge--<?=$task->status->code?>"><?=$task->status->title?></span></td>
+                            <td class="enterprise-grid__cell"><span class="enterprise-badge enterprise-badge--<?=$task->priority->code?>"><?=$task->priority->title?></span></td>
+                            <td class="enterprise-grid__cell"><?=$task->dateFormated('end_date')?></td>
                             <td class="enterprise-grid__cell enterprise-grid__cell--actions">
                                 <div class="enterprise-grid__cell-actions">
                                     <button class="enterprise-button enterprise-button--ghost enterprise-button--small" title="View">
@@ -156,10 +135,35 @@
         </div>
     </div>
 </div>
-<?php $this->startSection('bottom-js'); ?>
+
+
+<?php $this->startSection('html-header'); ?>
+
+<?php $this->endSection(); ?>
+
+<?php $this->startSection('html-footer'); ?>
     <script>
+        (function() {
+            const beginDateInput = document.getElementById('begin_date');
+            const endDateInput = document.getElementById('end_date');
+            if (beginDateInput && endDateInput) {
+                beginDateInput.addEventListener('change', function() {
+                    const selectedBeginDate = this.value;
+                    if (selectedBeginDate) {
+                        endDateInput.min = selectedBeginDate;
+                        if (endDateInput.value && endDateInput.value < selectedBeginDate) {
+                            endDateInput.value = selectedBeginDate;
+                        }
+                        endDateInput.focus();
+                        endDateInput.showPicker();
+                    }
+                });
+            }
+        })();
+
+
+
         let demoModalInstance;
-        
         function openDemoModal() {
             const modal = document.getElementById('myModal');
             if (!demoModalInstance) {
@@ -167,7 +171,6 @@
             }
             demoModalInstance.open();
         }
-        
         function closeDemoModal() {
             if (demoModalInstance) {
                 demoModalInstance.close();
@@ -180,11 +183,11 @@
 
 
 <?php $this->startSection('toolbar-right'); ?>
-<button class="enterprise-button enterprise-button--secondary" style="display:none">
+<button class="enterprise-button enterprise-button--secondary">
     <i class="bi bi-download"></i>
     Export
 </button>
-<button class="enterprise-button enterprise-button--primary" onclick="openDemoModal()">
+<button class="enterprise-button enterprise-button--primary"  style="display:none" onclick="openDemoModal()">
     <i class="bi bi-plus-lg"></i>
     Add new Task
 </button>

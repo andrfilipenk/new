@@ -4,6 +4,7 @@ namespace User\Controller;
 
 use Core\Pagination\DatabasePaginator;
 use Core\Pagination\PaginatorView;
+use Intern\Model\TaskPriority;
 use User\Model\Activity;
 use User\Model\User;
 
@@ -31,7 +32,8 @@ class BoardController extends AbstractController
             'tasks'         => $paginator->items(),
             'totalTasks'    => $paginator->total(),
             'pagination'    => PaginatorView::make($paginator, ['view' => 'bootstrap']),
-            'activities'    => Activity::getRecent()
+            'activities'    => Activity::getRecent(),
+            'priorities'    => TaskPriority::all()
         ]);
     }
     

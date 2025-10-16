@@ -35,7 +35,6 @@ class CreateAclTables extends Migration
             $table->integer('role_id')->unsigned();
             $table->integer('permission_id')->unsigned();
             $table->timestamps();
-
             $table->foreign('role_id')->references('id')->on('acl_role');
             $table->foreign('permission_id')->references('id')->on('acl_permission');
         });
@@ -46,7 +45,6 @@ class CreateAclTables extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('role_id')->unsigned();
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('user');
             $table->foreign('role_id')->references('id')->on('acl_role');
         });
@@ -58,7 +56,6 @@ class CreateAclTables extends Migration
             $table->integer('permission_id')->unsigned();
             $table->integer('granted')->default(value: 1); // 1 = granted, 0 = denied
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('user');  
             $table->foreign('permission_id')->references('id')->on('acl_permission');
         });

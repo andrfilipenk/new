@@ -6,13 +6,13 @@
     <title>Components Showcase - Enterprise UI Kit</title>
     
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/bootstrap-icons.min.css" rel="stylesheet">
     
     <!-- Enterprise UI Kit CSS -->
-    <link href="assets/css/kit-enterprise.css" rel="stylesheet">
+    <link href="../css/kit-enterprise.css" rel="stylesheet">
     
     <style>
         .showcase-section {
@@ -49,7 +49,7 @@
         }
         .color-swatch {
             display: inline-block;
-            width: 100px;
+            width: 150px;
             height: 60px;
             border: 1px solid #d0d0d0;
             margin-right: 16px;
@@ -147,33 +147,42 @@
                         
                         <h3 class="showcase-subtitle">Primary Colors</h3>
                         <div class="showcase-example">
-                            <div class="color-swatch" style="background-color: #fafafa;">
-                                <div class="color-info">#fafafa<br>Background Primary</div>
+                            <div class="color-swatch" style="background-color: #1a1a1a;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#1a1a1a<br>BG Primary</div>
                             </div>
                             <div class="color-swatch" style="background-color: #f0f0f0;">
-                                <div class="color-info">#f0f0f0<br>Background Secondary</div>
+                                <div class="color-info" style="padding: 4px;">#f0f0f0<br>BG Secondary</div>
                             </div>
-                            <div class="color-swatch" style="background-color: #1a1a1a;">
-                                <div class="color-info" style="color: #fff; padding: 4px;">#1a1a1a<br>Text Primary</div>
+                            <div class="color-swatch" style="background-color: #dddddd;">
+                                <div class="color-info" style="color: #333333; padding: 4px;">#dddddd<br>BG Default</div>
+                            </div>
+                            <div class="color-swatch" style="background-color: #28a745;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#28a745<br>BG Success</div>
                             </div>
                             <div class="color-swatch" style="background-color: #0066cc;">
-                                <div class="color-info" style="color: #fff; padding: 4px;">#0066cc<br>Accent</div>
+                                <div class="color-info" style="color: #fff; padding: 4px;">#0066cc<br>BG Info</div>
                             </div>
                         </div>
 
                         <h3 class="showcase-subtitle">Status Colors</h3>
                         <div class="showcase-example">
+                            <div class="color-swatch" style="background-color: #6c757d;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#6c757d<br>Default</div>
+                            </div>
                             <div class="color-swatch" style="background-color: #28a745;">
                                 <div class="color-info" style="color: #fff; padding: 4px;">#28a745<br>Success</div>
                             </div>
                             <div class="color-swatch" style="background-color: #ffc107;">
-                                <div class="color-info" style="padding: 4px;">#ffc107<br>Warning</div>
+                                <div class="color-info" style="color: #fff; padding: 4px;">#ffc107<br>Warning</div>
                             </div>
                             <div class="color-swatch" style="background-color: #dc3545;">
                                 <div class="color-info" style="color: #fff; padding: 4px;">#dc3545<br>Danger</div>
                             </div>
-                            <div class="color-swatch" style="background-color: #0c5460;">
-                                <div class="color-info" style="color: #fff; padding: 4px;">#0c5460<br>Info</div>
+                            <div class="color-swatch" style="background-color: #fd7e14;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#fd7e14<br>Medium</div>
+                            </div>
+                            <div class="color-swatch" style="background-color: #0066cc;">
+                                <div class="color-info" style="color: #fff; padding: 4px;">#0066cc<br>Info</div>
                             </div>
                         </div>
                     </section>
@@ -198,8 +207,11 @@
                         
                         <h3 class="showcase-subtitle">Button Variants</h3>
                         <div class="showcase-example">
+                            <button class="enterprise-button enterprise-button--default">Default</button>
                             <button class="enterprise-button enterprise-button--primary">Primary</button>
                             <button class="enterprise-button enterprise-button--secondary">Secondary</button>
+                            <button class="enterprise-button enterprise-button--medium">Medium</button>
+                            <button class="enterprise-button enterprise-button--info">Info</button>
                             <button class="enterprise-button enterprise-button--danger">Danger</button>
                             <button class="enterprise-button enterprise-button--ghost">Ghost</button>
                             <button class="enterprise-button enterprise-button--primary" disabled>Disabled</button>
@@ -440,6 +452,7 @@
                             <span class="enterprise-badge enterprise-badge--warning">Warning</span>
                             <span class="enterprise-badge enterprise-badge--danger">Danger</span>
                             <span class="enterprise-badge enterprise-badge--info">Info</span>
+                            <span class="enterprise-badge enterprise-badge--medium">Medium</span>
                             <span class="enterprise-badge enterprise-badge--default">Default</span>
                         </div>
 
@@ -470,6 +483,16 @@
                         <h2 class="showcase-title">Alerts</h2>
                         
                         <div class="showcase-example">
+                            <div class="enterprise-alert enterprise-alert--default">
+                                <div class="enterprise-alert__icon">
+                                    <i class="bi bi-check-circle"></i>
+                                </div>
+                                <div class="enterprise-alert__content">
+                                    <div class="enterprise-alert__title">Default</div>
+                                    <div class="enterprise-alert__message">Operation default settings</div>
+                                </div>
+                            </div>
+                            
                             <div class="enterprise-alert enterprise-alert--success">
                                 <div class="enterprise-alert__icon">
                                     <i class="bi bi-check-circle"></i>
@@ -500,12 +523,22 @@
                                 </div>
                             </div>
 
+                            <div class="enterprise-alert enterprise-alert--medium">
+                                <div class="enterprise-alert__icon">
+                                    <i class="bi bi-info-circle"></i>
+                                </div>
+                                <div class="enterprise-alert__content">
+                                    <div class="enterprise-alert__title">Medium</div>
+                                    <div class="enterprise-alert__message">Here's some helpful information for you</div>
+                                </div>
+                            </div>
+
                             <div class="enterprise-alert enterprise-alert--info">
                                 <div class="enterprise-alert__icon">
                                     <i class="bi bi-info-circle"></i>
                                 </div>
                                 <div class="enterprise-alert__content">
-                                    <div class="enterprise-alert__title">Information</div>
+                                    <div class="enterprise-alert__title">Info</div>
                                     <div class="enterprise-alert__message">Here's some helpful information for you</div>
                                 </div>
                             </div>
@@ -516,13 +549,13 @@
                             <button class="enterprise-button enterprise-button--primary" onclick="window.EnterpriseToast.success('Success!', 'This is a success message')">
                                 Show Success Toast
                             </button>
-                            <button class="enterprise-button enterprise-button--secondary" onclick="window.EnterpriseToast.warning('Warning', 'This is a warning message')">
+                            <button class="enterprise-button enterprise-button--medium" onclick="window.EnterpriseToast.warning('Warning', 'This is a warning message')">
                                 Show Warning Toast
                             </button>
                             <button class="enterprise-button enterprise-button--danger" onclick="window.EnterpriseToast.danger('Error', 'This is an error message')">
                                 Show Error Toast
                             </button>
-                            <button class="enterprise-button enterprise-button--ghost" onclick="window.EnterpriseToast.info('Info', 'This is an info message')">
+                            <button class="enterprise-button enterprise-button--info" onclick="window.EnterpriseToast.info('Info', 'This is an info message')">
                                 Show Info Toast
                             </button>
                         </div>
@@ -553,10 +586,10 @@
     </div>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/bootstrap.bundle.min.js"></script>
     
     <!-- Enterprise UI Kit JS -->
-    <script src="assets/js/kit-enterprise.js"></script>
+    <script src="../js/kit-enterprise.js"></script>
     
     <script>
         let demoModalInstance;

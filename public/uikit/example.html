@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Dashboard - UI Kit</title>
+    
+    <!-- Bootstrap CSS (Foundation) -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="../css/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Enterprise UI Kit CSS -->
+    <link href="../css/kit-enterprise.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Root Layout Container -->
+    <div class="enterprise-layout">
+        
+        <!-- Header Bar -->
+        <header class="enterprise-header">
+            <div class="enterprise-header__brand">
+                <i class="bi bi-grid-3x3-gap"></i> Enterprise
+            </div>
+            
+            <div class="enterprise-header__search">
+                <input type="search" 
+                       class="enterprise-input" 
+                       placeholder="Search... (Ctrl+K)"
+                       aria-label="Global search">
+            </div>
+            
+            <div class="enterprise-header__actions">
+                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                        title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </button>
+                <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                        title="Settings">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <button class="enterprise-button enterprise-button--secondary" 
+                        title="User menu">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Admin User</span>
+                </button>
+
+                 <a href="components.html" class="enterprise-button enterprise-button--default">
+                    <i class="bi bi-speedometer2"></i>
+                    Components
+                </a>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <div class="enterprise-main">
+            
+            <!-- Left Sidebar -->
+            <aside class="enterprise-sidebar">
+                ...
+            </aside>
+
+            <!-- Content Area -->
+            <main class="enterprise-content">
+                
+                <!-- Toolbar -->
+                <div class="enterprise-toolbar">
+                    <div class="enterprise-toolbar__left">
+                        <button class="enterprise-button enterprise-button--ghost enterprise-button--icon-only" 
+                                data-sidebar-toggle
+                                title="Toggle sidebar">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        
+                        <nav class="enterprise-breadcrumb">
+                            <a href="#" class="enterprise-breadcrumb__item">Home</a>
+                            <span class="enterprise-breadcrumb__separator">/</span>
+                            <span class="enterprise-breadcrumb__item enterprise-breadcrumb__item--active">Dashboard</span>
+                        </nav>
+                    </div>
+                    
+                    <div class="enterprise-toolbar__right">
+                        <button class="enterprise-button enterprise-button--secondary">
+                            <i class="bi bi-download"></i>
+                            Export
+                        </button>
+                        <button class="enterprise-button enterprise-button--primary">
+                            <i class="bi bi-plus-lg"></i>
+                            New XXX
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Body -->
+                <div class="enterprise-content__body">
+                    
+                    <!-- YOU CODE HERE -->
+
+                </div>
+
+            </main>
+
+            <!-- Right Sidebar (Optional) -->
+            <aside class="enterprise-sidebar enterprise-sidebar--right">
+                <div class="enterprise-card">
+                    <div class="enterprise-card__header">
+                        <h3 class="enterprise-card__title">Recent Activity</h3>
+                    </div>
+                    <div class="enterprise-card__body">
+                        <div style="font-size: 12px; color: var(--enterprise-text-secondary);">
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Task #1001 completed</div>
+                                <div>by John Doe</div>
+                                <div style="color: var(--enterprise-text-muted);">2 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">New comment on #1002</div>
+                                <div>by Jane Smith</div>
+                                <div style="color: var(--enterprise-text-muted);">4 hours ago</div>
+                            </div>
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #e0e0e0;">
+                                <div style="font-weight: 500; color: var(--enterprise-text-primary);">Task #1003 created</div>
+                                <div>by Mike Johnson</div>
+                                <div style="color: var(--enterprise-text-muted);">6 hours ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+
+        <!-- Footer Bar -->
+        <footer class="enterprise-footer">
+            <span>© 2025 Enterprise System</span>
+            <span style="margin-left: auto;">Version 1.0.0</span>
+        </footer>
+
+    </div>
+
+    <!-- Example Modal -->
+    <div class="enterprise-modal" id="exampleModal">
+        <div class="enterprise-modal__backdrop"></div>
+        <div class="enterprise-modal__container">
+            <div class="enterprise-modal__header">
+                <h2 class="enterprise-modal__title">Create New Task</h2>
+                <button class="enterprise-modal__close" aria-label="Close">×</button>
+            </div>
+            <div class="enterprise-modal__body">
+                <form data-validate>
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Task Title</label>
+                        <input type="text" 
+                               class="enterprise-input" 
+                               required
+                               placeholder="Enter task title">
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label">Description</label>
+                        <textarea class="enterprise-textarea" 
+                                  placeholder="Enter task description"></textarea>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Assignee</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select assignee</option>
+                            <option value="1">John Doe</option>
+                            <option value="2">Jane Smith</option>
+                            <option value="3">Mike Johnson</option>
+                        </select>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Priority</label>
+                        <select class="enterprise-select" required>
+                            <option value="">Select priority</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="enterprise-form-group">
+                        <label class="enterprise-label enterprise-label--required">Due Date</label>
+                        <input type="date" 
+                               class="enterprise-input" 
+                               required>
+                    </div>
+                </form>
+            </div>
+            <div class="enterprise-modal__footer">
+                <button class="enterprise-button enterprise-button--secondary" onclick="closeModal()">Cancel</button>
+                <button class="enterprise-button enterprise-button--primary">Create Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Enterprise UI Kit JS -->
+    <script src="../js/kit-enterprise.js"></script>
+    
+    <!-- Demo Scripts -->
+    <script>
+        // Open modal on "New Task" button
+        document.querySelector('.enterprise-toolbar__right .enterprise-button--primary').addEventListener('click', function() {
+            const modal = document.getElementById('exampleModal');
+            const modalInstance = new window.EnterpriseUI.Modal(modal);
+            modalInstance.open();
+        });
+        
+        function closeModal() {
+            const modal = document.getElementById('exampleModal');
+            const modalInstance = new window.EnterpriseUI.Modal(modal);
+            modalInstance.close();
+        }
+        
+        // Demo toast notifications
+        setTimeout(() => {
+            window.EnterpriseToast.info('Welcome', 'Enterprise UI Kit dashboard loaded successfully');
+        }, 1000);
+        
+        // Grid event listeners
+        document.querySelector('.enterprise-grid').addEventListener('grid:selectionChanged', function(e) {
+            console.log('Selected rows:', e.detail.selectedRows);
+        });
+        
+        document.querySelector('.enterprise-grid').addEventListener('grid:sort', function(e) {
+            console.log('Sort:', e.detail.column, e.detail.direction);
+        });
+    </script>
+</body>
+</html>

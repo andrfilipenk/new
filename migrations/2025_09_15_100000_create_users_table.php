@@ -28,13 +28,19 @@ class CreateUsersTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('group_id')->unsigned();
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('user');
             $table->foreign('group_id')->references('id')->on('groups');
         });
 
+        $this->createTable('holidays', callback: function($table) {
+            /** @var Blueprint $table */
+            $table->id();
+            $table->date('date_on');
+            $table->string('title', 32);
+        });
 
 
+        // Insert user data
         $users  = $this->getTestUserList();
         $config = $this->getDI()->get('config');
         $algo   = $config['app']['hash_algo'];
@@ -42,6 +48,16 @@ class CreateUsersTable extends Migration
             $users[$i][3] = password_hash($row[3], $algo);
         }
         $this->insertDataArray('user', ['id', 'name', 'email', 'password', 'custom_id'], $users);
+
+        
+        // Insert holidays
+        $query = self::db()->table('holidays');
+        foreach ($this->getHolidays() as $date => $title) {
+            $query->insert([
+                'date_on' => $date,
+                'title'   => $title
+            ]);
+        }
     }
 
     public function down()
@@ -49,6 +65,20 @@ class CreateUsersTable extends Migration
         $this->dropTable('user_group');
         $this->dropTable('groups');
         $this->dropTable('user');
+    }
+
+    protected function getHolidays() {
+        return [
+            '2025-01-01' => 'Neues Jahr',
+            '2025-04-18' => 'Karlfreitag',
+            '2025-04-21' => 'Ostermontag',
+            '2025-05-01' => 'Tag der Arbeit',
+            '2025-05-29' => 'Christi Himmelfahrt',
+            '2025-06-09' => 'Pfingstmontag',
+            '2025-10-03' => 'Tag der Deutschen Einheit',
+            '2025-12-25' => '1. Weihnachtstag',
+            '2025-12-26' => '2. Weihnachtstag'
+        ];
     }
 
     protected function getTestUserList() {

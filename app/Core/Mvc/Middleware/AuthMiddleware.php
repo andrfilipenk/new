@@ -14,11 +14,13 @@ class AuthMiddleware implements MiddlewareInterface
                 return true; // Public route, no auth needed
             }
         }
-
-        if (!$di->get('auth', fn() => new Auth())->isLoggedIn()) {
-            $di->get('dispatcher')->setModule('User')->setController('Auth')->setAction('login');
+        $auth = new Auth();
+        if (!$auth->isLoggedIn()) {
+            $di->get('response')->redirect('login')->send();
             return false;
         }
+        
+        // check access rights now
 
         return true;
     }
