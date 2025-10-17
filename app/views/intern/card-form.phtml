@@ -31,3 +31,19 @@ $url = $this->getDI()->get('url');
         <input type="submit" class="enterprise-button enterprise-button--primary" value="Save">
     </div>
 </form>
+
+
+
+<?php $this->startSection('html-footer'); ?>
+    <script>
+    document.getElementById('simpleTaskForm').addEventListener('ajax-form:success', (e) => {
+        const { result, response } = e.detail;
+        if (result === 'success') {
+            const task = response.item;
+            
+            alert(response.message); // e.g., "Logged in successfully."
+            //  window.location.href = '/board';
+        } 
+    });
+    </script>
+<?php $this->endSection(); ?>

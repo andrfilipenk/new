@@ -14,7 +14,7 @@ return [
             'module'     => 'Intern',
             'controller' => 'Task',
             'action'     => 'add',
-            'method'     => 'POST'
+            'method'     => ['POST']
         ]
     ],
 ];

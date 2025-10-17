@@ -2,65 +2,72 @@
 // app/Intern/Form/TaskForm.php
 namespace Intern\Form;
 
-use Core\Forms\Builder;
+  /*
+        - 
+        - begin_date
+        - end_date
+        - status_id
+        - priority_id
+        */
+
+
+use Core\Forms\FormBuilder;
 
 class TaskForm
 {
-    /**
-     * Build task form with user options
-     * 
-     * @param array $values Form values to populate
-     * @param array $options Additional options like 'users' array
-     * @return \Core\Forms\FormInterface
-     */
-    public static function build(array $values = [], array $options = []): \Core\Forms\FormInterface
+    public static function build($short = false)
     {
-        $builder = new Builder();
+        $userForm = FormBuilder::create('user_form', [
+            'action' => '/user',
+            'method' => 'POST'
+        ]);
 
-        // Get user options from controller (no database queries in form!)
-        $userOptions = $options['users'] ?? [];
-        $statusOptions = $options['statuses'] ?? [
-            'open' => 'Open',
-            'in-progress' => 'In Progress',
-            'done' => 'Done'
-        ];
+        $userForm->text('title', [
+            'label'         => 'Title',
+            'required'      => true,
+            'class'         => 'form-control'
+        ]);
 
-        $builder
-            ->setAction('')
-            ->addSelect('created_by', $userOptions, 'Created By', [
-                'required' => true,
-                'rules' => ['required', 'numeric']
-            ])
-            ->addSelect('assigned_to', $userOptions, 'Assigned To', [
-                'required' => true,
-                'rules' => ['required', 'numeric']
-            ])
-            ->addText('title', 'Task Title', [
-                'required' => true,
-                'rules' => ['required', ['min_length', 3]]
-            ])
-            ->addDate('begin_date', 'Begin Date', [
-                'rules' => ['date']
-            ])
-            ->addDate('end_date', 'End Date', [
-                'rules' => ['date']
-            ])
-            ->addSelect('status', $statusOptions, 'Status', [
-                'required' => true,
-                'rules' => ['required']
-            ])
-            ->addNumber('priority', 'Priority', [
-                'required' => true,
-                'min' => 1,
-                'max' => 10,
-                'rules' => ['required', 'numeric', ['min', 1], ['max', 10]]
-            ])
-            ->addButton('submit', 'Save', ['type' => 'submit', 'class' => 'btn btn-primary']);
+        $userForm->date('begin_date', [
+            'label'         => 'Title',
+            'required'      => true,
+            'class'         => 'form-control'
+        ]);
 
-        if (!empty($values)) {
-            $builder->setValues($values);
+        $userForm->date('end_date', [
+            'label'         => 'Title',
+            'required'      => true,
+            'class'         => 'form-control'
+        ]);
+
+        $userForm->select('priority_id', [], [
+            'label'         => 'Priority',
+            'required'      => true,
+            'class'         => 'form-control'
+        ]);
+
+        if (!$short) {
+            
         }
 
-        return $builder->build();
+        $userForm->select('status_id', [], [
+            'label'         => 'Status',
+            'required'      => true,
+            'class'         => 'form-control'
+        ]);
+
+        $userForm->select('created_by', [], [
+            'label'         => 'Created by',
+            'required'      => true,
+            'class'         => 'form-control'
+        ]);
+
+        $userForm->select('assigned_to', [], [
+            'label'         => 'Assuigned to',
+            'class'         => 'form-control'
+        ]);
+        
+        return $userForm->build();
     }
+
 }

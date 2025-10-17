@@ -11,7 +11,24 @@ class TaskController extends Controller
 {
     public function addAction()
     {
-        
+        $request = $this->getRequest();
+        if ($this->isPost() && $this->isAjax()) {
+            $item = $request->post();
+            $item['created_by'] = $this->getSession()->get('user');
+            $task = new TaskModel($item);
+            if ($task->save())
+
+
+            return $this->getResponse()->json([
+                'status'    => 'success',
+                'message'   => 'Vielen Dank',
+                'item'      => $item
+            ]);
+        }
+        return $this->getResponse()->json([
+            'status' => 'error',
+            'message' => 'Error on task create'
+        ]);
     }
 
 
