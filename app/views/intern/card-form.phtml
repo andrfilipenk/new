@@ -1,10 +1,20 @@
-<form class="row" method="post" id="simpleTaskForm">
+<?php
+/** @var \Core\Utils\Url $url */
+$url = $this->getDI()->get('url');
+?>
+<form class="row" 
+      method="post" 
+      action="<?=$url->get('add-task')?>" 
+      id="simpleTaskForm"
+      data-ajax-form
+      data-form-title="Create Task"
+      data-reset-on-success="true">
     <div class="col-6">
-          <input type="text" name="title" class="enterprise-input" placeholder="This Task must be done by...">
+          <input type="text" name="title" class="enterprise-input" placeholder="This Task must be done by..." required>
     </div>
     <div class="col-2">
-        <select class="enterprise-select" name="priority_id">
-            <option>Priority</option>
+        <select class="enterprise-select" name="priority_id" required>
+            <option value="">Priority</option>
             <?php foreach ($priorities as $prio): ?>
                 <option value="<?=$prio->id?>"><?=$prio->title?></option>
             <?php endforeach; ?>
@@ -12,9 +22,9 @@
     </div>
     <div class="col">
         <div class="input-group">
-            <input type="date" class="enterprise-input" value="2025-10-16" name="begin_date" id="begin_date">
+            <input type="date" class="enterprise-input" value="2025-10-16" name="begin_date" id="begin_date" required>
             <span class="input-group-text">-</span>
-            <input type="date" class="enterprise-input" min="2025-10-16" name="end_date" id="end_date">
+            <input type="date" class="enterprise-input" min="2025-10-16" name="end_date" id="end_date" required>
         </div>
     </div>
     <div class="col-1">

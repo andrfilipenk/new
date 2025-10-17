@@ -610,164 +610,6 @@
   }
 
   // ============================================================
-  // AJAX FORM HANDLER
-  // ============================================================
-
-  class AjaxFormHandler {
-    constructor(form) {
-      this.form = form;
-      this.submitButton = null;
-      this.originalButtonText = '';
-      this.init();
-    }
-
-    init() {
-      this.submitButton = this.form.querySelector('input[type="submit"], button[type="submit"]');
-      if (this.submitButton) {
-        this.originalButtonText = this.submitButton.value || this.submitButton.textContent;
-      }
-
-      this.form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        this.handleSubmit();
-      });
-    }
-
-    async handleSubmit() {
-      const action = this.form.getAttribute('action') || window.location.href;
-      const method = this.form.getAttribute('method') || 'POST';
-      const formData = new FormData(this.form);
-
-      // Show loading state
-      this.setLoadingState(true);
-
-      // Dispatch before submit event
-      const beforeSubmitEvent = new CustomEvent('ajax-form:beforeSubmit', {
-        detail: { formData, action, method },
-        cancelable: true
-      });
-      
-      if (!this.form.dispatchEvent(beforeSubmitEvent)) {
-        this.setLoadingState(false);
-        return;
-      }
-
-      try {
-        const response = await fetch(action, {
-          method: method.toUpperCase(),
-          body: formData,
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-          }
-        });
-
-        let result;
-        const contentType = response.headers.get('content-type');
-        
-        if (contentType && contentType.includes('application/json')) {
-          result = await response.json();
-        } else {
-          const text = await response.text();
-          result = { status: response.ok ? 'success' : 'error', message: text };
-        }
-
-        // Handle response
-        this.handleResponse(result, response.ok);
-
-        // Dispatch success event
-        this.form.dispatchEvent(new CustomEvent('ajax-form:success', {
-          detail: { result, response }
-        }));
-
-      } catch (error) {
-        console.error('Form submission error:', error);
-        
-        const errorResult = {
-          status: 'error',
-          message: 'An error occurred while submitting the form. Please try again.'
-        };
-
-        this.handleResponse(errorResult, false);
-
-        // Dispatch error event
-        this.form.dispatchEvent(new CustomEvent('ajax-form:error', {
-          detail: { error }
-        }));
-      } finally {
-        this.setLoadingState(false);
-      }
-    }
-
-    handleResponse(result, isSuccess) {
-      // Show toast notification if available
-      if (window.EnterpriseToast) {
-        const toastType = result.status === 'success' ? 'success' : 
-                         result.status === 'warning' ? 'warning' : 'danger';
-        
-        const title = this.getResponseTitle(result);
-        const message = result.message || (isSuccess ? 'Operation completed successfully' : 'Operation failed');
-        
-        window.EnterpriseToast.show({
-          type: toastType,
-          title: title,
-          message: message
-        });
-      }
-
-      // Reset form on success if specified
-      if (result.status === 'success' && this.form.dataset.resetOnSuccess !== 'false') {
-        this.form.reset();
-      }
-
-      // Redirect if specified
-      if (result.redirect) {
-        setTimeout(() => {
-          window.location.href = result.redirect;
-        }, 1000);
-      }
-    }
-
-    getResponseTitle(result) {
-      const formTitle = this.form.dataset.formTitle || 'Form Submission';
-      
-      if (result.title) return result.title;
-      
-      switch (result.status) {
-        case 'success':
-          return formTitle + ' - Success';
-        case 'warning':
-          return formTitle + ' - Warning';
-        case 'error':
-          return formTitle + ' - Error';
-        default:
-          return formTitle;
-      }
-    }
-
-    setLoadingState(loading) {
-      if (!this.submitButton) return;
-
-      if (loading) {
-        this.submitButton.disabled = true;
-        if (this.submitButton.tagName === 'BUTTON') {
-          this.submitButton.textContent = 'Submitting...';
-        } else {
-          this.submitButton.value = 'Submitting...';
-        }
-        this.form.classList.add('enterprise-form--loading');
-      } else {
-        this.submitButton.disabled = false;
-        if (this.submitButton.tagName === 'BUTTON') {
-          this.submitButton.textContent = this.originalButtonText;
-        } else {
-          this.submitButton.value = this.originalButtonText;
-        }
-        this.form.classList.remove('enterprise-form--loading');
-      }
-    }
-  }
-
-  // ============================================================
   // AUTO-INITIALIZATION
   // ============================================================
 
@@ -779,7 +621,6 @@
     Tabs,
     FormValidator,
     SearchBox,
-    AjaxFormHandler,
     
     init() {
       // Initialize sidebars
@@ -810,11 +651,6 @@
       // Initialize search boxes
       document.querySelectorAll('[data-search]').forEach(el => {
         new SearchBox(el);
-      });
-
-      // Initialize AJAX forms
-      document.querySelectorAll('form[data-ajax-form]').forEach(el => {
-        new AjaxFormHandler(el);
       });
 
       // Create global toast manager

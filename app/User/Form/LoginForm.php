@@ -15,12 +15,12 @@ class LoginForm
         ->text('custom_id', [
             'label'         => 'Custom ID',
             'required'      => true,
-            'class' => 'form-control'
+            'class' => 'enterprise-input'
         ])
         ->password('password', [
             'label'         => 'Password',
             'required'      => true,
-            'class' => 'form-control'
+            'class' => 'enterprise-input'
         ])
         #->csrf()
         ;

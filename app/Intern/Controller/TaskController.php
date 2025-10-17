@@ -1,5 +1,5 @@
 <?php
-// app/Intern/Controller/Task.php
+// app/Intern/Controller/TaskController.php
 namespace Intern\Controller;
 
 use Core\Mvc\Controller;
@@ -7,8 +7,19 @@ use Intern\Model\Task as TaskModel;
 use Intern\Model\TaskStatus;
 use Intern\Model\TaskPriority;
 
-class Task extends Controller
+class TaskController extends Controller
 {
+    public function addAction()
+    {
+        
+    }
+
+
+
+
+
+
+
     /**
      * @return []
      */
@@ -22,7 +33,7 @@ class Task extends Controller
                 if ($status = $request->get('status', null)) {
                     $query->where('status_id', $status);
                 }
-                if ($priority = $request->get('priority', null)) {
+                if ($priority = $request->get(key: 'priority')) {
                     $query->where('priority_id', $priority);
                 }
                 // assigned to 
@@ -51,14 +62,5 @@ class Task extends Controller
         }
         return $rows;
     }
-    
-    public function listAction()
-    {
-        return $this->render('task/task-list', $this->getData());   
-    }
-
-    public function boardAction()
-    {
-        return $this->render('task/task-board', $this->getData());
-    }
+  
 }
