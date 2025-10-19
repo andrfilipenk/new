@@ -1,111 +1,91 @@
 <?php
 // app/Eav/config.php
 
-/**
- * EAV Module Configuration
- * 
- * This configuration file defines the EAV module's settings, routes,
- * and service providers.
- */
 return [
     /**
-     * Service Providers
-     * 
-     * Providers that will be registered when the module is loaded.
-     */
-    'provider' => [
-        '\Eav\Provider\EavServiceProvider',
-    ],
-
-    /**
-     * Routes
-     * 
-     * Define any admin/management routes for the EAV module.
-     * Most EAV operations are programmatic, but you can add
-     * admin interfaces here if needed.
-     */
-    'routes' => [
-        // Example: EAV management interface
-        // '/admin/eav/entities' => [
-        //     'module'     => 'Eav',
-        //     'controller' => 'Admin',
-        //     'action'     => 'entities',
-        //     'method'     => 'GET'
-        // ],
-    ],
-
-    /**
-     * Global EAV Configuration
-     * 
-     * These settings control the behavior of the EAV system.
+     * EAV Module Configuration
      */
     'eav' => [
         /**
-         * Table prefix for all EAV tables
+         * Default entity type code for dynamic entities
          */
-        'table_prefix' => 'eav_',
+        'default_entity_type' => 'product',
 
         /**
-         * Automatic schema synchronization
-         * 
-         * When enabled, the system will automatically detect configuration
-         * changes and synchronize the database schema.
+         * Cache configuration
          */
-        'auto_sync' => true,
+        'cache' => [
+            'enabled' => true,
+            'ttl' => 3600, // 1 hour
+            'prefix' => 'eav:',
+            'schema_ttl' => 7200, // 2 hours
+            'entity_ttl' => 1800, // 30 minutes
+            'query_ttl' => 600, // 10 minutes
+        ],
 
         /**
-         * Synchronization mode
-         * 
-         * - immediate: Apply changes immediately when detected
-         * - deferred: Queue changes for batch processing
-         * - manual: Require manual synchronization trigger
+         * Batch processing configuration
          */
-        'sync_mode' => 'immediate',
+        'batch' => [
+            'chunk_size' => 1000,
+            'max_batch_size' => 5000,
+        ],
 
         /**
-         * Create backup before schema synchronization
+         * Query optimization settings
          */
-        'backup_before_sync' => false,
+        'query' => [
+            'max_joins' => 10,
+            'optimize_joins' => true,
+            'use_subqueries' => true,
+        ],
 
         /**
-         * Maximum index key length in bytes
-         * 
-         * This is important for MySQL/MariaDB compatibility,
-         * especially when using utf8mb4 charset.
+         * Value storage configuration
          */
-        'max_index_length' => 767,
+        'storage' => [
+            'tables' => [
+                'varchar' => 'eav_values_varchar',
+                'int' => 'eav_values_int',
+                'decimal' => 'eav_values_decimal',
+                'text' => 'eav_values_text',
+                'datetime' => 'eav_values_datetime',
+            ],
+            'varchar_length' => 255,
+        ],
 
         /**
-         * Enable flat table generation for performance
-         * 
-         * Flat tables denormalize EAV data into single tables
-         * for improved read performance.
+         * Index settings
          */
-        'use_flat_tables' => true,
+        'index' => [
+            'enabled' => true,
+            'auto_index_searchable' => true,
+            'rebuild_on_schema_change' => true,
+        ],
 
         /**
-         * Minimum attributes for flat table consideration
-         * 
-         * Entity types with fewer attributes than this threshold
-         * will not generate flat tables.
+         * Event settings
          */
-        'flat_table_threshold' => 10,
+        'events' => [
+            'enabled' => true,
+            'async' => false,
+        ],
 
         /**
-         * Enable query result caching
+         * Validation rules
          */
-        'enable_cache' => true,
+        'validation' => [
+            'strict_mode' => true,
+            'validate_on_save' => true,
+        ],
 
         /**
-         * Default cache TTL in seconds
+         * Performance settings
          */
-        'cache_ttl' => 3600,
-
-        /**
-         * Entity configuration directory
-         * 
-         * Where to find entity configuration files
-         */
-        'config_path' => __DIR__ . '/Config/entities',
+        'performance' => [
+            'eager_load_attributes' => true,
+            'lazy_load_values' => false,
+            'preload_common_attributes' => true,
+        ],
     ],
 ];

@@ -1,62 +1,61 @@
 <?php
-// app/Core/Eav/Storage/StorageStrategyInterface.php
-namespace Core\Eav\Storage;
+// app/Eav/Storage/StorageStrategyInterface.php
+namespace Eav\Storage;
 
 /**
- * Interface for storage strategy implementations
+ * Storage Strategy Interface
+ * 
+ * Defines contract for type-specific value storage handlers
  */
 interface StorageStrategyInterface
 {
     /**
-     * Load attribute values for an entity
-     *
-     * @param int $entityId Entity ID
-     * @param array $attributes Array of Attribute objects
-     * @return array Associative array of attribute_code => value
+     * Get the backend type this strategy handles
      */
-    public function loadValues(int $entityId, array $attributes): array;
+    public function getBackendType(): string;
 
     /**
-     * Save attribute values for an entity
-     *
-     * @param int $entityId Entity ID
-     * @param int $entityTypeId Entity type ID
-     * @param array $values Associative array of attribute objects with values
-     * @return bool Success status
+     * Get the table name for this storage type
      */
-    public function saveValues(int $entityId, int $entityTypeId, array $values): bool;
+    public function getTableName(): string;
 
     /**
-     * Delete specific attribute values
-     *
-     * @param int $entityId Entity ID
-     * @param array $attributeCodes Array of attribute codes to delete
-     * @return bool Success status
+     * Save a value
      */
-    public function deleteValues(int $entityId, array $attributeCodes): bool;
+    public function saveValue(int $entityId, int $attributeId, mixed $value): bool;
 
     /**
-     * Delete all attribute values for an entity
-     *
-     * @param int $entityId Entity ID
-     * @return bool Success status
+     * Get a value
      */
-    public function deleteAllValues(int $entityId): bool;
+    public function getValue(int $entityId, int $attributeId): mixed;
 
     /**
-     * Load values for multiple entities
-     *
-     * @param array $entityIds Array of entity IDs
-     * @param array $attributes Array of Attribute objects
-     * @return array Multi-dimensional array: entityId => [attribute_code => value]
+     * Delete a value
      */
-    public function loadMultiple(array $entityIds, array $attributes): array;
+    public function deleteValue(int $entityId, int $attributeId): bool;
 
     /**
-     * Get table name for backend type
-     *
-     * @param string $backendType Backend type (varchar, int, decimal, datetime, text)
-     * @return string Table name
+     * Get multiple values for an entity
      */
-    public function getValueTable(string $backendType): string;
+    public function getEntityValues(int $entityId, array $attributeIds = []): array;
+
+    /**
+     * Save multiple values for an entity
+     */
+    public function saveEntityValues(int $entityId, array $values): bool;
+
+    /**
+     * Validate value before storage
+     */
+    public function validateValue(mixed $value): bool;
+
+    /**
+     * Transform value for storage
+     */
+    public function transformForStorage(mixed $value): mixed;
+
+    /**
+     * Transform value from storage
+     */
+    public function transformFromStorage(mixed $value): mixed;
 }
