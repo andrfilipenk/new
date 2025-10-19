@@ -1,110 +1,73 @@
 <?php
-// app/Eav/Models/Attribute.php
-namespace Eav\Models;
-
-use Core\Database\Model;
+// app/Core/Eav/Model/Attribute.php
+namespace Core\Eav\Model;
 
 /**
- * Attribute Model
- * 
- * Represents an EAV attribute definition
+ * Represents an attribute definition
  */
-class Attribute extends Model
+class Attribute
 {
-    protected $table = 'eav_attributes';
+    private string $code;
+    private string $label;
+    private string $backendType;
+    private string $frontendType;
+    private bool $isRequired = false;
+    private bool $isUnique = false;
+    private bool $isSearchable = false;
+    private bool $isFilterable = false;
+    private mixed $defaultValue = null;
+    private array $validationRules = [];
+    private int $sortOrder = 0;
+    private ?int $attributeId = null;
 
-    protected array $fillable = [
-        'entity_type_id',
-        'attribute_code',
-        'attribute_name',
-        'backend_type',
-        'frontend_input',
-        'source_model',
-        'is_required',
-        'is_unique',
-        'is_searchable',
-        'is_filterable',
-        'is_visible',
-        'default_value',
-        'validation_rules',
-        'sort_order',
-        'note'
-    ];
-
-    protected array $casts = [
-        'is_required' => 'boolean',
-        'is_unique' => 'boolean',
-        'is_searchable' => 'boolean',
-        'is_filterable' => 'boolean',
-        'is_visible' => 'boolean',
-        'sort_order' => 'integer',
-        'validation_rules' => 'json'
-    ];
-
-    /**
-     * Get the entity type this attribute belongs to
-     */
-    public function entityType()
+    public function __construct(array $data)
     {
-        return $this->belongsTo(EntityType::class, 'entity_type_id');
+        $this->code = $data['code'] ?? '';
+        $this->label = $data['label'] ?? '';
+        $this->backendType = $data['backend_type'] ?? 'varchar';
+        $this->frontendType = $data['frontend_type'] ?? 'text';
+        $this->isRequired = $data['is_required'] ?? false;
+        $this->isUnique = $data['is_unique'] ?? false;
+        $this->isSearchable = $data['is_searchable'] ?? false;
+        $this->isFilterable = $data['is_filterable'] ?? false;
+        $this->defaultValue = $data['default_value'] ?? null;
+        $this->validationRules = $data['validation_rules'] ?? [];
+        $this->sortOrder = $data['sort_order'] ?? 0;
+        $this->attributeId = $data['attribute_id'] ?? null;
     }
 
+    public function getCode(): string { return $this->code; }
+    public function getLabel(): string { return $this->label; }
+    public function getBackendType(): string { return $this->backendType; }
+    public function getFrontendType(): string { return $this->frontendType; }
+    public function isRequired(): bool { return $this->isRequired; }
+    public function isUnique(): bool { return $this->isUnique; }
+    public function isSearchable(): bool { return $this->isSearchable; }
+    public function isFilterable(): bool { return $this->isFilterable; }
+    public function getDefaultValue(): mixed { return $this->defaultValue; }
+    public function getValidationRules(): array { return $this->validationRules; }
+    public function getSortOrder(): int { return $this->sortOrder; }
+    public function getAttributeId(): ?int { return $this->attributeId; }
+    
+    public function setAttributeId(int $id): void { $this->attributeId = $id; }
+    
     /**
-     * Get attribute options (for select/multiselect)
+     * Convert to array format for database storage
      */
-    public function options()
+    public function toArray(): array
     {
-        return $this->hasMany(AttributeOption::class, 'attribute_id');
-    }
-
-    /**
-     * Check if attribute is required
-     */
-    public function isRequired(): bool
-    {
-        return (bool)$this->is_required;
-    }
-
-    /**
-     * Check if attribute is unique
-     */
-    public function isUnique(): bool
-    {
-        return (bool)$this->is_unique;
-    }
-
-    /**
-     * Check if attribute is searchable
-     */
-    public function isSearchable(): bool
-    {
-        return (bool)$this->is_searchable;
-    }
-
-    /**
-     * Check if attribute is filterable
-     */
-    public function isFilterable(): bool
-    {
-        return (bool)$this->is_filterable;
-    }
-
-    /**
-     * Get validation rules
-     */
-    public function getValidationRules(): array
-    {
-        if (is_string($this->validation_rules)) {
-            return json_decode($this->validation_rules, true) ?? [];
-        }
-        return $this->validation_rules ?? [];
-    }
-
-    /**
-     * Set validation rules
-     */
-    public function setValidationRules(array $rules): void
-    {
-        $this->validation_rules = $rules;
+        return [
+            'attribute_code' => $this->code,
+            'attribute_label' => $this->label,
+            'backend_type' => $this->backendType,
+            'frontend_type' => $this->frontendType,
+            'is_required' => $this->isRequired ? 1 : 0,
+            'is_unique' => $this->isUnique ? 1 : 0,
+            'is_searchable' => $this->isSearchable ? 1 : 0,
+            'is_filterable' => $this->isFilterable ? 1 : 0,
+            'default_value' => $this->defaultValue !== null ? json_encode($this->defaultValue) : null,
+            'validation_rules' => !empty($this->validationRules) ? json_encode($this->validationRules) : null,
+            'sort_order' => $this->sortOrder,
+        ];
     }
 }

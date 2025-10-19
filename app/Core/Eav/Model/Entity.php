@@ -1,143 +1,78 @@
 <?php
-// app/Eav/Model/Entity.php
-namespace Eav\Model;
+// app/Core/Eav/Model/Entity.php
+namespace Core\Eav\Model;
 
-use Eav\Exception\ValidationException;
+use Core\Exception\ValidationException;
 
 /**
- * EAV Entity Model
- * 
- * Represents a single entity instance with its attributes.
+ * Represents an entity instance with attributes and dirty tracking
  */
 class Entity
 {
-    /**
-     * Entity ID
-     */
-    protected ?int $entityId = null;
+    private EntityType $entityType;
+    private ?int $entityId = null;
+    private array $data = [];
+    private array $originalData = [];
+    private array $dirtyAttributes = [];
+    private ?string $createdAt = null;
+    private ?string $updatedAt = null;
 
-    /**
-     * Entity type
-     */
-    protected EntityType $entityType;
-
-    /**
-     * Attribute values
-     */
-    protected array $data = [];
-
-    /**
-     * Original data (for change tracking)
-     */
-    protected array $originalData = [];
-
-    /**
-     * Dirty attributes (changed since load)
-     */
-    protected array $dirtyAttributes = [];
-
-    /**
-     * Created at timestamp
-     */
-    protected ?string $createdAt = null;
-
-    /**
-     * Updated at timestamp
-     */
-    protected ?string $updatedAt = null;
-
-    /**
-     * Constructor
-     */
-    public function __construct(EntityType $entityType, array $data = [])
+    public function __construct(EntityType $entityType)
     {
         $this->entityType = $entityType;
-        $this->setData($data);
-        $this->originalData = $this->data;
     }
 
-    /**
-     * Get entity ID
-     */
-    public function getEntityId(): ?int
-    {
-        return $this->entityId;
-    }
-
-    /**
-     * Set entity ID
-     */
-    public function setEntityId(int $id): self
-    {
-        $this->entityId = $id;
-        return $this;
-    }
-
-    /**
-     * Get entity type
-     */
     public function getEntityType(): EntityType
     {
         return $this->entityType;
     }
 
+    public function getId(): ?int
+    {
+        return $this->entityId;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->entityId = $id;
+    }
+
+    /**
+     * Set attribute value
+     */
+    public function set(string $attributeCode, mixed $value): void
+    {
+        if (!$this->entityType->hasAttribute($attributeCode)) {
+            throw new ValidationException(
+                [$attributeCode => "Attribute '{$attributeCode}' does not exist for entity type '{$this->entityType->getCode()}'"],
+                "Invalid attribute"
+            );
+        }
+
+        $this->data[$attributeCode] = $value;
+        
+        // Track dirty state
+        if (!isset($this->originalData[$attributeCode]) || $this->originalData[$attributeCode] !== $value) {
+            $this->dirtyAttributes[$attributeCode] = true;
+        }
+    }
+
+    /**
+     * Get attribute value
+     */
+    public function get(string $attributeCode): mixed
+    {
+        return $this->data[$attributeCode] ?? null;
+    }
+
     /**
      * Set multiple attribute values
      */
-    public function setData(array $data): self
+    public function setDataValues(array $data): void
     {
-        foreach ($data as $key => $value) {
-            $this->setDataValue($key, $value);
+        foreach ($data as $code => $value) {
+            $this->set($code, $value);
         }
-        return $this;
-    }
-
-    /**
-     * Set a single attribute value
-     */
-    public function setDataValue(string $attributeCode, $value): self
-    {
-        // Special handling for entity_id, created_at, updated_at
-        if ($attributeCode === 'entity_id') {
-            $this->entityId = (int)$value;
-            return $this;
-        }
-        if ($attributeCode === 'created_at') {
-            $this->createdAt = $value;
-            return $this;
-        }
-        if ($attributeCode === 'updated_at') {
-            $this->updatedAt = $value;
-            return $this;
-        }
-
-        // Get attribute definition
-        $attribute = $this->entityType->getAttribute($attributeCode);
-        if (!$attribute) {
-            // Allow setting undefined attributes (they won't be persisted)
-            $this->data[$attributeCode] = $value;
-            return $this;
-        }
-
-        // Cast value to appropriate type
-        $castedValue = $attribute->cast($value);
-        
-        // Mark as dirty if changed
-        if (!isset($this->originalData[$attributeCode]) || 
-            $this->originalData[$attributeCode] !== $castedValue) {
-            $this->dirtyAttributes[$attributeCode] = true;
-        }
-
-        $this->data[$attributeCode] = $castedValue;
-        return $this;
-    }
-
-    /**
-     * Get an attribute value
-     */
-    public function getDataValue(string $attributeCode, $default = null)
-    {
-        return $this->data[$attributeCode] ?? $default;
     }
 
     /**
@@ -149,18 +84,7 @@ class Entity
     }
 
     /**
-     * Check if attribute has been modified
-     */
-    public function isDirty($attributeCode = null): bool
-    {
-        if ($attributeCode === null) {
-            return !empty($this->dirtyAttributes);
-        }
-        return isset($this->dirtyAttributes[$attributeCode]);
-    }
-
-    /**
-     * Get dirty attributes
+     * Get dirty (modified) attributes
      */
     public function getDirtyAttributes(): array
     {
@@ -168,107 +92,96 @@ class Entity
     }
 
     /**
-     * Get only dirty data (changed values)
+     * Check if entity has changes
+     */
+    public function isDirty(): bool
+    {
+        return !empty($this->dirtyAttributes);
+    }
+
+    /**
+     * Get only dirty attribute values
      */
     public function getDirtyData(): array
     {
         $dirty = [];
-        foreach ($this->dirtyAttributes as $code => $isDirty) {
-            if ($isDirty && isset($this->data[$code])) {
-                $dirty[$code] = $this->data[$code];
-            }
+        foreach ($this->dirtyAttributes as $code => $_) {
+            $dirty[$code] = $this->data[$code] ?? null;
         }
         return $dirty;
     }
 
     /**
-     * Mark entity as clean (no changes)
+     * Clear dirty tracking (after save)
      */
-    public function markClean(): self
+    public function clearDirtyTracking(): void
     {
-        $this->originalData = $this->data;
         $this->dirtyAttributes = [];
-        return $this;
+        $this->originalData = $this->data;
     }
 
     /**
-     * Validate all attributes
+     * Validate entity data
      */
-    public function validate(): bool
+    public function validate(): array
     {
         $errors = [];
-
-        // Validate each attribute
+        
         foreach ($this->entityType->getAttributes() as $attribute) {
-            $code = $attribute->getAttributeCode();
-            $value = $this->getDataValue($code);
+            $code = $attribute->getCode();
+            $value = $this->get($code);
 
-            try {
-                $attribute->validate($value);
-            } catch (ValidationException $e) {
-                $errors = array_merge($errors, $e->getValidationErrors());
+            // Required validation
+            if ($attribute->isRequired() && ($value === null || $value === '')) {
+                $errors[$code] = "Attribute '{$attribute->getLabel()}' is required";
+                continue;
+            }
+
+            // Type validation based on backend type
+            if ($value !== null) {
+                $typeError = $this->validateType($attribute, $value);
+                if ($typeError) {
+                    $errors[$code] = $typeError;
+                }
             }
         }
 
-        if (!empty($errors)) {
-            throw ValidationException::multipleErrors($errors);
+        return $errors;
+    }
+
+    private function validateType(Attribute $attribute, mixed $value): ?string
+    {
+        $backendType = $attribute->getBackendType();
+        
+        switch ($backendType) {
+            case 'int':
+                if (!is_numeric($value) || (string)(int)$value !== (string)$value) {
+                    return "Attribute '{$attribute->getLabel()}' must be an integer";
+                }
+                break;
+            case 'decimal':
+                if (!is_numeric($value)) {
+                    return "Attribute '{$attribute->getLabel()}' must be a number";
+                }
+                break;
+            case 'datetime':
+                if (!strtotime($value)) {
+                    return "Attribute '{$attribute->getLabel()}' must be a valid date/time";
+                }
+                break;
+            case 'varchar':
+            case 'text':
+                if (!is_string($value) && !is_numeric($value)) {
+                    return "Attribute '{$attribute->getLabel()}' must be a string";
+                }
+                break;
         }
-
-        return true;
+        
+        return null;
     }
 
-    /**
-     * Get created at timestamp
-     */
-    public function getCreatedAt(): ?string
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Get updated at timestamp
-     */
-    public function getUpdatedAt(): ?string
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Magic getter for attributes
-     */
-    public function __get(string $name)
-    {
-        return $this->getDataValue($name);
-    }
-
-    /**
-     * Magic setter for attributes
-     */
-    public function __set(string $name, $value)
-    {
-        $this->setDataValue($name, $value);
-    }
-
-    /**
-     * Magic isset for attributes
-     */
-    public function __isset(string $name): bool
-    {
-        return isset($this->data[$name]);
-    }
-
-    /**
-     * Convert entity to array
-     */
-    public function toArray(): array
-    {
-        return array_merge(
-            [
-                'entity_id' => $this->entityId,
-                'created_at' => $this->createdAt,
-                'updated_at' => $this->updatedAt,
-            ],
-            $this->data
-        );
-    }
+    public function getCreatedAt(): ?string { return $this->createdAt; }
+    public function getUpdatedAt(): ?string { return $this->updatedAt; }
+    public function setCreatedAt(string $createdAt): void { $this->createdAt = $createdAt; }
+    public function setUpdatedAt(string $updatedAt): void { $this->updatedAt = $updatedAt; }
 }

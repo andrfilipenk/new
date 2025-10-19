@@ -1,47 +1,16 @@
 <?php
-// app/Eav/Exception/EavException.php
-namespace Eav\Exception;
+// app/Core/Eav/Exception/EavException.php
+namespace Core\Eav\Exception;
 
-use Exception;
+use Core\Exception\BaseException;
 
 /**
- * Base EAV Exception
- * 
- * All EAV-related exceptions extend from this base class.
+ * Base exception for all EAV-related errors
  */
-abstract class EavException extends Exception
+abstract class EavException extends BaseException
 {
-    /**
-     * Context information for debugging
-     */
-    protected array $context = [];
-
-    /**
-     * Set context information
-     */
-    public function setContext(array $context): self
+    public function getHttpStatusCode(): int
     {
-        $this->context = $context;
-        return $this;
-    }
-
-    /**
-     * Get context information
-     */
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
-    /**
-     * Get formatted error message with context
-     */
-    public function getFullMessage(): string
-    {
-        $message = $this->getMessage();
-        if (!empty($this->context)) {
-            $message .= ' | Context: ' . json_encode($this->context);
-        }
-        return $message;
+        return 500;
     }
 }

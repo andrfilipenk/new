@@ -232,3 +232,6 @@ PHP;
         return '[' . implode(', ', $elements) . ']';
     }
 }
+PHP;
+    }
+}
