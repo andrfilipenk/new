@@ -1,283 +1,450 @@
 <?php
-// app/Eav/Cache/CacheManager.php
-namespace Eav\Cache;
 
-use Core\Database\Database;
+namespace App\Core\Eav\Cache;
+
+use App\Core\Eav\Cache\RequestCache;
+use App\Core\Eav\Cache\MemoryCache;
+use App\Core\Eav\Cache\PersistentCache;
+use App\Core\Eav\Cache\QueryResultCache;
 
 /**
  * Cache Manager
  * 
- * Multi-level caching (query cache, schema cache, entity cache) with invalidation
+ * Orchestrates all cache levels (L1-L4) with intelligent fallback.
+ * - Unified cache interface
+ * - Multi-level cache hierarchy
+ * - Automatic cache warming
+ * - Comprehensive statistics
+ * 
+ * Cache Hierarchy:
+ * L1 (Request) → L2 (Memory/APCu) → L3 (Persistent/File/Redis) → L4 (Query Results)
+ * 
+ * @package App\Core\Eav\Cache
  */
 class CacheManager
 {
-    private Database $db;
-    private array $memoryCache = [];
-    private string $cachePrefix = 'eav:';
-    private int $defaultTtl = 3600;
+    private RequestCache $l1Cache;
+    private MemoryCache $l2Cache;
+    private PersistentCache $l3Cache;
+    private QueryResultCache $l4Cache;
+    
+    private array $config;
+    private array $stats = [
+        'l1_hits' => 0,
+        'l2_hits' => 0,
+        'l3_hits' => 0,
+        'l4_hits' => 0,
+        'total_requests' => 0,
+        'cache_sets' => 0,
+        'invalidations' => 0,
+    ];
 
-    public function __construct(Database $db, string $cachePrefix = 'eav:', int $defaultTtl = 3600)
+    /**
+     * @param array $config Cache configuration
+     */
+    public function __construct(array $config = [])
     {
-        $this->db = $db;
-        $this->cachePrefix = $cachePrefix;
-        $this->defaultTtl = $defaultTtl;
+        $this->config = array_merge([
+            'l1_enable' => true,
+            'l2_enable' => true,
+            'l3_enable' => true,
+            'l4_enable' => true,
+            'l1_ttl' => 0,      // Request lifetime
+            'l2_ttl' => 900,    // 15 minutes
+            'l3_ttl' => 3600,   // 1 hour
+            'l4_ttl' => 300,    // 5 minutes
+            'auto_warm' => false,
+        ], $config);
+
+        $this->initializeCaches();
     }
 
     /**
-     * Get a cached value
+     * Get value from cache (multi-level lookup)
+     * 
+     * @param string $key Cache key
+     * @param string|null $level Specific cache level (L1/L2/L3/L4) or null for auto
+     * @return mixed|null Cached value or null
      */
-    public function get(string $key): mixed
+    public function get(string $key, ?string $level = null): mixed
     {
-        $fullKey = $this->cachePrefix . $key;
+        $this->stats['total_requests']++;
 
-        // Check memory cache first
-        if (isset($this->memoryCache[$fullKey])) {
-            return $this->memoryCache[$fullKey];
+        // Specific level lookup
+        if ($level !== null) {
+            return $this->getFromLevel($key, $level);
         }
 
-        // Check database cache
-        $result = $this->db->table('eav_entity_cache')
-            ->where('cache_key', $fullKey)
-            ->where('expires_at', '>', date('Y-m-d H:i:s'))
-            ->first();
+        // Multi-level lookup with backfill
+        // L1: Request Cache
+        if ($this->config['l1_enable']) {
+            $value = $this->l1Cache->get($key);
+            if ($value !== null) {
+                $this->stats['l1_hits']++;
+                return $value;
+            }
+        }
 
-        if ($result) {
-            $value = $this->unserialize($result['cache_value']);
-            $this->memoryCache[$fullKey] = $value;
-            return $value;
+        // L2: Memory Cache (APCu/Static)
+        if ($this->config['l2_enable']) {
+            $value = $this->l2Cache->get($key);
+            if ($value !== null) {
+                $this->stats['l2_hits']++;
+                
+                // Backfill L1
+                if ($this->config['l1_enable']) {
+                    $this->l1Cache->set($key, $value);
+                }
+                
+                return $value;
+            }
+        }
+
+        // L3: Persistent Cache (File/Redis)
+        if ($this->config['l3_enable']) {
+            $value = $this->l3Cache->get($key);
+            if ($value !== null) {
+                $this->stats['l3_hits']++;
+                
+                // Backfill L2 and L1
+                if ($this->config['l2_enable']) {
+                    $this->l2Cache->set($key, $value, $this->config['l2_ttl']);
+                }
+                if ($this->config['l1_enable']) {
+                    $this->l1Cache->set($key, $value);
+                }
+                
+                return $value;
+            }
         }
 
         return null;
     }
 
     /**
-     * Set a cached value
+     * Set value in cache (all levels)
+     * 
+     * @param string $key Cache key
+     * @param mixed $value Value to cache
+     * @param int|null $ttl TTL in seconds (null = use defaults)
+     * @param array $levels Specific levels to set (empty = all enabled)
+     * @return bool Success status
      */
-    public function set(string $key, mixed $value, ?int $ttl = null): bool
+    public function set(string $key, mixed $value, ?int $ttl = null, array $levels = []): bool
     {
-        $fullKey = $this->cachePrefix . $key;
-        $ttl = $ttl ?? $this->defaultTtl;
-        $expiresAt = date('Y-m-d H:i:s', time() + $ttl);
+        $this->stats['cache_sets']++;
+        $success = true;
 
-        // Set in memory cache
-        $this->memoryCache[$fullKey] = $value;
+        $targetLevels = empty($levels) ? ['L1', 'L2', 'L3'] : $levels;
 
-        // Set in database cache
-        $serialized = $this->serialize($value);
-
-        // Check if exists
-        $existing = $this->db->table('eav_entity_cache')
-            ->where('cache_key', $fullKey)
-            ->first();
-
-        if ($existing) {
-            $affected = $this->db->table('eav_entity_cache')
-                ->where('cache_key', $fullKey)
-                ->update([
-                    'cache_value' => $serialized,
-                    'ttl' => $ttl,
-                    'expires_at' => $expiresAt,
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
-            return $affected > 0;
-        } else {
-            $id = $this->db->table('eav_entity_cache')->insert([
-                'cache_key' => $fullKey,
-                'cache_value' => $serialized,
-                'ttl' => $ttl,
-                'expires_at' => $expiresAt,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-            return $id > 0;
-        }
-    }
-
-    /**
-     * Delete a cached value
-     */
-    public function delete(string $key): bool
-    {
-        $fullKey = $this->cachePrefix . $key;
-
-        // Remove from memory cache
-        unset($this->memoryCache[$fullKey]);
-
-        // Remove from database cache
-        $affected = $this->db->table('eav_entity_cache')
-            ->where('cache_key', $fullKey)
-            ->delete();
-
-        return $affected > 0;
-    }
-
-    /**
-     * Check if a key exists in cache
-     */
-    public function has(string $key): bool
-    {
-        return $this->get($key) !== null;
-    }
-
-    /**
-     * Clear all cache or by pattern
-     */
-    public function clear(?string $pattern = null): bool
-    {
-        if ($pattern === null) {
-            // Clear all
-            $this->memoryCache = [];
-            $affected = $this->db->table('eav_entity_cache')->delete();
-            return $affected > 0;
-        } else {
-            // Clear by pattern
-            $fullPattern = $this->cachePrefix . $pattern;
+        foreach ($targetLevels as $level) {
+            $levelSuccess = match($level) {
+                'L1' => $this->config['l1_enable'] && $this->l1Cache->set($key, $value),
+                'L2' => $this->config['l2_enable'] && $this->l2Cache->set($key, $value, $ttl ?? $this->config['l2_ttl']),
+                'L3' => $this->config['l3_enable'] && $this->l3Cache->set($key, $value, $ttl ?? $this->config['l3_ttl']),
+                default => false,
+            };
             
-            // Clear memory cache
-            foreach (array_keys($this->memoryCache) as $key) {
-                if (fnmatch($fullPattern, $key)) {
-                    unset($this->memoryCache[$key]);
-                }
-            }
-
-            // Clear database cache (using LIKE)
-            $likePattern = str_replace('*', '%', $fullPattern);
-            $affected = $this->db->table('eav_entity_cache')
-                ->whereRaw('cache_key LIKE ?', [$likePattern])
-                ->delete();
-
-            return $affected > 0;
+            $success = $success && $levelSuccess;
         }
+
+        return $success;
     }
 
     /**
-     * Get or set cache value
+     * Remember pattern with multi-level caching
+     * 
+     * @param string $key Cache key
+     * @param callable $callback Callback to execute on cache miss
+     * @param int|null $ttl TTL in seconds
+     * @return mixed Cached or computed value
      */
     public function remember(string $key, callable $callback, ?int $ttl = null): mixed
     {
         $value = $this->get($key);
-
+        
         if ($value !== null) {
             return $value;
         }
-
+        
         $value = $callback();
         $this->set($key, $value, $ttl);
-
+        
         return $value;
     }
 
     /**
-     * Invalidate entity cache
+     * Delete value from all cache levels
+     * 
+     * @param string $key Cache key
+     * @return bool Success status
      */
-    public function invalidateEntity(int $entityId): void
+    public function delete(string $key): bool
     {
-        $this->clear("entity:{$entityId}:*");
-        $this->delete("entity:{$entityId}");
+        $this->stats['invalidations']++;
+        $success = true;
+
+        if ($this->config['l1_enable']) {
+            $success = $this->l1Cache->delete($key) && $success;
+        }
+        if ($this->config['l2_enable']) {
+            $success = $this->l2Cache->delete($key) && $success;
+        }
+        if ($this->config['l3_enable']) {
+            $success = $this->l3Cache->delete($key) && $success;
+        }
+
+        return $success;
     }
 
     /**
-     * Invalidate entity type cache
+     * Clear all cache levels
+     * 
+     * @return bool Success status
      */
-    public function invalidateEntityType(int $entityTypeId): void
+    public function clear(): bool
     {
-        $this->clear("entity_type:{$entityTypeId}:*");
-        $this->delete("entity_type:{$entityTypeId}");
+        $success = true;
+
+        if ($this->config['l1_enable']) {
+            $success = $this->l1Cache->clear() && $success;
+        }
+        if ($this->config['l2_enable']) {
+            $success = $this->l2Cache->clear() && $success;
+        }
+        if ($this->config['l3_enable']) {
+            $success = $this->l3Cache->clear() && $success;
+        }
+        if ($this->config['l4_enable']) {
+            $success = $this->l4Cache->clear() && $success;
+        }
+
+        return $success;
     }
 
     /**
-     * Invalidate query cache
+     * Get query result cache (L4)
+     * 
+     * @return QueryResultCache
      */
-    public function invalidateQuery(string $queryHash): void
+    public function queries(): QueryResultCache
     {
-        $this->delete("query:{$queryHash}");
+        return $this->l4Cache;
     }
 
     /**
-     * Invalidate all queries for an entity type
+     * Invalidate entity-related caches
+     * 
+     * @param string $entityType Entity type code
+     * @param int|null $entityId Entity ID (null = all entities of type)
+     * @return int Number of cache entries invalidated
      */
-    public function invalidateEntityTypeQueries(int $entityTypeId): void
+    public function invalidateEntity(string $entityType, ?int $entityId = null): int
     {
-        $this->clear("query:type:{$entityTypeId}:*");
+        $invalidated = 0;
+
+        // Invalidate specific entity
+        if ($entityId !== null) {
+            $key = "entity:{$entityType}:{$entityId}";
+            if ($this->delete($key)) {
+                $invalidated++;
+            }
+            
+            // Invalidate L4 query cache
+            if ($this->config['l4_enable']) {
+                $invalidated += $this->l4Cache->invalidateByEntity($entityType, $entityId);
+            }
+        } else {
+            // Invalidate all entities of type
+            if ($this->config['l4_enable']) {
+                $invalidated += $this->l4Cache->invalidateByEntityType($entityType);
+            }
+        }
+
+        $this->stats['invalidations'] += $invalidated;
+        return $invalidated;
     }
 
     /**
-     * Clean expired cache entries
+     * Invalidate by tag
+     * 
+     * @param string $tag Tag to invalidate
+     * @return int Number of cache entries invalidated
      */
-    public function cleanExpired(): int
+    public function invalidateByTag(string $tag): int
     {
-        $affected = $this->db->table('eav_entity_cache')
-            ->where('expires_at', '<', date('Y-m-d H:i:s'))
-            ->delete();
+        $invalidated = 0;
 
-        return $affected;
+        if ($this->config['l4_enable']) {
+            $invalidated = $this->l4Cache->invalidateByTag($tag);
+        }
+
+        $this->stats['invalidations'] += $invalidated;
+        return $invalidated;
     }
 
     /**
-     * Get cache statistics
+     * Warm up cache with pre-computed data
+     * 
+     * @param array $data Array of key => value pairs
+     * @param int|null $ttl TTL in seconds
+     * @return int Number of entries cached
+     */
+    public function warmUp(array $data, ?int $ttl = null): int
+    {
+        $cached = 0;
+
+        foreach ($data as $key => $value) {
+            if ($this->set($key, $value, $ttl)) {
+                $cached++;
+            }
+        }
+
+        return $cached;
+    }
+
+    /**
+     * Get comprehensive cache statistics
+     * 
+     * @return array Statistics from all cache levels
      */
     public function getStats(): array
     {
-        $total = $this->db->table('eav_entity_cache')
-            ->selectRaw('COUNT(*) as count')
-            ->first();
+        $l1Stats = $this->config['l1_enable'] ? $this->l1Cache->getStats() : [];
+        $l2Stats = $this->config['l2_enable'] ? $this->l2Cache->getStats() : [];
+        $l3Stats = $this->config['l3_enable'] ? $this->l3Cache->getStats() : [];
+        $l4Stats = $this->config['l4_enable'] ? $this->l4Cache->getStats() : [];
 
-        $expired = $this->db->table('eav_entity_cache')
-            ->where('expires_at', '<', date('Y-m-d H:i:s'))
-            ->selectRaw('COUNT(*) as count')
-            ->first();
-
-        $size = $this->db->table('eav_entity_cache')
-            ->selectRaw('SUM(LENGTH(cache_value)) as size')
-            ->first();
+        $totalRequests = $this->stats['total_requests'];
+        $totalHits = $this->stats['l1_hits'] + $this->stats['l2_hits'] + 
+                     $this->stats['l3_hits'] + $this->stats['l4_hits'];
+        $overallHitRate = $totalRequests > 0 ? ($totalHits / $totalRequests) * 100 : 0;
 
         return [
-            'total_entries' => $total['count'] ?? 0,
-            'expired_entries' => $expired['count'] ?? 0,
-            'active_entries' => ($total['count'] ?? 0) - ($expired['count'] ?? 0),
-            'memory_cache_size' => count($this->memoryCache),
-            'database_cache_size' => $size['size'] ?? 0,
+            'overall' => [
+                'total_requests' => $totalRequests,
+                'total_hits' => $totalHits,
+                'hit_rate' => round($overallHitRate, 2),
+                'cache_sets' => $this->stats['cache_sets'],
+                'invalidations' => $this->stats['invalidations'],
+            ],
+            'l1' => array_merge($l1Stats, [
+                'hits' => $this->stats['l1_hits'],
+                'enabled' => $this->config['l1_enable'],
+            ]),
+            'l2' => array_merge($l2Stats, [
+                'hits' => $this->stats['l2_hits'],
+                'enabled' => $this->config['l2_enable'],
+            ]),
+            'l3' => array_merge($l3Stats, [
+                'hits' => $this->stats['l3_hits'],
+                'enabled' => $this->config['l3_enable'],
+            ]),
+            'l4' => array_merge($l4Stats, [
+                'hits' => $this->stats['l4_hits'],
+                'enabled' => $this->config['l4_enable'],
+            ]),
         ];
     }
 
     /**
-     * Warm up cache for entity type
+     * Reset all statistics
      */
-    public function warmUpEntityType(int $entityTypeId, array $attributes): void
+    public function resetStats(): void
     {
-        // This would be called to pre-populate cache with frequently accessed data
-        $this->set("entity_type:{$entityTypeId}:attributes", $attributes, 7200);
+        $this->stats = [
+            'l1_hits' => 0,
+            'l2_hits' => 0,
+            'l3_hits' => 0,
+            'l4_hits' => 0,
+            'total_requests' => 0,
+            'cache_sets' => 0,
+            'invalidations' => 0,
+        ];
+
+        if ($this->config['l1_enable']) $this->l1Cache->resetStats();
+        if ($this->config['l2_enable']) $this->l2Cache->resetStats();
+        if ($this->config['l3_enable']) $this->l3Cache->resetStats();
+        if ($this->config['l4_enable']) $this->l4Cache->resetStats();
     }
 
     /**
-     * Serialize value for storage
+     * Get individual cache layer
+     * 
+     * @param string $level Cache level (L1/L2/L3/L4)
+     * @return RequestCache|MemoryCache|PersistentCache|QueryResultCache|null
      */
-    private function serialize(mixed $value): string
+    public function getLayer(string $level): mixed
     {
-        return json_encode($value);
+        return match(strtoupper($level)) {
+            'L1' => $this->l1Cache,
+            'L2' => $this->l2Cache,
+            'L3' => $this->l3Cache,
+            'L4' => $this->l4Cache,
+            default => null,
+        };
     }
 
     /**
-     * Unserialize value from storage
+     * Check cache health
+     * 
+     * @return array Health status of all cache layers
      */
-    private function unserialize(string $value): mixed
+    public function healthCheck(): array
     {
-        return json_decode($value, true);
+        return [
+            'l1' => [
+                'enabled' => $this->config['l1_enable'],
+                'available' => $this->l1Cache->isAvailable(),
+                'status' => 'ok',
+            ],
+            'l2' => [
+                'enabled' => $this->config['l2_enable'],
+                'available' => $this->l2Cache->isAvailable(),
+                'driver' => get_class($this->l2Cache->getDriver()),
+                'status' => $this->l2Cache->isAvailable() ? 'ok' : 'degraded',
+            ],
+            'l3' => [
+                'enabled' => $this->config['l3_enable'],
+                'available' => $this->l3Cache->isAvailable(),
+                'driver' => get_class($this->l3Cache->getDriver()),
+                'status' => $this->l3Cache->isAvailable() ? 'ok' : 'degraded',
+            ],
+            'l4' => [
+                'enabled' => $this->config['l4_enable'],
+                'available' => $this->l4Cache->isEnabled(),
+                'status' => $this->l4Cache->isEnabled() ? 'ok' : 'disabled',
+            ],
+        ];
     }
 
     /**
-     * Get memory cache for debugging
+     * Initialize all cache layers
      */
-    public function getMemoryCache(): array
+    private function initializeCaches(): void
     {
-        return $this->memoryCache;
+        $this->l1Cache = new RequestCache();
+        $this->l2Cache = new MemoryCache(null, $this->config['l2_ttl']);
+        $this->l3Cache = new PersistentCache(null, $this->config['l3_ttl']);
+        
+        // L4 uses L2 driver for storage
+        $this->l4Cache = new QueryResultCache(
+            $this->l2Cache->getDriver(),
+            $this->config['l4_ttl'],
+            $this->config['l4_enable']
+        );
     }
 
     /**
-     * Clear only memory cache
+     * Get value from specific cache level
      */
-    public function clearMemoryCache(): void
+    private function getFromLevel(string $key, string $level): mixed
     {
-        $this->memoryCache = [];
+        return match(strtoupper($level)) {
+            'L1' => $this->config['l1_enable'] ? $this->l1Cache->get($key) : null,
+            'L2' => $this->config['l2_enable'] ? $this->l2Cache->get($key) : null,
+            'L3' => $this->config['l3_enable'] ? $this->l3Cache->get($key) : null,
+            default => null,
+        };
     }
 }
