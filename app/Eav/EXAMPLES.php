@@ -4,12 +4,15 @@
  * 
  * This file demonstrates various use cases and patterns for the EAV module
  */
+use Eav\Models\EntityType;
+use Eav\Models\Attribute;
+use Eav\Models\AttributeOption;
+
 
 // Example 1: Setup Entity Type and Attributes
 function setupProductCatalog($di)
 {
-    use Eav\Models\EntityType;
-    use Eav\Models\Attribute;
+    
 
     // Create entity type
     $productType = new EntityType([
@@ -370,8 +373,6 @@ function repositoryPatterns($di)
 // Example 8: Working with Attribute Options
 function attributeOptions($di)
 {
-    use Eav\Models\Attribute;
-    use Eav\Models\AttributeOption;
 
     $attributeRepository = $di->get('eavAttributeRepository');
 

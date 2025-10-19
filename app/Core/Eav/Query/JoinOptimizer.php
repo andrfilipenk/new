@@ -206,14 +206,6 @@ class JoinOptimizer
     }
 
     /**
-     * Get table alias for attribute
-     */
-    private function getTableAlias(int $attributeId): string
-    {
-        return "val_{$attributeId}";
-    }
-
-    /**
      * Set maximum number of joins
      */
     public function setMaxJoins(int $max): void
