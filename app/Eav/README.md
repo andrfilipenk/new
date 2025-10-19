@@ -1,385 +1,607 @@
-# EAV (Entity-Attribute-Value) Library
+# EAV Phase 3: Advanced Entity Management & Query System
 
 ## Overview
 
-The EAV library provides a flexible, high-performance data modeling pattern that enables dynamic attribute management for entities without schema modifications. This implementation is designed for the existing PHP framework and follows the project's architectural patterns.
+The EAV (Entity-Attribute-Value) module provides a flexible data modeling solution that allows dynamic attribute management without schema changes. Phase 3 implements advanced entity management, sophisticated querying, and performance optimizations.
 
-## Features
+## Table of Contents
 
-- **Dynamic Schema Management**: Define and modify entity attributes through configuration files without database migrations
-- **Type Safety**: Strong type system with validation and casting capabilities
-- **Flexible Storage**: Support for both EAV table storage and flat table storage strategies
-- **Configuration-Driven**: Simple PHP array configuration for all aspects of the system
-- **Extensible**: Modular architecture with clear separation of concerns
+1. [Installation](#installation)
+2. [Architecture](#architecture)
+3. [Core Components](#core-components)
+4. [Usage Guide](#usage-guide)
+5. [API Reference](#api-reference)
+6. [Performance Optimization](#performance-optimization)
+7. [Examples](#examples)
 
-## Implementation Status
+---
 
-### ✅ Completed Components
+## Installation
 
-1. **Module Structure**
-   - `Module.php` - EAV module bootstrap
-   - `config.php` - Module configuration with global EAV settings
+### 1. Run Migrations
 
-2. **Exception Hierarchy**
-   - `EavException` - Base exception class
-   - `ConfigurationException` - Configuration-related errors
-   - `SynchronizationException` - Schema synchronization errors
-   - `ValidationException` - Attribute validation errors
-   - `StorageException` - Storage operation errors
-   - `EntityException` - Entity operation errors
+```bash
+php cli.php migrate
+```
 
-3. **Entity Type System**
-   - `Attribute` - Attribute model with validation and type casting
-   - `AttributeCollection` - Collection of attributes with filtering capabilities
-   - `EntityType` - Entity type model with attribute management
-   - `Entity` - Entity instance with dirty tracking and validation
+This will create all necessary EAV tables:
+- `eav_entity_types` - Entity type definitions
+- `eav_attributes` - Attribute definitions
+- `eav_entities` - Entity instances
+- `eav_values_*` - Value storage tables (varchar, int, decimal, text, datetime)
+- `eav_attribute_options` - Options for select attributes
+- `eav_entity_cache` - Cache storage
 
-4. **Configuration System**
-   - `ConfigLoader` - Loads and validates entity configurations from files
-   - `EntityTypeRegistry` - Runtime registry of entity types
+### 2. Register Module
 
-5. **Example Configurations**
-   - `product.php` - Product entity with 17 attributes
-   - `customer.php` - Customer entity with 18 attributes
-   - `category.php` - Category entity with 17 attributes
+Add to your bootstrap or configuration:
 
-6. **Service Provider**
-   - `EavServiceProvider` - Registers EAV services in DI container
+```php
+use Eav\Module as EavModule;
 
-### 📋 Planned Components (To Be Implemented)
+$eavModule = new EavModule();
+$eavModule->registerServices($di);
+$eavModule->boot();
+```
 
-The following components are defined in the design document but not yet implemented:
+---
 
-1. **Schema Synchronization Engine**
-   - Schema analyzer and comparator
-   - Structure builder for database tables
-   - Migration generator
-   - Backup and restore functionality
+## Architecture
 
-2. **Storage Strategy Pattern**
-   - `StorageStrategyInterface` - Interface for storage strategies
-   - `EavTableStorage` - EAV table-based storage implementation
-   - `FlatTableStorage` - Flat table storage implementation
-   - Storage factory and selector
-
-3. **Attribute Manager**
-   - Attribute metadata CRUD operations
-   - Attribute caching
-   - Validation rule management
-
-4. **Value Manager**
-   - Value persistence and retrieval
-   - Batch value operations
-   - Value change tracking
-
-5. **EAV Query Builder**
-   - Extension of existing QueryBuilder
-   - Join optimization for EAV queries
-   - Filter translation for attributes
-   - Query result caching
-
-6. **Entity Manager**
-   - Complete entity lifecycle management
-   - Entity CRUD operations with attribute handling
-   - Lazy and eager loading strategies
-   - Entity validation and persistence
-
-7. **Index Management**
-   - Index creation based on attribute flags
-   - Index synchronization
-   - Performance monitoring
-
-8. **Cache Strategy**
-   - Multi-level caching
-   - Cache invalidation logic
-   - Query result caching
-
-## Directory Structure
+### System Layers
 
 ```
-app/Eav/
-├── Cache/                      # (Planned) Cache implementations
-├── Config/                     # Configuration management
-│   ├── entities/              # Entity configuration files
-│   │   ├── product.php        # Product entity configuration
-│   │   ├── customer.php       # Customer entity configuration
-│   │   └── category.php       # Category entity configuration
-│   ├── ConfigLoader.php       # Configuration file loader
-│   └── EntityTypeRegistry.php # Entity type registry
-├── Exception/                  # Exception hierarchy
-│   ├── EavException.php       # Base exception
-│   ├── ConfigurationException.php
-│   ├── EntityException.php
-│   ├── StorageException.php
-│   ├── SynchronizationException.php
-│   └── ValidationException.php
-├── Model/                      # Core models
-│   ├── Attribute.php          # Attribute model
-│   ├── AttributeCollection.php # Attribute collection
-│   ├── Entity.php             # Entity instance
-│   └── EntityType.php         # Entity type model
-├── Provider/                   # Service providers
-│   └── EavServiceProvider.php # DI service registration
-├── Query/                      # (Planned) Query builders
-├── Schema/                     # (Planned) Schema management
-├── Storage/                    # (Planned) Storage strategies
-├── Module.php                  # Module bootstrap
-├── config.php                  # Module configuration
-└── README.md                   # This file
+┌─────────────────────────────────────┐
+│     Application Layer               │
+│  (Controllers, Services)            │
+└─────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│   Entity Management Layer           │
+│  - EntityManager                    │
+│  - EntityRepository                 │
+│  - QueryFactory                     │
+└─────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│      Query Layer                    │
+│  - EavQueryBuilder                  │
+│  - JoinOptimizer                    │
+│  - FilterTranslator                 │
+└─────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│    Data Access Layer                │
+│  - ValueRepository                  │
+│  - AttributeRepository              │
+│  - StorageStrategy                  │
+└─────────────────────────────────────┘
+              ↓
+┌─────────────────────────────────────┐
+│   Performance Layer                 │
+│  - CacheManager                     │
+│  - BatchManager                     │
+│  - IndexManager                     │
+└─────────────────────────────────────┘
 ```
+
+---
+
+## Core Components
+
+### EntityManager
+
+Central component for entity lifecycle management.
+
+**Responsibilities:**
+- Create, read, update, delete entities
+- Validate attribute values
+- Manage transactions
+- Fire events
+- Cache invalidation
+
+### EntityRepository
+
+High-level repository pattern for entity operations.
+
+**Features:**
+- Fluent query interface
+- Pagination support
+- Bulk operations
+- Search and filtering
+
+### EavQueryBuilder
+
+EAV-aware query builder with optimization.
+
+**Capabilities:**
+- Attribute-based filtering
+- Join optimization
+- Subquery strategies
+- Complex WHERE conditions
+
+### ValueRepository
+
+Handles value storage across multiple backend types.
+
+**Functions:**
+- Multi-table value management
+- Batch operations
+- Type conversion
+- Value validation
+
+### CacheManager
+
+Multi-level caching system.
+
+**Cache Types:**
+- Entity cache
+- Attribute schema cache
+- Query result cache
+- Memory cache (runtime)
+
+---
+
+## Usage Guide
+
+### 1. Define Entity Type
+
+```php
+use Eav\Models\EntityType;
+
+$entityType = new EntityType([
+    'entity_type_code' => 'product',
+    'entity_type_name' => 'Product',
+    'description' => 'Product catalog items',
+    'is_active' => true
+]);
+$entityType->save();
+```
+
+### 2. Define Attributes
+
+```php
+use Eav\Models\Attribute;
+
+$attribute = new Attribute([
+    'entity_type_id' => $entityType->id,
+    'attribute_code' => 'name',
+    'attribute_name' => 'Product Name',
+    'backend_type' => 'varchar',
+    'frontend_input' => 'text',
+    'is_required' => true,
+    'is_searchable' => true,
+    'is_filterable' => true,
+    'sort_order' => 10
+]);
+$attribute->save();
+
+// Numeric attribute
+$priceAttr = new Attribute([
+    'entity_type_id' => $entityType->id,
+    'attribute_code' => 'price',
+    'attribute_name' => 'Price',
+    'backend_type' => 'decimal',
+    'frontend_input' => 'number',
+    'is_required' => true,
+    'is_filterable' => true,
+    'validation_rules' => ['min' => 0],
+    'sort_order' => 20
+]);
+$priceAttr->save();
+```
+
+### 3. Create Entities
+
+```php
+use Eav\Services\EntityManager;
+
+$entityManager = $di->get('eavEntityManager');
+
+// Create entity with attributes
+$entity = $entityManager->create($entityType->id, [
+    'entity_code' => 'PROD-001',
+    'name' => 'Premium Widget',
+    'price' => 99.99,
+    'description' => 'High-quality widget',
+    'stock_quantity' => 100,
+    'is_active' => true
+]);
+
+echo "Created entity ID: " . $entity->id;
+```
+
+### 4. Query Entities
+
+```php
+use Eav\Repositories\EntityRepository;
+
+$repository = $di->get('eavEntityRepository');
+
+// Simple query
+$products = $repository->findByAttribute(
+    $entityType->id,
+    'name',
+    'Premium Widget'
+);
+
+// Advanced query
+$expensiveProducts = $repository->query($entityType->id)
+    ->where('price', '>', 50)
+    ->where('stock_quantity', '>', 0)
+    ->orderBy('price', 'DESC')
+    ->limit(10)
+    ->get();
+
+// Search with LIKE
+$searchResults = $repository->searchLike(
+    $entityType->id,
+    'name',
+    'Widget',
+    20
+);
+
+// Range query
+$midRangeProducts = $repository->whereBetween(
+    $entityType->id,
+    'price',
+    25,
+    75
+);
+```
+
+### 5. Update Entities
+
+```php
+// Update single entity
+$entityManager->update($entity->id, [
+    'price' => 89.99,
+    'stock_quantity' => 95
+]);
+
+// Bulk update
+$repository->bulkUpdate([1, 2, 3], [
+    'is_active' => false
+]);
+```
+
+### 6. Batch Operations
+
+```php
+use Eav\Services\BatchManager;
+
+$batchManager = $di->get('eavBatchManager');
+
+// Batch create
+$newEntities = [
+    ['name' => 'Product 1', 'price' => 10.00],
+    ['name' => 'Product 2', 'price' => 20.00],
+    ['name' => 'Product 3', 'price' => 30.00],
+];
+
+$entityIds = $batchManager->batchCreate($entityType->id, $newEntities);
+
+// Batch delete
+$batchManager->batchDelete([1, 2, 3], $soft = true);
+```
+
+### 7. Pagination
+
+```php
+$page = 1;
+$perPage = 20;
+
+$result = $repository->paginate($entityType->id, $page, $perPage);
+
+echo "Total: " . $result['total'];
+echo "Page: " . $result['page'] . " of " . $result['total_pages'];
+
+foreach ($result['data'] as $entity) {
+    echo $entity->attributeValues['name'];
+}
+```
+
+---
+
+## API Reference
+
+### EntityManager
+
+#### create(int $entityTypeId, array $data, ?int $parentId = null): Entity
+Create a new entity with attribute values.
+
+#### find(int $entityId, bool $loadValues = true): ?Entity
+Find entity by ID, optionally loading all attribute values.
+
+#### findMany(array $entityIds, bool $loadValues = true): array
+Find multiple entities by IDs.
+
+#### update(int $entityId, array $data): bool
+Update entity and its attribute values.
+
+#### delete(int $entityId, bool $soft = true): bool
+Delete entity (soft or hard delete).
+
+#### copy(int $sourceEntityId, ?array $overrideData = null): ?Entity
+Create a copy of an existing entity.
+
+---
+
+### EntityRepository
+
+#### query(int $entityTypeId): EavQueryBuilder
+Create query builder for entity type.
+
+#### find(int $id, bool $loadValues = true): ?Entity
+Find entity by ID.
+
+#### search(int $entityTypeId, array $criteria, ?int $limit = null): array
+Search entities by multiple criteria.
+
+#### paginate(int $entityTypeId, int $page = 1, int $perPage = 20): array
+Get paginated results.
+
+#### firstOrCreate(int $entityTypeId, array $criteria, array $data = []): Entity
+Get existing or create new entity.
+
+---
+
+### EavQueryBuilder
+
+#### where(string $attributeCode, string $operator, mixed $value): self
+Add WHERE condition on attribute.
+
+#### whereIn(string $attributeCode, array $values): self
+Add WHERE IN condition.
+
+#### whereBetween(string $attributeCode, $min, $max): self
+Add BETWEEN condition.
+
+#### whereLike(string $attributeCode, string $pattern): self
+Add LIKE condition.
+
+#### orderBy(string $attributeCode, string $direction = 'ASC'): self
+Add ORDER BY clause.
+
+#### limit(int $limit): self
+Set result limit.
+
+#### offset(int $offset): self
+Set result offset.
+
+#### get(): array
+Execute query and get results.
+
+#### first(): ?Entity
+Get first result.
+
+#### count(): int
+Count matching entities.
+
+---
+
+## Performance Optimization
+
+### 1. Caching
+
+The system implements multi-level caching:
+
+```php
+// Cache is automatic, but you can control TTL in config
+'cache' => [
+    'enabled' => true,
+    'entity_ttl' => 1800,    // 30 minutes
+    'schema_ttl' => 7200,    // 2 hours
+    'query_ttl' => 600,      // 10 minutes
+]
+```
+
+### 2. Indexing
+
+Create indexes for searchable attributes:
+
+```php
+use Eav\Services\IndexManager;
+
+$indexManager = $di->get('eavIndexManager');
+
+// Create index for attribute
+$indexManager->createAttributeIndex($attributeId, 'varchar');
+
+// Rebuild all indexes for entity type
+$indexManager->rebuildIndexes($entityTypeId);
+
+// Optimize tables
+$indexManager->optimizeTables();
+```
+
+### 3. Query Optimization
+
+```php
+// Select only needed attributes
+$entities = $repository->withAttributes($entityTypeId, ['name', 'price']);
+
+// Use join optimization (automatic)
+// Configurable max joins
+'query' => [
+    'max_joins' => 10,
+    'optimize_joins' => true,
+]
+```
+
+### 4. Batch Processing
+
+```php
+// Process large datasets in chunks
+$batchManager->setChunkSize(500);
+
+// Batch operations are transactional
+$batchManager->batchUpdateValues($updates);
+```
+
+---
+
+## Examples
+
+### Example 1: Product Catalog
+
+```php
+// Define product entity type
+$productType = new EntityType([
+    'entity_type_code' => 'product',
+    'entity_type_name' => 'Product'
+]);
+$productType->save();
+
+// Define attributes
+$attributes = [
+    ['code' => 'sku', 'type' => 'varchar', 'required' => true, 'unique' => true],
+    ['code' => 'name', 'type' => 'varchar', 'required' => true, 'searchable' => true],
+    ['code' => 'price', 'type' => 'decimal', 'required' => true, 'filterable' => true],
+    ['code' => 'description', 'type' => 'text', 'searchable' => true],
+    ['code' => 'category', 'type' => 'varchar', 'filterable' => true],
+];
+
+foreach ($attributes as $attrData) {
+    $attr = new Attribute([
+        'entity_type_id' => $productType->id,
+        'attribute_code' => $attrData['code'],
+        'attribute_name' => ucfirst($attrData['code']),
+        'backend_type' => $attrData['type'],
+        'is_required' => $attrData['required'] ?? false,
+        'is_unique' => $attrData['unique'] ?? false,
+        'is_searchable' => $attrData['searchable'] ?? false,
+        'is_filterable' => $attrData['filterable'] ?? false,
+    ]);
+    $attr->save();
+}
+
+// Create products
+$products = [
+    ['sku' => 'WIDGET-001', 'name' => 'Widget A', 'price' => 29.99, 'category' => 'Electronics'],
+    ['sku' => 'WIDGET-002', 'name' => 'Widget B', 'price' => 39.99, 'category' => 'Electronics'],
+    ['sku' => 'GADGET-001', 'name' => 'Gadget X', 'price' => 49.99, 'category' => 'Tools'],
+];
+
+foreach ($products as $productData) {
+    $entityManager->create($productType->id, $productData);
+}
+
+// Query products
+$electronics = $repository->findByAttribute($productType->id, 'category', 'Electronics');
+
+$affordable = $repository->query($productType->id)
+    ->where('price', '<', 40)
+    ->orderBy('price', 'ASC')
+    ->get();
+```
+
+### Example 2: Customer Management
+
+```php
+// Complex query with multiple conditions
+$customers = $repository->query($customerTypeId)
+    ->where('status', '=', 'active')
+    ->where('total_orders', '>', 10)
+    ->whereBetween('last_order_date', '2024-01-01', '2024-12-31')
+    ->orderBy('total_spent', 'DESC')
+    ->limit(50)
+    ->get();
+
+// First or create
+$customer = $repository->firstOrCreate(
+    $customerTypeId,
+    ['email' => 'john@example.com'],
+    ['name' => 'John Doe', 'status' => 'active']
+);
+```
+
+---
 
 ## Configuration
 
-### Global Configuration
-
-Edit `app/Eav/config.php` to configure global EAV settings:
+All configuration options are in `app/Eav/config.php`:
 
 ```php
-'eav' => [
-    'table_prefix' => 'eav_',           // Prefix for all EAV tables
-    'auto_sync' => true,                // Automatic schema synchronization
-    'sync_mode' => 'immediate',         // immediate, deferred, or manual
-    'backup_before_sync' => false,      // Create backup before sync
-    'max_index_length' => 767,          // Maximum index key length
-    'use_flat_tables' => true,          // Enable flat table generation
-    'flat_table_threshold' => 10,       // Min attributes for flat tables
-    'enable_cache' => true,             // Enable query result caching
-    'cache_ttl' => 3600,                // Default cache TTL in seconds
-    'config_path' => __DIR__ . '/Config/entities',
-],
-```
-
-### Entity Configuration
-
-Create entity configuration files in `app/Eav/Config/entities/`:
-
-```php
-<?php
-// app/Eav/Config/entities/my_entity.php
 return [
-    'entity_code' => 'my_entity',
-    'entity_label' => 'My Entity',
-    'entity_table' => 'eav_my_entity_entity',
-    'storage_strategy' => 'eav',
-    'enable_cache' => true,
-    'cache_ttl' => 3600,
-
-    'attributes' => [
-        [
-            'attribute_code' => 'name',
-            'attribute_label' => 'Name',
-            'backend_type' => 'varchar',
-            'frontend_type' => 'text',
-            'is_required' => true,
-            'is_unique' => false,
-            'is_searchable' => true,
-            'is_filterable' => true,
-            'is_comparable' => true,
-            'default_value' => null,
-            'validation_rules' => [
-                'min_length' => 3,
-                'max_length' => 255,
-            ],
-            'sort_order' => 10,
+    'eav' => [
+        'cache' => [
+            'enabled' => true,
+            'ttl' => 3600,
         ],
-        // More attributes...
+        'batch' => [
+            'chunk_size' => 1000,
+            'max_batch_size' => 5000,
+        ],
+        'query' => [
+            'max_joins' => 10,
+            'optimize_joins' => true,
+        ],
+        // ... more options
     ],
 ];
 ```
 
-## Usage Examples
+---
 
-### Loading Entity Types
+## Events
 
-```php
-// Get entity type registry from DI container
-$registry = $di->get('eav.entity_type_registry');
+The system fires events for entity lifecycle:
 
-// Load an entity type
-$productType = $registry->getByCode('product');
+- `eav:entity:creating` - Before entity creation
+- `eav:entity:created` - After entity creation
+- `eav:entity:updating` - Before entity update
+- `eav:entity:updated` - After entity update
+- `eav:entity:deleting` - Before entity deletion
+- `eav:entity:deleted` - After entity deletion
 
-// Get all attributes
-$attributes = $productType->getAttributes();
-
-// Get specific attribute
-$nameAttr = $productType->getAttribute('name');
-```
-
-### Creating and Validating Entities
+Listen to events:
 
 ```php
-// Create a new entity instance
-$product = new \Eav\Model\Entity($productType);
-
-// Set attribute values
-$product->setDataValue('name', 'Sample Product');
-$product->setDataValue('sku', 'PROD-001');
-$product->setDataValue('price', 99.99);
-
-// Validate entity
-try {
-    $product->validate();
-} catch (\Eav\Exception\ValidationException $e) {
-    $errors = $e->getValidationErrors();
-    // Handle validation errors
-}
-
-// Check dirty attributes
-if ($product->isDirty()) {
-    $dirtyData = $product->getDirtyData();
-    // Save only changed attributes
-}
+$eventsManager->attach('eav:entity:created', function($event, $data) {
+    // Handle event
+    $entity = $data['entity'];
+    // ...
+});
 ```
 
-### Working with Attributes
+---
 
+## Best Practices
+
+1. **Use appropriate backend types** - Choose the most specific type for performance
+2. **Index searchable attributes** - Improves query performance significantly
+3. **Use batch operations** - For bulk inserts/updates
+4. **Enable caching** - Reduces database load
+5. **Limit attribute count** - Keep queries performant (use max_joins config)
+6. **Use soft deletes** - Allows recovery and maintains referential integrity
+
+---
+
+## Troubleshooting
+
+### Slow Queries
+
+1. Check index status: `$indexManager->getIndexStats($tableName)`
+2. Optimize tables: `$indexManager->optimizeTables()`
+3. Review join count in queries
+4. Enable query caching
+
+### Cache Issues
+
+1. Clear cache: `$cacheManager->clear()`
+2. Check cache stats: `$cacheManager->getStats()`
+3. Clean expired entries: `$cacheManager->cleanExpired()`
+
+### Orphaned Values
+
+Clean up values without entities:
 ```php
-// Get attribute
-$attribute = $productType->getAttribute('price');
-
-// Validate value
-try {
-    $attribute->validate(99.99);
-} catch (\Eav\Exception\ValidationException $e) {
-    // Handle validation error
-}
-
-// Cast value to appropriate type
-$castedValue = $attribute->cast('99.99'); // Returns float 99.99
-
-// Get attribute properties
-$isRequired = $attribute->isRequired();
-$isSearchable = $attribute->isSearchable();
-$backendType = $attribute->getBackendType();
+$indexManager->cleanOrphanedValues();
 ```
 
-### Working with Attribute Collections
-
-```php
-$attributes = $productType->getAttributes();
-
-// Get searchable attributes
-$searchableAttrs = $attributes->getSearchable();
-
-// Get filterable attributes
-$filterableAttrs = $attributes->getFilterable();
-
-// Get attributes by backend type
-$varcharAttrs = $attributes->getByBackendType('varchar');
-
-// Sort attributes
-$attributes->sort();
-
-// Iterate through attributes
-foreach ($attributes as $code => $attribute) {
-    echo $attribute->getAttributeLabel();
-}
-```
-
-## Architecture
-
-The EAV library follows a layered architecture:
-
-1. **Configuration Layer**: Loads and validates entity definitions from PHP files
-2. **Model Layer**: Provides entity types, attributes, and entity instances
-3. **Storage Layer**: (Planned) Handles persistence with multiple strategies
-4. **Query Layer**: (Planned) Extends QueryBuilder for EAV-specific queries
-5. **Schema Layer**: (Planned) Manages database structure synchronization
-6. **Cache Layer**: (Planned) Implements multi-level caching
-
-## Validation Rules
-
-Supported validation rules in attribute configuration:
-
-- `min`: Minimum numeric value
-- `max`: Maximum numeric value
-- `min_length`: Minimum string length
-- `max_length`: Maximum string length
-- `pattern`: Regular expression pattern
-
-Example:
-```php
-'validation_rules' => [
-    'min' => 0,
-    'max' => 999999,
-    'min_length' => 3,
-    'max_length' => 255,
-    'pattern' => '/^[A-Z0-9-]+$/',
-],
-```
-
-## Backend Types
-
-Supported backend types for attribute storage:
-
-- `varchar`: Short text values (up to 255 characters)
-- `text`: Long text values
-- `int`: Integer values
-- `decimal`: Decimal/float values
-- `datetime`: Date and time values
-
-## Frontend Types
-
-Supported frontend input types:
-
-- `text`: Single-line text input
-- `textarea`: Multi-line text input
-- `select`: Single-selection dropdown
-- `multiselect`: Multiple-selection dropdown
-- `date`: Date picker
-- `datetime`: Date and time picker
-- `boolean`: Checkbox/toggle
-- `number`: Numeric input
-
-## Extension Points
-
-The EAV library is designed to be extensible:
-
-1. **Custom Attribute Types**: Extend `Attribute` class for custom backend/frontend types
-2. **Custom Validation**: Add custom validation rules
-3. **Custom Storage**: Implement `StorageStrategyInterface` (when available)
-4. **Source Models**: Provide option sources for select/multiselect attributes
-5. **Backend Models**: Custom backend processing for attribute values
-6. **Frontend Models**: Custom frontend rendering for attributes
-
-## Testing
-
-(To be implemented)
-
-Unit tests and integration tests will be created in:
-- `tests/Unit/Eav/` - Unit tests for individual components
-- `tests/Integration/Eav/` - Integration tests for EAV operations
-
-## Performance Considerations
-
-1. **Attribute Indexing**: Mark frequently filtered/searched attributes with appropriate flags
-2. **Cache Configuration**: Adjust `cache_ttl` based on data change frequency
-3. **Storage Strategy**: Use flat tables for entities with many consistent attributes
-4. **Lazy Loading**: Entity attributes can be loaded on-demand
-5. **Batch Operations**: (Planned) Use batch methods for bulk operations
-
-## Future Enhancements
-
-1. Complete implementation of planned components
-2. Add support for attribute sets/groups
-3. Implement attribute options/source models
-4. Add support for scoped attributes (store, website, global)
-5. Implement attribute value versioning
-6. Add migration tools for schema changes
-7. Performance monitoring and query profiling
-8. Admin interface for entity/attribute management
-
-## Contributing
-
-When extending the EAV library:
-
-1. Follow existing naming conventions
-2. Add appropriate exception handling
-3. Include validation for user inputs
-4. Document public methods and classes
-5. Write unit tests for new functionality
-6. Update this README with new features
+---
 
 ## License
 
-This EAV library is part of the project framework and follows the same license terms.
+This module is part of the application framework.

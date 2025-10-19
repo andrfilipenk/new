@@ -1,4 +1,3 @@
-use Core\Database\Blueprint;
 <?php
 // migrations/2025_10_17_100000_create_eav_tables.php
 
