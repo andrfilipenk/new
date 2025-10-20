@@ -37,6 +37,7 @@ $url = $this->getDI()->get('url');
 <?php $this->startSection('html-footer'); ?>
     <script>
     document.getElementById('simpleTaskForm').addEventListener('ajax-form:success', (e) => {
+        e.stopPropagation();
         const { result, response } = e.detail;
         if (result === 'success') {
             const task = response.item;

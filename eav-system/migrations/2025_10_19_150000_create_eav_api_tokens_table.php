@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('eav_api_tokens', function ($table) {
+        $this->createTable('eav_api_tokens', function ($table) {
             $table->id('token_id');
             $table->integer('user_id')->unsigned();
             $table->string('token_hash', 255)->unique();
@@ -31,6 +31,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('eav_api_tokens');
+        $this->dropTable('eav_api_tokens');
     }
 };

@@ -13,12 +13,13 @@ return new class extends Migration
     {
         // Create eav_entity_types table
         $this->createTable('eav_entity_types', function(Blueprint $table) {
+             /** @var Blueprint $table */
             $table->id();
             $table->string('entity_type_code', 100)->unique();
             $table->string('entity_type_name', 255);
             $table->text('description')->nullable();
             $table->string('entity_table', 100)->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->boolval('is_active')->default(true);
             $table->timestamps();
             
             $table->index('entity_type_code');
@@ -26,6 +27,7 @@ return new class extends Migration
 
         // Create eav_attributes table
         $this->createTable('eav_attributes', function(Blueprint $table) {
+             /** @var Blueprint $table */
             $table->id();
             $table->foreignId('entity_type_id')->constrained('eav_entity_types')->onDelete('cascade');
             $table->string('attribute_code', 100);
@@ -52,6 +54,7 @@ return new class extends Migration
 
         // Create eav_entities table
         $this->createTable('eav_entities', function(Blueprint $table) {
+             /** @var Blueprint $table */
             $table->id();
             $table->foreignId('entity_type_id')->constrained('eav_entity_types')->onDelete('cascade');
             $table->foreignId('parent_id')->nullable()->constrained('eav_entities')->onDelete('set null');
@@ -68,18 +71,20 @@ return new class extends Migration
 
         // Create eav_values_varchar table
         $this->createTable('eav_values_varchar', function(Blueprint $table) {
-            $table->id();
-            $table->foreignId('entity_id')->constrained('eav_entities')->onDelete('cascade');
-            $table->foreignId('attribute_id')->constrained('eav_attributes')->onDelete('cascade');
-            $table->string('value', 255);
-            
-            $table->unique(['entity_id', 'attribute_id']);
+        /** @var Blueprint $table */
+        $table->id();
+        $table->foreignId('entity_id')->constrained('eav_entities')->onDelete('cascade');
+        $table->foreignId('attribute_id')->constrained('eav_attributes')->onDelete('cascade');
+        $table->string('value', 255);
+
+        $table->unique(['entity_id', 'attribute_id']);
             $table->index('attribute_id');
             $table->index('value');
         });
 
         // Create eav_values_int table
         $this->createTable('eav_values_int', function(Blueprint $table) {
+
             $table->id();
             $table->foreignId('entity_id')->constrained('eav_entities')->onDelete('cascade');
             $table->foreignId('attribute_id')->constrained('eav_attributes')->onDelete('cascade');

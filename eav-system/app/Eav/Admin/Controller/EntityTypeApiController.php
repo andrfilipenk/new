@@ -15,7 +15,6 @@ class EntityTypeApiController extends Controller
     
     public function __construct()
     {
-        parent::__construct();
         
         // Initialize services via DI
         $this->adminService = $this->container->get(AdminService::class);

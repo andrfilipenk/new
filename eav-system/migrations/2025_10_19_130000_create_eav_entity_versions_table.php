@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('eav_entity_versions', function ($table) {
+        $this->createTable('eav_entity_versions', function ($table) {
             $table->id('version_id');
             $table->integer('entity_id')->unsigned();
             $table->integer('entity_type_id')->unsigned();
@@ -31,6 +31,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('eav_entity_versions');
+        $this->dropTable('eav_entity_versions');
     }
 };

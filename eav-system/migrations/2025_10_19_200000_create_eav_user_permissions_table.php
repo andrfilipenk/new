@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('eav_user_permissions', function ($table) {
+        $this->createTable('eav_user_permissions', function ($table) {
             $table->id('permission_id');
             $table->integer('user_id')->unsigned();
             $table->string('role', 50);
@@ -32,6 +32,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('eav_user_permissions');
+        $this->dropTable('eav_user_permissions');
     }
 };

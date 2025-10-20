@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('eav_webhooks', function ($table) {
+        $this->createTable('eav_webhooks', function ($table) {
             $table->id('webhook_id');
             $table->string('webhook_name', 200);
             $table->string('target_url', 500);
@@ -32,6 +32,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('eav_webhooks');
+        $this->dropTable('eav_webhooks');
     }
 };

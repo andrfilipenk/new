@@ -1,5 +1,7 @@
 <?php
-// migrations/2025_01_15_000000_create_eav_base_structure.php
+// migrations/2025_10_16_000000_create_eav_base_structure.php
+
+use Core\Database\Blueprint;
 use Core\Database\Migration;
 
 class CreateEavBaseStructure extends Migration
@@ -8,6 +10,7 @@ class CreateEavBaseStructure extends Migration
     {
         // Create entity type table
         $this->createTable('eav_entity_type', function($table) {
+            /** @var Blueprint $table */
             $table->id('entity_type_id');
             $table->string('entity_code')->unique();
             $table->string('entity_label');
@@ -18,6 +21,7 @@ class CreateEavBaseStructure extends Migration
 
         // Create attribute metadata table
         $this->createTable('eav_attribute', function($table) {
+            /** @var Blueprint $table */
             $table->id('attribute_id');
             $table->integer('entity_type_id')->unsigned();
             $table->string('attribute_code');
@@ -46,28 +50,34 @@ class CreateEavBaseStructure extends Migration
 
     private function createValueTable($type, $valueType)
     {
-        $this->createTable("eav_value_{$type}", function($table) use ($valueType) {
+        $this->createTable("eav_value_{$type}", function($table) use ($type) {
+            /** @var Blueprint $table */
             $table->id('value_id');
             $table->integer('entity_type_id')->unsigned();
             $table->integer('attribute_id')->unsigned();
             $table->integer('entity_id')->unsigned();
-            
-            if ($valueType === 'VARCHAR(255)') {
+
+
+            if ($type === 'varchar') {
                 $table->string('value')->nullable();
-            } elseif ($valueType === 'INT') {
+            }
+            if ($type === 'int') {
                 $table->integer('value')->nullable();
-            } elseif ($valueType === 'DECIMAL(12,4)') {
+            }
+            if ($type === 'decimal') {
                 $table->decimal('value', 12, 4)->nullable();
-            } elseif ($valueType === 'DATETIME') {
+            }
+            if ($type === 'datetime') {
                 $table->timestamp('value')->nullable();
-            } elseif ($valueType === 'TEXT') {
+            }
+            if ($type === 'text') {
                 $table->text('value')->nullable();
             }
-            
+
             $table->index(['entity_type_id', 'attribute_id', 'entity_id'], 'idx_unique_entity_attr', 'UNIQUE');
             $table->index(['entity_id']);
             
-            if ($valueType !== 'TEXT') {
+            if ($type !== 'text') {
                 $table->index(['attribute_id', 'value']);
             }
         });

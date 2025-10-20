@@ -7,7 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('eav_reports', function ($table) {
+        $this->createTable('eav_reports', function ($table) {
             $table->id('report_id');
             $table->string('report_name', 200);
             $table->string('report_type', 50);
@@ -34,6 +34,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('eav_reports');
+        $this->dropTable('eav_reports');
     }
 };

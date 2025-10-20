@@ -7,17 +7,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('eav_export_jobs', function ($table) {
+        $this->createTable('eav_import_jobs', function ($table) {
             $table->id('job_id');
             $table->integer('entity_type_id')->unsigned();
             $table->integer('user_id')->unsigned();
-            $table->string('export_name', 255);
-            $table->string('file_path', 500)->nullable();
-            $table->enum('format', ['csv', 'xlsx', 'json', 'xml'])->default('csv');
-            $table->json('filter_config')->nullable();
-            $table->json('column_config')->nullable();
+            $table->string('file_name', 255);
+            $table->string('file_path', 500);
             $table->enum('status', ['pending', 'processing', 'completed', 'failed'])->default('pending');
             $table->integer('total_rows')->default(0);
+            $table->integer('processed_rows')->default(0);
+            $table->integer('successful_rows')->default(0);
+            $table->integer('failed_rows')->default(0);
+            $table->json('error_details')->nullable();
             $table->datetime('started_at')->nullable();
             $table->datetime('completed_at')->nullable();
             $table->datetime('created_at');
@@ -36,6 +37,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('eav_export_jobs');
+        $this->dropTable('eav_import_jobs');
     }
 };
