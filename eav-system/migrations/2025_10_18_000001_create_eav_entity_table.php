@@ -3,16 +3,17 @@
 use Core\Database\Migration;
 use Core\Database\Blueprint;
 
-return new class extends Migration
+class CreateEavEntityTable extends Migration
 {
     public function up(): void
     {
         $this->createTable('eav_entity', function (Blueprint $table) {
             $table->id('entity_id');
-            $table->string('entity_type', 100)->index();
+            $table->string('entity_type', 100);
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             
+            $table->index('entity_type');
             $table->index(['entity_type', 'entity_id']);
         });
     }

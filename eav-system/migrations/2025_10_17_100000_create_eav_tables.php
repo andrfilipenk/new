@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('entity_type_code', 100)->unique();
             $table->string('entity_type_name', 255);
             $table->text('description')->nullable();
-            $table->string('entity_table', 100)->nullable();
-            $table->boolval('is_active')->default(true);
+            $table->string(name: 'entity_table', length: 100)->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
             
             $table->index('entity_type_code');

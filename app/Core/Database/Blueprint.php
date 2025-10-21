@@ -38,6 +38,17 @@ class Blueprint
         return $this->addColumn('INT', $name);
     }
 
+    public function boolean(string $name): ColumnDefinition
+    {
+        return $this->addColumn('TINYINT(1)', $name);
+    }
+
+    public function enum(string $name, array $values): ColumnDefinition
+    {
+        $enumValues = implode("','", array_map('addslashes', $values));
+        return $this->addColumn("ENUM('{$enumValues}')", $name);
+    }
+
     public function decimal(string $name, int $total = 8, int $places = 2): ColumnDefinition
     {
         return $this->addColumn("DECIMAL({$total},{$places})", $name);
@@ -79,6 +90,13 @@ class Blueprint
             'columns' => $columns
         ]);
         return $this;
+    }
+
+    public function unique($columns, $name = null): self
+    {
+        $columns = (array) $columns;
+        $name = $name ?? 'unq_' . $this->table . '_' . implode('_', $columns);
+        return $this->index($columns, $name, 'UNIQUE');
     }
 
     /*
