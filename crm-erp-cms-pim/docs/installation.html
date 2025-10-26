@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Installation Guide - Framework Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <link href="assets/css/docs.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <h4><i class="fas fa-book"></i> Framework Docs</h4>
+        </div>
+        
+        <div class="sidebar-heading">Getting Started</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="installation.html">
+                    <i class="fas fa-download"></i> Installation
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="quick-start.html">
+                    <i class="fas fa-rocket"></i> Quick Start
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading">Architecture</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="architecture.html">
+                    <i class="fas fa-sitemap"></i> Overview
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="directory-structure.html">
+                    <i class="fas fa-folder-tree"></i> Directory Structure
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="request-lifecycle.html">
+                    <i class="fas fa-sync-alt"></i> Request Lifecycle
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading">Core Components</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="routing.html">
+                    <i class="fas fa-route"></i> Routing
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="database.html">
+                    <i class="fas fa-database"></i> Database & ORM
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="validation.html">
+                    <i class="fas fa-check-circle"></i> Validation
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="authentication.html">
+                    <i class="fas fa-lock"></i> Authentication
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="authorization.html">
+                    <i class="fas fa-shield-alt"></i> Authorization
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="middleware.html">
+                    <i class="fas fa-filter"></i> Middleware
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="views.html">
+                    <i class="fas fa-eye"></i> Views & Templates
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="caching.html">
+                    <i class="fas fa-bolt"></i> Caching
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="events.html">
+                    <i class="fas fa-broadcast-tower"></i> Events
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="logging.html">
+                    <i class="fas fa-file-alt"></i> Logging
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading">Advanced Topics</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="module-development.html">
+                    <i class="fas fa-cube"></i> Module Development
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="workflow-engine.html">
+                    <i class="fas fa-project-diagram"></i> Workflow Engine
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="api-development.html">
+                    <i class="fas fa-code"></i> API Development
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="testing.html">
+                    <i class="fas fa-vial"></i> Testing
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="security.html">
+                    <i class="fas fa-user-shield"></i> Security
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading">Best Practices</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="coding-standards.html">
+                    <i class="fas fa-code-branch"></i> Coding Standards
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="performance.html">
+                    <i class="fas fa-tachometer-alt"></i> Performance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="deployment.html">
+                    <i class="fas fa-cloud-upload-alt"></i> Deployment
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html" class="text-white">Home</a></li>
+                        <li class="breadcrumb-item active">Installation</li>
+                    </ol>
+                </nav>
+                <h1><i class="fas fa-download"></i> Installation Guide</h1>
+                <p class="lead">Step-by-step installation and configuration instructions</p>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="container-fluid">
+                <!-- System Requirements -->
+                <section id="requirements">
+                    <h2>System Requirements</h2>
+                    <p>Before installing the framework, ensure your system meets the following requirements:</p>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="doc-card">
+                                <div class="card-header">
+                                    <i class="fas fa-server"></i> Server Requirements
+                                </div>
+                                <div class="card-body">
+                                    <ul>
+                                        <li><strong>PHP:</strong> 7.4 or higher</li>
+                                        <li><strong>Web Server:</strong> Apache 2.4+ or Nginx</li>
+                                        <li><strong>Database:</strong> MySQL 5.7+ / MariaDB 10.2+</li>
+                                        <li><strong>Memory:</strong> 128MB minimum (512MB recommended)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="doc-card">
+                                <div class="card-header">
+                                    <i class="fas fa-puzzle-piece"></i> PHP Extensions
+                                </div>
+                                <div class="card-body">
+                                    <ul>
+                                        <li>PDO</li>
+                                        <li>pdo_mysql</li>
+                                        <li>mbstring</li>
+                                        <li>openssl</li>
+                                        <li>json</li>
+                                        <li>fileinfo</li>
+                                        <li>session</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Installation Steps -->
+                <section id="installation">
+                    <h2>Installation Steps</h2>
+
+                    <h3>Step 1: Download the Framework</h3>
+                    <p>Clone the repository or download the source code:</p>
+
+                    <pre><code class="language-bash"># Clone via Git
+git clone https://github.com/your-org/framework.git
+
+# Or download and extract the ZIP file
+unzip framework.zip</code></pre>
+
+                    <h3>Step 2: Configure Web Server</h3>
+                    
+                    <h4>Apache Configuration</h4>
+                    <p>Point your web server's document root to the <code>public</code> directory:</p>
+
+                    <pre><code class="language-apache">&lt;VirtualHost *:80&gt;
+    ServerName myapp.local
+    DocumentRoot "/path/to/framework/public"
+    
+    &lt;Directory "/path/to/framework/public"&gt;
+        AllowOverride All
+        Require all granted
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;</code></pre>
+
+                    <div class="alert-custom alert-tip">
+                        <strong><i class="fas fa-lightbulb"></i> Tip:</strong> 
+                        Make sure <code>mod_rewrite</code> is enabled in Apache for clean URLs to work.
+                    </div>
+
+                    <h4>Nginx Configuration</h4>
+                    <pre><code class="language-nginx">server {
+    listen 80;
+    server_name myapp.local;
+    root /path/to/framework/public;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}</code></pre>
+
+                    <h3>Step 3: Configure Environment</h3>
+                    <p>Copy the environment file and configure your settings:</p>
+
+                    <pre><code class="language-bash"># Copy environment file
+cp config/.env.example config/.env
+
+# Edit configuration
+nano config/.env</code></pre>
+
+                    <p>Update the database credentials in <code>config/.env</code>:</p>
+
+                    <pre><code class="language-ini"># Database Configuration
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=your_database_name
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# Application
+APP_NAME="My Application"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://myapp.local
+
+# Security
+APP_KEY=your-secret-application-key</code></pre>
+
+                    <div class="alert-custom alert-warning">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Important:</strong>
+                        Generate a secure <code>APP_KEY</code> for production environments. You can use <code>bin2hex(random_bytes(32))</code> in PHP.
+                    </div>
+
+                    <h3>Step 4: Set Directory Permissions</h3>
+                    <p>Set proper permissions for writable directories:</p>
+
+                    <pre><code class="language-bash"># Linux/Mac
+chmod -R 775 storage
+chmod -R 775 storage/logs
+chmod -R 775 storage/cache
+chmod -R 775 storage/uploads
+chmod -R 775 storage/sessions
+
+# Ensure web server can write to these directories
+chown -R www-data:www-data storage</code></pre>
+
+                    <div class="alert-custom alert-danger">
+                        <strong><i class="fas fa-shield-alt"></i> Security Note:</strong>
+                        Never make the entire application directory writable. Only <code>storage</code> subdirectories need write permissions.
+                    </div>
+
+                    <h3>Step 5: Create Database</h3>
+                    <p>Create a new database for your application:</p>
+
+                    <pre><code class="language-sql">CREATE DATABASE your_database_name CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;</code></pre>
+
+                    <h3>Step 6: Run Migrations</h3>
+                    <p>Run database migrations to create tables:</p>
+
+                    <pre><code class="language-bash"># Navigate to project root
+cd /path/to/framework
+
+# Run migrations
+php cli/migrate.php up</code></pre>
+
+                    <p>You should see output like:</p>
+
+                    <pre><code class="language-text">Running migrations...
+✓ 2024_01_01_000001_create_users_table
+✓ 2024_01_01_000002_create_roles_table
+✓ 2024_01_01_000003_create_permissions_table
+...
+All migrations completed successfully!</code></pre>
+
+                    <h3>Step 7: Seed Database (Optional)</h3>
+                    <p>Populate the database with initial data:</p>
+
+                    <pre><code class="language-bash">php cli/seed.php run</code></pre>
+
+                    <p>This will create:</p>
+                    <ul>
+                        <li>Default admin user</li>
+                        <li>Basic roles (Admin, Manager, User)</li>
+                        <li>Permissions</li>
+                        <li>Sample data for testing</li>
+                    </ul>
+
+                    <div class="alert-custom alert-success">
+                        <strong><i class="fas fa-check-circle"></i> Success!</strong>
+                        Your framework is now installed and ready to use!
+                    </div>
+                </section>
+
+                <!-- Post-Installation -->
+                <section id="post-installation">
+                    <h2>Post-Installation Steps</h2>
+
+                    <h3>Verify Installation</h3>
+                    <p>Access your application in a web browser:</p>
+
+                    <pre><code>http://myapp.local</code></pre>
+
+                    <p>You should see the welcome page.</p>
+
+                    <h3>Login to Admin Panel</h3>
+                    <p>Default administrator credentials (if you ran seeders):</p>
+
+                    <div class="card doc-card">
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li><strong>Email:</strong> <code>admin@example.com</code></li>
+                                <li><strong>Password:</strong> <code>admin123</code></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert-custom alert-danger mt-3">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Security Warning:</strong>
+                        Change the default admin password immediately after first login!
+                    </div>
+
+                    <h3>Clear Cache</h3>
+                    <p>If you encounter any issues, try clearing the cache:</p>
+
+                    <pre><code class="language-bash">php cli/cache.php clear</code></pre>
+                </section>
+
+                <!-- Troubleshooting -->
+                <section id="troubleshooting">
+                    <h2>Troubleshooting</h2>
+
+                    <h3>Common Issues</h3>
+
+                    <div class="card doc-card">
+                        <div class="card-header">
+                            <i class="fas fa-exclamation-circle"></i> Blank Page / 500 Error
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Solution:</strong></p>
+                            <ol>
+                                <li>Check file permissions on <code>storage</code> directories</li>
+                                <li>Enable error display in <code>config/.env</code>: <code>APP_DEBUG=true</code></li>
+                                <li>Check <code>storage/logs/app.log</code> for error messages</li>
+                                <li>Verify web server configuration</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="card doc-card">
+                        <div class="card-header">
+                            <i class="fas fa-exclamation-circle"></i> Database Connection Error
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Solution:</strong></p>
+                            <ol>
+                                <li>Verify database credentials in <code>config/.env</code></li>
+                                <li>Ensure MySQL/MariaDB service is running</li>
+                                <li>Check if database exists</li>
+                                <li>Verify user has proper permissions</li>
+                                <li>Test connection: <code>mysql -u username -p database_name</code></li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="card doc-card">
+                        <div class="card-header">
+                            <i class="fas fa-exclamation-circle"></i> 404 Errors on Routes
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Solution:</strong></p>
+                            <ol>
+                                <li>Ensure <code>mod_rewrite</code> is enabled (Apache)</li>
+                                <li>Check <code>public/.htaccess</code> file exists</li>
+                                <li>Verify web server <code>AllowOverride All</code> is set</li>
+                                <li>For Nginx, check <code>try_files</code> configuration</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="card doc-card">
+                        <div class="card-header">
+                            <i class="fas fa-exclamation-circle"></i> Permission Denied Errors
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Solution:</strong></p>
+                            <ol>
+                                <li>Set proper ownership: <code>chown -R www-data:www-data storage</code></li>
+                                <li>Set permissions: <code>chmod -R 775 storage</code></li>
+                                <li>Check SELinux settings (if applicable)</li>
+                            </ol>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Next Steps -->
+                <section id="next-steps">
+                    <h2>Next Steps</h2>
+                    <p>Now that you have successfully installed the framework, here are recommended next steps:</p>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card doc-card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-rocket text-primary"></i> Quick Start Tutorial</h5>
+                                    <p>Learn the basics by building your first application.</p>
+                                    <a href="quick-start.html" class="btn btn-primary btn-sm">Start Tutorial</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card doc-card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-sitemap text-success"></i> Architecture Overview</h5>
+                                    <p>Understand how the framework is structured.</p>
+                                    <a href="architecture.html" class="btn btn-success btn-sm">Learn Architecture</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card doc-card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-route text-info"></i> Routing Guide</h5>
+                                    <p>Define routes and create your first controller.</p>
+                                    <a href="routing.html" class="btn btn-info btn-sm">Routing Docs</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card doc-card">
+                                <div class="card-body">
+                                    <h5><i class="fas fa-database text-warning"></i> Database & ORM</h5>
+                                    <p>Work with databases using the query builder and ORM.</p>
+                                    <a href="database.html" class="btn btn-warning btn-sm">Database Docs</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Page Navigation -->
+                <div class="page-navigation">
+                    <div class="nav-previous">
+                        <a href="index.html">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </a>
+                    </div>
+                    <div class="nav-next">
+                        <a href="quick-start.html">
+                            Quick Start Guide <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Back to Top -->
+    <div class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js"></script>
+    <script>
+        // Back to top button
+        window.addEventListener('scroll', function() {
+            const backToTop = document.getElementById('backToTop');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        document.getElementById('backToTop').addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

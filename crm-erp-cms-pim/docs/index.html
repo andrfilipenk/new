@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Framework Documentation - CRM/ERP/CMS/PIM System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --info: #17a2b8;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --dark: #343a40;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            padding: 70px 0 0;
+            box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+            background: #2c3e50;
+            width: 280px;
+            overflow-y: auto;
+        }
+
+        .sidebar .nav-link {
+            color: #ecf0f1;
+            padding: 0.75rem 1.5rem;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary);
+            color: #fff;
+        }
+
+        .sidebar .nav-link.active {
+            background: rgba(13, 110, 253, 0.2);
+            border-left-color: var(--primary);
+            color: #fff;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        .sidebar-heading {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 0.75rem 1.5rem;
+            color: #95a5a6;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        main {
+            margin-left: 280px;
+            padding: 0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .header .lead {
+            font-size: 1.4rem;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 3rem;
+        }
+
+        .doc-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .doc-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .doc-card .card-header {
+            border: none;
+            padding: 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .doc-card-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .feature-list li:last-child {
+            border: none;
+        }
+
+        .feature-list i {
+            color: var(--success);
+            margin-right: 10px;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stats-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .quick-links {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .quick-link-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s;
+        }
+
+        .quick-link-item:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .quick-link-item i {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 30px;
+        }
+
+        .version-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-block;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+            }
+            main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="text-center p-3 border-bottom border-secondary">
+            <h4 class="text-white mb-0"><i class="fas fa-book"></i> Docs</h4>
+        </div>
+        <div class="sidebar-heading">Getting Started</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="index.html">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="installation.html">
+                    <i class="fas fa-download"></i> Installation
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="quick-start.html">
+                    <i class="fas fa-rocket"></i> Quick Start
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading">Architecture</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="architecture.html">
+                    <i class="fas fa-sitemap"></i> Overview
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="directory-structure.html">
+                    <i class="fas fa-folder-tree"></i> Directory Structure
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="request-lifecycle.html">
+                    <i class="fas fa-sync-alt"></i> Request Lifecycle
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading">Core Components</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="routing.html">
+                    <i class="fas fa-route"></i> Routing
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="database.html">
+                    <i class="fas fa-database"></i> Database & ORM
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="validation.html">
+                    <i class="fas fa-check-circle"></i> Validation
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="authentication.html">
+                    <i class="fas fa-lock"></i> Authentication
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="authorization.html">
+                    <i class="fas fa-shield-alt"></i> Authorization
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="middleware.html">
+                    <i class="fas fa-filter"></i> Middleware
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="views.html">
+                    <i class="fas fa-eye"></i> Views & Templates
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="caching.html">
+                    <i class="fas fa-bolt"></i> Caching
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="events.html">
+                    <i class="fas fa-broadcast-tower"></i> Events
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="logging.html">
+                    <i class="fas fa-file-alt"></i> Logging
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading">Advanced Topics</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="module-development.html">
+                    <i class="fas fa-cube"></i> Module Development
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="workflow-engine.html">
+                    <i class="fas fa-project-diagram"></i> Workflow Engine
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="api-development.html">
+                    <i class="fas fa-code"></i> API Development
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="testing.html">
+                    <i class="fas fa-vial"></i> Testing
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="security.html">
+                    <i class="fas fa-user-shield"></i> Security
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-heading">Best Practices</div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="coding-standards.html">
+                    <i class="fas fa-code-branch"></i> Coding Standards
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="performance.html">
+                    <i class="fas fa-tachometer-alt"></i> Performance
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="deployment.html">
+                    <i class="fas fa-cloud-upload-alt"></i> Deployment
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Header -->
+        <div class="header">
+            <div class="container">
+                <h1><i class="fas fa-book-open"></i> Framework Documentation</h1>
+                <p class="lead">Complete guide to building applications with our PHP Framework</p>
+                <div class="mt-4">
+                    <span class="version-badge me-2">Version 1.0.0</span>
+                    <span class="version-badge me-2">PHP 7.4+</span>
+                    <span class="version-badge">Last Updated: October 2025</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="container">
+                <!-- Welcome Section -->
+                <div class="row mb-5">
+                    <div class="col-12">
+                        <h2 class="mb-4">Welcome to the Documentation</h2>
+                        <p class="lead">
+                            This comprehensive framework provides everything you need to build modern, 
+                            scalable CRM, ERP, CMS, and PIM applications. Built with PHP using best practices, 
+                            clean architecture, and modular design.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="row mb-5">
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card">
+                            <span class="stats-number">50+</span>
+                            <span class="stats-label">Core Components</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <span class="stats-number">4</span>
+                            <span class="stats-label">Modules</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <span class="stats-number">100+</span>
+                            <span class="stats-label">Database Tables</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="stats-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <span class="stats-number">10+</span>
+                            <span class="stats-label">Middleware</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documentation Cards -->
+                <div class="row mb-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="card doc-card">
+                            <div class="card-body text-center">
+                                <div class="doc-card-icon bg-primary text-white">
+                                    <i class="fas fa-rocket"></i>
+                                </div>
+                                <h5 class="card-title">Getting Started</h5>
+                                <p class="card-text">
+                                    Learn how to install and configure the framework. 
+                                    Get your first application running in minutes.
+                                </p>
+                                <a href="installation.html" class="btn btn-primary">Installation Guide</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card doc-card">
+                            <div class="card-body text-center">
+                                <div class="doc-card-icon bg-success text-white">
+                                    <i class="fas fa-sitemap"></i>
+                                </div>
+                                <h5 class="card-title">Architecture</h5>
+                                <p class="card-text">
+                                    Understand the framework's architecture, design patterns, 
+                                    and how components work together.
+                                </p>
+                                <a href="architecture.html" class="btn btn-success">Learn Architecture</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card doc-card">
+                            <div class="card-body text-center">
+                                <div class="doc-card-icon bg-info text-white">
+                                    <i class="fas fa-cube"></i>
+                                </div>
+                                <h5 class="card-title">Module Development</h5>
+                                <p class="card-text">
+                                    Create custom modules with full MVC structure, 
+                                    migrations, and seamless integration.
+                                </p>
+                                <a href="module-development.html" class="btn btn-info">Build Modules</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card doc-card">
+                            <div class="card-body text-center">
+                                <div class="doc-card-icon bg-warning text-dark">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <h5 class="card-title">Database & ORM</h5>
+                                <p class="card-text">
+                                    Powerful query builder, ORM with relationships, 
+                                    migrations, and schema management.
+                                </p>
+                                <a href="database.html" class="btn btn-warning">Database Guide</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card doc-card">
+                            <div class="card-body text-center">
+                                <div class="doc-card-icon bg-danger text-white">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h5 class="card-title">Security</h5>
+                                <p class="card-text">
+                                    Built-in security features: CSRF protection, 
+                                    XSS prevention, authentication, and authorization.
+                                </p>
+                                <a href="security.html" class="btn btn-danger">Security Guide</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card doc-card">
+                            <div class="card-body text-center">
+                                <div class="doc-card-icon bg-secondary text-white">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <h5 class="card-title">Workflow Engine</h5>
+                                <p class="card-text">
+                                    Visual workflow designer for creating approval processes, 
+                                    notifications, and automation.
+                                </p>
+                                <a href="workflow-engine.html" class="btn btn-secondary">Workflow Guide</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Features -->
+                <div class="row mb-5">
+                    <div class="col-12">
+                        <h2 class="mb-4">Key Features</h2>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card doc-card">
+                            <div class="card-header bg-primary text-white">
+                                <i class="fas fa-star"></i> Core Features
+                            </div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li><i class="fas fa-check-circle"></i> RESTful Routing with Named Routes</li>
+                                    <li><i class="fas fa-check-circle"></i> Powerful Query Builder & ORM</li>
+                                    <li><i class="fas fa-check-circle"></i> Database Migrations & Seeding</li>
+                                    <li><i class="fas fa-check-circle"></i> Authentication & Authorization (RBAC)</li>
+                                    <li><i class="fas fa-check-circle"></i> Middleware Pipeline</li>
+                                    <li><i class="fas fa-check-circle"></i> Template Engine with Layouts</li>
+                                    <li><i class="fas fa-check-circle"></i> Validation Engine</li>
+                                    <li><i class="fas fa-check-circle"></i> Event Dispatcher</li>
+                                    <li><i class="fas fa-check-circle"></i> Multi-Level Caching</li>
+                                    <li><i class="fas fa-check-circle"></i> Logging System</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card doc-card">
+                            <div class="card-header bg-success text-white">
+                                <i class="fas fa-cubes"></i> Built-in Modules
+                            </div>
+                            <div class="card-body">
+                                <ul class="feature-list">
+                                    <li><i class="fas fa-check-circle"></i> <strong>CRM:</strong> Leads, Contacts, Accounts, Opportunities</li>
+                                    <li><i class="fas fa-check-circle"></i> <strong>ERP:</strong> Inventory, Procurement, Sales, Finance, HR</li>
+                                    <li><i class="fas fa-check-circle"></i> <strong>CMS:</strong> Pages, Posts, Media, Menus, Categories</li>
+                                    <li><i class="fas fa-check-circle"></i> <strong>PIM:</strong> Products, Variants, Attributes, Pricing</li>
+                                    <li><i class="fas fa-check-circle"></i> Workflow Engine with Visual Designer</li>
+                                    <li><i class="fas fa-check-circle"></i> Notification System</li>
+                                    <li><i class="fas fa-check-circle"></i> Report Generator</li>
+                                    <li><i class="fas fa-check-circle"></i> Audit Trail System</li>
+                                    <li><i class="fas fa-check-circle"></i> File Upload Management</li>
+                                    <li><i class="fas fa-check-circle"></i> Email Service</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="mb-4">Quick Links</h2>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="quick-links">
+                            <a href="installation.html" class="quick-link-item">
+                                <i class="fas fa-download"></i>
+                                <div>
+                                    <strong>Installation</strong>
+                                    <div class="small text-muted">Step-by-step installation guide</div>
+                                </div>
+                            </a>
+                            <a href="quick-start.html" class="quick-link-item">
+                                <i class="fas fa-rocket"></i>
+                                <div>
+                                    <strong>Quick Start</strong>
+                                    <div class="small text-muted">Build your first application</div>
+                                </div>
+                            </a>
+                            <a href="routing.html" class="quick-link-item">
+                                <i class="fas fa-route"></i>
+                                <div>
+                                    <strong>Routing</strong>
+                                    <div class="small text-muted">Define routes and controllers</div>
+                                </div>
+                            </a>
+                            <a href="database.html" class="quick-link-item">
+                                <i class="fas fa-database"></i>
+                                <div>
+                                    <strong>Database</strong>
+                                    <div class="small text-muted">Query builder and ORM usage</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="quick-links">
+                            <a href="module-development.html" class="quick-link-item">
+                                <i class="fas fa-cube"></i>
+                                <div>
+                                    <strong>Module Development</strong>
+                                    <div class="small text-muted">Create custom modules</div>
+                                </div>
+                            </a>
+                            <a href="authentication.html" class="quick-link-item">
+                                <i class="fas fa-lock"></i>
+                                <div>
+                                    <strong>Authentication</strong>
+                                    <div class="small text-muted">User authentication setup</div>
+                                </div>
+                            </a>
+                            <a href="api-development.html" class="quick-link-item">
+                                <i class="fas fa-code"></i>
+                                <div>
+                                    <strong>API Development</strong>
+                                    <div class="small text-muted">Build RESTful APIs</div>
+                                </div>
+                            </a>
+                            <a href="testing.html" class="quick-link-item">
+                                <i class="fas fa-vial"></i>
+                                <div>
+                                    <strong>Testing</strong>
+                                    <div class="small text-muted">Unit and integration tests</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-php.min.js"></script>
+</body>
+</html>
