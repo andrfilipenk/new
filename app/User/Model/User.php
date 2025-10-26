@@ -11,7 +11,6 @@ class User extends \Core\Acl\User
     /**
      *
      * @param int $id
-     * @return User
      */
     static public function byCustomID($id)
     {

@@ -18,7 +18,7 @@ use App\Eav\Schema\Migration\MigrationValidator;
 use App\Eav\Schema\Backup\BackupManager;
 use App\Eav\Schema\Backup\BackupType;
 use App\Eav\Schema\Backup\RestoreOptions;
-use App\Eav\Config\EntityTypeRegistry;
+use Core\Eav\Config\EntityTypeRegistry;
 use Core\Database\Connection;
 
 // Initialize dependencies

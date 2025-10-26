@@ -11,7 +11,6 @@ abstract class AbstractController extends Controller {
     /**
      * Undocumented function
      *
-     * @return UserModel
      */
     protected function userByGetID()
     {
@@ -22,7 +21,6 @@ abstract class AbstractController extends Controller {
     /**
      * Undocumented function
      *
-     * @return void
      */
     public function beforeExecute()
     {
@@ -36,7 +34,7 @@ abstract class AbstractController extends Controller {
         return parent::beforeExecute();
     }
 
-    protected function render(string $template = null, array $data = []): string
+    protected function render($template = null, array $data = []): string
     {
         return $this->getView()->render($template, $data);
     }

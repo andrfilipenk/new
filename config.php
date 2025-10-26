@@ -4,7 +4,7 @@ return [
     'app' => [
         'name'              => 'My Application',
         'version'           => '1.0.0',
-        'base'              => '/new/',
+        'base'              => 'http://new.local/',
         'debug'             => true,
         'hash_algo'         => PASSWORD_BCRYPT,
         'module' => [

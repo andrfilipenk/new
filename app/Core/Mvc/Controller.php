@@ -205,11 +205,11 @@ abstract class Controller
     /**
      * Render template with vars
      *
-     * @param string $template
+     * @param $template
      * @param array $data
      * @return string
      */
-    protected function render(string $template = null, array $data = []): string
+    protected function render($template = null, array $data = []): string
     {
         $dispatcher = $this->getDispatcher();
         if ($template === null) {

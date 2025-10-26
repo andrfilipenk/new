@@ -1,3 +1,18 @@
+ <div class="row">
+        <?php foreach ($statuses as $status): ?>
+            <div class="col">
+                <h2><?=$status->title?></h2>
+                <?php foreach ($status->tasks as $task): ?>
+                    <div class="enterprise-card">
+                        <div class="enterprise-card__body">
+                            <h3 class="enterprise-card__title"><?=$task->title ?></h3>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endforeach; ?>
+    </div>
+
 <div class="enterprise-alert enterprise-alert--info" style="display: none ;">
     <div class="enterprise-alert__icon">
         <i class="bi bi-info-circle"></i>
@@ -162,6 +177,16 @@
                 demoModalInstance.close();
             }
         }
+
+
+        document.getElementById('simpleTaskForm').addEventListener('ajax-form:success', (e) => {
+            const { result, response } = e.detail;
+            if (result.status === 'success') {
+                const task = result.item;
+                console.log(task);
+                //  window.location.href = '/board';
+            } 
+        });
     </script>
 <?php $this->endSection(); ?>
 

@@ -40,4 +40,4 @@ $di->set('exceptionHandler', fn() => new \Core\Exception\ExceptionHandler());
 $di->register('\Core\Provider\CookieServiceProvider');
 $di->register('\Core\Provider\SessionServiceProvider');
 $di->register('\Main\Provider\ViewServiceProvider');
-$di->register('\Core\Eav\Provider\EavServiceProvider');
+#$di->register('\Core\Eav\Provider\EavServiceProvider');

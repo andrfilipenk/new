@@ -3,6 +3,7 @@
 namespace Core\Database;
 
 use Core\Di\Container;
+use Core\Database\Model\Relation;
 use Core\Database\Model\HasOne;
 use Core\Database\Model\HasMany;
 use Core\Database\Model\BelongsTo;
@@ -381,7 +382,7 @@ abstract class Model
 
     /**
      *
-     * @param string $key
+     * @param $key
      * @param mixed $value
      * @return void
      */
@@ -522,7 +523,7 @@ abstract class Model
      *
      * @param string $key
      * @param int|float|string|boolean|array|\DateTime $value
-     * @return void
+     * @return 
      */
     protected function castAttribute(string $key, $value)
     {

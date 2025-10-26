@@ -5,6 +5,7 @@ namespace User\Controller;
 use Core\Pagination\DatabasePaginator;
 use Core\Pagination\PaginatorView;
 use Intern\Model\TaskPriority;
+use Intern\Model\TaskStatus;
 use User\Model\Activity;
 use User\Model\User;
 
@@ -28,12 +29,15 @@ class BoardController extends AbstractController
             return $this->getResponse()->json($paginator->toArray());
         }
 
+        $statuses = TaskStatus::all();
+
         return $this->render('user/board/index', [
             'tasks'         => $paginator->items(),
             'totalTasks'    => $paginator->total(),
             'pagination'    => PaginatorView::make($paginator, ['view' => 'bootstrap']),
             'activities'    => Activity::getRecent(),
-            'priorities'    => TaskPriority::all()
+            'priorities'    => TaskPriority::all(),
+            'statuses'      => $statuses,
         ]);
     }
     

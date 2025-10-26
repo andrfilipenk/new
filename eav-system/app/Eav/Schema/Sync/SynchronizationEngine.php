@@ -9,7 +9,7 @@ use App\Eav\Schema\Migration\MigrationExecutor;
 use App\Eav\Schema\Backup\BackupManager;
 use App\Eav\Schema\DifferenceSet;
 use App\Eav\Schema\SchemaDifference;
-use App\Eav\Config\EntityTypeRegistry;
+use Core\Eav\Config\EntityTypeRegistry;
 use Core\Database\Connection;
 use Core\Events\EventDispatcher;
 

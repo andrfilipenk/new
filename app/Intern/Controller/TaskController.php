@@ -16,11 +16,14 @@ class TaskController extends Controller
             $item = $request->post();
             $item['created_by'] = $this->getSession()->get('user');
             $task = new TaskModel($item);
-            if ($task->save())
+            if ($task->save()) {
+
+            }
 
 
             return $this->getResponse()->json([
                 'status'    => 'success',
+                #'redirect'  => $this->url('board'),
                 'message'   => 'Vielen Dank',
                 'item'      => $item
             ]);

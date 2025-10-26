@@ -1,6 +1,7 @@
 <?php
 /** @var \Core\Utils\Url $url */
 $url = $this->getDI()->get('url');
+$today = date('Y-m-d');
 ?>
 <form class="row" 
       method="post" 
@@ -22,9 +23,9 @@ $url = $this->getDI()->get('url');
     </div>
     <div class="col">
         <div class="input-group">
-            <input type="date" class="enterprise-input" value="2025-10-16" name="begin_date" id="begin_date" required>
+            <input type="date" class="enterprise-input" value="<?=$today?>" name="begin_date" id="begin_date" required>
             <span class="input-group-text">-</span>
-            <input type="date" class="enterprise-input" min="2025-10-16" name="end_date" id="end_date" required>
+            <input type="date" class="enterprise-input" min="<?=$today?>" value="<?=$today?>" name="end_date" id="end_date" required>
         </div>
     </div>
     <div class="col-1">
@@ -32,19 +33,3 @@ $url = $this->getDI()->get('url');
     </div>
 </form>
 
-
-
-<?php $this->startSection('html-footer'); ?>
-    <script>
-    document.getElementById('simpleTaskForm').addEventListener('ajax-form:success', (e) => {
-        e.stopPropagation();
-        const { result, response } = e.detail;
-        if (result === 'success') {
-            const task = response.item;
-            
-            alert(response.message); // e.g., "Logged in successfully."
-            //  window.location.href = '/board';
-        } 
-    });
-    </script>
-<?php $this->endSection(); ?>
